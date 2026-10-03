@@ -1,0 +1,170 @@
+{
+  "$schema": "./asset-manifest.schema.md",
+  "version": "1.2",
+  "summary": {
+    "scope": "IMPERIVM premium art direction (package 1A pilot).",
+    "engine": "lib/engine/ \u2014 preserved verbatim. Game balance, card IDs, hero IDs, and gameplay rules are unaffected by this manifest.",
+    "style_reference": "docs/art-direction/style-bible.md",
+    "transport_notes": "docs/imagegen/transport-notes.md",
+    "delivered": 5,
+    "contact_sheet": "public/preview/1a-contact-sheet.webp"
+  },
+  "assets": [
+    {
+      "id": "imperator-liquidus",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/imperator-liquidus.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/imperator-liquidus.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "png",
+      "response_format": "b64_json",
+      "output_compression": null,
+      "asset_path": "public/cards/imperator-liquidus.webp",
+      "raw_path": ".orchestration/imagegen/raw/imperator-liquidus.webp",
+      "sidecar_path": ".orchestration/imagegen/raw/imperator-liquidus.webp.sse.json",
+      "preview_path": ".orchestration/imagegen/review/imperator-liquidus.preview.webp",
+      "public_bytes": 263210,
+      "sha256": "a467ecc3b594a43150b3145f0a9abed0cb8ae6f3ab3d088ae15142604fea83be",
+      "image_size": [
+        1024,
+        1536
+      ],
+      "jpeg_size": null,
+      "bytes": 283194,
+      "verify_ok": true,
+      "source_event": "image_generation.partial_image (raw SSE pipeline v1 \u2014 non-streaming urllib, single-part)",
+      "transport": "urllib-non-streaming (legacy)",
+      "review_notes": "matches requested."
+    },
+    {
+      "id": "genesis-pfp",
+      "kind": "card",
+      "model": "gpt-image-2.5-flare",
+      "prompt_file": ".orchestration/imagegen/prompts/genesis-pfp.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/genesis-pfp.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": null,
+      "asset_path": "public/cards/genesis-pfp.webp",
+      "raw_path": ".orchestration/imagegen/raw/genesis-pfp.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/genesis-pfp.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 344076,
+      "sha256": "69209edd07521e7f602845250187faf955106e3cbeca7698fd05e514f4b7bc5e",
+      "image_size": [
+        1145,
+        1374
+      ],
+      "jpeg_size": [
+        1145,
+        1374
+      ],
+      "bytes": 313749,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator decision to accept or downscale/crop before final packaging."
+    },
+    {
+      "id": "the-grand-cartographer",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/the-grand-cartographer.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/the-grand-cartographer.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": null,
+      "asset_path": "public/cards/the-grand-cartographer.webp",
+      "raw_path": ".orchestration/imagegen/raw/the-grand-cartographer.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/the-grand-cartographer.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 339718,
+      "sha256": "1fabfb5d0202979ee6b319223107cff0ee7e0305cd97eccf62a4d0a131f07ce0",
+      "image_size": [
+        1024,
+        1536
+      ],
+      "jpeg_size": [
+        1024,
+        1536
+      ],
+      "bytes": 316738,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; matches requested 1024x1536 aspect."
+    },
+    {
+      "id": "fud-hydra",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/fud-hydra.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/fud-hydra.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": null,
+      "asset_path": "public/cards/fud-hydra.webp",
+      "raw_path": ".orchestration/imagegen/raw/fud-hydra.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/fud-hydra.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 364648,
+      "sha256": "b3d14ab65bf3f67b5129f9e729fcc96e50319cc476d29d89a91be11172f133bb",
+      "image_size": [
+        1024,
+        1536
+      ],
+      "jpeg_size": [
+        1024,
+        1536
+      ],
+      "bytes": 331897,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; matches requested 1024x1536 aspect."
+    },
+    {
+      "id": "whale",
+      "kind": "hero",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/whale.coin.txt",
+      "negative_file": ".orchestration/imagegen/prompts/whale.coin.negative.txt",
+      "requested_size": "1024x1024",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/heroes/whale.webp",
+      "raw_path": ".orchestration/imagegen/raw/whale.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/whale.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 399552,
+      "sha256": "cb3cddadc1e75f96eff1ad30c4b38fc8f75e13c03464b1b2830391aa3f2d0fae",
+      "image_size": [
+        1254,
+        1254
+      ],
+      "jpeg_size": [
+        1254,
+        1254
+      ],
+      "bytes": 399552,
+      "verify_ok": true,
+      "source_event": "image_generation.completed",
+      "transport": "curl-http1.1",
+      "review_notes": "coin redesign accepted; deep violet vault obsidian void, oversized aureus-style portrait (left facing imperial profile + laurel), no text, no frame, no UI; replaces v1 (emperor holding coin). sha256 and dimensions from on-disk final.",
+      "webp_size": [
+        1254,
+        1254
+      ]
+    }
+  ]
+}
