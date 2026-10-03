@@ -1,12 +1,12 @@
 {
   "$schema": "./asset-manifest.schema.md",
-  "version": "1.2",
+  "version": "1.3",
   "summary": {
-    "scope": "IMPERIVM premium art direction (package 1A pilot).",
+    "scope": "IMPERIVM premium art direction (package 1C: hero coins + board backgrounds + new Audit card).",
     "engine": "lib/engine/ \u2014 preserved verbatim. Game balance, card IDs, hero IDs, and gameplay rules are unaffected by this manifest.",
     "style_reference": "docs/art-direction/style-bible.md",
     "transport_notes": "docs/imagegen/transport-notes.md",
-    "delivered": 5,
+    "delivered": 48,
     "contact_sheet": "public/preview/1a-contact-sheet.webp"
   },
   "assets": [
@@ -164,6 +164,1367 @@
       "webp_size": [
         1254,
         1254
+      ]
+    },
+    {
+      "id": "lending-legionnaire",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/lending-legionnaire.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/lending-legionnaire.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/lending-legionnaire.webp",
+      "raw_path": ".orchestration/imagegen/raw/lending-legionnaire.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/lending-legionnaire.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 664476,
+      "sha256": "3d9e3ce593eeab553c51ad0d7ecf1222bf16103edd8ef357dc63224bc9322e2f",
+      "image_size": [
+        1070,
+        1470
+      ],
+      "jpeg_size": [
+        1070,
+        1470
+      ],
+      "bytes": 309654,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "liquidation-officer",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/liquidation-officer.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/liquidation-officer.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/liquidation-officer.webp",
+      "raw_path": ".orchestration/imagegen/raw/liquidation-officer.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/liquidation-officer.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 653076,
+      "sha256": "785dc6972ef450e2163e97262a54675e58644461c055b6abac1029fe3475843c",
+      "image_size": [
+        1070,
+        1470
+      ],
+      "jpeg_size": [
+        1070,
+        1470
+      ],
+      "bytes": 281684,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "amm-centurion",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/amm-centurion.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/amm-centurion.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/amm-centurion.webp",
+      "raw_path": ".orchestration/imagegen/raw/amm-centurion.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/amm-centurion.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 956816,
+      "sha256": "4db492181f5442a927848e17e737b2dc46ef382be3583564619180a3f234e467",
+      "image_size": [
+        1063,
+        1480
+      ],
+      "jpeg_size": [
+        1063,
+        1480
+      ],
+      "bytes": 348402,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "frontrun-bot",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/frontrun-bot.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/frontrun-bot.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/frontrun-bot.webp",
+      "raw_path": ".orchestration/imagegen/raw/frontrun-bot.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/frontrun-bot.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 762030,
+      "sha256": "7accaea51261d894f0be712f82a1bee4188d84b6c6fc837fc47b62fc2f17225d",
+      "image_size": [
+        1024,
+        1536
+      ],
+      "jpeg_size": [
+        1024,
+        1536
+      ],
+      "bytes": 301270,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; matches requested 1024x1536 aspect."
+    },
+    {
+      "id": "priority-fee",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/priority-fee.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/priority-fee.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/priority-fee.webp",
+      "raw_path": ".orchestration/imagegen/raw/priority-fee.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/priority-fee.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 763906,
+      "sha256": "92aa3e84e24439d285770f2c869412628aed4edc48ab0e45d85c1de443e63504",
+      "image_size": [
+        1106,
+        1422
+      ],
+      "jpeg_size": [
+        1106,
+        1422
+      ],
+      "bytes": 266498,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "staking-pool",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/staking-pool.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/staking-pool.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/staking-pool.webp",
+      "raw_path": ".orchestration/imagegen/raw/staking-pool.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/staking-pool.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 684578,
+      "sha256": "ffaa5e2d6ec90bf29d2a821ea601e602970a3af664b00399837e91fb9f58c0d9",
+      "image_size": [
+        1024,
+        1536
+      ],
+      "jpeg_size": [
+        1024,
+        1536
+      ],
+      "bytes": 301960,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; matches requested 1024x1536 aspect."
+    },
+    {
+      "id": "yield-farmer",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/yield-farmer.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/yield-farmer.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/yield-farmer.webp",
+      "raw_path": ".orchestration/imagegen/raw/yield-farmer.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/yield-farmer.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 828650,
+      "sha256": "a2f6f68893ee2fe57c3d7704f069aead6de56abfd2fe0ed2dfb9915a875ec620",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 316524,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "flash-loan",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/flash-loan.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/flash-loan.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/flash-loan.webp",
+      "raw_path": ".orchestration/imagegen/raw/flash-loan.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/flash-loan.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 791012,
+      "sha256": "4237a136f58d040c4ae8fab07694aae30272d85ac278c4087dfc247e5dc96089",
+      "image_size": [
+        1082,
+        1454
+      ],
+      "jpeg_size": [
+        1082,
+        1454
+      ],
+      "bytes": 270004,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "impermanent-guard",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/impermanent-guard.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/impermanent-guard.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/impermanent-guard.webp",
+      "raw_path": ".orchestration/imagegen/raw/impermanent-guard.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/impermanent-guard.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 628004,
+      "sha256": "6ef3bd19408cace2ddf35dc6b5fc384f02a0783e11925a3f7cd38af5b31c2257",
+      "image_size": [
+        1024,
+        1536
+      ],
+      "jpeg_size": [
+        1024,
+        1536
+      ],
+      "bytes": 292271,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; matches requested 1024x1536 aspect."
+    },
+    {
+      "id": "pixel-squire",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/pixel-squire.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/pixel-squire.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/pixel-squire.webp",
+      "raw_path": ".orchestration/imagegen/raw/pixel-squire.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/pixel-squire.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 625544,
+      "sha256": "b0655cd61fd92d574b59cb04ef29aa004130860057df121062f4fd51c2e0e6df",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 329303,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "whitelist-scout",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/whitelist-scout.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/whitelist-scout.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/whitelist-scout.webp",
+      "raw_path": ".orchestration/imagegen/raw/whitelist-scout.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/whitelist-scout.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 594594,
+      "sha256": "dbb979a8ea8c22f5c874b0baf6fcb93425ace2f2122f445ec82f5baba198924a",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 306659,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "profile-pic-phalanx",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/profile-pic-phalanx.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/profile-pic-phalanx.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/profile-pic-phalanx.webp",
+      "raw_path": ".orchestration/imagegen/raw/profile-pic-phalanx.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/profile-pic-phalanx.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 618078,
+      "sha256": "265bebb073be3313b4dd12be87e6247fb1d0268395aff101b9191153d9127a2e",
+      "image_size": [
+        1070,
+        1470
+      ],
+      "jpeg_size": [
+        1070,
+        1470
+      ],
+      "bytes": 317945,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "trait-reroll",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/trait-reroll.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/trait-reroll.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/trait-reroll.webp",
+      "raw_path": ".orchestration/imagegen/raw/trait-reroll.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/trait-reroll.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 737042,
+      "sha256": "2253992f8754199ff470207d7ae3ff71ee3cf175c6adec40ef93aa2b690c9842",
+      "image_size": [
+        1082,
+        1454
+      ],
+      "jpeg_size": [
+        1082,
+        1454
+      ],
+      "bytes": 311917,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "floor-sweeper",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/floor-sweeper.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/floor-sweeper.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/floor-sweeper.webp",
+      "raw_path": ".orchestration/imagegen/raw/floor-sweeper.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/floor-sweeper.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 671250,
+      "sha256": "de103b145c1de70e3d4b6f5aacb6106b10a23cc260a2ec4e3a67779740355a5f",
+      "image_size": [
+        1024,
+        1536
+      ],
+      "jpeg_size": [
+        1024,
+        1536
+      ],
+      "bytes": 306991,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; matches requested 1024x1536 aspect."
+    },
+    {
+      "id": "ape-praetorian",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/ape-praetorian.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/ape-praetorian.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/ape-praetorian.webp",
+      "raw_path": ".orchestration/imagegen/raw/ape-praetorian.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/ape-praetorian.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 804402,
+      "sha256": "68bb46c9aa3d205bb9ce968b938886729cb7d72587c1d9c50ead1a660048ff96",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 317477,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "reveal-ceremony",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/reveal-ceremony.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/reveal-ceremony.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/reveal-ceremony.webp",
+      "raw_path": ".orchestration/imagegen/raw/reveal-ceremony.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/reveal-ceremony.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 604130,
+      "sha256": "5e1575446df8951be7f6c793df8914fc85e9807f5b41929febfda221048d867b",
+      "image_size": [
+        1122,
+        1402
+      ],
+      "jpeg_size": [
+        1122,
+        1402
+      ],
+      "bytes": 331372,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "minting-press",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/minting-press.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/minting-press.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/minting-press.webp",
+      "raw_path": ".orchestration/imagegen/raw/minting-press.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/minting-press.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 775850,
+      "sha256": "6494c3dd97732bca0ffe3e62070df03726914219c7b315c48efd8f36207e3d9d",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 322641,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "antenna-auxilia",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/antenna-auxilia.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/antenna-auxilia.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/antenna-auxilia.webp",
+      "raw_path": ".orchestration/imagegen/raw/antenna-auxilia.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/antenna-auxilia.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 957854,
+      "sha256": "89e9247daaa5ed715543571b9c712f8ded596cace46c2cb772e0c2dc1d3d294d",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 291227,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "blue-chip-basilisk",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/blue-chip-basilisk.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/blue-chip-basilisk.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/blue-chip-basilisk.webp",
+      "raw_path": ".orchestration/imagegen/raw/blue-chip-basilisk.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/blue-chip-basilisk.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 683648,
+      "sha256": "9c1d60962b44cd19719d055db2e70a4bea201429213f4f8ded17af20d5f81e8e",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 311975,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "mesh-messenger",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/mesh-messenger.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/mesh-messenger.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/mesh-messenger.webp",
+      "raw_path": ".orchestration/imagegen/raw/mesh-messenger.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/mesh-messenger.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 810194,
+      "sha256": "bf959a1ff25803fd15252d603b907dba4d11452177f5ed2b59a5b60fea66d3d4",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 280648,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "relay-runner",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/relay-runner.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/relay-runner.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/relay-runner.webp",
+      "raw_path": ".orchestration/imagegen/raw/relay-runner.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/relay-runner.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 768508,
+      "sha256": "19462bb3e03260a914c1e5fe3a09a695f8fdb8c03a8911d1a7e5ea17d53453f4",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 315664,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "node-sentinel",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/node-sentinel.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/node-sentinel.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/node-sentinel.webp",
+      "raw_path": ".orchestration/imagegen/raw/node-sentinel.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/node-sentinel.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 873744,
+      "sha256": "8fbe5ef5b6855eafa03899b7fe1523cf2f48c4ec0b5229a51f2b8c203be55bd9",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 306279,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "bandwidth-barbarian",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/bandwidth-barbarian.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/bandwidth-barbarian.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/bandwidth-barbarian.webp",
+      "raw_path": ".orchestration/imagegen/raw/bandwidth-barbarian.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/bandwidth-barbarian.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 807562,
+      "sha256": "3069392507dae09743cb3bae9260872621a89d234887570fd3847b69dbd338a8",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 340006,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "hotspot-hoplite",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/hotspot-hoplite.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/hotspot-hoplite.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/hotspot-hoplite.webp",
+      "raw_path": ".orchestration/imagegen/raw/hotspot-hoplite.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/hotspot-hoplite.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 771080,
+      "sha256": "e16c39822aac4e9c5bc758ccfce367aee67ea1fac3329661b2ea9e2596c62f11",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 327351,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "gps-gladiator",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/gps-gladiator.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/gps-gladiator.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/gps-gladiator.webp",
+      "raw_path": ".orchestration/imagegen/raw/gps-gladiator.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/gps-gladiator.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 776608,
+      "sha256": "56996b219ec0f5310cdf40fc7b09c18e286a18f05b631b4781a61462541e4d05",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 306231,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "solar-sapper",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/solar-sapper.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/solar-sapper.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/solar-sapper.webp",
+      "raw_path": ".orchestration/imagegen/raw/solar-sapper.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/solar-sapper.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 925136,
+      "sha256": "62e46b6c55e4b2e3c17997456204a4d1a4ceebac5552044a6a0088fa26c17de7",
+      "image_size": [
+        1079,
+        1458
+      ],
+      "jpeg_size": [
+        1079,
+        1458
+      ],
+      "bytes": 312675,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "firmware-phalanx",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/firmware-phalanx.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/firmware-phalanx.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/firmware-phalanx.webp",
+      "raw_path": ".orchestration/imagegen/raw/firmware-phalanx.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/firmware-phalanx.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 723222,
+      "sha256": "4fd0b97e49fe416eba689523cb1e18ec985829d3830738e966a30f75b8d1bca0",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 317392,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "jeet-legion",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/jeet-legion.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/jeet-legion.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/jeet-legion.webp",
+      "raw_path": ".orchestration/imagegen/raw/jeet-legion.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/jeet-legion.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 820220,
+      "sha256": "b6a368408a32185d99dbc7b3d70af879750a15b5b54351d4cc100d620206c121",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 278042,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "gm-greeter",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/gm-greeter.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/gm-greeter.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/gm-greeter.webp",
+      "raw_path": ".orchestration/imagegen/raw/gm-greeter.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/gm-greeter.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 817744,
+      "sha256": "69f58586bc2c0020649bb7ee7d2de5c05d27ed34293adaf7d23f0e6f515d4bbf",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 284834,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "sandwich-attacker",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/sandwich-attacker.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/sandwich-attacker.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/sandwich-attacker.webp",
+      "raw_path": ".orchestration/imagegen/raw/sandwich-attacker.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/sandwich-attacker.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 910710,
+      "sha256": "939e1b236549cbe6d1e84f6eef813ce3e35d9fe1c556a1981fb4c8ba5fa9f421",
+      "image_size": [
+        1024,
+        1536
+      ],
+      "jpeg_size": [
+        1024,
+        1536
+      ],
+      "bytes": 283899,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; matches requested 1024x1536 aspect."
+    },
+    {
+      "id": "dogen",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/dogen.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/dogen.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/dogen.webp",
+      "raw_path": ".orchestration/imagegen/raw/dogen.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/dogen.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 772064,
+      "sha256": "9442119224996d7dbffa0fe9c713312b4f1e7987905e82f5ab12861ad10d64a3",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 298809,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "pepito",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/pepito.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/pepito.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/pepito.webp",
+      "raw_path": ".orchestration/imagegen/raw/pepito.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/pepito.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 866600,
+      "sha256": "c0a5850c5fa976282620847278cbf166b94052bb77439c97b7fd57ab936848f0",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 300569,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "pump-chaser",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/pump-chaser.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/pump-chaser.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/pump-chaser.webp",
+      "raw_path": ".orchestration/imagegen/raw/pump-chaser.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/pump-chaser.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 915904,
+      "sha256": "9b5831d701c29b27d53af56c0af692fbfceeeb489eaf35fbab651fe9119bd11e",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 274493,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "diamond-hoarder",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/diamond-hoarder.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/diamond-hoarder.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/diamond-hoarder.webp",
+      "raw_path": ".orchestration/imagegen/raw/diamond-hoarder.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/diamond-hoarder.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 845980,
+      "sha256": "f24646c02b8ad5312ae898c20e971c9ac3fb93fb74ff1da984656020e0c66ca2",
+      "image_size": [
+        1064,
+        1479
+      ],
+      "jpeg_size": [
+        1064,
+        1479
+      ],
+      "bytes": 294074,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "to-the-moon-militia",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/to-the-moon-militia.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/to-the-moon-militia.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/to-the-moon-militia.webp",
+      "raw_path": ".orchestration/imagegen/raw/to-the-moon-militia.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/to-the-moon-militia.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 972526,
+      "sha256": "b408c4bec3aaafddc5a5b82eca5db1411b9e097000d1337962cd8d23ba8f302f",
+      "image_size": [
+        1024,
+        1536
+      ],
+      "jpeg_size": [
+        1024,
+        1536
+      ],
+      "bytes": 342649,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; matches requested 1024x1536 aspect."
+    },
+    {
+      "id": "rug-pull",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/rug-pull.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/rug-pull.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/rug-pull.webp",
+      "raw_path": ".orchestration/imagegen/raw/rug-pull.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/rug-pull.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 906694,
+      "sha256": "5741370183a8bbced384aa7364f60273f33d0ff00b404dcd5337cdc73133769c",
+      "image_size": [
+        1122,
+        1402
+      ],
+      "jpeg_size": [
+        1122,
+        1402
+      ],
+      "bytes": 335278,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "delivered as observed; aspect differs from requested \u2014 coordinator direction: accept as observed."
+    },
+    {
+      "id": "degen",
+      "kind": "hero",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/degen.coin.txt",
+      "negative_file": ".orchestration/imagegen/prompts/degen.coin.negative.txt",
+      "requested_size": "1024x1024",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/heroes/degen.webp",
+      "raw_path": ".orchestration/imagegen/raw/degen.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/degen.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 415812,
+      "sha256": "8fb9f13f7778d4ff8782c7e86a0c30c08964a79d95a47859351777a5db685f00",
+      "image_size": [
+        1254,
+        1254
+      ],
+      "jpeg_size": [
+        1254,
+        1254
+      ],
+      "bytes": 363218,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "young Roman gambler profile, tousled hair, slipping laurel, coin behind ear; same aureus style, distinct face from whale/builder/validator.",
+      "webp_size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "id": "builder",
+      "kind": "hero",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/builder.coin.txt",
+      "negative_file": ".orchestration/imagegen/prompts/builder.coin.negative.txt",
+      "requested_size": "1024x1024",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/heroes/builder.webp",
+      "raw_path": ".orchestration/imagegen/raw/builder.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/builder.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 455524,
+      "sha256": "bd932aa2c0f84dd5de787141494470b542b24de18dfb146d96b8f54bcc9f581a",
+      "image_size": [
+        1254,
+        1254
+      ],
+      "jpeg_size": [
+        1254,
+        1254
+      ],
+      "bytes": 390819,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "female Roman architect profile, olive-leaf crown, marble-blueprint edge motif; same aureus style with distinct face from whale; replaces legacy default.",
+      "webp_size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "id": "validator",
+      "kind": "hero",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/validator.coin.txt",
+      "negative_file": ".orchestration/imagegen/prompts/validator.coin.negative.txt",
+      "requested_size": "1024x1024",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/heroes/validator.webp",
+      "raw_path": ".orchestration/imagegen/raw/validator.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/validator.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 421676,
+      "sha256": "efb0705f08d630088ddf6ccd8849db43dcf4b02a5c0c776e994ec06df1350f0d",
+      "image_size": [
+        1254,
+        1254
+      ],
+      "jpeg_size": [
+        1254,
+        1254
+      ],
+      "bytes": 370686,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "older stern Roman magistrate profile, grey beard, full laurel crown, balance-scale edge motif; same aureus style, distinct face from whale/builder/degen.",
+      "webp_size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "id": "board-marble",
+      "kind": "board",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/board.marble.txt",
+      "negative_file": ".orchestration/imagegen/prompts/board.marble.negative.txt",
+      "requested_size": "1536x1024",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/boards/marble.webp",
+      "raw_path": ".orchestration/imagegen/raw/board-marble.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/board-marble.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 272362,
+      "sha256": "a0772cf9091e6f6259d98adc2bad0b911ac7f9a60689d9126c3ee40ef77c22ed",
+      "image_size": [
+        1536,
+        1024
+      ],
+      "jpeg_size": [
+        1536,
+        1024
+      ],
+      "bytes": 268507,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "Roman marble architectural edges top/bottom, dark clean center band for card UI; painterly oil; no UI/text.",
+      "webp_size": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "id": "board-lava",
+      "kind": "board",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/board.lava.txt",
+      "negative_file": ".orchestration/imagegen/prompts/board.lava.negative.txt",
+      "requested_size": "1536x1024",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/boards/lava.webp",
+      "raw_path": ".orchestration/imagegen/raw/board-lava.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/board-lava.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 244304,
+      "sha256": "6c73717d4658eb8aa29d56cdc1215a22d1cbba98baab77219bac379a64b06617",
+      "image_size": [
+        1536,
+        1024
+      ],
+      "jpeg_size": [
+        1536,
+        1024
+      ],
+      "bytes": 243433,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "Roman volcanic basalt architectural edges, dim ember uplight, dark clean center; painterly oil; no UI/text.",
+      "webp_size": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "id": "board-neon",
+      "kind": "board",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/board.neon.txt",
+      "negative_file": ".orchestration/imagegen/prompts/board.neon.negative.txt",
+      "requested_size": "1536x1024",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/boards/neon.webp",
+      "raw_path": ".orchestration/imagegen/raw/board-neon.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/board-neon.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 212588,
+      "sha256": "ca1aa4314aae4514c2d0cee8813814d4816a69c3b54180ddbbd396a0ef9ebdb3",
+      "image_size": [
+        1536,
+        1024
+      ],
+      "jpeg_size": [
+        1536,
+        1024
+      ],
+      "bytes": 226271,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "Roman obsidian-and-gold architectural edges with thin turquoise tracer lines, dark clean center; painterly oil; no UI/text.",
+      "webp_size": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "id": "audit",
+      "kind": "card",
+      "model": "gpt-image-2.5-sunburst",
+      "prompt_file": ".orchestration/imagegen/prompts/audit.prompt.txt",
+      "negative_file": ".orchestration/imagegen/prompts/audit.negative.txt",
+      "requested_size": "1024x1536",
+      "quality": "high",
+      "output_format": "jpeg",
+      "response_format": "b64_json",
+      "output_compression": 80,
+      "asset_path": "public/cards/audit.webp",
+      "raw_path": ".orchestration/imagegen/raw/audit.jpeg",
+      "sidecar_path": ".orchestration/imagegen/raw/audit.jpeg.sse.json",
+      "preview_path": null,
+      "public_bytes": 254894,
+      "sha256": "0a3bfad86701335f05ff11a785a48ab011ecd14640ea89983e47b3fb90e22afd",
+      "image_size": [
+        1024,
+        1536
+      ],
+      "jpeg_size": [
+        1024,
+        1536
+      ],
+      "bytes": 251427,
+      "verify_ok": true,
+      "source_event": "completed",
+      "transport": "curl-http1.1",
+      "review_notes": "DeFi rare audit: imperial magistrate pressing crimson wax seal onto marble ledger, rug-pull crimson wisps pinned beneath seal, gold laurel-and-pillar +1/+1 rune motif at page corner; no text/lettering/UI.",
+      "webp_size": [
+        1024,
+        1536
       ]
     }
   ]
