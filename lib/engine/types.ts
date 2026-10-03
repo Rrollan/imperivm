@@ -2,7 +2,7 @@
  * IMPERIVM — engine contract v1.
  *
  * This file is the source of truth shared by engine, content, AI and UI.
- * DO NOT modify it — implement against it.
+ * Extend additively; existing required fields and actions remain compatible.
  */
 
 export type Faction = 'DeFi' | 'NFT' | 'DePIN' | 'Meme';
@@ -43,6 +43,10 @@ export interface CardDef {
   battlecry?: EffectDef; // minion: on play
   spell?: EffectDef; // spell: on resolve from mempool
   priority?: boolean; // on play/cast: immediately counter highest-cost enemy mempool spell
+  /* --- package 4A: additive keywords (all optional, default false) --- */
+  taunt?: boolean; // enemy attackers must target this minion before non-taunt minions or hero
+  rush?: boolean; // can attack the turn played, but only enemy minions (not hero)
+  lifesteal?: boolean; // damage dealt heals damage source owner's treasury by actual hp removed
 }
 
 export type HeroPowerKind =
@@ -75,6 +79,12 @@ export interface Minion {
   maxHealth: number;
   canAttack: boolean;
   staked: boolean;
+  /* --- package 4A: optional keyword instances; engine normalizes absent -> false / fresh=true --- */
+  taunt?: boolean;
+  rush?: boolean;
+  lifesteal?: boolean;
+  /* true until the start of this minion owner's next turn; gate for "first turn" rules */
+  fresh?: boolean;
 }
 
 export interface MempoolEntry {
@@ -95,6 +105,10 @@ export interface PlayerState {
   maxGas: number;
   heroPowerUsed: boolean;
   fatigue: number; // increments each empty draw
+  /* --- package 4A: optional additive bookkeeping (engine normalizes absent -> defaults) --- */
+  mulliganUsed?: boolean;
+  factionPlaysThisTurn?: Partial<Record<Faction, number>>;
+  pavilionBonuses?: Faction[];
 }
 
 export interface GameState {
@@ -114,22 +128,56 @@ export type Action =
   | { type: 'hero-power' }
   | { type: 'stake'; uid: string }
   | { type: 'unstake'; uid: string }
-  | { type: 'end-turn' };
+  | { type: 'end-turn' }
+  | { type: 'mulligan'; uids: string[] }; // package 4A: opt-in one-shot starting hand rebuild
+
+/**
+ * Optional additive options for createGame (package 4A). The 5-argument
+ * legacy signature createGame(heroA, deckA, heroB, deckB, seed?) is
+ * preserved unchanged; the engine additionally accepts a 6-argument
+ * form createGame(heroA, deckA, heroB, deckB, opts, seed?) where opts
+ * is this object. When opts.enableMulligan is true the engine opens a
+ * pre-game mulligan window for each player (no other rules change).
+ */
+export interface CreateGameOptions {
+  enableMulligan?: boolean;
+  mulliganCount?: number; // default 3 for P0, 4 for P1 (matches opening draws)
+}
 
 /**
  * Engine module (lib/engine/engine.ts) MUST export:
  *
- *   createGame(heroA: string, deckA: string[], heroB: string, deckB: string[], seed?: number): GameState
- *   applyAction(state: GameState, action: Action): GameState   // returns NEW state; throws on illegal action
- *   legalActions(state: GameState): Action[]                    // all legal actions for state.turn
- *   isGameOver(state: GameState): boolean
+ *   createGame(heroA, deckA, heroB, deckB, seed?): GameState                // legacy
+ *   createGame(heroA, deckA, heroB, deckB, opts: CreateGameOptions, seed?): GameState  // additive
+ *   applyAction(state, action): GameState   // returns NEW state; throws on illegal action
+ *   legalActions(state): Action[]            // all legal actions for state.turn
+ *   isGameOver(state): boolean
+ *
+ * Additive UI helpers (package 4A):
+ *   effectivePowerCost(state, pid): number              // hero power cost incl. comeback discount
+ *   cardKeywords(cardId): { taunt; rush; lifesteal }    // static read of card keywords
+ *   mulliganDrawSize(state, pid): number                // how many cards pid may discard
+ *   canPlay(state, pid, uid): boolean                   // can this hand card be played now
+ *   enemyHasTaunt(state): boolean                       // UI highlight
+ *   mulliganAvailable(state): boolean                   // may the active player mulligan now
  *
  * Engine imports card data as:
  *   import { CARDS } from '../cards';    // Record<string, CardDef>
  *   import { HEROES } from '../heroes';  // Record<string, HeroDef>
  *
+ * Package 4A adds OPTIONAL fields on existing public types. Existing
+ * fixtures and external builders continue to type-check; the engine
+ * normalizes absent fields on clone/createGame:
+ *   Minion: taunt?, rush?, lifesteal?, fresh?    -> defaulted to false / fresh=true at summon
+ *   PlayerState: mulliganUsed?, factionPlaysThisTurn?, pavilionBonuses? -> defaulted
+ * Existing required fields and action variants retain their meaning.
+ * Keywords, faction rebates and comeback costs are deliberate rule additions.
+ * Mulligan is opt-in; the original five-argument createGame signature remains.
+ */
+
+/**
  * Rules summary (implement exactly):
- * - 30-card decks, 30 treasury each. P0 draws 3, P1 draws 4 to start. Mulligan: none.
+ * - 30-card decks, 30 treasury each. P0 draws 3, P1 draws 4 to start. Mulligan: optional pre-game selection.
  * - Turn start (after end-turn): block += 1; active player switches; FIRST resolve
  *   the new active player's mempool entries (in cast order), THEN halving tick
  *   (every minion on both boards with halvingPeriod h where block % h === 0 gets +1/+1),

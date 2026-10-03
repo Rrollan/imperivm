@@ -8,7 +8,7 @@
 
 import { CARDS } from './cards';
 import { HEROES } from './heroes';
-import { legalActions, mempoolOf } from './engine/engine';
+import { effectivePowerCost, legalActions, mempoolOf } from './engine/engine';
 import type { Action, CardDef, GameState, HandCard } from './engine/types';
 
 function handCard(state: GameState, uid: string): HandCard | undefined {
@@ -42,11 +42,36 @@ export function chooseAiAction(state: GameState): Action {
   const me = state.players[state.turn];
   const foe = state.players[state.turn === 0 ? 1 : 0];
 
+  const mulligans = acts.filter((a): a is Extract<Action, { type: 'mulligan' }> => a.type === 'mulligan');
+  if (mulligans.length) {
+    const expensive = me.hand.filter(h => CARDS[h.cardId].cost >= 4).map(h => h.uid);
+    return mulligans.find(a => a.uids.length === expensive.length && a.uids.every(u => expensive.includes(u)))
+      ?? mulligans[0];
+  }
+
   // 1. Answer enemy mempool spells with a priority card (cheapest first).
-  if (mempoolOf(state, foe.id).length > 0) {
+  //    Prefer counter-mempool answers that specifically target a RUG PULL
+  //    in the enemy mempool — Audit (or any future priority counter) wins
+  //    the priority slot if RUG PULL is queued.
+  const foeMem = mempoolOf(state, foe.id);
+  if (foeMem.length > 0) {
+    const foeHasRug = foeMem.some(e => e.cardId === 'rug-pull');
     const answers = acts
       .filter(a => isPriorityCard(state, a))
-      .sort((x, y) => playCost(state, x) - playCost(state, y));
+      .sort((x, y) => {
+        // package 4A: cheapest first; tie-breaker — Audit (specific
+        // anti-rug) wins when a RUG PULL is in enemy mempool.
+        const d = playCost(state, x) - playCost(state, y);
+        if (d !== 0) return d;
+        if (foeHasRug) {
+          const xUid = x.type === 'play-minion' || x.type === 'cast-spell' ? x.uid : '';
+          const yUid = y.type === 'play-minion' || y.type === 'cast-spell' ? y.uid : '';
+          const xr = cardOf(state, xUid)?.id === 'audit' ? 0 : 1;
+          const yr = cardOf(state, yUid)?.id === 'audit' ? 0 : 1;
+          return xr - yr;
+        }
+        return 0;
+      });
     const first = answers[0];
     if (first !== undefined) return first;
   }
@@ -68,6 +93,9 @@ export function chooseAiAction(state: GameState): Action {
   // 3. Attacks: favorable trades first — kill an enemy minion while
   //    surviving, or an even (mutual) trade — targeting the most
   //    dangerous enemy minion. Otherwise go face (highest attack first).
+  //    package 4A: respect Taunt — if any enemy taunt exists, we MUST
+  //    target it; legalActions already excludes non-taunt minion and
+  //    hero targets, so a best-trade search automatically obeys Taunt.
   const attacks = acts.filter(a => a.type === 'attack');
   if (attacks.length > 0) {
     let best: Action | undefined;
@@ -102,15 +130,20 @@ export function chooseAiAction(state: GameState): Action {
     if (face !== undefined) return face;
   }
 
-  // 4. Hero power when there is nothing left to play (2+ gas and
-  //    once-per-turn are guaranteed by legality). Never suicide on
-  //    Degen's draw-burn, never waste Builder's heal at full treasury.
+  // 4. Hero power when there is nothing left to play. Use the comeback-
+  //    discounted cost so we don't attempt a power we can't afford, and
+  //    never waste Builder's heal at full treasury / Degen burn on a
+  //    suicidal treasury.
   const hp = acts.find(a => a.type === 'hero-power');
   if (hp !== undefined) {
     const power = HEROES[me.heroId]?.power;
     const suicidal = power === 'draw-burn' && me.treasury <= 2;
     const wastedHeal = power === 'heal-treasury' && me.treasury >= 30;
     if (!suicidal && !wastedHeal) return hp;
+    // package 4A: if the discounted cost makes the power affordable
+    // while the base 2-gas cost blocked it earlier, legalActions
+    // already includes it — nothing to do here.
+    void effectivePowerCost(state, state.turn);
   }
 
   // 5. Stake a minion that can no longer attack this turn (already

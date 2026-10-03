@@ -41,8 +41,9 @@ export const CARDS: Record<string, CardDef> = {
     type: 'minion',
     attack: 2,
     health: 2,
+    lifesteal: true,
     battlecry: { kind: 'damage-random-enemy', amount: 1 },
-    text: 'Battlecry: Deal 1 damage to a random enemy minion. Your collateral was delicious.',
+    text: 'Lifesteal. Battlecry: Deal 1 damage to a random enemy minion. Your collateral was delicious.',
   },
   'frontrun-bot': {
     id: 'frontrun-bot',
@@ -111,8 +112,9 @@ export const CARDS: Record<string, CardDef> = {
     type: 'minion',
     attack: 3,
     health: 3,
+    taunt: true,
     battlecry: { kind: 'heal-treasury', amount: 4 },
-    text: 'Battlecry: Restore 4 to your treasury. Losses impermanent. Loyalty eternal.',
+    text: 'Taunt. Battlecry: Restore 4 to your treasury. Losses impermanent. Loyalty eternal.',
   },
   'imperator-liquidus': {
     id: 'imperator-liquidus',
@@ -160,7 +162,8 @@ export const CARDS: Record<string, CardDef> = {
     type: 'minion',
     attack: 1,
     health: 2,
-    text: 'Right-click. Save. Enlist.',
+    taunt: true,
+    text: 'Taunt. Right-click. Save. Enlist.',
   },
   'trait-reroll': {
     id: 'trait-reroll',
@@ -227,7 +230,8 @@ export const CARDS: Record<string, CardDef> = {
     type: 'minion',
     attack: 4,
     health: 3,
-    text: 'Gaze upon the floor price.',
+    rush: true,
+    text: 'Rush. Gaze upon the floor price.',
   },
   'genesis-pfp': {
     id: 'genesis-pfp',
@@ -309,7 +313,8 @@ export const CARDS: Record<string, CardDef> = {
     type: 'minion',
     attack: 1,
     health: 4,
-    text: 'Stake him. He holds the line — and the yield. Staked minions pay +1 gas each at turn start.',
+    taunt: true,
+    text: 'Taunt. Stake him. He holds the line — and the yield. Staked minions pay +1 gas each at turn start.',
   },
   'gps-gladiator': {
     id: 'gps-gladiator',
@@ -474,5 +479,22 @@ export const CARDS: Record<string, CardDef> = {
     type: 'spell',
     spell: { kind: 'rugpull' },
     text: 'Destroy ALL minions on both boards. Veni. Vidi. Rugi.',
+  },
+
+  // ----------------------------------------------------- package 4A: Audit
+  // Counter to RUG PULL. DeFi/rare, cost 3, Priority — when cast it
+  // immediately pulls the highest-cost enemy mempool spell (RUG PULL
+  // is cost 8, so it gets countered). On resolve the spell buffs the
+  // caster's own board with +1/+1.
+  audit: {
+    id: 'audit',
+    name: 'Audit',
+    faction: 'DeFi',
+    rarity: 'rare',
+    cost: 3,
+    type: 'spell',
+    priority: true,
+    spell: { kind: 'buff-own', attack: 1, health: 1 },
+    text: 'Priority. Pull the highest-cost enemy mempool spell. On resolve: give your minions +1/+1. The ledger closes before the rug falls.',
   },
 };

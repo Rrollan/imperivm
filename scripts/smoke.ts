@@ -1,7 +1,11 @@
 /**
- * Headless smoke test: plays a full AI-vs-AI game to completion.
+ * Headless smoke test: plays a full AI-vs-AI game to completion, then
+ * spawns the package 4A deterministic regression suite as a child
+ * process so both can be exercised via `npm run smoke`.
  * Run: npm run smoke
  */
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { createGame, applyAction, isGameOver } from '../lib/engine/engine';
 import { DECKS } from '../lib/decks';
 import { chooseAiAction } from '../lib/ai';
@@ -37,3 +41,14 @@ if (!isGameOver(state) || state.winner === null) {
   process.exit(1);
 }
 console.log('SMOKE OK');
+
+// package 4A: chain the deterministic regression suite as a subprocess
+// so the smoke script stays synchronous. tsx is in devDependencies.
+console.log('\n--- package 4A regressions ---');
+const reg = spawnSync(process.execPath, [fileURLToPath(new URL('../node_modules/tsx/dist/cli.mjs', import.meta.url)), 'scripts/regressions.ts'], {
+  stdio: 'inherit',
+});
+if (reg.status !== 0) {
+  console.error(`REGRESSIONS FAIL: exit ${reg.status}`);
+  process.exit(reg.status ?? 1);
+}

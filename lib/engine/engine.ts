@@ -6,7 +6,7 @@
  * and returns a brand-new GameState. Throws Error on illegal actions.
  *
  * Implements the "Rules summary" in lib/engine/types.ts exactly.
- * types.ts is the source of truth and is NOT modified here.
+ * types.ts remains the shared, additive public contract.
  */
 
 import { CARDS } from '../cards';
@@ -14,8 +14,11 @@ import { HEROES } from '../heroes';
 import type {
   Action,
   CardDef,
+  CreateGameOptions,
   EffectDef,
+  Faction,
   GameState,
+  HandCard,
   HeroDef,
   MempoolEntry,
   Minion,
@@ -39,6 +42,10 @@ interface EnginePlayer extends PlayerState {
 
 interface EngineGame extends GameState {
   players: [EnginePlayer, EnginePlayer];
+  /* --- package 4A: opt-in mulligan window (additive, defaults false/closed) --- */
+  enableMulligan: boolean;
+  mulliganCount: [number, number]; // P0, P1
+  mulliganPhase: [boolean, boolean]; // true while that player may still mulligan
 }
 
 /** Read a player's mempool (cast spells waiting to resolve next turn). */
@@ -46,6 +53,14 @@ export function mempoolOf(state: GameState, pid: PlayerId): MempoolEntry[] {
   const p = state.players[pid] as EnginePlayer | undefined;
   return p !== undefined && Array.isArray(p.mempool) ? p.mempool : [];
 }
+
+/* ------------------------------------------------------------------ */
+/* Constants (package 4A balance knobs)                                */
+/* ------------------------------------------------------------------ */
+
+/** Comeback valve: hero power discounts to 1 gas when both hold. */
+const COMEBACK_HP_THRESHOLD = 12; // own treasury must be <= this
+const COMEBACK_GAP = 12; // enemy treasury must be >= this much higher
 
 /* ------------------------------------------------------------------ */
 /* Small helpers                                                       */
@@ -143,6 +158,40 @@ function damageMinion(s: EngineGame, pid: PlayerId, uid: string, amount: number)
   }
 }
 
+/** Remove dead minions in-place. Returns names that died (logging done by caller). */
+function reapDead(s: EngineGame, pid: PlayerId): string[] {
+  const p = s.players[pid];
+  const dead: string[] = [];
+  p.board = p.board.filter(m => {
+    if (m.health <= 0) {
+      dead.push(m.name);
+      return false;
+    }
+    return true;
+  });
+  return dead;
+}
+
+/**
+ * Lifesteal: heal the dealer-owner by the actual health removed from
+ * the target, capped at 30 treasury. No overheal, no overkill.
+ */
+function tryLifesteal(
+  s: EngineGame,
+  dealer: Minion | null | undefined,
+  dealerOwner: PlayerId,
+  actualRemoved: number,
+): void {
+  if (!dealer || !dealer.lifesteal || actualRemoved <= 0) return;
+  const p = s.players[dealerOwner];
+  if (!p) return;
+  const room = Math.max(0, 30 - p.treasury);
+  const heal = Math.min(room, actualRemoved);
+  if (heal <= 0) return;
+  p.treasury += heal;
+  pushLog(s, `P${dealerOwner} lifesteals ${heal}`);
+}
+
 function makeMinion(s: EngineGame, def: CardDef): Minion {
   return {
     uid: nextUid(s),
@@ -151,8 +200,12 @@ function makeMinion(s: EngineGame, def: CardDef): Minion {
     attack: def.attack ?? 0,
     health: def.health ?? 1,
     maxHealth: def.health ?? 1,
-    canAttack: false,
+    canAttack: def.rush === true, // package 4A: Rush minions ready immediately
     staked: false,
+    taunt: def.taunt === true,
+    rush: def.rush === true,
+    lifesteal: def.lifesteal === true,
+    fresh: true, // package 4A: gate for "first turn" rules
   };
 }
 
@@ -259,10 +312,46 @@ function applyEffect(s: EngineGame, caster: PlayerId, eff: EffectDef): void {
   checkWinner(s);
 }
 
+/**
+ * Pavilion (faction synergy) bookkeeping. Called on play-minion / cast-spell.
+ * When a player has just played their 2nd card of the same faction this turn,
+ * grant a one-time +1 gas rebate. Subsequent plays (3rd, 4th, 5th) and
+ * mempool spell resolutions do NOT re-trigger.
+ */
+function noteFactionPlay(s: EngineGame, faction: Faction): void {
+  const me = s.players[s.turn];
+  if (!me.factionPlaysThisTurn) me.factionPlaysThisTurn = {};
+  if (!me.pavilionBonuses) me.pavilionBonuses = [];
+  me.factionPlaysThisTurn[faction] = (me.factionPlaysThisTurn[faction] ?? 0) + 1;
+  const count = me.factionPlaysThisTurn[faction] ?? 0;
+  if (count >= 2 && !me.pavilionBonuses.includes(faction)) {
+    me.gas += 1;
+    me.pavilionBonuses.push(faction);
+    pushLog(s, `P${s.turn} pavilion bonus: ${faction} (+1 gas)`);
+  }
+}
+
+function resetPavilion(p: PlayerState): void {
+  p.factionPlaysThisTurn = {};
+  p.pavilionBonuses = [];
+}
+
 /** Runs the start-of-turn sequence for the new active player. */
 function startTurn(s: EngineGame): void {
   s.block += 1;
   s.turn = other(s.turn);
+  const me = s.players[s.turn];
+
+  // P1 chooses from four opening cards before the normal first-turn draw.
+  // Complete this same block after the choice; do not skip or add a turn.
+  if (mulliganAvailable(s)) {
+    pushLog(s, `Block ${s.block} — P${s.turn} mulligan window open`);
+    return;
+  }
+  completeTurnStart(s);
+}
+
+function completeTurnStart(s: EngineGame): void {
   const me = s.players[s.turn];
   pushLog(s, `Block ${s.block} — P${s.turn} turn`);
 
@@ -298,14 +387,93 @@ function startTurn(s: EngineGame): void {
   me.gas = me.maxGas + me.board.filter(m => m.staked).length;
   me.heroPowerUsed = false;
 
+  // 3b. Pavilion reset for the new active player; additive stats above persist.
+  resetPavilion(me);
+
   // 4. Draw (fatigue / burn handled inside).
   drawCards(s, s.turn, 1);
   if (s.winner !== null) return;
 
-  // 5. Ready unstaked minions.
+  // 5. Ready unstaked minions and clear "fresh" (first-turn) flag.
   for (const m of me.board) {
     if (!m.staked) m.canAttack = true;
+    m.fresh = false;
   }
+}
+
+function closeMulligan(s: EngineGame): void {
+  const pid = s.turn;
+  s.players[pid].mulliganUsed = true;
+  s.mulliganPhase[pid] = false;
+  if (pid === 1 && s.block === 2 && s.winner === null) completeTurnStart(s);
+}
+
+/* ------------------------------------------------------------------ */
+/* Public UI helpers (package 4A)                                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Effective hero power cost for `pid` after comeback discount.
+ * Base cost is heroDef.powerCost (always 2 today). Discount of -1 gas
+ * when the player's treasury is materially lower than the enemy's.
+ */
+export function effectivePowerCost(state: GameState, pid: PlayerId): number {
+  const p = state.players[pid];
+  const f = state.players[other(pid)];
+  if (!p || !f) return 2;
+  const base = HEROES[p.heroId]?.powerCost ?? 2;
+  const discount =
+    p.treasury <= COMEBACK_HP_THRESHOLD && f.treasury - p.treasury >= COMEBACK_GAP ? 1 : 0;
+  return Math.max(0, base - discount);
+}
+
+/** Return the package 4A keywords carried by a card. */
+export function cardKeywords(cardId: string): { taunt: boolean; rush: boolean; lifesteal: boolean } {
+  const c = CARDS[cardId];
+  return {
+    taunt: c?.taunt === true,
+    rush: c?.rush === true,
+    lifesteal: c?.lifesteal === true,
+  };
+}
+
+/**
+ * How many cards the player may discard in a single mulligan, given
+ * the createGame options that opened this match. UI uses this to render
+ * the starting-hand "mulligan" buttons and to validate its picks.
+ */
+export function mulliganDrawSize(state: GameState, pid: PlayerId): number {
+  const s = state as EngineGame;
+  if (!s.enableMulligan) return 0;
+  if (s.players[pid].mulliganUsed) return 0;
+  return s.mulliganCount[pid] ?? (pid === 0 ? 3 : 4);
+}
+
+/** Cheap UI check: is the hand card playable right now? */
+export function canPlay(state: GameState, pid: PlayerId, uid: string): boolean {
+  const me = state.players[pid];
+  const hc = me.hand.find(h => h.uid === uid);
+  if (!hc || state.winner !== null || state.turn !== pid || mulliganAvailable(state)) return false;
+  const def = cardDef(hc.cardId);
+  if (def.cost > me.gas) return false;
+  if (def.type === 'minion') return me.board.length < 7;
+  return true; // spell
+}
+
+/** Whether the active enemy board has any Taunt minion (UI highlight). */
+export function enemyHasTaunt(state: GameState): boolean {
+  const foe = state.players[other(state.turn)];
+  return foe.board.some(m => m.taunt);
+}
+
+/** Whether the active player may legally mulligan this very moment. */
+export function mulliganAvailable(state: GameState): boolean {
+  const s = state as EngineGame;
+  if (!s.enableMulligan) return false;
+  if (s.winner !== null) return false;
+  if (!s.mulliganPhase[s.turn]) return false;
+  if (s.players[s.turn].mulliganUsed) return false;
+  return true;
 }
 
 /* ------------------------------------------------------------------ */
@@ -328,6 +496,8 @@ function actionKey(a: Action): string {
       return `unstake:${a.uid}`;
     case 'end-turn':
       return 'end-turn';
+    case 'mulligan':
+      return `mulligan:${[...a.uids].sort().join(',')}`;
   }
   return 'unknown';
 }
@@ -337,8 +507,18 @@ export function createGame(
   deckA: string[],
   heroB: string,
   deckB: string[],
-  seed?: number,
+  arg5?: number | CreateGameOptions,
+  arg6?: number,
 ): GameState {
+  let seed: number | undefined;
+  let opts: CreateGameOptions | undefined;
+  if (typeof arg5 === 'number') {
+    seed = arg5;
+  } else if (arg5 && typeof arg5 === 'object') {
+    opts = arg5;
+    if (typeof arg6 === 'number') seed = arg6;
+  }
+
   heroDef(heroA);
   heroDef(heroB);
 
@@ -356,8 +536,19 @@ export function createGame(
       heroPowerUsed: false,
       fatigue: 0,
       mempool: [],
+      // package 4A additions (defaults; preserved on legacy callers):
+      mulliganUsed: false,
+      factionPlaysThisTurn: {},
+      pavilionBonuses: [],
     };
   };
+
+  const enableMulligan = opts?.enableMulligan === true;
+  if (opts?.mulliganCount !== undefined &&
+      (!Number.isInteger(opts.mulliganCount) || opts.mulliganCount < 0 || opts.mulliganCount > 4)) {
+    throw new Error('mulliganCount must be an integer from 0 to 4');
+  }
+  const mulliganCount: [number, number] = [opts?.mulliganCount ?? 3, opts?.mulliganCount ?? 4];
 
   const s: EngineGame = {
     block: 1,
@@ -366,6 +557,9 @@ export function createGame(
     winner: null,
     log: [],
     rng: seed === undefined ? (Math.random() * 0x7fffffff) | 0 : seed | 0,
+    enableMulligan,
+    mulliganCount,
+    mulliganPhase: enableMulligan ? [true, true] : [false, false],
   };
 
   shuffleDeck(s, s.players[0].deck);
@@ -377,14 +571,31 @@ export function createGame(
   drawCards(s, 1, 4);
 
   pushLog(s, `Game start: ${heroDef(heroA).name} (P0) vs ${heroDef(heroB).name} (P1)`);
+  if (enableMulligan) pushLog(s, 'Mulligan phase open for both players');
   return s;
 }
 
 export function legalActions(state: GameState): Action[] {
   if (state.winner !== null) return [];
-  const me = state.players[state.turn];
-  const foe = state.players[other(state.turn)];
+  const s = state as EngineGame;
+  const me = s.players[s.turn];
+  const foe = s.players[other(s.turn)];
   const acts: Action[] = [];
+
+  if (mulliganAvailable(s)) {
+    const limit = Math.min(mulliganDrawSize(s, s.turn), me.hand.length);
+    // Opening hands have at most four cards: enumerate every legal subset,
+    // including keep. AI and UI share the same complete action contract.
+    for (let mask = 0; mask < 2 ** me.hand.length; mask++) {
+      const uids = me.hand.filter((_, i) => (mask & (1 << i)) !== 0).map(h => h.uid);
+      if (uids.length <= limit) acts.push({ type: 'mulligan', uids });
+    }
+    return acts;
+  }
+
+  // package 4A: any enemy Taunt forces attackers to target it first.
+  const enemyTaunts = foe.board.filter(m => m.taunt);
+  const tauntActive = enemyTaunts.length > 0;
 
   for (const hc of me.hand) {
     const def = cardDef(hc.cardId);
@@ -398,13 +609,23 @@ export function legalActions(state: GameState): Action[] {
 
   for (const m of me.board) {
     if (!m.canAttack || m.staked) continue;
-    acts.push({ type: 'attack', attackerUid: m.uid, target: 'hero' });
+    // package 4A: fresh = just played; non-Rush fresh can't attack;
+    // Rush fresh can attack enemy minions but never the hero.
+    const canTargetMinions = !m.fresh || m.rush;
+    const canTargetHero = !m.fresh;
+    if (canTargetHero && !tauntActive) {
+      acts.push({ type: 'attack', attackerUid: m.uid, target: 'hero' });
+    }
     for (const t of foe.board) {
+      if (tauntActive && !t.taunt) continue; // must attack a Taunt
+      if (!canTargetMinions) continue;
       acts.push({ type: 'attack', attackerUid: m.uid, target: t.uid });
     }
   }
 
-  if (me.gas >= 2 && !me.heroPowerUsed) acts.push({ type: 'hero-power' });
+  // package 4A: hero power uses comeback-discounted cost.
+  const pc = effectivePowerCost(s, s.turn);
+  if (me.gas >= pc && !me.heroPowerUsed) acts.push({ type: 'hero-power' });
 
   for (const m of me.board) {
     acts.push({ type: m.staked ? 'unstake' : 'stake', uid: m.uid });
@@ -416,18 +637,105 @@ export function legalActions(state: GameState): Action[] {
 
 export function applyAction(state: GameState, action: Action): GameState {
   if (isGameOver(state)) throw new Error('cannot act: game is over');
-  const key = actionKey(action);
-  const ok = legalActions(state).some(a => actionKey(a) === key);
-  if (!ok) throw new Error(`illegal action: ${key}`);
+
+  // package 4A: mulligan is validated by its own case (subset selection,
+  // including an empty "keep" pass) — we exempt it from the strict
+  // legalActions key match because legalActions only needs to surface
+  // the mulligan as a possible action type.
+  if (action.type !== 'mulligan') {
+    const key = actionKey(action);
+    const ok = legalActions(state).some(a => actionKey(a) === key);
+    if (!ok) throw new Error(`illegal action: ${key}`);
+  }
 
   const s = structuredClone(state) as EngineGame;
   for (const p of s.players) {
     if (!Array.isArray(p.mempool)) p.mempool = [];
+    if (!p.factionPlaysThisTurn) p.factionPlaysThisTurn = {};
+    if (!Array.isArray(p.pavilionBonuses)) p.pavilionBonuses = [];
+    if (typeof p.mulliganUsed !== 'boolean') p.mulliganUsed = false;
+    for (const m of p.board) {
+      if (m.taunt === undefined) m.taunt = false;
+      if (m.rush === undefined) m.rush = false;
+      if (m.lifesteal === undefined) m.lifesteal = false;
+      if (m.fresh === undefined) m.fresh = false;
+    }
   }
+  if (typeof s.enableMulligan !== 'boolean') s.enableMulligan = false;
+  if (!Array.isArray(s.mulliganPhase)) s.mulliganPhase = [false, false];
+  if (!Array.isArray(s.mulliganCount)) s.mulliganCount = [3, 4];
+
   const me = s.players[s.turn];
   const foe = s.players[other(s.turn)];
 
   switch (action.type) {
+    case 'mulligan': {
+      if (!s.enableMulligan || !s.mulliganPhase[s.turn] || me.mulliganUsed) {
+        throw new Error('mulligan not allowed');
+      }
+      const chosen = action.uids;
+      if (!Array.isArray(chosen)) {
+        throw new Error('mulligan uids must be an array');
+      }
+      // Empty subset (keep) is legal and simply closes the window.
+      if (chosen.length === 0) {
+        closeMulligan(s);
+        pushLog(s, `P${s.turn} keeps opening hand`);
+        return s;
+      }
+      const seen = new Set<string>();
+      for (const u of chosen) {
+        if (typeof u !== 'string') throw new Error('mulligan uids must be strings');
+        if (seen.has(u)) throw new Error(`duplicate mulligan uid: ${u}`);
+        seen.add(u);
+        if (!me.hand.some(h => h.uid === u)) throw new Error(`uid not in hand: ${u}`);
+      }
+      if (chosen.length > s.mulliganCount[s.turn]) {
+        throw new Error(`mulligan picks > ${s.mulliganCount[s.turn]}`);
+      }
+      const beforeDeck = me.deck.length;
+      const beforeHand = me.hand.length;
+      const rejected: HandCard[] = [];
+      me.hand = me.hand.filter(h => {
+        if (chosen.includes(h.uid)) {
+          rejected.push(h);
+          return false;
+        }
+        return true;
+      });
+      for (let i = 0; i < chosen.length; i++) {
+        if (s.winner !== null) break;
+        if (me.deck.length === 0) {
+          me.fatigue += 1;
+          me.treasury -= me.fatigue;
+          pushLog(s, `P${s.turn} fatigue ${me.fatigue}`);
+          checkWinner(s);
+          if (s.winner !== null) break;
+        } else {
+          const cardId = me.deck.shift() as string;
+          const def = cardDef(cardId);
+          if (me.hand.length >= 10) {
+            pushLog(s, `P${s.turn} burns ${def.name}`);
+          } else {
+            me.hand.push({ uid: nextUid(s), cardId });
+          }
+        }
+      }
+      for (const r of rejected) me.deck.push(r.cardId);
+      shuffleDeck(s, me.deck);
+      const afterDeck = me.deck.length;
+      const afterHand = me.hand.length;
+      if (afterDeck + afterHand !== beforeDeck + beforeHand) {
+        throw new Error(
+          `mulligan conservation violated: deck+hand ${beforeDeck}+${beforeHand} -> ${afterDeck}+${afterHand}`,
+        );
+      }
+      pushLog(s, `P${s.turn} mulligans ${chosen.length} card(s)`);
+      closeMulligan(s);
+      checkWinner(s);
+      return s;
+    }
+
     case 'play-minion': {
       const idx = me.hand.findIndex(h => h.uid === action.uid);
       if (idx < 0) throw new Error(`card not in hand: ${action.uid}`);
@@ -438,6 +746,9 @@ export function applyAction(state: GameState, action: Action): GameState {
       const m = makeMinion(s, def);
       me.board.push(m);
       pushLog(s, `P${s.turn} plays ${def.name}`);
+      if (s.mulliganPhase[s.turn]) s.mulliganPhase[s.turn] = false;
+      // package 4A: pavilion (faction synergy) tracks plays; battlecry resolves separately.
+      noteFactionPlay(s, def.faction);
       if (def.battlecry) applyEffect(s, s.turn, def.battlecry);
       if (def.priority) counterMempool(s, s.turn);
       checkWinner(s);
@@ -453,6 +764,8 @@ export function applyAction(state: GameState, action: Action): GameState {
       me.gas -= def.cost;
       me.mempool.push({ uid: nextUid(s), cardId: def.id, name: def.name, owner: s.turn });
       pushLog(s, `P${s.turn} casts ${def.name} -> mempool`);
+      if (s.mulliganPhase[s.turn]) s.mulliganPhase[s.turn] = false;
+      noteFactionPlay(s, def.faction);
       if (def.priority) counterMempool(s, s.turn);
       checkWinner(s);
       return s;
@@ -461,38 +774,58 @@ export function applyAction(state: GameState, action: Action): GameState {
     case 'attack': {
       const atk = me.board.find(m => m.uid === action.attackerUid);
       if (!atk) throw new Error(`attacker not found: ${action.attackerUid}`);
+      // package 4A: summoning sickness gate + taunt re-check.
+      if (atk.fresh && !atk.rush) throw new Error('summoning sickness');
+      if (atk.staked) throw new Error('staked cannot attack');
       atk.canAttack = false;
+      const enemyTaunts = foe.board.filter(m => m.taunt);
+      const tauntActive = enemyTaunts.length > 0;
       if (action.target === 'hero') {
-        foe.treasury -= atk.attack;
-        pushLog(s, `P${s.turn} ${atk.name} hits treasury for ${atk.attack}`);
+        if (atk.fresh) throw new Error('rush cannot attack hero on summon turn');
+        if (tauntActive) throw new Error('hero protected by Taunt');
+        const dmg = atk.attack;
+        // package 4A: lifesteal caps at the pre-damage treasury — never
+        // overheal, never treat post-death negative HP as healing.
+        const heroActualRemoved = Math.max(0, Math.min(foe.treasury, dmg));
+        foe.treasury -= dmg;
+        pushLog(s, `P${s.turn} ${atk.name} hits treasury for ${dmg}`);
+        tryLifesteal(s, atk, s.turn, heroActualRemoved);
       } else {
         const tgt = foe.board.find(m => m.uid === action.target);
         if (!tgt) throw new Error(`attack target not found: ${action.target}`);
+        if (tauntActive && !tgt.taunt) throw new Error('must attack a Taunt');
         const atkName = atk.name;
         const tgtName = tgt.name;
         const atkDmg = atk.attack;
         const tgtDmg = tgt.attack;
+        // package 4A: capture actual hp removed BEFORE simultaneous damage
+        // for accurate lifesteal computation.
+        const tgtActualRemoved = Math.max(0, Math.min(tgt.health, atkDmg));
+        const atkActualRemoved = Math.max(0, Math.min(atk.health, tgtDmg));
         tgt.health -= atkDmg;
         atk.health -= tgtDmg;
         pushLog(s, `${atkName} trades with ${tgtName}`);
-        if (tgt.health <= 0) {
-          foe.board = foe.board.filter(m => m.uid !== tgt.uid);
-          pushLog(s, `${tgtName} dies`);
-        }
-        if (atk.health <= 0) {
-          me.board = me.board.filter(m => m.uid !== atk.uid);
-          pushLog(s, `${atkName} dies`);
-        }
+        const deadFoe = reapDead(s, foe.id);
+        const deadMe = reapDead(s, me.id);
+        for (const n of deadFoe) pushLog(s, `${n} dies`);
+        for (const n of deadMe) pushLog(s, `${n} dies`);
+        // package 4A: defender retaliation also heals if defender has lifesteal.
+        tryLifesteal(s, atk, s.turn, tgtActualRemoved);
+        tryLifesteal(s, tgt, other(s.turn), atkActualRemoved);
       }
       checkWinner(s);
       return s;
     }
 
     case 'hero-power': {
-      me.gas -= 2;
+      // package 4A: comeback discount applies; base cost is still 2.
+      const pc = effectivePowerCost(s, s.turn);
+      if (me.gas < pc) throw new Error(`hero power costs ${pc}, have ${me.gas}`);
+      me.gas -= pc;
       me.heroPowerUsed = true;
+      if (s.mulliganPhase[s.turn]) s.mulliganPhase[s.turn] = false;
       const hero = heroDef(me.heroId);
-      pushLog(s, `P${s.turn} hero power: ${hero.powerName}`);
+      pushLog(s, `P${s.turn} hero power: ${hero.powerName}${pc === 1 ? ' (comeback)' : ''}`);
       switch (hero.power) {
         case 'damage-random-enemy':
           applyEffect(s, s.turn, { kind: 'damage-random-enemy', amount: 2 });
@@ -527,12 +860,14 @@ export function applyAction(state: GameState, action: Action): GameState {
       const m = me.board.find(mm => mm.uid === action.uid);
       if (!m) throw new Error(`minion not found: ${action.uid}`);
       m.staked = false;
-      m.canAttack = false;
+      m.canAttack = false; // unstaked this turn can't attack until next turn
+      m.fresh = false;
       pushLog(s, `P${s.turn} unstakes ${m.name}`);
       return s;
     }
 
     case 'end-turn': {
+      if (s.mulliganPhase[s.turn]) s.mulliganPhase[s.turn] = false;
       startTurn(s);
       return s;
     }
