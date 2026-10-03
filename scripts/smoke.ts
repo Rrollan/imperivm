@@ -42,13 +42,9 @@ if (!isGameOver(state) || state.winner === null) {
 }
 console.log('SMOKE OK');
 
-// package 4A: chain the deterministic regression suite as a subprocess
-// so the smoke script stays synchronous. tsx is in devDependencies.
-console.log('\n--- package 4A regressions ---');
-const reg = spawnSync(process.execPath, [fileURLToPath(new URL('../node_modules/tsx/dist/cli.mjs', import.meta.url)), 'scripts/regressions.ts'], {
-  stdio: 'inherit',
-});
-if (reg.status !== 0) {
-  console.error(`REGRESSIONS FAIL: exit ${reg.status}`);
-  process.exit(reg.status ?? 1);
+// Use the installed runner directly: verification never downloads packages.
+const runner = fileURLToPath(new URL('../node_modules/tsx/dist/cli.mjs', import.meta.url));
+for (const script of ['scripts/validate-content.ts', 'scripts/regressions.ts']) {
+  const result = spawnSync(process.execPath, [runner, script], { stdio: 'inherit' });
+  if (result.status !== 0) process.exit(result.status ?? 1);
 }

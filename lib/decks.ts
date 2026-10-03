@@ -136,7 +136,6 @@ export const DECKS: Record<string, string[]> = {
     'firmware-phalanx',
     'firmware-phalanx',
     'audit',
-    'audit',
     'the-grand-cartographer',
   ],
 };
