@@ -1,5 +1,19 @@
-import type { GameState, MempoolEntry, Minion, PlayerId } from '../lib/engine/types';
-import { mempoolOf } from '../lib/engine/engine';
+/**
+ * IMPERIVM — legacy UI-FX adapter.
+ *
+ * The board UI still reads board-level deltas (deaths / floats / new
+ * cards) for its inline animations (overlay on individual minions).
+ * The structured, action-aware events come from `lib/events.ts` and are
+ * consumed directly by `MotionFx` + `emitSfxFromEvents`.
+ *
+ * IMPORTANT: this file MUST NOT trigger off stale log markers. The new
+ * `BattleEvents` payload is computed via the safe suffix-overlap
+ * algorithm in `lib/events.ts`, so we forward its `deaths`, `damages`
+ * and `attack` fields directly and skip the log-string scanning path
+ * that broke once the log cap rolled.
+ */
+import type { GameState, Minion, PlayerId } from '../lib/engine/types';
+import { diffAction, type BattleEvents } from '../lib/events';
 
 export interface UiFloat {
   key: number;
@@ -29,23 +43,24 @@ export interface BattleFx {
   newHandUids: string[]; // player 0 only (foe hand is hidden)
 }
 
-function allMempool(s: GameState): MempoolEntry[] {
-  return [...mempoolOf(s, 0), ...mempoolOf(s, 1)];
-}
-
 function byUid(list: Minion[], uid: string): Minion | undefined {
-  for (const m of list) {
-    if (m.uid === uid) return m;
-  }
+  for (const m of list) if (m.uid === uid) return m;
   return undefined;
 }
 
 /**
  * Pure diff between two consecutive game states → UI animation events.
- * The engine itself is never touched; everything is derived from
- * board/treasury/mempool deltas and new log lines.
+ *
+ * If `action` is supplied we route through `diffAction` (the safe
+ * suffix-overlap scanner). Without action we fall back to a board-only
+ * diff (no log-string scanning) so this function is still safe under
+ * capped log.
  */
-export function diffBattleFx(prev: GameState, next: GameState): BattleFx {
+export function diffBattleFx(
+  prev: GameState,
+  next: GameState,
+  action?: import('../lib/engine/types').Action,
+): BattleFx {
   const fx: BattleFx = {
     floats: [],
     deaths: [],
@@ -58,27 +73,67 @@ export function diffBattleFx(prev: GameState, next: GameState): BattleFx {
     newHandUids: [],
   };
 
-  const newLog = next.log.slice(prev.log.length);
-  const hasLog = (sub: string) => {
-    for (const l of newLog) {
-      if (l.includes(sub)) return true;
-    }
-    return false;
-  };
-  fx.rugPull = hasLog('RUG PULL');
-  fx.halving = hasLog('Halving:');
-  fx.countered = hasLog('counters ');
-
-  // mempool entries that vanished
-  const nextMpUids: Record<string, true> = {};
-  for (const e of allMempool(next)) nextMpUids[e.uid] = true;
-  for (const e of allMempool(prev)) {
-    if (!nextMpUids[e.uid] && hasLog(`${e.name} resolves`)) {
-      fx.resolvedNames.push(e.name);
+  // Structured events — only when action context is available.
+  let ev: BattleEvents | null = null;
+  if (action) {
+    try {
+      ev = diffAction(prev, next, action);
+    } catch {
+      ev = null;
     }
   }
 
-  // boards: deaths, damage/heal floats, newcomers
+  if (ev) {
+    fx.rugPull = !!ev.rugPull;
+    fx.halving = !!(ev.halvings && ev.halvings.length > 0);
+    fx.countered = !!ev.spellCountered;
+    if (ev.spellResolved) {
+      for (const r of ev.spellResolved) fx.resolvedNames.push(r.name);
+    }
+    if (ev.attack) {
+      fx.attack = {
+        attackerUid: ev.attack.attackerUid,
+        targetUid:
+          ev.attack.targetUid === 'hero'
+            ? `hero-${ev.attack.targetOwner}`
+            : ev.attack.targetUid,
+      };
+    }
+    if (ev.deaths) {
+      for (const d of ev.deaths) {
+        // Recover the prev-state minion snapshot for legacy consumers.
+        const m = byUid(prev.players[d.owner].board, d.uid);
+        if (!m) continue;
+        fx.deaths.push({
+          uid: d.uid,
+          cardId: m.cardId,
+          name: m.name,
+          owner: d.owner,
+          attack: m.attack,
+          health: m.health,
+        });
+      }
+    }
+    if (ev.damages) {
+      for (const d of ev.damages) {
+        const owner = d.prevHealth > d.health
+          ? (prev.players[0].board.some(m => m.uid === d.uid) ? 0 : 1)
+          : (next.players[0].board.some(m => m.uid === d.uid) ? 0 : 1);
+        if (d.health < d.prevHealth) {
+          fx.floats.push({ targetUid: d.uid, amount: d.prevHealth - d.health, kind: 'damage' });
+        } else if (d.health > d.prevHealth) {
+          fx.floats.push({ targetUid: d.uid, amount: d.health - d.prevHealth, kind: 'heal' });
+        }
+        void owner;
+      }
+    }
+    if (ev.gameOver) {
+      // Legacy field — surfaced through `rugPull`/`halving` for old
+      // consumers. End-game UI now reads `events.gameOver` directly.
+    }
+  }
+
+  // Board deltas — exact uid lookups (safe under any log cap).
   const pids: PlayerId[] = [0, 1];
   for (const pid of pids) {
     const pb = prev.players[pid].board;
@@ -86,11 +141,18 @@ export function diffBattleFx(prev: GameState, next: GameState): BattleFx {
     for (const m of pb) {
       const n = byUid(nb, m.uid);
       if (!n) {
-        fx.deaths.push({ uid: m.uid, cardId: m.cardId, name: m.name, owner: pid, attack: m.attack, health: m.health });
+        // Skip duplicates from the structured-events branch above.
+        if (!fx.deaths.some(d => d.uid === m.uid && d.owner === pid)) {
+          fx.deaths.push({ uid: m.uid, cardId: m.cardId, name: m.name, owner: pid, attack: m.attack, health: m.health });
+        }
       } else if (n.health < m.health) {
-        fx.floats.push({ targetUid: m.uid, amount: m.health - n.health, kind: 'damage' });
+        if (!fx.floats.some(f => f.targetUid === m.uid && f.kind === 'damage')) {
+          fx.floats.push({ targetUid: m.uid, amount: m.health - n.health, kind: 'damage' });
+        }
       } else if (n.health > m.health) {
-        fx.floats.push({ targetUid: m.uid, amount: n.health - m.health, kind: 'heal' });
+        if (!fx.floats.some(f => f.targetUid === m.uid && f.kind === 'heal')) {
+          fx.floats.push({ targetUid: m.uid, amount: n.health - m.health, kind: 'heal' });
+        }
       }
     }
     for (const n of nb) {
@@ -98,16 +160,15 @@ export function diffBattleFx(prev: GameState, next: GameState): BattleFx {
     }
   }
 
-  // treasuries
+  // Treasuries
   for (const pid of pids) {
     const d = prev.players[pid].treasury - next.players[pid].treasury;
     if (d > 0) fx.floats.push({ targetUid: `hero-${pid}`, amount: d, kind: 'damage' });
     else if (d < 0) fx.floats.push({ targetUid: `hero-${pid}`, amount: -d, kind: 'heal' });
   }
 
-  // attack lunge: same player's turn continuing + one of their minions went
-  // canAttack true→false (still alive, unstaked) + damage was dealt to the foe.
-  if (next.turn === prev.turn) {
+  // Attack lunge fallback — only when structured events are unavailable.
+  if (!fx.attack && !action && next.turn === prev.turn) {
     const actor = next.turn;
     const foe: PlayerId = actor === 0 ? 1 : 0;
     const pb = prev.players[actor].board;
@@ -127,10 +188,7 @@ export function diffBattleFx(prev: GameState, next: GameState): BattleFx {
       let bestDrop = 0;
       for (const m of foePb) {
         const n = byUid(foeNb, m.uid);
-        if (!n) {
-          target = m.uid;
-          break;
-        }
+        if (!n) { target = m.uid; break; }
         if (n.health < m.health && m.health - n.health > bestDrop) {
           bestDrop = m.health - n.health;
           target = m.uid;
@@ -143,7 +201,7 @@ export function diffBattleFx(prev: GameState, next: GameState): BattleFx {
     }
   }
 
-  // freshly drawn hand cards (player 0)
+  // Freshly drawn hand cards (player 0).
   const prevHandUids: Record<string, true> = {};
   for (const h of prev.players[0].hand) prevHandUids[h.uid] = true;
   for (const h of next.players[0].hand) {

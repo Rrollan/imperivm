@@ -336,3 +336,160 @@ body {
   }
   .mempool-band { animation: none; }
 }
+
+/* ── package 2 (motion) extensions ──────────────────────────────────── */
+
+/* play-flight: card sprite travels from hand rect to board rect */
+.play-flight {
+  z-index: 80;
+  transform: translate(-50%, -50%);
+  animation: play-flight 0.72s var(--ease-imperial) forwards;
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.55));
+}
+@keyframes play-flight {
+  0% {
+    transform: translate(-50%, -50%) scale(1) rotate(-6deg);
+    left: var(--from-x);
+    top: var(--from-y);
+    opacity: 1;
+  }
+  35% {
+    transform: translate(-50%, -50%) scale(1.45) rotate(8deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    left: var(--to-x);
+    top: var(--to-y);
+    opacity: 1;
+  }
+}
+
+/* landing dust burst — small radial puff */
+.landing-dust {
+  position: fixed;
+  left: var(--dust-x);
+  top: var(--dust-y);
+  width: 60px;
+  height: 24px;
+  margin-left: -30px;
+  margin-top: -12px;
+  background: radial-gradient(ellipse at center, rgba(245, 215, 110, 0.65) 0%, rgba(212, 175, 55, 0.25) 50%, transparent 80%);
+  pointer-events: none;
+  animation: landing-dust 0.6s ease-out forwards;
+  z-index: 70;
+}
+@keyframes landing-dust {
+  0% { transform: scale(0.4); opacity: 0; }
+  35% { transform: scale(1.1); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* halving +1/+1 pop */
+.halving-pop {
+  pointer-events: none;
+  text-shadow: 0 0 8px rgba(245, 215, 110, 0.85), 0 2px 4px rgba(0, 0, 0, 0.7);
+  animation: halving-pop 1.1s var(--ease-imperial) forwards;
+  transform: translate(-50%, -50%);
+  z-index: 70;
+}
+@keyframes halving-pop {
+  0% { transform: translate(-50%, -10%) scale(0.6); opacity: 0; }
+  20% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+  100% { transform: translate(-50%, -160%) scale(1); opacity: 0; }
+}
+
+/* screen-shake on the page body — we toggle a class on <body> */
+.rug-shake-body {
+  animation: rug-shake 0.7s linear both;
+}
+
+/* rug-pull red vortex — screen-tinted rotating gradient */
+.rug-vortex {
+  background: radial-gradient(ellipse at center, rgba(255, 77, 94, 0.55) 0%, rgba(138, 28, 43, 0.35) 45%, transparent 80%),
+              conic-gradient(from 0deg, rgba(255, 77, 94, 0.0), rgba(255, 77, 94, 0.4), rgba(255, 77, 94, 0.0));
+  animation: rug-vortex 1s ease-out forwards;
+  mix-blend-mode: screen;
+  z-index: 55;
+}
+@keyframes rug-vortex {
+  0% { opacity: 0; transform: scale(0.2) rotate(0deg); filter: blur(0px); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: scale(2.4) rotate(360deg); filter: blur(12px); }
+}
+
+/* end-game screen overlay */
+.endgame {
+  background: radial-gradient(ellipse at center, rgba(18, 7, 31, 0.85) 0%, rgba(18, 7, 31, 0.97) 70%, rgba(18, 7, 31, 1) 100%);
+  animation: endgame-fade-in 0.4s ease-out forwards;
+  z-index: 65;
+}
+.endgame-win { color: #F5D76E; text-shadow: 0 0 16px rgba(245, 215, 110, 0.5); }
+.endgame-loss { color: #FF4D5E; text-shadow: 0 0 16px rgba(255, 77, 94, 0.55); }
+.endgame-draw { color: #A89BC0; text-shadow: 0 0 14px rgba(168, 155, 192, 0.55); }
+@keyframes endgame-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* rugged crack — SVG-like diagonal break across the screen */
+.rugged-crack {
+  position: relative;
+  width: min(640px, 80vw);
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #F5D76E 20%, #8A1C2B 50%, #F5D76E 80%, transparent);
+  filter: drop-shadow(0 0 6px rgba(255, 77, 94, 0.6));
+  transform-origin: center;
+  animation: rugged-crack 0.6s var(--ease-imperial) forwards;
+}
+.rugged-crack::before,
+.rugged-crack::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: inherit;
+  filter: inherit;
+}
+.rugged-crack::before {
+  transform: rotate(-12deg) translateY(-8px);
+  opacity: 0.85;
+}
+.rugged-crack::after {
+  transform: rotate(7deg) translateY(10px);
+  opacity: 0.6;
+}
+@keyframes rugged-crack {
+  0% { transform: scaleX(0); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0.85; }
+}
+
+/* landing page: idle coin drift for ambient motion */
+@keyframes coin-drift {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(4deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+.coin-drift {
+  animation: coin-drift 5s ease-in-out infinite;
+}
+
+/* spell-buildup glow (mempool queued) */
+.mempool-glow {
+  box-shadow: 0 0 14px rgba(20, 241, 225, 0.45), inset 0 0 12px rgba(20, 241, 225, 0.2);
+  animation: mempool-glow 1.6s ease-in-out infinite;
+}
+@keyframes mempool-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(20, 241, 225, 0.3), inset 0 0 10px rgba(20, 241, 225, 0.15); }
+  50% { box-shadow: 0 0 20px rgba(20, 241, 225, 0.7), inset 0 0 18px rgba(20, 241, 225, 0.3); }
+}
+
+/* resolved flash — used on mempool resolution */
+.mempool-resolved-flash {
+  animation: mempool-resolved-flash 0.9s var(--ease-imperial) both;
+}
+@keyframes mempool-resolved-flash {
+  0% { filter: brightness(1) saturate(1); transform: scale(1); }
+  20% { filter: brightness(1.8) saturate(1.5); transform: scale(1.08); box-shadow: 0 0 26px rgba(20, 241, 225, 0.9); }
+  100% { filter: brightness(1) saturate(1); transform: scale(1); }
+}

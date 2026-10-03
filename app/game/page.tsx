@@ -46,6 +46,12 @@ import {
   type DyingMinion,
   type UiFloat,
 } from '../../components/battleFx';
+import MotionFx from '../../components/MotionFx';
+import MuteButton from '../../components/MuteButton';
+import { diffAction, type BattleEvents } from '../../lib/events';
+import { emitSfxFromEvents, markAmbientStarted, shouldStartAmbient } from '../../lib/audio/events';
+import { startAmbient } from '../../lib/audio/sfx';
+import { useReducedMotion } from '../../lib/prefersReducedMotion';
 
 const ME: PlayerId = 0;
 const FOE: PlayerId = 1;
@@ -102,13 +108,28 @@ function GameBoard() {
   const [dealtUids, setDealtUids] = useState<Set<string>>(new Set());
   const [mempoolFx, setMempoolFx] = useState<{ kind: 'resolve' | 'counter'; key: number } | null>(null);
   const [screenFx, setScreenFx] = useState<{ kind: 'rug' | 'halving'; key: number } | null>(null);
+  // package 2 + 3 wiring
+  const [events, setEvents] = useState<BattleEvents | null>(null);
+  const [playRects, setPlayRects] = useState<{ from: DOMRect; to: DOMRect } | null>(null);
+  const [bodyShakeKey, setBodyShakeKey] = useState(0);
+  const lastActionRef = useRef<Action | null>(null);
+  const stateBeforeActionRef = useRef<GameState | null>(null);
+  const reduced = useReducedMotion();
 
   const prevRef = useRef<GameState | null>(null);
   const fxKey = useRef(0);
   const logBoxRef = useRef<HTMLDivElement>(null);
+  const timers = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+  const schedule = useCallback((callback: () => void, delay: number) => {
+    const timer = setTimeout(() => { timers.current.delete(timer); callback(); }, delay);
+    timers.current.add(timer);
+  }, []);
+  useEffect(() => () => { timers.current.forEach(clearTimeout); timers.current.clear(); }, []);
+
 
   const startGame = useCallback(
     (seed?: number) => {
+      timers.current.forEach(clearTimeout); timers.current.clear();
       const s = createGame(
         heroId,
         DECKS[heroId] ?? DECKS.whale,
@@ -126,10 +147,14 @@ function GameBoard() {
       setPlayedUids(new Set());
       setMempoolFx(null);
       setScreenFx(null);
+      setEvents(null);
+      setPlayRects(null);
+      lastActionRef.current = null;
+      stateBeforeActionRef.current = null;
       // opening hand slides in from the deck
       const opening = new Set(s.players[ME].hand.map(h => h.uid));
       setDealtUids(opening);
-      setTimeout(() => {
+      schedule(() => {
         setDealtUids(cur => {
           const n = new Set(cur);
           opening.forEach(u => n.delete(u));
@@ -152,15 +177,49 @@ function GameBoard() {
     startGame();
   }, [startGame]);
 
+  // Lazy-start the imperial ambient loop on the first deliberate user
+  // gesture, then remember it across navigation (localStorage).
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!shouldStartAmbient()) return;
+    const handler = () => {
+      startAmbient();
+      markAmbientStarted(true);
+      window.removeEventListener('pointerdown', handler);
+      window.removeEventListener('keydown', handler);
+    };
+    window.addEventListener('pointerdown', handler, { once: true });
+    window.addEventListener('keydown', handler, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', handler);
+      window.removeEventListener('keydown', handler);
+    };
+  }, []);
+
+  // RUG PULL — toggle the body shake class so the whole viewport jolts.
+  useEffect(() => {
+    if (typeof document === 'undefined' || reduced) return;
+    if (bodyShakeKey === 0) return;
+    document.body.classList.add('rug-shake-body');
+    const t = setTimeout(() => document.body.classList.remove('rug-shake-body'), 720);
+    return () => { clearTimeout(t); document.body.classList.remove('rug-shake-body'); };
+  }, [bodyShakeKey, reduced]);
+
   // AI loop: one action every ~600ms until the AI ends its turn.
   useEffect(() => {
     if (!state || state.winner !== null || state.turn !== FOE || !aiThinking) return;
     const t = setTimeout(() => {
       try {
         const action = chooseAiAction(state);
+        lastActionRef.current = action;
+        stateBeforeActionRef.current = state;
         setState(applyAction(state, action));
         if (action.type === 'end-turn') setAiThinking(false);
       } catch {
+        const fallback: Action = { type: 'end-turn' };
+        lastActionRef.current = fallback;
+        stateBeforeActionRef.current = state;
+        setState(applyAction(state, fallback));
         setAiThinking(false);
       }
     }, 600);
@@ -173,24 +232,54 @@ function GameBoard() {
     const prev = prevRef.current;
     prevRef.current = state;
     if (!prev) return;
-    const fx = diffBattleFx(prev, state);
+    // diffBattleFx still takes (prev, next, action) so the engine contract
+    // stays unchanged. When the caller forgot to record an action (the
+    // AI loop does this), we fall back to a heuristic.
+    const fx = diffBattleFx(prev, state, lastActionRef.current ?? undefined);
+
+    // ── structured event payload (lib/events.ts) ──
+    if (stateBeforeActionRef.current) {
+      try {
+        const ev = diffAction(stateBeforeActionRef.current, state, lastActionRef.current ?? ({ type: 'end-turn' } as Action));
+        if (ev !== null) {
+          // SFX: a single pass per logical action. Same adapter as the
+          // visual layer, so motion and audio can never desync.
+          emitSfxFromEvents(ev);
+          setEvents(ev);
+          if (ev.play) {
+            // Clear playRects after the flight consumes it (so a stale
+            // rect does not animate twice).
+            schedule(() => setPlayRects(null), 950);
+          }
+          // Rug-pull also shakes the entire document so the red vortex
+          // is not the only cue — the player feels it.
+          if (ev.rugPull && !reduced) {
+            setBodyShakeKey(k => k + 1);
+          }
+        }
+      } catch {
+        /* keep going with the legacy FX pipeline */
+      }
+      stateBeforeActionRef.current = null;
+      lastActionRef.current = null;
+    }
 
     if (fx.floats.length > 0) {
       const keyed = fx.floats.map(f => ({ ...f, key: ++fxKey.current }));
       const keys = keyed.map(k => k.key);
       setFloats(cur => [...cur.slice(-24), ...keyed]);
-      setTimeout(() => setFloats(cur => cur.filter(f => !keys.includes(f.key))), 1450);
+      schedule(() => setFloats(cur => cur.filter(f => !keys.includes(f.key))), 1450);
     }
     if (fx.deaths.length > 0) {
       const keyed = fx.deaths.map(d => ({ ...d, key: ++fxKey.current }));
       const keys = keyed.map(k => k.key);
       setDying(cur => [...cur, ...keyed]);
-      setTimeout(() => setDying(cur => cur.filter(d => !keys.includes(d.key))), 900);
+      schedule(() => setDying(cur => cur.filter(d => !keys.includes(d.key))), 900);
     }
     if (fx.attack) {
       const key = ++fxKey.current;
       setAttackAnim({ ...fx.attack, key });
-      setTimeout(() => setAttackAnim(cur => (cur && cur.key === key ? null : cur)), 700);
+      schedule(() => setAttackAnim(cur => (cur && cur.key === key ? null : cur)), 700);
     }
     if (fx.newBoardUids.length > 0) {
       const uids = fx.newBoardUids;
@@ -199,7 +288,7 @@ function GameBoard() {
         uids.forEach(u => n.add(u));
         return n;
       });
-      setTimeout(() => {
+      schedule(() => {
         setPlayedUids(cur => {
           const n = new Set(cur);
           uids.forEach(u => n.delete(u));
@@ -214,7 +303,7 @@ function GameBoard() {
         uids.forEach(u => n.add(u));
         return n;
       });
-      setTimeout(() => {
+      schedule(() => {
         setDealtUids(cur => {
           const n = new Set(cur);
           uids.forEach(u => n.delete(u));
@@ -225,16 +314,16 @@ function GameBoard() {
     if (fx.resolvedNames.length > 0 || fx.countered) {
       const key = ++fxKey.current;
       setMempoolFx({ kind: fx.countered ? 'counter' : 'resolve', key });
-      setTimeout(() => setMempoolFx(cur => (cur && cur.key === key ? null : cur)), 1400);
+      schedule(() => setMempoolFx(cur => (cur && cur.key === key ? null : cur)), 1400);
     }
     if (fx.rugPull) {
       const key = ++fxKey.current;
       setScreenFx({ kind: 'rug', key });
-      setTimeout(() => setScreenFx(cur => (cur && cur.key === key ? null : cur)), 1300);
+      schedule(() => setScreenFx(cur => (cur && cur.key === key ? null : cur)), 1300);
     } else if (fx.halving) {
       const key = ++fxKey.current;
       setScreenFx({ kind: 'halving', key });
-      setTimeout(() => setScreenFx(cur => (cur && cur.key === key ? null : cur)), 1300);
+      schedule(() => setScreenFx(cur => (cur && cur.key === key ? null : cur)), 1300);
     }
   }, [state]);
 
@@ -270,9 +359,24 @@ function GameBoard() {
   }
   const hpAction = legal.find(a => a.type === 'hero-power');
 
-  const act = (action: Action) => {
+  const act = (action: Action, opts?: { collectPlayRects?: boolean }) => {
     if (!myTurn) return;
     try {
+      // Capture before-state + the action so the post-state diff can use
+      // them. This replaces the old log-slice approach (which broke once
+      // the log cap kicked in).
+      stateBeforeActionRef.current = state;
+      lastActionRef.current = action;
+
+      // For card plays: capture source (hand) and target (board) rects.
+      if (opts?.collectPlayRects && state && (action.type === 'play-minion' || action.type === 'cast-spell')) {
+        const fromEl = document.querySelector<HTMLElement>(`[data-hand-uid="${action.uid}"]`);
+        const toEl = document.querySelector<HTMLElement>(`#my-board-slot`);
+        if (fromEl && toEl) {
+          setPlayRects({ from: fromEl.getBoundingClientRect(), to: toEl.getBoundingClientRect() });
+        }
+      }
+
       setState(applyAction(state, action));
     } catch {
       /* illegal action — ignore */
@@ -290,7 +394,7 @@ function GameBoard() {
       a => (a.type === 'play-minion' || a.type === 'cast-spell') && a.uid === uid,
     );
     if (action) {
-      act(action);
+      act(action, { collectPlayRects: true });
       setAttackerUid(null);
     }
   };
@@ -437,13 +541,16 @@ function GameBoard() {
             </span>
             <span className="text-gold text-sm">❧</span>
           </div>
-          <button
-            onClick={() => startGame(Date.now() & 0x7fffffff)}
-            className="text-xs px-2.5 py-1.5 rounded border border-lavender/40 text-lavender hover:bg-lavender/10 shrink-0"
-            title="Restart the game"
-          >
-            ↺ <span className="hidden sm:inline">Restart</span>
-          </button>
+          <div className="flex items-center gap-1.5 md:gap-2">
+            <MuteButton className="hidden sm:inline-flex" />
+            <button
+              onClick={() => startGame(Date.now() & 0x7fffffff)}
+              className="text-xs px-2.5 py-1.5 rounded border border-lavender/40 text-lavender hover:bg-lavender/10 shrink-0"
+              title="Restart the game"
+            >
+              ↺ <span className="hidden sm:inline">Restart</span>
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-2 md:gap-3">
@@ -560,7 +667,7 @@ function GameBoard() {
 
             {/* ── my board on marble ── */}
             <DroppableBoard>
-            <div className="marble marble-edge rounded-xl px-2 py-2.5 md:py-3 min-h-[7rem] md:min-h-[8rem]">
+            <div id="my-board-slot" className="marble marble-edge rounded-xl px-2 py-2.5 md:py-3 min-h-[7rem] md:min-h-[8rem]">
               {me.board.length === 0 && dying.filter(d => d.owner === ME).length === 0 ? (
                 <div className="text-center text-[#6b5a35]/70 text-xs md:text-sm italic py-6">
                   Your ranks are empty. Play a minion!
@@ -668,6 +775,7 @@ function GameBoard() {
                       return (
                         <DraggableHandCard key={hc.uid} id={hc.uid} disabled={!playable}>
                         <div
+                          data-hand-uid={hc.uid}
                           style={
                             isDesktop
                               ? {
@@ -795,6 +903,11 @@ function GameBoard() {
 
       {/* ── drag preview (portal) ── */}
       <DragPreview hand={me.hand} board={me.board} />
+
+      {/* ── package 2: motion overlay (play-flight, halving +1/+1, RUG PULL
+            vortex + screen shake, VICTORIA laurels + coin confetti, RUGGED
+            crack). Driven by the same structured event adapter as audio. */}
+      <MotionFx events={events} playRects={playRects} reduced={reduced} />
     </div>
     </DndProvider>
   );
@@ -816,7 +929,10 @@ function DragPreview({ hand, board }: { hand: HandCard[]; board: Minion[] }) {
 function MempoolCard({ entry, ownerLabel, mine }: { entry: MempoolEntry; ownerLabel: string; mine: boolean }) {
   const def = CARDS[entry.cardId];
   return (
-    <div className="relative mt-1" title={def ? `${entry.name} — ${def.text}` : entry.name}>
+    <div
+      className="relative mt-1 mempool-glow rounded-md"
+      title={def ? `${entry.name} — ${def.text}` : entry.name}
+    >
       <CardBack size="sm" />
       <span className="absolute -top-2 -left-1.5 w-5 h-5 rounded-full bg-solana/25 border border-solana text-solana text-[10px] font-bold flex items-center justify-center font-mono">
         {def?.cost ?? '?'}

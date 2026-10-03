@@ -233,6 +233,7 @@ export function MinionToken({
   return (
     <div className="flex flex-col items-center relative">
       <div
+        data-minion-uid={minion.uid}
         role={onClick ? 'button' : undefined}
         tabIndex={onClick ? 0 : undefined}
         onClick={onClick}

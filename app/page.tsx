@@ -1,9 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { HEROES } from '../lib/heroes';
 import WalletBar from '../components/WalletBar';
 import ArtImg from '../components/ArtImg';
+import MuteButton from '../components/MuteButton';
+import { markAmbientStarted, shouldStartAmbient } from '../lib/audio/events';
+import { startAmbient } from '../lib/audio/sfx';
 
 const HOW_TO_PLAY = [
   'Spend gas to play minions and cast spells. Gas refills every block — stake minions to earn even more.',
@@ -15,9 +19,29 @@ const HOW_TO_PLAY = [
 export default function LandingPage() {
   const heroes = Object.values(HEROES);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!shouldStartAmbient()) return;
+    const handler = () => {
+      startAmbient();
+      markAmbientStarted(true);
+      window.removeEventListener('pointerdown', handler);
+      window.removeEventListener('keydown', handler);
+    };
+    window.addEventListener('pointerdown', handler, { once: true });
+    window.addEventListener('keydown', handler, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', handler);
+      window.removeEventListener('keydown', handler);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-abyss text-parchment">
       <WalletBar />
+      <div className="absolute right-4 top-3 z-30">
+        <MuteButton />
+      </div>
 
       <main className="max-w-5xl mx-auto px-6 pb-16">
         {/* Hero */}

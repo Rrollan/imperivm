@@ -6,6 +6,11 @@ import { CARDS } from '../../lib/cards';
 import type { CardDef, Rarity } from '../../lib/engine/types';
 import CardView, { CardBack, RARITY_COLORS } from '../../components/CardView';
 import WalletBar from '../../components/WalletBar';
+import MuteButton from '../../components/MuteButton';
+import { play } from '../../lib/audio/sfx';
+import { markAmbientStarted, shouldStartAmbient } from '../../lib/audio/events';
+import { startAmbient } from '../../lib/audio/sfx';
+import { unlockAudio } from '../../lib/audio/manager';
 
 const RARITY_WEIGHTS: { rarity: Rarity; weight: number }[] = [
   { rarity: 'common', weight: 60 },
@@ -47,25 +52,51 @@ export default function PacksPage() {
     [],
   );
 
-  const handleOpen = () => {
+  // Lazy-start ambient on first gesture.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!shouldStartAmbient()) return;
+    const handler = () => {
+      startAmbient();
+      markAmbientStarted(true);
+      window.removeEventListener('pointerdown', handler);
+      window.removeEventListener('keydown', handler);
+    };
+    window.addEventListener('pointerdown', handler, { once: true });
+    window.addEventListener('keydown', handler, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', handler);
+      window.removeEventListener('keydown', handler);
+    };
+  }, []);
+
+  const handleOpen = async () => {
     if (timerRef.current) clearInterval(timerRef.current);
+    // Unlock audio context inside the user gesture.
+    await unlockAudio();
     setPack(openPack());
     setRevealed(0);
     setOpened(true);
+    play('pack-open');
+    let step = 0;
     timerRef.current = setInterval(() => {
-      setRevealed(r => {
-        if (r >= 5) {
-          if (timerRef.current) clearInterval(timerRef.current);
-          return r;
-        }
-        return r + 1;
-      });
+      step += 1;
+      if (step >= 5) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        setRevealed(5);
+        return;
+      }
+      setRevealed(step);
+      play('card-reveal');
     }, 450);
   };
 
   return (
     <div className="min-h-screen bg-abyss text-parchment">
       <WalletBar />
+      <div className="absolute right-4 top-3 z-30">
+        <MuteButton />
+      </div>
 
       <main className="max-w-5xl mx-auto px-6 py-12 text-center">
         <h1 className="font-display text-5xl font-bold gold-text tracking-widest">PACKS</h1>
