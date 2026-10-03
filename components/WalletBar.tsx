@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { FC, ReactNode } from 'react';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import type { Adapter } from '@solana/wallet-adapter-base';
 
 const ENDPOINT = 'https://api.devnet.solana.com';
