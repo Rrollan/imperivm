@@ -25,7 +25,7 @@ button:disabled { --button-texture: url('/ui/buttons/tablet-disabled.png'); }
 .arena-frieze .frieze-control > span:last-child:not(:first-child) { display: none; }
 .arena-frieze .wallet-button { width: auto; min-width: 44px; padding-inline: 10px; font-size: 13px; }
 .arena-frieze .wallet-button .frieze-wallet-label { display: inline!important; }
-.game-shell, .arena-scene { --board-art: url('/boards/marble.webp'); min-height: 100dvh; background-color: #332d32; background-image: radial-gradient(ellipse at 50% 45%,#15101b18 20%,#100a15b8 100%),var(--board-art); background-size: cover; background-position: center; color: #eee5d3; isolation: isolate; }
+.game-shell, .arena-scene { --board-art: url('/boards/marble-light.webp'); min-height: 100dvh; background-color: #e8dcc8; background-image: radial-gradient(ellipse at 50% 45%,#fff8ec66 20%,#d4c4a833 100%),var(--board-art); background-size: 512px; background-position: center; color: #2a1f1a; isolation: isolate; }
 .game-content { width: 100%; padding: 0 24px 8px; }
 /* Table geometry and raised edges are owned by arena.css. */
 .arena-toolbar { height: 46px; }

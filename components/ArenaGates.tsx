@@ -27,9 +27,7 @@ export default function ArenaGates() {
       <h1 className={styles.heading}>{t('Арена', 'Arena')}</h1>
       <Link href={`/game?hero=${hero}`} className={styles.portal} aria-label={t('В бой — тренировка против ИИ', 'To battle — training against AI')}>
         <span className={styles.keystone} aria-hidden="true">⚔</span>
-        <div className={styles.interior} aria-hidden="true">
-          <div className={styles.brazier}><CoinPreview model="brazier" size="100%" autoRotate={false} label="" /></div>
-          <div className={styles.embers}>{Array.from({ length: 9 }, (_, i) => <i key={i} style={{ left: `${16 + i * 8}%`, animationDelay: `${-i * .7}s` }} />)}</div>
+        <div className={styles.interior} aria-hidden="true" style={{ backgroundImage: "url('/ui/portals/training.webp')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
         </div>
         <div className={styles.portalCopy}>
           <h2>{t('Тренировка', 'Training')}</h2>
@@ -42,8 +40,8 @@ export default function ArenaGates() {
         <div className={styles.heroOptions}>{Object.values(HEROES).map(h => <button key={h.id} className={styles.hero} aria-pressed={h.id === hero} aria-label={heroName(h.id)} title={heroName(h.id)} onClick={() => setHero(h.id)}><img src={`/heroes/${h.id}.webp`} alt="" />{h.id === hero && <span aria-hidden="true">✓</span>}</button>)}</div>
       </section>
       <div className={styles.futureModes} aria-label={t('Будущие режимы', 'Upcoming modes')}>
-        <div><span aria-hidden="true">⚔</span><span>{t('Онлайн-дуэль', 'Online duel')}</span><small>{t('Скоро', 'Soon')}</small></div>
-        <div><span aria-hidden="true">♜</span><span>{t('Своя игра', 'Private game')}</span><small>{t('Скоро', 'Soon')}</small></div>
+        <div style={{ backgroundImage: "url('/ui/portals/duel.webp')", backgroundSize: 'cover', backgroundPosition: 'center' }}><span aria-hidden="true">⚔</span><span>{t('Онлайн-дуэль', 'Online duel')}</span><small>{t('Скоро', 'Soon')}</small></div>
+        <div style={{ backgroundImage: "url('/ui/portals/custom.webp')", backgroundSize: 'cover', backgroundPosition: 'center' }}><span aria-hidden="true">♜</span><span>{t('Своя игра', 'Private game')}</span><small>{t('Скоро', 'Soon')}</small></div>
       </div>
     </main>
     {settingsOpen && <ArenaSettings skin={skin} onChange={setSkin} onClose={() => setSettingsOpen(false)} />}
