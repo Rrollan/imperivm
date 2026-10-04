@@ -4,6 +4,7 @@ import type { HeroDef } from '../lib/engine/types';
 import { CoinPreview, type ModelKey } from './3d/CoinPreview';
 import { useLocale } from './LocaleContext';
 import type { UiFloat } from './battleFx';
+import NumberFlow from '@number-flow/react';
 
 interface HeroPortraitProps {
   hero: HeroDef;
@@ -53,7 +54,7 @@ export default function HeroPortrait({
       </div>
       <div key={hits[hits.length - 1]?.key ?? 'treasury'} className={`hero-treasury ${damaged ? 'target-shake treasury-hit' : ''}`}
         title={t('Казна: прочность империи', 'Treasury: the strength of your empire')}>
-        <img src="/ornaments/chest.svg" alt="" /><strong>{treasury}</strong>
+        <img src="/ornaments/chest.svg" alt="" /><strong><NumberFlow value={treasury} /></strong>
         <small>{t('КАЗНА', 'TREASURY')}</small>
         <span className="treasury-reserve" aria-hidden>{Array.from({ length: 5 }, (_, i) => <i key={i} className={i < Math.ceil(Math.max(0, treasury) / maxTreasury * 5) ? 'filled' : ''} />)}</span>
       </div>

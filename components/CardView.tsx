@@ -8,6 +8,7 @@ import type { CardDef, Faction, Minion, Rarity } from '../lib/engine/types';
 import { CARDS } from '../lib/cards';
 import ArtImg from './ArtImg';
 import type { UiFloat } from './battleFx';
+import { HoloCard } from 'react-holo-card';
 
 export const FACTION_COLORS: Record<Faction, string> = {
   DeFi: '#795297',
@@ -117,15 +118,31 @@ export default function CardView({
         <div className="card-cost absolute -top-2.5 -left-2.5 w-8 h-8 rotate-45 border-2 border-[#f5d76e] flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.6)] z-10" title={t(`Стоимость: ${card.cost} газа`, `Cost: ${card.cost} gas`)}>
           <span className="-rotate-45 text-white font-mono font-bold text-sm drop-shadow">{card.cost}</span>
         </div>
-        {/* art */}
+        {/* art — holo for epic/legendary, standard for others */}
         <div className="card-art mx-1.5 mt-1 rounded-lg overflow-hidden border border-gold-dark/60 aspect-[3/4] bg-abyss">
-          <ArtImg
-            src={`/cards/${card.id}.webp`}
-            alt={name}
-            letter={name.charAt(0)}
-            className="w-full h-full"
-            imgClassName="w-full h-full object-cover"
-          />
+          {(card.rarity === 'epic' || card.rarity === 'legendary') && !reduced ? (
+            <HoloCard
+              url={`/cards/${card.id}.webp`}
+              width={size === 'lg' ? 200 : size === 'sm' ? 100 : 120}
+              height={size === 'lg' ? 267 : size === 'sm' ? 133 : 160}
+              radius="md"
+              showSparkles={card.rarity === 'legendary'}
+              maxTilt={18}
+              scale={1.03}
+              perspective={900}
+              gyro={false}
+              alt={name}
+              className="w-full h-full"
+            />
+          ) : (
+            <ArtImg
+              src={`/cards/${card.id}.webp`}
+              alt={name}
+              letter={name.charAt(0)}
+              className="w-full h-full"
+              imgClassName="w-full h-full object-cover"
+            />
+          )}
         </div>
 
         {/* name plate */}
@@ -209,9 +226,8 @@ interface MinionTokenProps {
 }
 
 /**
- * Compact board token: art medallion, attack/health orbs, state highlights
- * (selected / attackable / canAct / staked), floating damage numbers,
- * death + play + attack-lunge animations.
+ * Hearthstone-style oval minion medallion: art fills the oval, attack shield
+ * bottom-left, HP crystal bottom-right, metal frame by rarity.
  */
 export function MinionToken({
   minion,
@@ -229,12 +245,13 @@ export function MinionToken({
   const { t, cardName, cardText, keywordName, mechanicText } = useLocale();
   const def = CARDS[minion.cardId];
   const name = def ? cardName(minion.cardId) : minion.name;
-  const rarityColor = def ? RARITY_COLORS[def.rarity] : '#A89BC0';
+  const rarity = def?.rarity ?? 'common';
 
   return (
-    <div className="minion-token flex flex-col items-center relative">
+    <div className="hs-minion relative">
       <div
         data-minion-uid={minion.uid}
+        data-rarity={rarity}
         role={onClick ? 'button' : undefined}
         tabIndex={onClick ? 0 : undefined}
         onClick={onClick}
@@ -242,72 +259,35 @@ export function MinionToken({
         aria-label={`${name}, ${minion.attack} ${t("атака", "attack")}, ${minion.health} ${t("здоровье", "health")}${minion.taunt ? `, ${keywordName("Taunt")}` : ""}${minion.staked ? `, ${t("в стейкинге", "staked")}` : ""}`}
         title={def ? `${name} — ${cardText(minion.cardId)}` : name}
         className={[
-          `board-token ${attackable ? 'valid-minion-target' : ''}`,
-          'relative w-[4.6rem] h-[5.4rem] md:w-20 md:h-[6rem] rounded-xl bg-gradient-to-b from-[#2a1745] to-abyss',
-          'flex flex-col items-center justify-start pt-1 pb-4',
+          'hs-minion-oval',
+          minion.taunt ? 'hs-taunt' : '',
           onClick && !dying ? 'cursor-pointer' : '',
-          selected
-            ? 'shadow-[0_0_18px_rgba(212,175,55,0.7)]'
-            : attackable
-              ? 'shadow-[0_0_10px_rgba(212,175,55,0.4)]'
-              : canAct
-                ? 'shadow-[0_0_10px_rgba(212,175,55,0.35)]'
-                : '',
+          selected ? 'hs-selected' : '',
+          attackable ? 'hs-attackable' : '',
+          canAct && !dying ? 'hs-can-act' : '',
+          minion.staked ? 'hs-staked' : '',
           dying ? 'death-fade' : '',
           shaking ? 'target-shake' : '',
           justPlayed ? 'play-to-board' : '',
         ].join(' ')}
-        style={{
-          border: `2px ${minion.staked ? 'dashed' : 'solid'} ${
-            selected ? '#D4AF37' : attackable ? '#f5d76e' : canAct ? 'rgba(212,175,55,0.65)' : minion.staked ? '#8C6A1F' : rarityColor
-          }`,
-        }}
       >
-        {/* art medallion */}
-        <div
-          className="board-minion-art overflow-hidden shrink-0 bg-abyss"
-          style={{ border: `2px solid ${rarityColor}` }}
-        >
-          <ArtImg
-            src={`/cards/${minion.cardId}.webp`}
-            alt={name}
-            letter={name.charAt(0)}
-            className="w-full h-full text-lg"
-            imgClassName="w-full h-full object-cover"
-          />
+        <ArtImg
+          src={`/cards/${minion.cardId}.webp`}
+          alt={name}
+          letter={name.charAt(0)}
+          className="w-full h-full"
+          imgClassName="w-full h-full object-cover"
+        />
+        {minion.staked && <div className="hs-staked-overlay" aria-hidden />}
+        {!minion.canAttack && !minion.staked && !dying && (
+          <div className="hs-sleep" title={t('Не может атаковать в ход призыва', 'Summoning sickness')}>💤</div>
+        )}
+        <div className="hs-pips">
+          {minion.rush && <span title={mechanicText("Rush")} className="hs-pip">↯</span>}
+          {minion.lifesteal && <span title={mechanicText("Lifesteal")} className="hs-pip">♥</span>}
+          {def?.halvingPeriod && <span title={t(`Халвинг каждые ${def.halvingPeriod} блока: +1/+1`, `Halving every ${def.halvingPeriod} blocks: +1/+1`)} className="hs-pip">◈</span>}
+          {def?.priority && <span title={keywordName("Priority")} className="hs-pip">⚡</span>}
         </div>
-        <div className="text-[8.5px] md:text-[9px] text-parchment/90 text-center leading-tight px-1 font-semibold mt-0.5 line-clamp-2">
-          {name}
-        </div>
-
-        {/* status icons */}
-        <div className="flex items-center gap-1 mt-0.5">
-          {minion.taunt && <span title={mechanicText("Taunt")} aria-label={keywordName("Taunt")} className="token-keyword">◆</span>}
-          {minion.rush && <span title={mechanicText("Rush")} aria-label={keywordName("Rush")} className="token-keyword">↯</span>}
-          {minion.lifesteal && <span title={mechanicText("Lifesteal")} aria-label={keywordName("Lifesteal")} className="token-keyword">♥</span>}
-          {minion.staked && (
-            <span className="text-[8px] uppercase tracking-widest text-gold-dark font-bold">{t('⛓ стейкинг', '⛓ staked')}</span>
-          )}
-          {!minion.canAttack && !minion.staked && !dying && (
-            <span className="text-[9px] text-lavender/70" title={t('Не может атаковать в ход призыва', 'Summoning sickness')}>💤</span>
-          )}
-          {def?.halvingPeriod && (
-            <span className="text-[9px] text-mint" title={t(`Халвинг каждые ${def.halvingPeriod} блока: +1/+1`, `Halving every ${def.halvingPeriod} blocks: +1/+1`)}>◈</span>
-          )}
-          {def?.priority && (
-            <span className="text-[9px] text-blood" title={keywordName("Priority")}>⚡</span>
-          )}
-        </div>
-
-        {/* stat orbs */}
-        <div className="absolute -bottom-2.5 left-0.5 w-7 h-7 rounded-full bg-gradient-to-br from-gold-light to-gold-dark border-2 border-[#6b4e12] flex items-center justify-center shadow z-10">
-          <span className="text-abyss font-mono font-bold text-xs">{minion.attack}</span>
-        </div>
-        <div className="absolute -bottom-2.5 right-0.5 w-7 h-7 rounded-full bg-gradient-to-br from-[#ff8a94] to-blood border-2 border-[#7a1f28] flex items-center justify-center shadow z-10">
-          <span className="text-white font-mono font-bold text-xs">{minion.health}</span>
-        </div>
-
-        {/* floating combat numbers */}
         {floats.map(f => (
           <span
             key={f.key}
@@ -319,40 +299,30 @@ export function MinionToken({
             {f.kind === 'damage' ? `-${f.amount}` : `+${f.amount}`}
           </span>
         ))}
-        {/* impact burst on hit */}
-        {shaking && (
-          <>
-            <span className="impact-flash" aria-hidden />
-            <span className="impact-burst" aria-hidden />
-          </>
-        )}
       </div>
-
+      <div className="hs-attack" aria-hidden>
+        <span>{minion.attack}</span>
+      </div>
+      <div className="hs-hp" aria-hidden>
+        <span>{minion.health}</span>
+      </div>
       {dying && <span className="golden-death-dust" aria-hidden>{Array.from({ length: 12 }, (_, i) => <i key={i} style={{ '--dust-x': `${Math.cos(i * Math.PI / 6) * (25 + i * 2)}px`, '--dust-y': `${Math.sin(i * Math.PI / 6) * 34 - 18}px`, animationDelay: `${i % 3 * 35}ms` } as CSSProperties} />)}</span>}
       {(onStake || onUnstake) && !dying && (
-        <div className="mt-3.5 flex gap-1">
+        <div className="hs-stake-row">
           {onStake && (
             <button
-              onClick={e => {
-                e.stopPropagation();
-                onStake();
-              }}
-              className="text-[9px] px-1.5 py-0.5 rounded border border-gold/50 text-gold hover:bg-gold/10 uppercase tracking-wide"
-              title={t('Стейкинг: +1 газ каждый ход, атака недоступна', 'Stake: +1 gas each turn, cannot attack')}
+              onClick={e => { e.stopPropagation(); onStake(); }}
+              className="hs-stake-btn"
             >
-              {t('В стейкинг', 'Stake')}
+              {t('Стейк', 'Stake')}
             </button>
           )}
           {onUnstake && (
             <button
-              onClick={e => {
-                e.stopPropagation();
-                onUnstake();
-              }}
-              className="text-[9px] px-1.5 py-0.5 rounded border border-lavender/50 text-lavender hover:bg-lavender/10 uppercase tracking-wide"
-              title={t('Вывести существо из стейкинга', 'Unstake this minion')}
+              onClick={e => { e.stopPropagation(); onUnstake(); }}
+              className="hs-unstake-btn"
             >
-              {t('Вывести', 'Unstake')}
+              {t('Снять', 'Unstake')}
             </button>
           )}
         </div>
@@ -360,6 +330,7 @@ export function MinionToken({
     </div>
   );
 }
+
 
 /** Attack-lunge wrapper: moves the whole token (art + orbs + buttons) toward the target. */
 export function LungeWrap({
