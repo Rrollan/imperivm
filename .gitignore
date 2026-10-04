@@ -9,3 +9,10 @@ dist/
 .vercel
 tsconfig.tsbuildinfo
 verification/
+
+/opencode.json
+/.orchestration/
+/tmp/imagegen/
+/.agents/
+/skills-lock.json
+/.opencode/
