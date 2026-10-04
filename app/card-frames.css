@@ -1,0 +1,61 @@
+/* Rome owns the silhouette: bronze legion shields, crystal spell tablets, laurel crowns. */
+.imperial-card-wrap { padding-top: 4px; }
+.imperial-card {
+  --frame-metal: #a28153;
+  --frame-light: #eed5a0;
+  border: 3px solid var(--frame-metal);
+  border-radius: 36px 36px 13px 13px;
+  background: radial-gradient(ellipse at 30% 0%,#b1996540,transparent 45%), repeating-linear-gradient(110deg,#fff1 0 1px,transparent 1px 6px), linear-gradient(135deg,#514539,#302731 35%,#716047 67%,#201924);
+  box-shadow: inset 0 0 0 2px #130c17,inset 3px 3px 3px #fff3,0 5px 0 #211824,0 9px 15px #0009;
+  isolation: isolate;
+}
+.imperial-card .card-faction-ribbon { height: 3px; margin: 2px 18% 0; opacity: .85; }
+.card-ornament { position: absolute; inset: -3px; width: calc(100% + 6px); height: calc(100% + 6px); z-index: 3; pointer-events: none; overflow: visible; }
+.frame-metal { fill: none; stroke: var(--frame-light); stroke-width: 1.7; opacity: .8; }
+.frame-engraving { fill: none; stroke: var(--frame-light); stroke-width: 2; opacity: .7; }
+.frame-crest { fill: var(--card-faction); stroke: #f1dba4; stroke-width: 1.5; }
+.frame-laurels { fill: #d0a34e; stroke: #f8dd98; stroke-width: .8; filter: drop-shadow(0 1px 1px #000); }
+.imperial-card .card-art { position: relative; margin: 9px 8px 0; border: 3px solid #a68852; border-radius: 45% 45% 7px 7px / 22% 22% 7px 7px; box-shadow: 0 0 0 1px #150d1b,inset 0 2px 8px #0008; }
+.imperial-card .card-art::after { content: ''; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 14px #07030b88,inset 0 -22px 22px -20px #000; border-radius: inherit; }
+.imperial-card .card-cost { width: 36px; height: 36px; top: 3px; left: -9px; border: 3px ridge #dcbb73; border-radius: 6px; background: conic-gradient(from 35deg,#213566,#85d9ef,#153277,#338cbd,#132055); box-shadow: 0 2px 0 #1e1524,0 3px 8px #000a,inset 1px 1px 2px #fff9; }
+.imperial-card .card-cost span { font: 800 20px var(--font-cinzel),serif; text-shadow: 0 2px 2px #061933; }
+.imperial-card .card-rarity-gem { top: 8px; right: 5px; width: 13px; height: 13px; border: 2px ridge #e4c790; box-shadow: 0 0 0 2px #302030,0 1px 6px var(--card-rarity); }
+.imperial-card .card-name { position: relative; z-index: 4; margin: -7px 2px 0; padding: 7px 9px 6px; background: linear-gradient(120deg,#b38a42,#f4d58f 30%,#d5af64 63%,#9c7438); color: #2e2026; text-shadow: 0 1px #ffe7ac66; clip-path: polygon(4% 0,96% 0,100% 50%,96% 100%,4% 100%,0 50%); box-shadow: inset 0 2px #ffe5a699,inset 0 -2px #715129; }
+.imperial-card .card-name > div:first-child { color: #291b24; font-weight: 800; }
+.imperial-card .card-name > div:last-child { color: #5c4133; font-size: 7px; letter-spacing: .07em; margin-top: 3px; }
+.imperial-card .card-rules { position: relative; margin: 0 8px; padding: 8px 6px 5px; min-height: 47px; color: #42303b; background: radial-gradient(ellipse at 50% 0,#f8e7b9,#dac496 70%,#ba9e78); border: 1px solid #a0865d; border-top: 0; box-shadow: inset 2px 0 5px #79624940,inset -2px 0 5px #79624940; }
+.imperial-card .card-keywords { min-height: 20px; padding: 3px 7px 9px; gap: 3px; }
+.imperial-card .keyword-chip { background: #271b31; color: #f1d79b; border-color: #a78a53; font-size: 8px; }
+.imperial-card .card-attack, .imperial-card .card-health { width: 36px; height: 39px; bottom: -10px; border: 3px ridge #edcb7e; box-shadow: 0 2px 5px #000b,inset 0 2px 3px #fff6; }
+.imperial-card .card-attack { border-radius: 9px 9px 16px 16px; background: linear-gradient(135deg,#fff0ac,#d8ad43 48%,#8b5e1e); }
+.imperial-card .card-health { border-radius: 9px 9px 18px 18px; background: radial-gradient(circle at 35% 20%,#ffa9a2,#c52d43 50%,#60112c); }
+.imperial-card .card-attack span, .imperial-card .card-health span { font: 800 20px var(--font-cinzel),serif; }
+.imperial-card .card-health span { text-shadow: 0 2px 2px #4c0824; }
+.card-family-spell { --frame-metal: #786696; --frame-light: #cfbce6; border-radius: 12px 12px 6px 6px; background: repeating-linear-gradient(115deg,#c6b5ff11 0 1px,transparent 1px 8px),linear-gradient(130deg,#685779,#2b1d3e 40%,#725186 64%,#241832); }
+.card-family-spell .card-art { border-radius: 5px; border-color: #bd9dd4; clip-path: polygon(15% 0,85% 0,100% 12%,100% 88%,85% 100%,15% 100%,0 88%,0 12%); }
+.card-family-spell .card-name { margin-top: -6px; background: linear-gradient(120deg,#7c598f,#b59bc9 30%,#8d6aad 70%,#614478); text-shadow: 0 1px #d8c4e366; }
+.card-family-spell .card-name > div:first-child { color: #f7ebda; text-shadow: 0 1px 2px #2c153d; }
+.card-family-spell .card-name > div:last-child { color: #e4d2e8; }
+.card-family-spell .card-rules { margin: 0 7px 5px; border-radius: 0 0 10px 10px; background: linear-gradient(90deg,#bda17b,#efdfb6 10%,#e4cfa4 88%,#b49a76); }
+.card-family-spell .card-keywords { border-top: 1px solid #b795cc66; margin: 0 7px; padding-top: 6px; }
+.card-tier-rare { --frame-metal: #6da6b1; --frame-light: #b6e6e5; }
+.card-tier-epic { --frame-metal: #a57ccb; --frame-light: #e3bef9; }
+.card-tier-legendary { --frame-metal: #d3a444; --frame-light: #ffe4a0; border-width: 4px; background: radial-gradient(ellipse at 35% 0,#dfb76566,transparent 60%),repeating-linear-gradient(115deg,#ffe7a211 0 1px,transparent 1px 5px),linear-gradient(135deg,#8b6630,#31212b 42%,#ba8f3f 75%,#36202b); }
+.card-tier-legendary .card-art { border-color: #f1c869; box-shadow: 0 0 0 2px #5b3925,0 0 13px #dcaf3d33; }
+.card-tier-legendary .card-name { background: linear-gradient(115deg,#d29940,#ffe4a3 30%,#e4b957 64%,#a97426); }
+.card-size-lg .card-name { padding: 9px 12px; }
+.card-size-lg .card-name > div:first-child { font-size: 17px; line-height: 1.15; }
+.card-size-lg .card-name > div:last-child { font-size: 9px; }
+.card-size-lg .card-rules { font-size: 13px; line-height: 1.45; padding: 11px 10px; }
+.card-size-lg .card-cost { width: 45px; height: 45px; }
+.card-size-lg .card-cost span { font-size: 26px; }
+.card-size-lg .card-attack, .card-size-lg .card-health { width: 45px; height: 47px; }
+.card-size-lg .card-attack span, .card-size-lg .card-health span { font-size: 26px; }
+.hand-zone .imperial-card .card-art { margin: 6px 6px 0; border-width: 2px; }
+.hand-zone .imperial-card .card-name { margin: -5px 0 0; padding: 5px 4px 4px; }
+.hand-zone .imperial-card .card-name > div:first-child { font-size: 9px; line-height: 11px; height: 22px; }
+.hand-zone .imperial-card .card-name > div:last-child { margin-top: 1px; font-size: 6px; }
+.hand-zone .imperial-card .card-cost { width: 29px; height: 29px; top: 2px; left: -6px; }
+.hand-zone .imperial-card .card-cost span { font-size: 17px; }
+.hand-zone .imperial-card .card-attack, .hand-zone .imperial-card .card-health { width: 27px; height: 29px; }
+.hand-zone .imperial-card .card-attack span, .hand-zone .imperial-card .card-health span { font-size: 17px; }

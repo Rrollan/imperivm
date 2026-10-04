@@ -2,6 +2,7 @@
 
 import type { HeroDef } from '../lib/engine/types';
 import ArtImg from './ArtImg';
+import { useLocale } from './LocaleContext';
 import type { UiFloat } from './battleFx';
 
 interface HeroPortraitProps {
@@ -34,6 +35,8 @@ export default function HeroPortrait({
   onClick,
   onKeyDown,
 }: HeroPortraitProps) {
+  const { t, heroName, heroTitle } = useLocale();
+  const name = heroName(hero.id);
   const coinSlots = 10;
   const filled = Math.ceil((Math.max(0, treasury) / maxTreasury) * coinSlots);
   const ring = foe ? 'border-blood' : 'border-gold';
@@ -42,23 +45,23 @@ export default function HeroPortrait({
     : 'shadow-[0_0_16px_rgba(212,175,55,0.4)]';
 
   return (
-    <div className="relative flex items-center gap-2.5 md:gap-4 min-w-0">
+    <div className="hero-profile relative flex items-center gap-2.5 md:gap-4 min-w-0">
       {/* coin portrait */}
-      <div className="relative shrink-0">
+      <div className="hero-coin relative shrink-0">
         <div
           role={onClick ? 'button' : undefined}
           tabIndex={onClick ? 0 : undefined}
           onClick={onClick}
           onKeyDown={onKeyDown}
-          title={foe ? 'Enemy treasury — empty it to win' : hero.name}
-          className={`${shaking ? 'target-shake' : 'float-slow'} w-14 h-14 md:w-20 md:h-20 rounded-full overflow-hidden border-4 ${ring} ${glow} bg-abyss ${
+          title={foe ? t('Вражеская казна — опустошите её для победы', 'Enemy treasury — empty it to win') : name}
+          className={`hero-medallion ${shaking ? 'target-shake' : 'float-slow'} w-14 h-14 md:w-20 md:h-20 rounded-full overflow-hidden border-4 ${ring} ${glow} bg-abyss ${
             onClick ? 'cursor-pointer' : ''
           } ${highlight ? 'animate-pulse ring-4 ring-blood/60' : ''}`}
         >
           <ArtImg
             src={`/heroes/${hero.id}.webp`}
-            alt={hero.name}
-            letter={hero.name.charAt(0)}
+            alt={name}
+            letter={name.charAt(0)}
             className="w-full h-full text-3xl md:text-4xl"
             imgClassName="w-full h-full object-cover"
           />
@@ -66,28 +69,28 @@ export default function HeroPortrait({
         {/* laurel tick under the coin */}
         <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
           <span className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-gold-dark font-bold bg-abyss/80 px-1.5 rounded border border-gold-dark/40">
-            {hero.name}
+            {name}
           </span>
         </div>
       </div>
 
       {/* name + treasury */}
-      <div className="min-w-0 pt-1">
+      <div className="hero-vitals min-w-0 pt-1">
         <div className="font-display font-bold text-sm md:text-lg leading-tight truncate">
-          {hero.name}
-          <span className="text-lavender text-[10px] md:text-xs italic font-normal"> · {hero.title}</span>
+          {name}
+          <span className="text-lavender text-[10px] md:text-xs italic font-normal"> · {heroTitle(hero.id)}</span>
         </div>
 
         <div
-          className="mt-1 flex items-center gap-2"
-          title={foe ? 'Enemy treasury — empty it to win' : 'Your treasury — if it empties, you lose'}
+          className="hero-treasury mt-1 flex items-center gap-2"
+          title={foe ? t('Вражеская казна — опустошите её для победы', 'Enemy treasury — empty it to win') : t('Ваша казна — если она опустеет, вы проиграете', 'Your treasury — if it empties, you lose')}
         >
           {/* treasury glyph */}
           <span className="text-gold text-base md:text-lg leading-none" aria-hidden>
             ◈
           </span>
           <span className="font-mono font-bold text-sm md:text-base text-gold-light">
-            {treasury} <span className="text-[10px] text-lavender font-sans font-medium">HP</span>
+            {treasury} <span className="text-[10px] text-lavender font-sans font-medium">{t('ОЗ', 'HP')}</span>
           </span>
           {/* coin pile: depletes visually */}
           <span className="hidden sm:flex items-center gap-[3px]" aria-hidden>
@@ -104,10 +107,10 @@ export default function HeroPortrait({
           </span>
         </div>
 
-        <div className="mt-0.5 flex items-center gap-2 text-[10px] text-lavender/80">
-          <span className="font-mono">Deck {deckCount}</span>
+        <div className="hero-counts mt-0.5 flex items-center gap-2 text-[10px] text-lavender/80">
+          <span className="font-mono">{t('Колода', 'Deck')} {deckCount}</span>
           {showHandBacks ? (
-            <span className="flex items-center" aria-label={`${handCount} cards in rival hand`}>
+            <span className="flex items-center" aria-label={t(`Карт в руке соперника: ${handCount}`, `${handCount} cards in rival hand`)}>
               {Array.from({ length: Math.min(handCount, 10) }, (_, i) => (
                 <span
                   key={i}
@@ -117,7 +120,7 @@ export default function HeroPortrait({
               <span className="ml-1 font-mono">×{handCount}</span>
             </span>
           ) : (
-            <span className="font-mono">Hand {handCount}</span>
+            <span className="font-mono">{t('Рука', 'Hand')} {handCount}</span>
           )}
         </div>
       </div>

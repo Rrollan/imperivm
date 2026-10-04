@@ -1,25 +1,12 @@
 'use client';
 import Dialog from './Dialog';
-export const MECHANICS: Record<string, string> = {
-  Gas: 'Pay card and hero power costs with gas. Your capacity grows by 1 on each own turn, up to 10. Staked minions add 1 gas each on refill.',
-  Treasury: 'Your 30 HP reserve. Empty the rival’s Treasury to win. Healing cannot exceed 30.',
-  Mempool: 'Cast a spell now; it resolves at the start of your next own turn. Your rival gets a turn to answer it.',
-  Priority: 'Immediately counters the highest-cost enemy queued spell. Equal costs: the earliest cast is removed first.',
-  Staking: 'Trade attack readiness for +1 gas each own turn. Staked minions remain attackable. Unstaking cannot restore an attack in the same turn.',
-  Halving: 'At the indicated block interval, this minion gains +1 attack and +1 health. Both boards tick; spells resolve before this buff.',
-  Taunt: 'Enemy minion attacks must target a Taunt first, including staked guards. Spells ignore Taunt.',
-  Rush: 'Attack enemy minions on the summon turn. Attack Treasuries from your next own turn. Taunt and staking still apply.',
-  Lifesteal: 'Combat damage heals your Treasury by actual health removed, including retaliation. No overkill healing; capped at 30.',
-  Pavilion: 'Your second card of the same faction in a turn refunds 1 gas, once per faction. Spell resolutions do not count.',
-  Comeback: 'At 12 HP or less, with the rival at least 12 HP ahead, your hero power costs 1 gas. It remains once per turn.',
-  Mulligan: 'Select opening cards to replace, or keep them all. Rejected cards return to the deck after replacements are drawn.',
-  'RUG PULL': 'A legendary spell that destroys every minion on both boards when it resolves. Priority cards can counter it beforehand.',
-  Audit: 'A 3-gas Priority spell that counters immediately, then gives your minions +1/+1 on your next own turn.',
-  Fatigue: 'When your deck is empty, each attempted draw damages your Treasury: 1, then 2, then 3…',
-};
+export { MECHANICS } from '../lib/mechanics';
+import { MECHANICS } from '../lib/mechanics';
+import { useLocale } from './LocaleContext';
 export default function MechanicsGuide({ onClose }: { onClose: () => void }) {
-  return <Dialog title="The imperial rulebook" onClose={onClose} wide>
-    <p className="dialog-copy">The engine decides what is legal. Tap a card to read it; glowing targets show where you can attack.</p>
-    <div className="mechanics-guide">{Object.entries(MECHANICS).map(([name, text]) => <details key={name}><summary>{name}</summary><p>{text}</p></details>)}</div>
+  const { t, keywordName, mechanicText } = useLocale();
+  return <Dialog title={t('Правила Империи', 'The imperial rulebook')} onClose={onClose} wide>
+    <p className="dialog-copy">{t('Нажмите на карту, чтобы прочитать её свойства. Подсвеченные цели показывают, куда можно атаковать.', 'Tap a card to read its rules; glowing targets show where you can attack.')}</p>
+    <div className="mechanics-guide">{Object.keys(MECHANICS).map(name => <details key={name}><summary>{keywordName(name)}</summary><p>{mechanicText(name)}</p></details>)}</div>
   </Dialog>;
 }

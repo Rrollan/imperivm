@@ -15,6 +15,7 @@
  * On unmount we sweep everything.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocale } from './LocaleContext';
 import { prefersReducedMotion } from '../lib/prefersReducedMotion';
 import type { BattleEvents } from '../lib/events';
 
@@ -41,6 +42,7 @@ interface HalvingSprite {
 }
 
 export default function MotionFx({ events, playRects, reduced: reducedProp }: MotionFxProps) {
+  const { t } = useLocale();
   const reduced = reducedProp ?? prefersReducedMotion();
   const [flights, setFlights] = useState<FlightSprite[]>([]);
   const [halvings, setHalvings] = useState<HalvingSprite[]>([]);
@@ -188,17 +190,17 @@ export default function MotionFx({ events, playRects, reduced: reducedProp }: Mo
           <div className="laurel-shimmer text-center font-display">
             <div className="text-5xl md:text-7xl font-bold tracking-[0.2em]">
               {endgame.perspective === 'draw'
-                ? 'STALEMATE'
+                ? t('НИЧЬЯ', 'STALEMATE')
                 : endgame.perspective === 'me'
-                  ? 'VICTORIA'
-                  : 'RUGGED'}
+                  ? t('ПОБЕДА', 'VICTORIA')
+                  : t('РАГПУЛ', 'RUGGED')}
             </div>
             <div className="mt-2 text-base md:text-xl italic text-parchment/80">
               {endgame.perspective === 'draw'
-                ? 'Both treasuries fell. The chain remembers.'
+                ? t('Обе казны пали. Сеть помнит.', 'Both treasuries fell. The chain remembers.')
                 : endgame.perspective === 'me'
                   ? 'Veni. Vidi. Rugi.'
-                  : 'The market has spoken.'}
+                  : t('Рынок вынес свой приговор.', 'The market has spoken.')}
             </div>
           </div>
           {endgame.perspective === 'me' && !reduced && <ConfettiRain />}

@@ -29,19 +29,21 @@ import {
   type UniqueIdentifier,
 } from '@dnd-kit/core';
 import CardView from './CardView';
+import { useLocale } from './LocaleContext';
 import type { CardDef } from '../lib/engine/types';
 
 /* ───────────────────────────── типы и id ───────────────────────────── */
 
 /** Payload, который мы кладём в `data` каждого перетаскиваемого элемента. */
 export type DragItemData =
-  | { type: 'hand-card'; uid: string }
+  | { type: 'hand-card'; uid: string; cardType?: 'minion' | 'spell' }
   | { type: 'attacker'; uid: string };
 
 export type DragItemType = DragItemData['type'];
 
 /** Id дроп-зон. Дроп id вражеского миньона: `minion-<uid>`. */
 export const DROP_BOARD_ID = 'my-board';
+export const DROP_MEMPOOL_ID = 'mempool';
 export const DROP_FOE_HERO_ID = 'foe-hero';
 export const minionDropId = (uid: string): string => `minion-${uid}`;
 export const ownMinionDropId = (uid: string): string => `own-minion-${uid}`;
@@ -69,7 +71,8 @@ export function getDragData(active: Active | null | undefined): DragItemData | n
   const type = (raw as { type?: unknown }).type;
   const uid = (raw as { uid?: unknown }).uid;
   if ((type === 'hand-card' || type === 'attacker') && typeof uid === 'string') {
-    return { type, uid };
+    const cardType = (raw as { cardType?: unknown }).cardType;
+    return type === 'hand-card' ? { type, uid, cardType: cardType === 'spell' || cardType === 'minion' ? cardType : undefined } : { type, uid };
   }
   return null;
 }
@@ -128,6 +131,7 @@ export function useDragState(): {
   active: boolean;
   dragType: DragItemType | null;
   dragUid: string | null;
+  cardType: 'minion' | 'spell' | null;
 } {
   const { active } = useDndContext();
   const data = getDragData(active);
@@ -135,6 +139,7 @@ export function useDragState(): {
     active: active !== null,
     dragType: data?.type ?? null,
     dragUid: data?.uid ?? null,
+    cardType: data?.type === 'hand-card' ? data.cardType ?? null : null,
   };
 }
 
@@ -145,6 +150,7 @@ interface DraggableHandCardProps {
   id: string;
   /** true для неиграбельных карт — их таскать нельзя */
   disabled?: boolean;
+  cardType?: 'minion' | 'spell';
   children: React.ReactNode;
 }
 
@@ -153,11 +159,11 @@ interface DraggableHandCardProps {
  * touchAction: pan-x — горизонтальный скролл карусели руки остаётся нативным.
  * Исходник во время драга приглушается (opacity), превью — в DragOverlay.
  */
-export function DraggableHandCard({ id, disabled = false, children }: DraggableHandCardProps) {
+export function DraggableHandCard({ id, disabled = false, cardType, children }: DraggableHandCardProps) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: handDragId(id),
     disabled,
-    data: { type: 'hand-card', uid: id } satisfies DragItemData,
+    data: { type: 'hand-card', uid: id, cardType } satisfies DragItemData,
   });
 
   return (
@@ -258,6 +264,7 @@ interface DroppableMinionProps {
   uid: string;
   /** true = вражеский миньон (цель атаки, красная пульсация) */
   foe?: boolean;
+  attackable?: boolean;
   children: React.ReactNode;
 }
 
@@ -266,10 +273,10 @@ interface DroppableMinionProps {
  * Красная пульсация, когда атакующего тянут над вражеским миньоном.
  * Совместимо с существующим `attackable`-хайлайтом page.tsx.
  */
-export function DroppableMinion({ uid, foe = true, children }: DroppableMinionProps) {
+export function DroppableMinion({ uid, foe = true, attackable = true, children }: DroppableMinionProps) {
   const id = foe ? minionDropId(uid) : ownMinionDropId(uid);
-  const { isOver, setNodeRef, active: currentActive } = useDroppable({ id });
-  const isValidTarget = getDragData(currentActive)?.type === 'attacker';
+  const { isOver, setNodeRef, active: currentActive } = useDroppable({ id, disabled: !attackable });
+  const isValidTarget = attackable && getDragData(currentActive)?.type === 'attacker';
 
   return (
     <div
@@ -292,9 +299,9 @@ export function DroppableMinion({ uid, foe = true, children }: DroppableMinionPr
  * Дроп-зона на портрете вражеского героя, id 'foe-hero'.
  * Красная пульсация, когда атакующего тянут над монетой врага.
  */
-export function DroppableFoeHero({ children }: { children: React.ReactNode }) {
-  const { isOver, setNodeRef, active: currentActive } = useDroppable({ id: DROP_FOE_HERO_ID });
-  const isValidTarget = getDragData(currentActive)?.type === 'attacker';
+export function DroppableFoeHero({ children, attackable = true }: { children: React.ReactNode; attackable?: boolean }) {
+  const { isOver, setNodeRef, active: currentActive } = useDroppable({ id: DROP_FOE_HERO_ID, disabled: !attackable });
+  const isValidTarget = attackable && getDragData(currentActive)?.type === 'attacker';
 
   return (
     <div
@@ -332,4 +339,13 @@ export function CardDragOverlay({ card }: { card: CardDef | undefined }) {
       ) : null}
     </DragOverlay>
   );
+}
+
+/** Spell drop target; casting is still validated by the unchanged engine. */
+export function DroppableMempool({ children }: { children: React.ReactNode }) {
+  const { t } = useLocale();
+  const { active } = useDndContext();
+  const data = getDragData(active), accepting = data?.type === 'hand-card' && data.cardType === 'spell';
+  const { isOver, setNodeRef } = useDroppable({ id: DROP_MEMPOOL_ID, disabled: !accepting });
+  return <div ref={setNodeRef} className={`mempool-drop ${accepting ? 'accepting-spell' : ''} ${accepting && isOver ? 'spell-over' : ''}`}>{children}{accepting && <span className="mempool-drop-hint">{t('Отпусти заклинание здесь', 'Drop your spell here')}</span>}</div>;
 }

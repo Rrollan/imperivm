@@ -6,6 +6,7 @@
  * separate concern from reduced motion (independent settings).
  */
 import { useEffect, useState } from 'react';
+import { useLocale } from './LocaleContext';
 import { initMute, isMuted, onMuteChange, setMuted, unlockAudio } from '../lib/audio/manager';
 
 interface MuteButtonProps {
@@ -13,6 +14,7 @@ interface MuteButtonProps {
 }
 
 export default function MuteButton({ className = '' }: MuteButtonProps) {
+  const { t } = useLocale();
   const [mounted, setMounted] = useState(false);
   const [muted, setLocalMuted] = useState(false);
 
@@ -36,8 +38,8 @@ export default function MuteButton({ className = '' }: MuteButtonProps) {
       type="button"
       onClick={onToggle}
       aria-pressed={mounted ? muted : false}
-      aria-label={mounted && muted ? 'Unmute sounds' : 'Mute sounds'}
-      title={mounted && muted ? 'Unmute sounds' : 'Mute sounds'}
+      aria-label={mounted && muted ? t('Включить звук', 'Unmute sounds') : t('Выключить звук', 'Mute sounds')}
+      title={mounted && muted ? t('Включить звук', 'Unmute sounds') : t('Выключить звук', 'Mute sounds')}
       className={
         'inline-flex items-center justify-center gap-1.5 h-9 px-3 rounded-lg border text-xs uppercase tracking-widest transition ' +
         (muted
@@ -48,7 +50,7 @@ export default function MuteButton({ className = '' }: MuteButtonProps) {
       }
     >
       <span aria-hidden>{muted ? '🔇' : '🔊'}</span>
-      <span>{muted ? 'Muted' : 'Sound'}</span>
+      <span>{muted ? t('Без звука', 'Muted') : t('Звук', 'Sound')}</span>
     </button>
   );
 }

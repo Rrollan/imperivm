@@ -1,8 +1,10 @@
 'use client';
 import { useEffect, useRef } from 'react';
+import { useLocale } from './LocaleContext';
 export default function Dialog({ title, onClose, children, wide = false }: {
   title: string; onClose: () => void; children: React.ReactNode; wide?: boolean;
 }) {
+  const { t } = useLocale();
   const ref = useRef<HTMLDivElement>(null);
   const closeRef = useRef(onClose); closeRef.current = onClose;
   useEffect(() => {
@@ -23,7 +25,7 @@ export default function Dialog({ title, onClose, children, wide = false }: {
   }, []);
   return <div className="dialog-backdrop" onClick={onClose}>
     <div ref={ref} className={`imperial-dialog ${wide ? 'dialog-wide' : ''}`} role="dialog" aria-modal="true" aria-label={title} onClick={e => e.stopPropagation()}>
-      <div className="dialog-heading"><h2>{title}</h2><button className="icon-button" onClick={onClose} aria-label="Close dialog">✕</button></div>
+      <div className="dialog-heading"><h2>{title}</h2><button className="icon-button" onClick={onClose} aria-label={t('Закрыть окно', 'Close dialog')}>✕</button></div>
       {children}
     </div>
   </div>;

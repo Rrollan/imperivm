@@ -1,0 +1,15 @@
+.choiceCoin { margin: -6px -4px; }
+.briefWithArt { gap: 22px; }
+.briefArt { flex: 0 0 160px; }
+.briefCopy { flex: 1; min-width: 0; }
+.briefCopy p { max-width: 500px; }
+
+@media (max-width: 767px) {
+  .briefWithArt { display: grid; grid-template-columns: 108px 1fr; align-items: center; gap: 12px; }
+  .briefArt { width: 108px !important; height: 108px !important; }
+  .briefWithArt > a { grid-column: 1 / -1; }
+  .briefCopy h3 { font-size: 17px; }
+  .briefCopy p { font-size: 11px; line-height: 1.5; }
+  .briefCopy small { grid-column: 1 / -1; }
+  .choiceCoin { width: 46px !important; height: 46px !important; margin: -3px; }
+}

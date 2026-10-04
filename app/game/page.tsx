@@ -2,6 +2,12 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useLocale } from '../../components/LocaleContext';
+import BoardRank, { isBoardSlot } from '../../components/BoardRank';
+import AttackAim from '../../components/AttackAim';
+import AbilityFx from '../../components/AbilityFx';
+import AttackFlight, { type CombatFlight } from '../../components/AttackFlight';
+import { VictoryCoin } from '../../components/3d/CoinPreview';
 import { useSearchParams } from 'next/navigation';
 import {
   applyAction,
@@ -30,6 +36,7 @@ import {
   DraggableHandCard,
   DraggableAttacker,
   DroppableBoard,
+  DroppableMempool,
   DroppableMinion,
   DroppableFoeHero,
   CardDragOverlay,
@@ -37,6 +44,7 @@ import {
   getDragData,
   minionUidFromDropId,
   DROP_BOARD_ID,
+  DROP_MEMPOOL_ID,
   DROP_FOE_HERO_ID,
 } from '../../components/dnd';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
@@ -57,6 +65,7 @@ import MuteButton from '../../components/MuteButton';
 import { diffAction, type BattleEvents } from '../../lib/events';
 import { emitSfxFromEvents, markAmbientStarted, shouldStartAmbient } from '../../lib/audio/events';
 import { startAmbient } from '../../lib/audio/sfx';
+import { unlockAudio } from '../../lib/audio/manager';
 import { useReducedMotion } from '../../lib/prefersReducedMotion';
 import { useImperivmWallet } from '../../components/WalletContext';
 import type { PlayProof } from '../../lib/solana/proof';
@@ -83,11 +92,12 @@ function useIsDesktop(): boolean {
 }
 
 export default function GamePage() {
+  const { t } = useLocale();
   return (
     <Suspense
       fallback={
         <div className="min-h-screen bg-abyss flex items-center justify-center text-gold font-display text-2xl">
-          Entering the arena…
+          {t('Входим на арену…', 'Entering the arena…')}
         </div>
       }
     >
@@ -97,11 +107,13 @@ export default function GamePage() {
 }
 
 function GameBoard() {
+  const { t, cardName, cardText, heroName, powerName, powerText, mechanicText, logLine, errorText } = useLocale();
   const searchParams = useSearchParams();
   const heroParam = searchParams.get('hero');
   const heroId = heroParam && HEROES[heroParam] ? heroParam : 'whale';
   const aiHeroId = heroId === 'degen' ? 'validator' : 'degen';
   const useCustom = searchParams.get('deck') === 'custom';
+  const autoDemo = searchParams.get('demo') === '1';
 
   const [state, setState] = useState<GameState | null>(null);
   const [attackerUid, setAttackerUid] = useState<string | null>(null);
@@ -126,6 +138,14 @@ function GameBoard() {
   const match = useRef({ id: '', owner: 'demo', startedAt: '', exhibition: false });
   if (autoplay) match.current.exhibition = true;
   const aiSteps = useRef(0);
+  const [combatFlight, setCombatFlight] = useState<CombatFlight | null>(null);
+  const captureCombat = useCallback((action: Action, game: GameState) => {
+    if (action.type !== 'attack') return;
+    const from = document.querySelector<HTMLElement>(`[data-minion-uid="${action.attackerUid}"]`);
+    const to = document.querySelector<HTMLElement>(action.target === 'hero' ? game.turn === ME ? '#foe-treasury-target' : '.combatant.own' : `[data-minion-uid="${action.target}"]`);
+    const minion = game.players[game.turn].board.find(m => m.uid === action.attackerUid);
+    if (from && to && minion) setCombatFlight({ uid: minion.uid, cardId: minion.cardId, from: from.getBoundingClientRect(), to: to.getBoundingClientRect() });
+  }, []);
 
 
   // battle FX state (all derived from state diffs — engine untouched)
@@ -157,8 +177,8 @@ function GameBoard() {
 
   const startGame = useCallback(
     (seed?: number) => {
-      match.current = { id: crypto.randomUUID(), owner: walletOwner.current ?? 'demo', startedAt: new Date().toISOString(), exhibition: false };
-      setProof(null); setProofError(null); setProofPending(!!walletOwner.current);
+      match.current = { id: crypto.randomUUID(), owner: walletOwner.current ?? 'demo', startedAt: new Date().toISOString(), exhibition: autoDemo };
+      setProof(null); setProofError(null); setProofPending(!!walletOwner.current && !autoDemo);
       timers.current.forEach(clearTimeout); timers.current.clear();
       const s = createGame(
         heroId,
@@ -172,7 +192,8 @@ function GameBoard() {
       setState(s);
       setStats(emptyMatchStats());
       setMulliganPicks([]);
-      setAutoplay(false);
+      setAutoplay(autoDemo);
+      setShowOnboarding(false);
       aiSteps.current = 0;
       setZoomUid(null);
       setInspectUid(null);
@@ -181,6 +202,7 @@ function GameBoard() {
       setFloats([]);
       setDying([]);
       setAttackAnim(null);
+      setCombatFlight(null);
       setPlayedUids(new Set());
       setMempoolFx(null);
       setScreenFx(null);
@@ -200,13 +222,13 @@ function GameBoard() {
       }, 1800);
       // first-game onboarding, shown once (localStorage)
       try {
-        if (!localStorage.getItem(ONBOARDING_KEY)) setShowOnboarding(true);
+        if (!autoDemo && !localStorage.getItem(ONBOARDING_KEY)) setShowOnboarding(true);
       } catch {
         /* storage unavailable — show anyway */
-        setShowOnboarding(true);
+        setShowOnboarding(!autoDemo);
       }
     },
-    [heroId, aiHeroId, useCustom],
+    [heroId, aiHeroId, useCustom, autoDemo],
   );
 
   // Create the game client-side only (never during SSR).
@@ -220,8 +242,7 @@ function GameBoard() {
     if (typeof window === 'undefined') return;
     if (!shouldStartAmbient()) return;
     const handler = () => {
-      startAmbient();
-      markAmbientStarted(true);
+      void unlockAudio().then(() => { startAmbient(); markAmbientStarted(true); });
       window.removeEventListener('pointerdown', handler);
       window.removeEventListener('keydown', handler);
     };
@@ -244,11 +265,12 @@ function GameBoard() {
 
   // AI loop: one action every ~600ms until the AI ends its turn.
   useEffect(() => {
-    if (!state || state.winner !== null || showOnboarding || proofPending || !(state.turn === FOE || autoplay)) return;
+    if (!state || state.winner !== null || proofPending || !(state.turn === FOE || autoplay)) return;
     const t = setTimeout(() => {
       try {
         aiSteps.current++;
         const action: Action = aiSteps.current > 100 && !mulliganAvailable(state) ? { type: 'end-turn' } : chooseAiAction(state);
+        captureCombat(action, state);
         lastActionRef.current = action;
         stateBeforeActionRef.current = state;
         setState(applyAction(state, action));
@@ -387,7 +409,7 @@ function GameBoard() {
       if (match.current.id !== captured) return;
       setProof(receipt); setProofPending(false);
       try { sessionStorage.setItem(`imperivm.proof.${captured}`, JSON.stringify(receipt)); } catch { /* optional receipt */ }
-    } catch (e) { if (match.current.id === captured) setProofError(e instanceof Error ? e.message : 'Signing declined. You can still play the demo.'); }
+    } catch (e) { if (match.current.id === captured) setProofError(e instanceof Error ? e.message : t('Подпись отклонена. Демо остаётся доступным.', 'Signing declined. You can still play the demo.')); }
   }
 
   if (!state) {
@@ -395,7 +417,7 @@ function GameBoard() {
       <div className="min-h-screen bg-abyss">
         <WalletBar />
         <div className="flex items-center justify-center py-32 text-gold font-display text-2xl">
-          Shuffling decks…
+          {t('Тасуем колоды…', 'Shuffling decks…')}
         </div>
       </div>
     );
@@ -405,7 +427,7 @@ function GameBoard() {
   const foe = state.players[FOE];
   const myHero = HEROES[me.heroId];
   const foeHero = HEROES[foe.heroId];
-  const myTurn = state.turn === ME && !aiThinking && state.winner === null && !proofPending && !showOnboarding;
+  const myTurn = state.turn === ME && !aiThinking && state.winner === null && !proofPending;
 
   const playableUids = new Set<string>();
   for (const a of legal) {
@@ -419,13 +441,14 @@ function GameBoard() {
       // Capture before-state + the action so the post-state diff can use
       // them. This replaces the old log-slice approach (which broke once
       // the log cap kicked in).
+      captureCombat(action, state);
       stateBeforeActionRef.current = state;
       lastActionRef.current = action;
 
       // For card plays: capture source (hand) and target (board) rects.
       if (opts?.collectPlayRects && state && (action.type === 'play-minion' || action.type === 'cast-spell')) {
         const fromEl = document.querySelector<HTMLElement>(`[data-hand-uid="${action.uid}"]`);
-        const toEl = document.querySelector<HTMLElement>(`#my-board-slot`);
+        const toEl = document.querySelector<HTMLElement>(`.own-rank .empty-slot`) ?? document.querySelector<HTMLElement>(`#my-board-slot`);
         if (fromEl && toEl) {
           setPlayRects({ from: fromEl.getBoundingClientRect(), to: toEl.getBoundingClientRect() });
         }
@@ -503,7 +526,7 @@ function GameBoard() {
   const handleDragEnd = (event: DragEndEvent) => {
     const data = getDragData(event.active);
     const overId = event.over?.id;
-    if (data?.type === 'hand-card' && overId === DROP_BOARD_ID) {
+    if (data?.type === 'hand-card' && (overId === DROP_BOARD_ID || overId === DROP_MEMPOOL_ID && data.cardType === 'spell' || isBoardSlot(overId) && data.cardType !== 'spell')) {
       onHandClick(data.uid); // same as click: finds play-minion/cast-spell in legal
     } else if (data?.type === 'attacker') {
       const targetUid = overId ? minionUidFromDropId(overId) : null;
@@ -555,16 +578,10 @@ function GameBoard() {
   const canHitFoeHero =
     !!attackerUid && legal.some(a => a.type === 'attack' && a.attackerUid === attackerUid && a.target === 'hero');
 
-  const phaseText =
-    state.winner !== null
-      ? 'Game over'
-      : mulliganAvailable(state)
-        ? state.turn === ME ? 'Mulligan · keep or replace your opening cards' : 'Rival chooses an opening hand…'
-      : myTurn
-        ? attackerUid && selectedAttacker
-          ? `Choose a target for ${selectedAttacker.name} — or click it again to cancel`
-          : 'Your turn — play cards, attack, stake'
-        : 'Rival is thinking…';
+  const phaseText = state.winner !== null ? t('Матч завершён', 'Game over')
+    : mulliganAvailable(state) ? state.turn === ME ? t('Стартовая рука: оставь карты или замени', 'Opening hand: keep or replace') : t('Противник выбирает карты…', 'Rival chooses an opening hand…')
+    : myTurn ? selectedAttacker ? t(`Выбери цель для «${cardName(selectedAttacker.cardId)}»`, `Choose a target for ${cardName(selectedAttacker.cardId)}`) : t('ВАШ ХОД', 'YOUR TURN')
+    : t('ХОД ПРОТИВНИКА', 'RIVAL’S TURN');
 
   const foeAttackable = (m: Minion) =>
     !!attackerUid && legal.some(a => a.type === 'attack' && a.attackerUid === attackerUid && a.target === m.uid);
@@ -574,86 +591,86 @@ function GameBoard() {
       <div className={`game-shell board-${skin}`} style={{ ['--board-art' as string]: `url('/boards/${skin}.webp')` }}>
         <WalletBar />
         <main className="game-content">
-          <nav className="arena-toolbar" aria-label="Match controls">
-            <Link href="/" className="quiet-link">← Heroes</Link>
-            <span className="block-plaque">BLOCK <b>{state.block.toString().padStart(2, '0')}</b></span>
+          <nav className="arena-toolbar" aria-label={t('Управление матчем', 'Match controls')}>
+            <Link href="/" className="quiet-link">{t('← Герои', '← Heroes')}</Link>
+            <span className="block-plaque">{t('БЛОК', 'BLOCK')} <b>{state.block.toString().padStart(2, '0')}</b></span>
             <div className="toolbar-actions">
-              <button className="icon-button" onClick={() => setHelpOpen(true)} aria-label="Open rulebook">?</button>
-              <button className="icon-button" onClick={() => setSettingsOpen(true)} aria-label="Arena settings">⚙</button>
-              <button className="icon-button" onClick={() => startGame(Date.now() & 0x7fffffff)} aria-label="Restart match">↻</button>
+              <button className="icon-button" onClick={() => setHelpOpen(true)} aria-label={t('Правила игры', 'Open rulebook')}>?</button>
+              <button className="icon-button" onClick={() => setSettingsOpen(true)} aria-label={t('Настройки арены', 'Arena settings')}>⚙</button>
+              <button className="icon-button" onClick={() => startGame(Date.now() & 0x7fffffff)} aria-label={t('Начать матч заново', 'Restart match')}>↻</button>
             </div>
           </nav>
-          <section className="battlefield" aria-label="Battlefield">
-            <DroppableFoeHero><div className={`combatant rival ${canHitFoeHero ? 'legal-target' : ''}`}>
-              <HeroPortrait hero={foeHero} treasury={foe.treasury} foe deckCount={foe.deck.length} handCount={foe.hand.length}
+          <section className="battlefield" aria-label={t('Поле боя', 'Battlefield')} onPointerMove={e => {
+            if (reduced || e.pointerType !== 'mouse') return;
+            const r = e.currentTarget.getBoundingClientRect();
+            e.currentTarget.style.setProperty('--table-x', `${((e.clientX - r.left) / r.width - .5) * 6}px`);
+            e.currentTarget.style.setProperty('--table-y', `${((e.clientY - r.top) / r.height - .5) * 4}px`);
+          }} onPointerLeave={e => { e.currentTarget.style.setProperty('--table-x', '0px'); e.currentTarget.style.setProperty('--table-y', '0px'); }}>
+            <DroppableFoeHero attackable={canHitFoeHero}><div id="foe-treasury-target" className={`combatant rival ${canHitFoeHero ? 'legal-target' : ''}`}>
+              <HeroPortrait hero={foeHero} treasury={foe.treasury} foe deckCount={foe.deck.length} handCount={foe.hand.length} showHandBacks
                 floats={floatsFor('hero-1')} highlight={canHitFoeHero} shaking={attackAnim?.targetUid === 'hero-1'}
                 onClick={canHitFoeHero ? onFoeHeroClick : undefined}
                 onKeyDown={canHitFoeHero ? e => { if (e.key === 'Enter' || e.key === ' ') onFoeHeroClick(); } : undefined} />
-              <span className="combatant-label">RIVAL · AI</span>
+              <span className="combatant-label">{t('ПРОТИВНИК · ИИ', 'RIVAL · AI')}</span>
             </div></DroppableFoeHero>
-            <div className="rank-row enemy-rank" aria-label="Rival minions">
-              <div className="rank-label">Rival ranks <span>{foe.board.length}/7</span></div>
-              <div className="rank-scroll thin-scroll">
-                {foe.board.length === 0 && <div className="empty-rank">The rival’s ranks are quiet.</div>}
-                {foe.board.map(m => <DroppableMinion key={m.uid} uid={m.uid} foe><LungeWrap active={attackAnim?.attackerUid === m.uid} up={false}>
-                  <MinionToken minion={m} attackable={foeAttackable(m)} shaking={attackAnim?.targetUid === m.uid}
-                    justPlayed={playedUids.has(m.uid)} floats={floatsFor(m.uid)}
-                    onClick={() => attackerUid && foeAttackable(m) ? onFoeMinionClick(m) : setInspectUid(m.uid)} />
-                </LungeWrap></DroppableMinion>)}
-                {dying.filter(d => d.owner === FOE).map(d => <MinionToken key={`dying-${d.key}`} minion={ghostOf(d)} dying floats={floatsFor(d.uid)} />)}
-              </div>
+            <div className="rank-row enemy-rank" aria-label={t('Существа противника', 'Rival minions')}>
+              <div className="rank-label">{t('Ряды противника', 'Rival ranks')} <span>{foe.board.length}/7</span></div>
+              <BoardRank cards={foe.board.map(m => ({ uid: m.uid, node: <DroppableMinion uid={m.uid} foe attackable={foeAttackable(m)}><LungeWrap active={attackAnim?.attackerUid === m.uid} up={false}>
+                <MinionToken minion={m} attackable={foeAttackable(m)} shaking={attackAnim?.targetUid === m.uid}
+                  justPlayed={playedUids.has(m.uid)} floats={floatsFor(m.uid)}
+                  onClick={() => attackerUid && foeAttackable(m) ? onFoeMinionClick(m) : setInspectUid(m.uid)} />
+              </LungeWrap></DroppableMinion> }))} ghosts={dying.filter(d => d.owner === FOE).map(d => <MinionToken key={`dying-${d.key}`} minion={ghostOf(d)} dying floats={floatsFor(d.uid)} />)} />
             </div>
-            <section className={`chain-strip ${mempoolFx ? 'mempool-flash-resolve' : ''}`} aria-label="Public mempool">
-              <button className="chain-label" onClick={() => setHelpOpen(true)} title={MECHANICS.Mempool}>⛓ MEMPOOL <b>{myMempool.length + foeMempool.length}</b></button>
+            <DroppableMempool><section className={`chain-strip ${mempoolFx ? 'mempool-flash-resolve' : ''}`} aria-label={t('Публичный мемпул', 'Public mempool')}>
+              <button className="chain-label" onClick={() => setHelpOpen(true)} title={mechanicText('Mempool')}>⛓ {t('МЕМПУЛ', 'MEMPOOL')} <b>{myMempool.length + foeMempool.length}</b></button>
               <div className="chain-entries thin-scroll">
-                {!myMempool.length && !foeMempool.length && <span className="chain-empty">Cast now. Resolve next own turn.</span>}
+                {!myMempool.length && !foeMempool.length && <span className="chain-empty">{t('Заклинание сработает в следующем вашем блоке.', 'Resolves at the start of your next block.')}</span>}
                 {[...foeMempool, ...myMempool].map(e => <button key={e.uid} className={`queued-spell ${e.owner === ME ? 'mine' : 'theirs'} mempool-glow`}
-                  onClick={() => setInspectCardId(e.cardId)} title={CARDS[e.cardId].text}>
-                  <img src={`/cards/${e.cardId}.webp`} alt="" /><span>{e.name}</span><small>{e.owner === ME ? 'YOU' : 'RIVAL'}</small>
+                  onClick={() => setInspectCardId(e.cardId)} title={cardText(e.cardId)}>
+                  <img src={`/cards/${e.cardId}.webp`} alt="" /><span>{cardName(e.cardId)}</span><small>{t('Следующий блок', 'Next block')} · {e.owner === ME ? t('ВАШЕ', 'YOURS') : t('ВРАГ', 'RIVAL')}</small>
                 </button>)}
               </div>
-            </section>
+            </section></DroppableMempool>
             <div className={`turn-status ${myTurn ? 'your-turn' : ''}`} role="status" aria-live="polite">
-              {autoplay ? 'Demo autoplay · pause below to take control' : phaseText}
-              {attackerUid && <button onClick={() => setAttackerUid(null)} className="cancel-target">Cancel</button>}
+              {autoplay ? t('Автобой: пауза вернёт управление', 'Autoplay: pause to take control') : phaseText}
+              {attackerUid && <button onClick={() => setAttackerUid(null)} className="cancel-target">{t('Отмена', 'Cancel')}</button>}
+              {attackerUid && <button className="cancel-target" onClick={() => setInspectUid(attackerUid)}>{t('Карта / стейкинг', 'Card / staking')}</button>}
             </div>
-            <DroppableBoard><div id="my-board-slot" className="rank-row own-rank" aria-label="Your minions">
-              <div className="rank-label">Your ranks <span>{me.board.length}/7</span>
-                {!!me.pavilionBonuses?.length && <b className="pavilion-tag" title={MECHANICS.Pavilion}>Pavilion +1 gas</b>}
+            <DroppableBoard><div id="my-board-slot" className="rank-row own-rank" aria-label={t('Ваши существа', 'Your minions')}>
+              <div className="rank-label">{t('Ваш легион', 'Your ranks')} <span>{me.board.length}/7</span>
+                {!!me.pavilionBonuses?.length && <b className="pavilion-tag" title={mechanicText('Pavilion')}>{t('Синергия +1 газ', 'Pavilion +1 gas')}</b>}
               </div>
-              <div className="rank-scroll thin-scroll">
-                {me.board.length === 0 && <div className="empty-rank">Raise your legion. Play a minion.</div>}
-                {me.board.map(m => {
-                  const ready = myTurn && legal.some(a => a.type === 'attack' && a.attackerUid === m.uid);
-                  const token = <LungeWrap active={attackAnim?.attackerUid === m.uid} up><MinionToken minion={m}
-                    selected={attackerUid === m.uid} canAct={ready} shaking={attackAnim?.targetUid === m.uid}
-                    justPlayed={playedUids.has(m.uid)} floats={floatsFor(m.uid)}
-                    onClick={() => ready && attackerUid !== m.uid ? onMyMinionClick(m) : setInspectUid(m.uid)} /></LungeWrap>;
-                  return ready && isDesktop ? <DraggableAttacker key={m.uid} uid={m.uid}>{token}</DraggableAttacker> : <div key={m.uid}>{token}</div>;
-                })}
-                {dying.filter(d => d.owner === ME).map(d => <MinionToken key={`dying-${d.key}`} minion={ghostOf(d)} dying floats={floatsFor(d.uid)} />)}
-              </div>
+              <BoardRank own cards={me.board.map(m => {
+                const ready = myTurn && legal.some(a => a.type === 'attack' && a.attackerUid === m.uid);
+                const token = <LungeWrap active={attackAnim?.attackerUid === m.uid} up><MinionToken minion={m}
+                  selected={attackerUid === m.uid} canAct={ready} shaking={attackAnim?.targetUid === m.uid}
+                  justPlayed={playedUids.has(m.uid)} floats={floatsFor(m.uid)}
+                  onClick={() => ready ? onMyMinionClick(m) : setInspectUid(m.uid)} /></LungeWrap>;
+                return { uid: m.uid, node: ready && isDesktop ? <DraggableAttacker uid={m.uid}>{token}</DraggableAttacker> : token };
+              })} ghosts={dying.filter(d => d.owner === ME).map(d => <MinionToken key={`dying-${d.key}`} minion={ghostOf(d)} dying floats={floatsFor(d.uid)} />)} />
             </div></DroppableBoard>
             <div className="combatant own"><HeroPortrait hero={myHero} treasury={me.treasury} deckCount={me.deck.length}
               handCount={me.hand.length} floats={floatsFor('hero-0')} shaking={attackAnim?.targetUid === 'hero-0'} />
-              <div className="gas-meter" title={MECHANICS.Gas}><span>GAS</span><b>{me.gas}<small>/{me.maxGas}</small></b>
+              <button className="hero-power-medallion" disabled={!myTurn || !hpAction || autoplay} onClick={() => hpAction && act(hpAction)} title={powerText(myHero.id)} aria-label={`${powerName(myHero.id)} · ${powerText(myHero.id)} · ${effectivePowerCost(state, ME)} ${t('газа', 'gas')}`}><span aria-hidden>⚡</span><b>{powerName(myHero.id)}</b><small>{effectivePowerCost(state, ME)}</small></button>
+              <div className="gas-meter" title={mechanicText('Gas')}><span>{t('ГАЗ', 'GAS')}</span><b>{me.gas}<small>/{me.maxGas}</small></b>
                 <div aria-hidden>{Array.from({ length: Math.min(me.maxGas, 10) }, (_, i) => <i key={i} className={i < me.gas ? 'filled' : ''} />)}</div>
               </div>
             </div>
           </section>
-          <section className="hand-zone" aria-label="Your hand">
-            <div className="hand-heading"><span>YOUR HAND <b>{me.hand.length}/10</b></span><span>{mulliganAvailable(state) ? 'Select cards to replace' : 'Tap to inspect · drag to deploy'}</span></div>
+          {showOnboarding && state.winner === null && <ContextCoach phase={mulliganAvailable(state) ? 'opening' : attackerUid ? 'target' : me.board.length === 0 ? 'play' : legal.some(a => a.type === 'attack') ? 'attack' : 'end'} onClose={closeOnboarding} />}
+          <section className="hand-zone" aria-label={t('Ваша рука', 'Your hand')}>
+            <div className="hand-heading"><span>{t('ВАША РУКА', 'YOUR HAND')} <b>{me.hand.length}/10</b></span><span>{mulliganAvailable(state) ? t('Выберите карты для замены', 'Select cards to replace') : t('Нажми или перетащи', 'Tap or drag to play')}</span></div>
             <div className="hand-scroll thin-scroll"><div className="hand-cards">
-              {me.hand.length === 0 && <p className="empty-hand">An empty hand. A full empire of possibilities.</p>}
+              {me.hand.length === 0 && <p className="empty-hand">{t('Рука пуста. Легион ещё в строю.', 'An empty hand. Your legion still stands.')}</p>}
               {me.hand.map((hc, i) => {
                 const def = CARDS[hc.cardId]; const playable = myTurn && playableUids.has(hc.uid);
                 const selecting = mulliganAvailable(state) && state.turn === ME;
                 const picked = mulliganPicks.includes(hc.uid);
-                return <DraggableHandCard key={hc.uid} id={hc.uid} disabled={!playable || !isDesktop}>
-                  <div data-hand-uid={hc.uid} className={`hand-card-wrap ${dealtUids.has(hc.uid) ? 'deal-in' : ''}`} style={{ animationDelay: `${i * 45}ms` }}>
-                    <CardView card={def} size="sm" playable={playable} selected={picked}
+                return <DraggableHandCard key={hc.uid} id={hc.uid} cardType={def.type} disabled={!playable}>
+                  <div data-hand-uid={hc.uid} className={`hand-card-wrap ${dealtUids.has(hc.uid) ? 'deal-in' : ''}`} style={{ animationDelay: `${i * 45}ms`, '--fan-angle': `${(i - (me.hand.length - 1) / 2) * Math.min(4, 20 / Math.max(1, me.hand.length))}deg`, '--fan-lift': `${Math.abs(i - (me.hand.length - 1) / 2) * 3}px` } as React.CSSProperties}>
+                    <CardView card={def} size="sm" playable={playable} disabled={!playable && !selecting} selected={picked}
                       onClick={() => selecting ? setMulliganPicks(old => old.includes(hc.uid) ? old.filter(u => u !== hc.uid) : [...old, hc.uid]) : setZoomUid(hc.uid)} />
-                    {selecting && <span className={`mulligan-choice ${picked ? 'replace' : ''}`}>{picked ? 'REPLACE' : 'KEEP'}</span>}
+                    {selecting && <span className={`mulligan-choice ${picked ? 'replace' : ''}`}>{picked ? t('ЗАМЕНИТЬ', 'REPLACE') : t('ОСТАВИТЬ', 'KEEP')}</span>}
                   </div>
                 </DraggableHandCard>;
               })}
@@ -661,36 +678,36 @@ function GameBoard() {
           </section>
           <div className="action-dock">
             {mulliganAvailable(state) && state.turn === ME ? <>
-              <span className="dock-hint">Build your opening hand.</span>
+              <span className="dock-hint">{t('Собери стартовую руку.', 'Build your opening hand.')}</span>
               <button className="gold-button" onClick={() => { act({ type: 'mulligan', uids: mulliganPicks }); setMulliganPicks([]); }}>
-                {mulliganPicks.length ? `Replace ${mulliganPicks.length}` : 'Keep hand'}
+                {mulliganPicks.length ? t(`Заменить ${mulliganPicks.length}`, `Replace ${mulliganPicks.length}`) : t('Оставить руку', 'Keep hand')}
               </button>
             </> : <>
               <button className={`power-button ${effectivePowerCost(state, ME) === 1 ? 'comeback-power' : ''}`} disabled={!myTurn || !hpAction || autoplay}
-                onClick={() => hpAction && act(hpAction)} title={myHero.powerText}>
-                <span>⚡ {myHero.powerName}</span><b>{effectivePowerCost(state, ME)} GAS</b>
+                onClick={() => hpAction && act(hpAction)} title={powerText(myHero.id)}>
+                <span>⚡ {powerName(myHero.id)}</span><b>{effectivePowerCost(state, ME)} {t('ГАЗ', 'GAS')}</b>
               </button>
               <button className="gold-button end-turn-button" onClick={endTurn} disabled={!myTurn || autoplay}>
-                {aiThinking ? 'Rival’s turn' : 'END TURN'}
+                {!myTurn ? t('ХОД ПРОТИВНИКА', 'RIVAL’S TURN') : t('ЗАВЕРШИТЬ ХОД', 'END TURN')}
               </button>
             </>}
           </div>
-          <div className="arena-bottom"><button className="quiet-link" onClick={() => setLogOpen(true)}>Battle log ↗</button>
-            <button className="quiet-link" onClick={() => setAutoplay(a => !a)}>{autoplay ? 'Ⅱ Pause demo' : '▷ Autoplay demo'}</button>
-            <button className="quiet-link" onClick={() => setShowOnboarding(true)}>Learn to play</button>
+          <div className="arena-bottom"><button className="quiet-link" onClick={() => setLogOpen(true)}>{t('Журнал боя ↗', 'Battle log ↗')}</button>
+            <button className="quiet-link" onClick={() => setAutoplay(a => !a)}>{autoplay ? t('Ⅱ Пауза автобоя', 'Ⅱ Pause demo') : t('▷ Автобой', '▷ Autoplay demo')}</button>
+            <button className="quiet-link" onClick={() => setShowOnboarding(true)}>{t('Подсказки', 'Learn to play')}</button>
           </div>
         </main>
-        {showOnboarding && <OnboardingOverlay onClose={closeOnboarding} />}
-        {proofPending && !showOnboarding && <Dialog title="Proof of play · devnet" onClose={() => setProofPending(false)}>
-          <p className="text-sm text-parchment/80 leading-relaxed">Sign a free message for your match as <b>{myHero.name}</b>. Phantom will show the domain, match ID, nonce, timestamp, and devnet label.</p>
-          <p className="integration-note">Match {match.current.id}<br />No transaction or payment. This verifies your wallet signature; gameplay runs locally against AI.</p>
-          {proofError && <p className="integration-error" role="status">{proofError}</p>}
-          <div className="dialog-actions"><button className="primary-button" disabled={wallet.busy || !wallet.owner} onClick={() => void approvePlayProof()}>{wallet.busy ? 'Waiting for Phantom…' : 'Sign & play'}</button><button className="secondary-button" onClick={() => setProofPending(false)}>Continue in demo</button></div>
+        {myTurn && selectedAttacker && <AttackAim attacker={selectedAttacker} targets={[...foe.board.filter(foeAttackable).map(m => ({ uid: m.uid, health: m.health, attack: m.attack })), ...(canHitFoeHero ? [{ uid: 'hero', health: foe.treasury, attack: 0 }] : [])]} />}
+        {proofPending && <Dialog title={t('Подтверждение игры · devnet', 'Proof of play · devnet')} onClose={() => setProofPending(false)}>
+          <p className="text-sm text-parchment/80 leading-relaxed">{t('Подпишите бесплатное сообщение для матча за', 'Sign a free match message as')} <b>{heroName(myHero.id)}</b>. {t('Phantom покажет домен, ID матча, одноразовый код, время и сеть devnet.', 'Phantom shows the domain, match ID, nonce, timestamp and devnet label.')}</p>
+          <p className="integration-note">{t('Матч', 'Match')} {match.current.id}<br />{t('Без транзакций и оплаты. Подпись подтверждает кошелёк; матч проходит локально против ИИ.', 'No transaction or payment. The signature verifies your wallet; gameplay runs locally against AI.')}</p>
+          {proofError && <p className="integration-error" role="status">{errorText(proofError)}</p>}
+          <div className="dialog-actions"><button className="primary-button" disabled={wallet.busy || !wallet.owner} onClick={() => void approvePlayProof()}>{wallet.busy ? t('Ожидаем Phantom…', 'Waiting for Phantom…') : t('Подписать и играть', 'Sign & play')}</button><button className="secondary-button" onClick={() => setProofPending(false)}>{t('Играть без подписи', 'Continue in demo')}</button></div>
         </Dialog>}
         {settingsOpen && <ArenaSettings skin={skin} onChange={setSkin} onClose={() => setSettingsOpen(false)} />}
         {helpOpen && <MechanicsGuide onClose={() => setHelpOpen(false)} />}
-        {logOpen && <Dialog title="Battle log" onClose={() => setLogOpen(false)}><div ref={logBoxRef} className="battle-log thin-scroll">
-          {state.log.map((line, i) => <p key={`${state.block}-${i}`}>{line}</p>)}
+        {logOpen && <Dialog title={t('Журнал боя', 'Battle log')} onClose={() => setLogOpen(false)}><div ref={logBoxRef} className="battle-log thin-scroll">
+          {state.log.map((line, i) => <p key={`${state.block}-${i}`}>{logLine(line)}</p>)}
         </div></Dialog>}
         {zoomUid && (() => { const h = me.hand.find(h => h.uid === zoomUid); return h ? <CardZoomModal card={CARDS[h.cardId]}
           playable={myTurn && playableUids.has(h.uid) && !autoplay} onPlay={() => onHandClick(h.uid)} onClose={() => setZoomUid(null)} /> : null; })()}
@@ -698,19 +715,21 @@ function GameBoard() {
         {inspectUid && (() => {
           const m = [...me.board, ...foe.board].find(m => m.uid === inspectUid); if (!m) return null;
           const own = me.board.some(x => x.uid === m.uid); const canAttack = legal.some(a => a.type === 'attack' && a.attackerUid === m.uid);
-          return <Dialog title={m.name} onClose={() => setInspectUid(null)}><div className="minion-detail">
+          return <Dialog title={cardName(m.cardId)} onClose={() => setInspectUid(null)}><div className="minion-detail">
             <CardView card={CARDS[m.cardId]} size="lg" tilt={false} />
-            <p>Current stats: <b>{m.attack} attack · {m.health}/{m.maxHealth} health</b></p>
-            <p>{m.staked ? 'Staked: +1 gas each own turn. Still attackable.' : m.canAttack ? 'Ready for combat.' : 'Cannot attack this turn.'}</p>
+            <p>{t('В бою:', 'Current stats:')} <b>{m.attack} {t('атака', 'attack')} · {m.health}/{m.maxHealth} {t('здоровье', 'health')}</b></p>
+            <p>{m.staked ? t('В стейкинге: +1 газ за ход. Остаётся целью атак.', 'Staked: +1 gas each turn. Still attackable.') : m.canAttack ? t('Готов к бою.', 'Ready for combat.') : t('Не может атаковать в этом ходу.', 'Cannot attack this turn.')}</p>
             {own && myTurn && !autoplay && <div className="dialog-actions">
-              {canAttack && <button className="gold-button" onClick={() => { setAttackerUid(m.uid); setInspectUid(null); }}>Choose target</button>}
-              {legal.some(a => a.type === 'stake' && a.uid === m.uid) && <button className="outline-button" onClick={() => { onStake(m.uid); setInspectUid(null); }}>Stake</button>}
-              {legal.some(a => a.type === 'unstake' && a.uid === m.uid) && <button className="outline-button" onClick={() => { onUnstake(m.uid); setInspectUid(null); }}>Unstake</button>}
+              {canAttack && <button className="gold-button" onClick={() => { setAttackerUid(m.uid); setInspectUid(null); }}>{t('Выбрать цель', 'Choose target')}</button>}
+              {legal.some(a => a.type === 'stake' && a.uid === m.uid) && <button className="outline-button" onClick={() => { onStake(m.uid); setInspectUid(null); }}>{t('В стейкинг', 'Stake')}</button>}
+              {legal.some(a => a.type === 'unstake' && a.uid === m.uid) && <button className="outline-button" onClick={() => { onUnstake(m.uid); setInspectUid(null); }}>{t('Вернуть в строй', 'Unstake')}</button>}
             </div>}
           </div></Dialog>;
         })()}
         {state.winner !== null && <EndOverlay winner={state.winner} blocks={state.block} stats={stats} onRematch={() => startGame(Date.now() & 0x7fffffff)} />}
         <DragPreview hand={me.hand} board={me.board} />
+        <AttackFlight flight={combatFlight} events={events} reduced={reduced} />
+        <AbilityFx events={events} floats={floats} reduced={reduced} />
         <MotionFx events={events} playRects={playRects} reduced={reduced} />
       </div>
     </DndProvider>
@@ -754,22 +773,16 @@ function MempoolCard({ entry, ownerLabel, mine }: { entry: MempoolEntry; ownerLa
 
 /** First-game onboarding: 3 numbered steps over a dimmed backdrop, shown once
  *  (localStorage key imperivm-onboarding-seen). Replaces the old hint. */
-function OnboardingOverlay({ onClose }: { onClose: () => void }) {
-  const [step, setStep] = useState(0);
-  const lessons = [
-    { icon: 'I', title: 'Raise your legion', body: 'Keep or replace your opening hand. Tap a card to inspect it, then pay its gas cost to deploy. Your gas refills and grows each own turn.' },
-    { icon: 'II', title: 'Strike. Or stake.', body: 'Select a ready minion, then a glowing enemy target. Taunt guards must fall first. Tap your selected minion again to inspect or stake it for extra gas.' },
-    { icon: 'III', title: 'Read the mempool', body: 'Spells resolve on your next own turn. A rival can counter them first with Priority. Watch for RUG PULL: it destroys both armies. Empty the rival’s 30 HP Treasury to win.' },
-  ];
-  const lesson = lessons[step];
-  return <Dialog title="Welcome, Imperator" onClose={onClose}>
-    <div className="onboarding-lesson"><span className="lesson-number">{lesson.icon}</span>
-      <h3>{lesson.title}</h3><p>{lesson.body}</p>
-      <div className="lesson-progress" aria-label={`Step ${step + 1} of 3`}>{lessons.map((_, i) => <i key={i} className={i === step ? 'active' : ''} />)}</div>
-      <button className="gold-button" onClick={() => step < 2 ? setStep(step + 1) : onClose()}>{step < 2 ? 'Next →' : 'Enter the arena'}</button>
-      <button className="quiet-link" onClick={onClose}>Skip tutorial</button>
-    </div>
-  </Dialog>;
+function ContextCoach({ phase, onClose }: { phase: 'opening' | 'play' | 'attack' | 'target' | 'end'; onClose: () => void }) {
+  const { t } = useLocale();
+  const hints = {
+    opening: t('Нажми на карты для замены. Затем оставь или обнови руку.', 'Tap cards to replace, then keep or refresh your hand.'),
+    play: t('Золотая карта доступна. Перетащи её в нишу или нажми, чтобы разыграть.', 'A golden card is ready. Drag it into a slot or tap to play.'),
+    attack: t('Нажми на готовое существо → выбери подсвеченную цель.', 'Tap a ready minion → choose a glowing target.'),
+    target: t('Цифры — урон цели и ответный удар. Нажми на цель для атаки.', 'Numbers preview damage and retaliation. Tap a target to attack.'),
+    end: t('Существо отдыхает до следующего хода. Заверши ход, когда будешь готов.', 'New minions rest until next turn. End your turn when ready.'),
+  };
+  return <div className={`context-coach coach-${phase}`} role="status"><span aria-hidden>✧</span><p>{hints[phase]}</p><button onClick={onClose} aria-label={t('Скрыть подсказки', 'Hide hints')}>×</button></div>;
 }
 
 /** Mobile zoom modal for a hand card: full readable card + Play / Close. */
@@ -784,11 +797,12 @@ function CardZoomModal({
   onPlay: () => void;
   onClose: () => void;
 }) {
-  return <Dialog title={card.name} onClose={onClose}>
+  const { t, cardName } = useLocale();
+  return <Dialog title={cardName(card.id)} onClose={onClose}>
     <div className="minion-detail"><CardView card={card} size="lg" tilt={false} playable={playable} />
-      <div className="dialog-actions"><button className="gold-button" disabled={!playable} onClick={() => { onPlay(); onClose(); }}>Play card</button>
-        <button className="outline-button" onClick={onClose}>Close</button></div>
-      {!playable && <p className="small-note">Inspect anytime. Playing requires your turn, enough gas and a free minion slot.</p>}
+      <div className="dialog-actions"><button className="gold-button" disabled={!playable} onClick={() => { onPlay(); onClose(); }}>{t('Разыграть', 'Play card')}</button>
+        <button className="outline-button" onClick={onClose}>{t('Закрыть', 'Close')}</button></div>
+      {!playable && <p className="small-note">{t('Можно смотреть в любой момент. Для розыгрыша нужны ваш ход, газ и свободная ниша для существа.', 'Inspect anytime. Playing requires your turn, enough gas and a free minion slot.')}</p>}
     </div>
   </Dialog>;
 }
@@ -866,6 +880,7 @@ function EndOverlay({
   stats: MatchStats;
   onRematch: () => void;
 }) {
+  const { t } = useLocale();
   const win = winner === ME;
   const reduced = useReducedMotion();
   return (
@@ -874,21 +889,22 @@ function EndOverlay({
       <div className="rise-in text-center px-6 relative z-10 max-w-lg">
         {win ? (
           <>
+            <VictoryCoin size={156} label={t('Монета победы', 'Victory coin')} />
             <Laurel />
             <div className="font-display text-4xl md:text-7xl font-bold gold-text tracking-[0.12em]">
-              VICTORIA!
+              {t('ПОБЕДА!', 'VICTORIA!')}
             </div>
             <p className="mt-3 text-lavender italic font-display text-lg">
-              Veni. Vidi. Rugi. The treasury is yours.
+              Veni. Vidi. Rugi. {t('Казна твоя.', 'The treasury is yours.')}
             </p>
           </>
         ) : winner === 'draw' ? (
           <>
             <div className="font-display text-4xl md:text-7xl font-bold text-lavender tracking-[0.12em]">
-              DRAW
+              {t('НИЧЬЯ', 'DRAW')}
             </div>
             <p className="mt-3 text-lavender italic font-display text-lg">
-              Both treasuries fall. Rome shrugs.
+              {t('Обе казны опустели. Рим переживёт.', 'Both treasuries fall. Rome shrugs.')}
             </p>
           </>
         ) : (
@@ -903,17 +919,17 @@ function EndOverlay({
               </svg>
             </div>
             <div className="mt-4 font-display text-4xl md:text-7xl font-bold text-blood tracking-[0.12em]">
-              RUGGED
+              {t('РАЗОРЕНИЕ', 'RUGGED')}
             </div>
             <p className="mt-3 text-lavender italic font-display text-lg">
-              Rugged. The forum will remember this.
+              {t('Империя пала. Форум это запомнит.', 'Rugged. The forum will remember this.')}
             </p>
           </>
         )}
-        <p className="mt-2 text-xs text-lavender/60 font-mono">decided in {blocks} blocks</p>
+        <p className="mt-2 text-xs text-lavender/60 font-mono">{t(`За ${blocks} блоков`, `Decided in ${blocks} blocks`)}</p>
         <div className="match-stats">
-          {[[stats.cardsPlayed, 'Cards played'], [stats.attacks, 'Attacks'], [stats.treasuryDamage, 'Treasury damage'],
-            [stats.treasuryHealed, 'HP restored'], [stats.minionsLost, 'Minions lost'], [stats.counters, 'Counters']].map(([value, label]) =>
+          {[[stats.cardsPlayed, t('Карт сыграно', 'Cards played')], [stats.attacks, t('Атак', 'Attacks')], [stats.treasuryDamage, t('Урон казне', 'Treasury damage')],
+            [stats.treasuryHealed, t('Исцелено', 'HP restored')], [stats.minionsLost, t('Потери', 'Minions lost')], [stats.counters, t('Контрзаклинаний', 'Counters')]].map(([value, label]) =>
             <div key={label}><b>{value}</b><span>{label}</span></div>)}
         </div>
         <div className="mt-7 flex gap-3 justify-center flex-wrap">
@@ -921,15 +937,15 @@ function EndOverlay({
             onClick={onRematch}
             className="px-8 py-3.5 rounded-lg bg-gradient-to-b from-gold-light to-gold-dark text-abyss font-bold text-lg tracking-wide hover:brightness-110 active:scale-[0.97] transition shadow-[0_0_28px_rgba(212,175,55,0.45)]"
           >
-            ⚔ Play again
+            ⚔ {t('Ещё матч', 'Play again')}
           </button>
           <Link
             href="/"
             className="px-6 py-3.5 rounded-lg border-2 border-gold/60 text-gold-light font-semibold hover:bg-gold/10 transition"
           >
-            Change hero
+            {t('Сменить героя', 'Change hero')}
           </Link>
-          <Link href="/leaderboard" className="text-mint text-sm w-full mt-2">Match history & devnet achievements ↗</Link>
+          <Link href="/leaderboard" className="text-mint text-sm w-full mt-2">{t('История и достижения devnet ↗', 'Match history & devnet achievements ↗')}</Link>
         </div>
       </div>
     </div>

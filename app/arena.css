@@ -1,0 +1,49 @@
+.game-content { position: relative; }
+.rank-scroll { overflow-y: hidden; scrollbar-width: thin; }
+.hero-power-medallion { display: none; }
+.game-shell { background: radial-gradient(ellipse at 50% 40%,#3b244444,transparent 70%),#100919; }
+.game-shell .app-header { background: #130c20bb; }
+.game-shell .block-plaque { background: linear-gradient(110deg,#382b28,#1b1325); padding: 5px 14px; border: 1px solid #ac89423d; border-radius: 30% 30% 7px 7px; box-shadow: inset 0 1px #d4b07544; }
+@media (min-width: 1000px) {
+  .battlefield { grid-template-rows: 76px 137px 36px 28px 137px 76px; padding-top: 5px; padding-bottom: 5px; }
+  .battlefield > .rank-row, .battlefield > .accepting-board, .battlefield > div:has(> .own-rank) { width: min(850px, 100%); margin-inline: auto; }
+  .rank-scroll { height: 120px; }
+  .combatant { position: relative; height: 76px; justify-content: center; }
+  .combatant > .hero-profile { flex: none; }
+  .combatant-label { position: absolute; right: 10px; top: 13px; color: #d2a8ad; }
+  .hero-profile { width: 310px; height: 76px; }
+  .hero-coin { position: absolute; left: 50%; transform: translateX(-50%); top: 0; }
+  .combatant .hero-medallion { width: 70px; height: 70px; border: 4px ridge #d6b266; box-shadow: 0 2px 0 #624222,0 5px 9px #0009,0 0 24px #cfad5033; }
+  .rival .hero-medallion { border-color: #b78367; }
+  .hero-vitals > .font-display { position: absolute; right: calc(50% + 48px); top: 17px; color: #e4ce9e; }
+  .hero-treasury { position: absolute; left: calc(50% + 17px); top: 39px; width: 39px; height: 42px; justify-content: center; background: radial-gradient(circle at 35% 20%,#e98581,#9e283f 65%,#57182f); border: 3px ridge #d9b66d; border-radius: 9px 9px 18px 18px; box-shadow: 0 3px 6px #0008; }
+  .hero-treasury > :first-child, .hero-treasury > span.hidden { display: none; }
+  .hero-treasury > .font-mono { font: 800 23px var(--font-cinzel),serif; color: #fff0d1; text-shadow: 0 2px #411726; }
+  .hero-treasury .font-sans { display: none; }
+  .hero-counts { position: absolute; right: calc(50% + 48px); top: 41px; white-space: nowrap; font-size: 9px; }
+  .gas-meter { position: absolute; right: 10px; bottom: 8px; }
+  .gas-meter b { display: inline; margin-left: 8px; }
+  .gas-meter > div { margin-top: 5px; }
+  .hero-power-medallion { position: absolute; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2px; left: calc(50% + 77px); top: 3px; width: 76px; height: 68px; border: 4px ridge #d7b363; border-radius: 50%; background: radial-gradient(circle at 36% 22%,#694876,#34263e 55%,#1a1225); box-shadow: 0 3px 0 #6a4526,0 6px 9px #0008,inset 0 0 12px #e5be5d33; color: #ffe1a0; }
+  .hero-power-medallion > span { font-size: 24px; line-height: 25px; filter: drop-shadow(0 0 5px #e6b544); }
+  .hero-power-medallion b { max-width: 64px; font-size: 8px; line-height: 9px; }
+  .hero-power-medallion small { position: absolute; bottom: -8px; right: -7px; width: 24px; height: 24px; border-radius: 5px; background: linear-gradient(135deg,#9de7ed,#3857b2); border: 2px ridge #e4c57c; color: white; font: 800 15px var(--font-cinzel),serif; }
+  .hero-power-medallion:disabled { filter: saturate(.45); opacity: .55; }
+  .hero-power-medallion:not(:disabled):hover { filter: brightness(1.2); box-shadow: 0 0 20px #edce7155; }
+  .game-shell .action-dock .power-button { display: none; }
+  .game-shell .action-dock .end-turn-button { position: absolute; top: 292px; right: 27px; min-width: 115px; max-width: 122px; min-height: 58px; padding: 10px; font-size: 12px; border-radius: 20% 20% 12px 12px; }
+  .action-dock:has(.end-turn-button) { min-height: 2px; padding: 0; }
+  .hand-zone { margin-top: 12px; }
+  .hand-scroll { padding-top: 16px; padding-bottom: 8px; }
+  .hand-cards { gap: 4px; }
+  .hand-card-wrap { transform: rotate(var(--fan-angle,0deg)) translateY(var(--fan-lift,0px)); transform-origin: 50% 140%; }
+  .hand-card-wrap:hover, .hand-card-wrap:focus-within { transform: translateY(-12px); z-index: 20; }
+  .arena-bottom { justify-content: center; gap: 30px; }
+  .chain-strip { max-width: calc(100% - 150px); }
+}
+@media (prefers-reduced-motion: reduce) { .hand-card-wrap { transition: none; } }
+@media (max-width: 767px) {
+  .battlefield::before { opacity: .9; }
+  .combatant .hero-medallion { border: 3px ridge #bca067; }
+  .combatant .hero-treasury > .font-mono { font-size: 17px; color: #ffe1a0; }
+}

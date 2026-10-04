@@ -1,21 +1,14 @@
 import './globals.css';
+import './card-frames.css';
+import './arena.css';
 import Providers from '../components/Providers';
 import type { Metadata } from 'next';
-import { Playfair_Display, Inter, JetBrains_Mono } from 'next/font/google';
+import { Cinzel, Cormorant_Garamond, Manrope, JetBrains_Mono } from 'next/font/google';
 
-const display = Playfair_Display({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['700', '800', '900'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-const sans = Inter({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-sans',
-  display: 'swap',
-});
+const display = Cinzel({ subsets: ['latin'], weight: ['500', '600', '700', '800'], variable: '--font-cinzel', display: 'swap', adjustFontFallback: false, fallback: [] });
+// Cinzel has no Cyrillic glyphs: this Roman serif keeps Russian headings coherent.
+const roman = Cormorant_Garamond({ subsets: ['latin', 'cyrillic'], weight: ['600', '700'], variable: '--font-roman', display: 'swap' });
+const sans = Manrope({ subsets: ['latin', 'cyrillic'], weight: ['400', '500', '600', '700'], variable: '--font-sans', display: 'swap' });
 
 const mono = JetBrains_Mono({
   subsets: ['latin', 'cyrillic'],
@@ -26,13 +19,13 @@ const mono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: 'IMPERIVM — Veni. Vidi. Rugi.',
-  description: 'A Hearthstone-style card battler where blockchain mechanics ARE the gameplay. Built for the Crypto World\'s Fair Hackathon.',
+  description: 'IMPERIVM — карточные сражения, где блокчейн-механики становятся правилами игры. Создано для Crypto World’s Fair Hackathon.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${display.variable} ${sans.variable} ${mono.variable} font-sans`}>
+    <html lang="ru">
+      <body className={`${display.variable} ${roman.variable} ${sans.variable} ${mono.variable} font-sans`}>
         <Providers>{children}</Providers>
       </body>
     </html>
