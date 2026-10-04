@@ -317,7 +317,7 @@ function makeAmbient(): AmbientController {
     const droneG = c.createGain();
     droneG.gain.value = 0.0;
     droneG.gain.setValueAtTime(0.0, t0);
-    droneG.gain.linearRampToValueAtTime(0.05, t0 + 2.0);
+    droneG.gain.linearRampToValueAtTime(0.02, t0 + 2.0);
     drone1.connect(lp); drone2.connect(lp); drone3.connect(lp);
     lp.connect(droneG).connect(masterOut() as AudioNode);
 
@@ -328,7 +328,7 @@ function makeAmbient(): AmbientController {
       const o = osc(c, 'triangle', motif[i], start, start + 0.9);
       const og = c.createGain();
       og.gain.setValueAtTime(0.0, start);
-      og.gain.linearRampToValueAtTime(0.04, start + 0.05);
+      og.gain.linearRampToValueAtTime(0.016, start + 0.05);
       og.gain.linearRampToValueAtTime(0.0, start + 0.9);
       o.connect(og).connect(masterOut() as AudioNode);
     }

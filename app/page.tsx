@@ -53,7 +53,7 @@ export default function LandingPage() {
     <section id="heroes" className="hero-select-section">
       <div className="section-heading"><div><p className="eyebrow">{t('ЧЕТЫРЕ КОШЕЛЬКА. ЧЕТЫРЕ ПУТИ К ВЛАСТИ.', 'FOUR WALLETS. FOUR WAYS TO RULE.')}</p><h2>{t('Выберите императора', 'Choose your Imperator')}</h2></div><span className="demo-label">{t('Бесплатное демо · без кошелька', 'Free demo · no wallet needed')}</span></div>
       <div className="hero-select-grid">{Object.values(HEROES).map(h => <button key={h.id} className={`hero-select ${h.id === selected ? 'active' : ''}`} onClick={() => select(h.id)} aria-pressed={h.id === selected}>
-        {h.id === 'whale' ? <Whale3D size={58} autoRotate={false} className={styles.choiceCoin} label={t('Золотая монета Кита', 'Golden Whale coin')} /> : <img src={`/heroes/${h.id}.webp`} alt="" />}<div><b>{heroName(h.id)}</b><span>{heroTitle(h.id)}</span></div><i>{h.id === selected ? '✓' : '↗'}</i>
+        <img src={`/heroes/${h.id}.webp`} alt="" /><div><b>{heroName(h.id)}</b><span>{heroTitle(h.id)}</span></div><i>{h.id === selected ? '✓' : '↗'}</i>
       </button>)}</div>
       <div className={`hero-brief ${styles.briefWithArt}`}>
         <CoinPreview key={selected} model={`hero-${selected}` as ModelKey} size={160} speed={0.18} className={styles.briefArt} label={t(`Монета героя: ${heroName(hero.id)}`, `Hero coin: ${heroName(hero.id)}`)} />

@@ -311,9 +311,10 @@ export function MinionToken({
         {floats.map(f => (
           <span
             key={f.key}
-            className={`damage-float absolute top-1 left-1/2 font-mono font-bold text-lg z-30 ${
+            className={`damage-float absolute top-0 left-1/2 font-mono font-black text-3xl z-30 ${
               f.kind === 'damage' ? 'text-blood' : 'text-mint'
             }`}
+            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 12px currentColor' }}
           >
             {f.kind === 'damage' ? `-${f.amount}` : `+${f.amount}`}
           </span>

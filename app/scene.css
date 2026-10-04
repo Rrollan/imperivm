@@ -3,7 +3,8 @@ button, .gold-button, .primary-button, .secondary-button, .outline-button {
   --button-texture: url('/ui/buttons/tablet-normal.png');
   /* Legacy selected/hover rules use background shorthand. Keep the slot in all states. */
   background-image: var(--button-texture), var(--button-fallback, linear-gradient(#665641,#342c25 55%,#211b19)) !important;
-  background-size: 100% 100%;
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
 }
 button:not(:disabled):hover, a.gold-button:hover, a.primary-button:hover { --button-texture: url('/ui/buttons/tablet-hover.png'); }
