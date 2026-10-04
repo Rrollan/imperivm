@@ -50,6 +50,6 @@ export default function LandingPage() {
     <section className="strategy-triptych"><article><span>I</span><h3>Commit your spells</h3><p>Your spell waits in a public mempool. Your rival sees it coming and has a turn to answer.</p></article>
       <article><span>II</span><h3>Choose your economy</h3><p>Attack now, or stake a minion for extra gas. A staked legion is still vulnerable.</p></article>
       <article><span>III</span><h3>Never trust the rug</h3><p>Halving grows your ranks. RUG PULL erases them. Hold a Priority counter for the moment that matters.</p></article></section>
-    <footer className="landing-footer"><Link href="/packs">✦ Open demo packs →</Link><span>Built for Crypto World’s Fair · Off-chain AI gameplay</span><a href="https://github.com/Rrollan/imperivm" target="_blank" rel="noreferrer">Source ↗</a></footer>
+    <footer className="landing-footer"><Link href="/packs">✦ Open packs →</Link><Link href="/collection">Collection & decks</Link><Link href="/leaderboard">Hall of victories</Link><span>Crypto World’s Fair · Off-chain AI gameplay</span><a href="https://github.com/Rrollan/imperivm" target="_blank" rel="noreferrer">Source ↗</a></footer>
   </main></div>;
 }

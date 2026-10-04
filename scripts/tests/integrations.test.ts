@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import { ed25519 } from '@noble/curves/ed25519';
+import { LocalCollectionGateway, PACK_COST, COLLECTION_KEY, configuredTitle, parseLocalCollection } from '../../lib/collection/gateway';
+import { GENESIS_IDS, cardIdFromUri, metadataBase, metadataUri, nftMetadata } from '../../lib/solana/metadata';
+import { proofMessage, verifyPlaySignature } from '../../lib/solana/proof';
+import { deckError } from '../../lib/deckbuilder';
+import { DECKS } from '../../lib/decks';
+async function main() {
+  const values = new Map<string, string>();
+  const storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value); } };
+  assert.equal(configuredTitle(undefined), null); assert.equal(configuredTitle('YOUR_TITLE_ID'), null); assert.equal(configuredTitle(' real-title '), 'real-title');
+  assert.equal(parseLocalCollection('{broken').rug, 500);
+  const gateway = new LocalCollectionGateway(storage, () => 0.2);
+  assert.equal((await gateway.load()).rug, 500);
+  const pack = await gateway.openPack();
+  assert.equal(pack.cards.length, 5); assert.equal(pack.snapshot.rug, 500 - PACK_COST); assert.equal(pack.snapshot.packsOpened, 1);
+  const id = pack.cards[0].id; assert.equal(pack.snapshot.owned[id], 7);
+  assert.equal((await new LocalCollectionGateway(storage).load()).owned[id], 7);
+  const concurrent = await Promise.allSettled([gateway.openPack(), gateway.openPack()]); assert.equal(concurrent.filter(x => x.status === 'fulfilled').length, 1);
+  for (let i = 0; i < 8; i++) await gateway.openPack();
+  assert.equal((await gateway.load()).rug, 0); await assert.rejects(gateway.openPack(), /Not enough/); assert.equal((await gateway.load()).packsOpened, 10);
+  values.set(COLLECTION_KEY, JSON.stringify({ version: 1, rug: -1, owned: { rug: 100 }, packsOpened: 2 })); assert.equal((await gateway.load()).rug, 500);
+  const blocked = new LocalCollectionGateway({ getItem: () => { throw Error(); }, setItem: () => { throw Error(); } }, () => 0);
+  await blocked.openPack(); assert.equal((await blocked.load()).rug, 450);
+  const readOnly = new LocalCollectionGateway({ getItem: () => null, setItem: () => { throw Error(); } }, () => 0);
+  await readOnly.openPack(); await readOnly.openPack(); assert.equal((await readOnly.load()).rug, 400);
+  const key = new Uint8Array(32).fill(7), pub = ed25519.getPublicKey(key);
+  const bytes = new TextEncoder().encode(proofMessage('localhost', 'match1', 'whale', 'nonce1', '2026-10-04T00:00:00Z'));
+  const sig = ed25519.sign(bytes, key);
+  assert(verifyPlaySignature(bytes, bytes, sig, pub)); assert(!verifyPlaySignature(bytes, new Uint8Array(bytes.length), sig, pub)); assert(!verifyPlaySignature(bytes, bytes, sig, new Uint8Array(32))); assert(!verifyPlaySignature(bytes, bytes, new Uint8Array(64), pub));
+  assert.equal(GENESIS_IDS.length, 40); assert(!GENESIS_IDS.includes('audit'));
+  for (const value of ['', 'http://game.test', 'https://example.com', 'https://localhost', 'https://127.0.0.1', 'https://good.com/path', 'https://user:pass@good.com', 'https://good.com/?key=a']) assert.equal(metadataBase(value), null);
+  const base = 'https://imperivm.vercel.app'; assert.equal(metadataBase(base), base);
+  for (const card of GENESIS_IDS) { const uri = metadataUri(card, base); assert.equal(cardIdFromUri(uri, base), card); const metadata = nftMetadata(card, base); assert.equal(metadata.image, `${base}/cards/${card}.webp`); }
+  assert.equal(cardIdFromUri(`${base}/api/nft/metadata/audit`, base), null); assert.equal(cardIdFromUri(`${base}/api/nft/metadata/rug-pull?other=1`, base), null); assert.equal(cardIdFromUri('https://evil.com/api/nft/metadata/rug-pull', base), null);
+  for (const deck of Object.values(DECKS)) assert.equal(deckError(deck), null);
+  assert(deckError(DECKS.whale.slice(0, 29))); assert(deckError(Array(30).fill('rug-pull'))); assert(deckError([...DECKS.whale.slice(0, 29), '__proto__'])); assert(deckError(DECKS.whale, {}));
+  console.log('Integration checks passed: local persistence, atomic purchases, fallback, signatures, metadata and custom decks. No live wallet transactions were sent.');
+}
+main().catch(error => { console.error(error); process.exitCode = 1; });

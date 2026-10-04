@@ -1,5 +1,5 @@
-import '@solana/wallet-adapter-react-ui/styles.css';
 import './globals.css';
+import Providers from '../components/Providers';
 import type { Metadata } from 'next';
 import { Playfair_Display, Inter, JetBrains_Mono } from 'next/font/google';
 
@@ -33,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${display.variable} ${sans.variable} ${mono.variable} font-sans`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

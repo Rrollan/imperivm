@@ -1,0 +1,33 @@
+'use client';
+import { useMemo, useState } from 'react';
+import Link from 'next/link';
+import WalletBar from '../../components/WalletBar';
+import CardView from '../../components/CardView';
+import Dialog from '../../components/Dialog';
+import { useCollection } from '../../components/CollectionContext';
+import { CARDS } from '../../lib/cards';
+import { HEROES } from '../../lib/heroes';
+import { DECKS } from '../../lib/decks';
+import { deckError, loadCustomDeck, saveCustomDeck } from '../../lib/deckbuilder';
+export default function CollectionPage() {
+  const collection = useCollection();
+  const [filter, setFilter] = useState('All'), [query, setQuery] = useState(''), [mode, setMode] = useState<'catalog' | 'owned'>('catalog');
+  const [hero, setHero] = useState('whale'), [deck, setDeck] = useState<string[]>([]), [building, setBuilding] = useState(false), [notice, setNotice] = useState<string | null>(null), [trade, setTrade] = useState(false);
+  const owned = collection.snapshot?.owned ?? {};
+  const visible = Object.values(CARDS).filter(c => (filter === 'All' || c.faction === filter) && (mode === 'catalog' || owned[c.id] > 0) && `${c.name} ${c.text}`.toLowerCase().includes(query.toLowerCase()));
+  const counts = useMemo(() => deck.reduce<Record<string, number>>((all, id) => ({ ...all, [id]: (all[id] ?? 0) + 1 }), {}), [deck]);
+  const error = deckError(deck, mode === 'owned' ? owned : undefined);
+  function add(id: string) { const limit = Math.min(CARDS[id].rarity === 'legendary' ? 1 : 2, mode === 'owned' ? owned[id] ?? 0 : 2); if (deck.length < 30 && (counts[id] ?? 0) < limit) { setDeck(d => [...d, id]); setNotice(null); } }
+  function save() { try { saveCustomDeck(hero, deck); setNotice('Deck saved in this browser. Ready for battle.'); } catch (e) { setNotice(e instanceof Error ? e.message : 'Browser storage is unavailable.'); } }
+  return <div className="min-h-screen bg-abyss text-parchment"><WalletBar /><main className="collection-page">
+    <nav className="collection-nav"><Link href="/">← Forum</Link><Link href="/packs">Packs</Link><Link href="/leaderboard">Victories</Link><button onClick={() => setTrade(true)}>Trade ↗</button></nav>
+    <p className="eyebrow">Assemble your legion</p><h1 className="font-display text-4xl sm:text-5xl gold-text">The collection</h1>
+    <p className="integration-note">40 Genesis cards + Audit. Demo catalog and all four preset decks are always playable. Packs grow your {collection.snapshot?.mode === 'idos' ? 'iDos' : 'local'} collection.</p>
+    <div className="collection-wallet"><strong>{collection.snapshot?.rug ?? '—'} $RUG</strong><span>{Object.keys(owned).length}/41 card types collected</span><button className="secondary-button" onClick={() => { setBuilding(b => !b); setNotice(null); }}>{building ? 'Close deckbuilder' : 'Build a deck'}</button></div>
+    {collection.error && <p className="integration-error" role="status">{collection.error} <button onClick={() => void collection.refresh()}>Retry</button> · <button onClick={() => void collection.useLocalDemo()}>Use local demo</button></p>}
+    <div className="collection-filters"><div className="mode-tabs"><button aria-pressed={mode === 'catalog'} onClick={() => setMode('catalog')}>Demo catalog</button><button aria-pressed={mode === 'owned'} onClick={() => setMode('owned')}>My collection</button></div><input aria-label="Search cards" placeholder="Search your legion…" value={query} onChange={e => setQuery(e.target.value)} /><select aria-label="Filter faction" value={filter} onChange={e => setFilter(e.target.value)}>{['All', 'DeFi', 'NFT', 'DePIN', 'Meme'].map(f => <option key={f}>{f}</option>)}</select></div>
+    <div className={building ? 'collection-workspace' : ''}><div className="collection-grid">{visible.map(card => <div key={card.id} className="collection-card"><CardView card={card} size="md" tilt={!building} onClick={building ? () => add(card.id) : undefined} /><div className="collection-card-caption"><span>{owned[card.id] ? `Owned ×${owned[card.id]}` : 'Demo catalog'}</span>{building && <button aria-label={`Add ${card.name} to deck`} disabled={deck.length >= 30 || (counts[card.id] ?? 0) >= Math.min(card.rarity === 'legendary' ? 1 : 2, mode === 'owned' ? owned[card.id] ?? 0 : 2)} onClick={() => add(card.id)}>+ {counts[card.id] ?? 0}</button>}</div></div>)}</div>
+    {building && <aside className="deck-panel"><h2 className="font-display text-xl text-gold">Your deck · {deck.length}/30</h2><label className="block mt-4 text-xs text-lavender">Hero<select value={hero} onChange={e => { setHero(e.target.value); setDeck([]); setNotice(null); }}>{Object.values(HEROES).map(h => <option key={h.id} value={h.id}>{h.name}</option>)}</select></label><div className="dialog-actions"><button className="secondary-button" onClick={() => { setMode('catalog'); setDeck([...DECKS[hero]]); setNotice(null); }}>Use preset</button><button className="secondary-button" onClick={() => { setDeck(loadCustomDeck(hero) ?? []); setNotice(null); }}>Load saved</button><button className="secondary-button" onClick={() => setDeck([])}>Clear</button></div><div className="deck-list thin-scroll">{Object.entries(counts).sort(([a], [b]) => CARDS[a].cost - CARDS[b].cost).map(([id, count]) => <button key={id} onClick={() => { setDeck(d => { const copy = [...d]; copy.splice(copy.lastIndexOf(id), 1); return copy; }); setNotice(null); }} aria-label={`Remove one ${CARDS[id].name}`}><span>{CARDS[id].cost} · {CARDS[id].name}</span><b>×{count} −</b></button>)}</div><p className="integration-note">{error ?? 'Valid deck · 30 cards · max 2 copies, 1 legendary.'}</p><button className="primary-button w-full mt-4" disabled={!!error} onClick={save}>Save deck</button>{notice && <p role="status" className="integration-note">{notice}</p>}{!error && notice?.startsWith('Deck saved') && <Link className="primary-button block mt-3" href={`/game?hero=${hero}&deck=custom`}>Play this deck →</Link>}</aside>}</div>
+    {!visible.length && <p className="py-12 text-center text-lavender">No cards here yet. Open a pack or explore the demo catalog.</p>}
+  </main>{trade && <Dialog title="Trade · devnet preview" onClose={() => setTrade(false)}><p className="text-sm text-parchment/80">IMPERIVM Genesis has no marketplace listing yet. This devnet preview does not support real trading.</p><a className="secondary-button inline-block mt-5" href="https://magiceden.io/" target="_blank" rel="noreferrer">Visit Magic Eden ↗</a><p className="integration-note">Collection-specific links will become available after a supported listing exists. Mainnet is disabled in this app.</p></Dialog>}</div>;
+}

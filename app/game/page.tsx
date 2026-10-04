@@ -58,6 +58,10 @@ import { diffAction, type BattleEvents } from '../../lib/events';
 import { emitSfxFromEvents, markAmbientStarted, shouldStartAmbient } from '../../lib/audio/events';
 import { startAmbient } from '../../lib/audio/sfx';
 import { useReducedMotion } from '../../lib/prefersReducedMotion';
+import { useImperivmWallet } from '../../components/WalletContext';
+import type { PlayProof } from '../../lib/solana/proof';
+import { saveMatch } from '../../lib/matches';
+import { loadCustomDeck } from '../../lib/deckbuilder';
 
 const ME: PlayerId = 0;
 const FOE: PlayerId = 1;
@@ -97,6 +101,7 @@ function GameBoard() {
   const heroParam = searchParams.get('hero');
   const heroId = heroParam && HEROES[heroParam] ? heroParam : 'whale';
   const aiHeroId = heroId === 'degen' ? 'validator' : 'degen';
+  const useCustom = searchParams.get('deck') === 'custom';
 
   const [state, setState] = useState<GameState | null>(null);
   const [attackerUid, setAttackerUid] = useState<string | null>(null);
@@ -113,6 +118,13 @@ function GameBoard() {
   const [mulliganPicks, setMulliganPicks] = useState<string[]>([]);
   const [stats, setStats] = useState<MatchStats>(emptyMatchStats);
   const [autoplay, setAutoplay] = useState(false);
+  const wallet = useImperivmWallet();
+  const walletOwner = useRef(wallet.owner); walletOwner.current = wallet.owner;
+  const [proofPending, setProofPending] = useState(false);
+  const [proofError, setProofError] = useState<string | null>(null);
+  const [proof, setProof] = useState<PlayProof | null>(null);
+  const match = useRef({ id: '', owner: 'demo', startedAt: '', exhibition: false });
+  if (autoplay) match.current.exhibition = true;
   const aiSteps = useRef(0);
 
 
@@ -145,10 +157,12 @@ function GameBoard() {
 
   const startGame = useCallback(
     (seed?: number) => {
+      match.current = { id: crypto.randomUUID(), owner: walletOwner.current ?? 'demo', startedAt: new Date().toISOString(), exhibition: false };
+      setProof(null); setProofError(null); setProofPending(!!walletOwner.current);
       timers.current.forEach(clearTimeout); timers.current.clear();
       const s = createGame(
         heroId,
-        DECKS[heroId] ?? DECKS.whale,
+        (useCustom ? loadCustomDeck(heroId) : null) ?? DECKS[heroId] ?? DECKS.whale,
         aiHeroId,
         DECKS[aiHeroId] ?? DECKS.degen,
         { enableMulligan: true },
@@ -192,7 +206,7 @@ function GameBoard() {
         setShowOnboarding(true);
       }
     },
-    [heroId, aiHeroId],
+    [heroId, aiHeroId, useCustom],
   );
 
   // Create the game client-side only (never during SSR).
@@ -230,7 +244,7 @@ function GameBoard() {
 
   // AI loop: one action every ~600ms until the AI ends its turn.
   useEffect(() => {
-    if (!state || state.winner !== null || showOnboarding || !(state.turn === FOE || autoplay)) return;
+    if (!state || state.winner !== null || showOnboarding || proofPending || !(state.turn === FOE || autoplay)) return;
     const t = setTimeout(() => {
       try {
         aiSteps.current++;
@@ -240,7 +254,7 @@ function GameBoard() {
         setState(applyAction(state, action));
         if (action.type === 'end-turn') { setAiThinking(state.turn === ME); aiSteps.current = 0; }
       } catch {
-        const fallback: Action = { type: 'end-turn' };
+        const fallback: Action = mulliganAvailable(state) ? { type: 'mulligan', uids: [] } : { type: 'end-turn' };
         lastActionRef.current = fallback;
         stateBeforeActionRef.current = state;
         setState(applyAction(state, fallback));
@@ -248,7 +262,7 @@ function GameBoard() {
       }
     }, autoplay ? 380 : 520);
     return () => clearTimeout(t);
-  }, [state, autoplay, showOnboarding]);
+  }, [state, autoplay, showOnboarding, proofPending]);
 
   // Derive battle animations from the diff between consecutive states.
   useEffect(() => {
@@ -361,6 +375,20 @@ function GameBoard() {
   }, [state?.log, logOpen]);
 
   const legal = useMemo<Action[]>(() => (state ? legalActions(state) : []), [state]);
+  useEffect(() => {
+    if (!state || state.winner === null || proofPending || !match.current.id) return;
+    saveMatch({ id: match.current.id, owner: proof?.owner ?? 'demo', heroId, won: state.winner === ME, draw: state.winner === 'draw', blocks: state.block, playedAt: match.current.startedAt, stats, exhibition: match.current.exhibition, proofSignature: proof?.signature });
+  }, [state?.winner, state?.block, stats, proof, proofPending, heroId]);
+  async function approvePlayProof() {
+    const captured = match.current.id;
+    setProofError(null);
+    try {
+      const receipt = await wallet.signPlay(captured, heroId);
+      if (match.current.id !== captured) return;
+      setProof(receipt); setProofPending(false);
+      try { sessionStorage.setItem(`imperivm.proof.${captured}`, JSON.stringify(receipt)); } catch { /* optional receipt */ }
+    } catch (e) { if (match.current.id === captured) setProofError(e instanceof Error ? e.message : 'Signing declined. You can still play the demo.'); }
+  }
 
   if (!state) {
     return (
@@ -377,7 +405,7 @@ function GameBoard() {
   const foe = state.players[FOE];
   const myHero = HEROES[me.heroId];
   const foeHero = HEROES[foe.heroId];
-  const myTurn = state.turn === ME && !aiThinking && state.winner === null;
+  const myTurn = state.turn === ME && !aiThinking && state.winner === null && !proofPending && !showOnboarding;
 
   const playableUids = new Set<string>();
   for (const a of legal) {
@@ -653,6 +681,12 @@ function GameBoard() {
           </div>
         </main>
         {showOnboarding && <OnboardingOverlay onClose={closeOnboarding} />}
+        {proofPending && !showOnboarding && <Dialog title="Proof of play · devnet" onClose={() => setProofPending(false)}>
+          <p className="text-sm text-parchment/80 leading-relaxed">Sign a free message for your match as <b>{myHero.name}</b>. Phantom will show the domain, match ID, nonce, timestamp, and devnet label.</p>
+          <p className="integration-note">Match {match.current.id}<br />No transaction or payment. This verifies your wallet signature; gameplay runs locally against AI.</p>
+          {proofError && <p className="integration-error" role="status">{proofError}</p>}
+          <div className="dialog-actions"><button className="primary-button" disabled={wallet.busy || !wallet.owner} onClick={() => void approvePlayProof()}>{wallet.busy ? 'Waiting for Phantom…' : 'Sign & play'}</button><button className="secondary-button" onClick={() => setProofPending(false)}>Continue in demo</button></div>
+        </Dialog>}
         {settingsOpen && <ArenaSettings skin={skin} onChange={setSkin} onClose={() => setSettingsOpen(false)} />}
         {helpOpen && <MechanicsGuide onClose={() => setHelpOpen(false)} />}
         {logOpen && <Dialog title="Battle log" onClose={() => setLogOpen(false)}><div ref={logBoxRef} className="battle-log thin-scroll">
@@ -895,6 +929,7 @@ function EndOverlay({
           >
             Change hero
           </Link>
+          <Link href="/leaderboard" className="text-mint text-sm w-full mt-2">Match history & devnet achievements ↗</Link>
         </div>
       </div>
     </div>

@@ -28,7 +28,7 @@ export default function MuteButton({ className = '' }: MuteButtonProps) {
     if (!mounted) return;
     // First interaction also unlocks the AudioContext (gesture requirement).
     await unlockAudio();
-    setMuted(!muted);
+    setMuted(!isMuted());
   };
 
   return (
