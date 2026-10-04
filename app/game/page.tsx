@@ -52,6 +52,7 @@ import {
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import WalletBar from '../../components/WalletBar';
 import HeroPortrait from '../../components/HeroPortrait';
+import ManaCrystals from '../../components/ManaCrystals';
 import Dialog from '../../components/Dialog';
 import ArenaSettings, { useBoardSkin } from '../../components/ArenaSettings';
 import MechanicsGuide, { MECHANICS } from '../../components/MechanicsGuide';
@@ -650,10 +651,11 @@ function GameBoard() {
             <ScrollDeck count={foe.deck.length} foe />
             <ScrollDeck count={me.deck.length} />
             <BlockHistory lines={state.log} onOpen={() => setLogOpen(true)} />
-            {!mulliganAvailable(state) && state.winner === null && <div key={`turn-${state.block}-${state.turn}`} className="turn-banner" role="status">{state.turn === ME ? t('ВАШ ХОД', 'YOUR TURN') : t('ХОД ПРОТИВНИКА', 'RIVAL’S TURN')}<small>{t('БЛОК', 'BLOCK')} #{state.block}</small></div>}
+            {!mulliganAvailable(state) && state.winner === null && <div key={`turn-${state.block}-${state.turn}`} className="turn-banner" role="status">{state.turn === ME ? t('ВАШ ХОД', 'YOUR TURN') : t('ХОД ПРОТИВНИКА', 'RIVAL’S TURN')}<small className="turn-banner-clock" aria-label={t(`Ход ${state.block}`, `Turn ${state.block}`)}><span aria-hidden="true">◷</span> {state.block}</small></div>}
             <button className="gold-button end-turn-button" onClick={endTurn} disabled={!myTurn || autoplay || mulliganAvailable(state)}
-              aria-label={!myTurn ? t('Ход противника', 'Rival’s turn') : t('Завершить ход', 'End turn')}>
-              <img className="button-laurel" src="/ornaments/laurel.svg" alt="" /><span>{!myTurn ? t('ХОД ПРОТИВНИКА', 'RIVAL’S TURN') : t('ЗАВЕРШИТЬ ХОД', 'END TURN')}</span><img className="button-laurel" src="/ornaments/laurel.svg" alt="" />
+              data-turn={state.turn === ME ? 'own' : 'rival'}
+              aria-label={state.turn !== ME ? t('Ход противника', "Rival's turn") : t('Завершить ход', 'End turn')}>
+              <img className="button-laurel" src="/ornaments/laurel.svg" alt="" /><span>{state.turn !== ME ? t('ХОД ПРОТИВНИКА', "RIVAL'S TURN") : t('ЗАВЕРШИТЬ ХОД', 'END TURN')}</span><img className="button-laurel" src="/ornaments/laurel.svg" alt="" />
             </button>
             <DroppableFoeHero attackable={canHitFoeHero}><div id="foe-treasury-target" className={`combatant rival ${canHitFoeHero ? 'legal-target' : ''}`}>
               <HeroPortrait hero={foeHero} treasury={foe.treasury} foe deckCount={foe.deck.length} handCount={foe.hand.length} showHandBacks
@@ -689,7 +691,7 @@ function GameBoard() {
             </div>
             <DroppableBoard><div id="my-board-slot" className="rank-row own-rank" aria-label={t('Ваши существа', 'Your minions')}>
               <div className="rank-label">{t('Ваш легион', 'Your ranks')} <span>{me.board.length}/7</span>
-                {!!me.pavilionBonuses?.length && <b className="pavilion-tag" title={mechanicText('Pavilion')}>{t('Синергия +1 газ', 'Pavilion +1 gas')}</b>}
+                {!!me.pavilionBonuses?.length && <b className="pavilion-tag" title={mechanicText('Pavilion')}>{t('Синергия +1 мана', 'Pavilion +1 mana')}</b>}
               </div>
               <BoardRank own cards={me.board.map(m => {
                 const ready = myTurn && legal.some(a => a.type === 'attack' && a.attackerUid === m.uid);
@@ -702,10 +704,8 @@ function GameBoard() {
             </div></DroppableBoard>
             <div className="combatant own"><HeroPortrait hero={myHero} treasury={me.treasury} deckCount={me.deck.length}
               handCount={me.hand.length} floats={floatsFor('hero-0')} shaking={attackAnim?.targetUid === 'hero-0'} />
-              <button className="hero-power-medallion" disabled={!myTurn || !hpAction || autoplay} onClick={() => hpAction && act(hpAction)} title={powerText(myHero.id)} aria-label={`${powerName(myHero.id)} · ${powerText(myHero.id)} · ${effectivePowerCost(state, ME)} ${t('газа', 'gas')}`}><CoinPreview model="coin-rug" size="100%" autoRotate={false} label={t('Монета силы героя', 'Hero power coin')} /><b>{powerName(myHero.id)}</b><small>{effectivePowerCost(state, ME)}</small></button>
-              <div className="gas-meter" title={mechanicText('Gas')}><span>{t('ГАЗ', 'GAS')}</span><b>{me.gas}<small>/{me.maxGas}</small></b>
-                <div aria-hidden>{Array.from({ length: 10 }, (_, i) => <i key={i} className={i < me.gas ? 'filled' : i < me.maxGas ? 'spent' : ''} />)}</div>
-              </div>
+              <button className="hero-power-medallion" disabled={!myTurn || !hpAction || autoplay} onClick={() => hpAction && act(hpAction)} title={powerText(myHero.id)} aria-label={`${powerName(myHero.id)} · ${powerText(myHero.id)} · ${effectivePowerCost(state, ME)} ${t('маны', 'mana')}`}><CoinPreview model="coin-rug" size="100%" autoRotate={false} label={t('Монета силы героя', 'Hero power coin')} /><b>{powerName(myHero.id)}</b><small>{effectivePowerCost(state, ME)}</small></button>
+              <ManaCrystals gas={me.gas} maxGas={me.maxGas} />
             </div>
           </section>
           <section className="hand-zone" aria-label={t('Ваша рука', 'Your hand')}>
@@ -759,7 +759,7 @@ function GameBoard() {
         {myTurn && selectedAttacker && <AttackAim attacker={selectedAttacker} followPointer={draggingAttacker} targets={[...foe.board.filter(foeAttackable).map(m => ({ uid: m.uid, health: m.health, attack: m.attack })), ...(canHitFoeHero ? [{ uid: 'hero', health: foe.treasury, attack: 0 }] : [])]} />}
         {proofPending && <Dialog title={t('Подтверждение игры · devnet', 'Proof of play · devnet')} onClose={() => setProofPending(false)}>
           <p className="text-sm text-parchment/80 leading-relaxed">{t('Подпишите бесплатное сообщение для матча за', 'Sign a free match message as')} <b>{heroName(myHero.id)}</b>. {t('Phantom покажет домен, ID матча, одноразовый код, время и сеть devnet.', 'Phantom shows the domain, match ID, nonce, timestamp and devnet label.')}</p>
-          <p className="integration-note">{t('Матч', 'Match')} {match.current.id}<br />{t('Без транзакций и оплаты. Подпись подтверждает кошелёк; матч проходит локально против ИИ.', 'No transaction or payment. The signature verifies your wallet; gameplay runs locally against AI.')}</p>
+          <p className="integration-note">{t('Матч', 'Match')} {match.current.id}<br />{t('Локальный поединок против ИИ.', 'Local duel against AI.')}</p>
           {proofError && <p className="integration-error" role="status">{errorText(proofError)}</p>}
           <div className="dialog-actions"><button className="primary-button" disabled={wallet.busy || !wallet.owner} onClick={() => void approvePlayProof()}>{wallet.busy ? t('Ожидаем Phantom…', 'Waiting for Phantom…') : t('Подписать и играть', 'Sign & play')}</button><button className="secondary-button" onClick={() => setProofPending(false)}>{t('Играть без подписи', 'Continue in demo')}</button></div>
         </Dialog>}
@@ -1008,7 +1008,7 @@ function EndOverlay({
             </p>
           </>
         )}
-        <p className="mt-2 text-xs text-lavender/60 font-mono">{t(`За ${blocks} блоков`, `Decided in ${blocks} blocks`)}</p>
+        <p className="mt-2 text-xs text-lavender/60 font-mono">{t(`За ${blocks} ходов`, `Decided in ${blocks} turns`)}</p>
         <div className="match-stats">
           {[[stats.cardsPlayed, t('Карт сыграно', 'Cards played')], [stats.attacks, t('Атак', 'Attacks')], [stats.treasuryDamage, t('Урон казне', 'Treasury damage')],
             [stats.treasuryHealed, t('Исцелено', 'HP restored')], [stats.minionsLost, t('Потери', 'Minions lost')], [stats.counters, t('Контрзаклинаний', 'Counters')]].map(([value, label]) =>

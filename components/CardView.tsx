@@ -39,7 +39,7 @@ interface CardViewProps {
 
 /**
  * Full card with 3D tilt on hover, rarity frame, art from /cards/<id>.webp,
- * gas crystal (amber, top-left), attack orb (gold, bottom-left), health shield
+ * blue hexagonal cost crystal, gold attack orb, red health teardrop
  * (red, bottom-right), name + rules text, Priority/Halving badges,
  * and a hover tooltip with the full rules text.
  */
@@ -54,6 +54,15 @@ export default function CardView({
 }: CardViewProps) {
   const { t, cardName, cardText, rarityName, typeName, keywordName, mechanicText } = useLocale();
   const name = cardName(card.id), text = cardText(card.id);
+  const ruleKeywords = ['Priority', 'Taunt', 'Rush', 'Lifesteal', 'Halving', 'Battlecry']
+    .flatMap(word => [keywordName(word), word]);
+  const firstKeyword = new RegExp(
+    `(?<![\\p{L}\\p{N}])(${ruleKeywords.join('|')})(?![\\p{L}\\p{N}])`, 'iu',
+  ).exec(text);
+  const rulesText = firstKeyword ? <>
+    {text.slice(0, firstKeyword.index)}<strong>{firstKeyword[0]}</strong>
+    {text.slice(firstKeyword.index + firstKeyword[0].length)}
+  </> : text;
   const innerRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const rarityColor = RARITY_COLORS[card.rarity];
@@ -91,9 +100,8 @@ export default function CardView({
         onMouseMove={onMove}
         onMouseLeave={onLeave}
         className={[
-          'card3d-inner card-shine relative rounded-xl flex flex-col',
+          'card3d-inner card-shine hs-card relative rounded-xl flex flex-col',
           `imperial-card card-family-${card.type} card-tier-${card.rarity} card-faction-${card.faction.toLowerCase()}`,
-          'bg-gradient-to-b from-[#2a1745] via-void to-abyss',
           selected ? 'card-selected -translate-y-2' : '',
           playable ? 'playable-card' : '',
           onClick && !disabled ? 'cursor-pointer' : '',
@@ -117,77 +125,81 @@ export default function CardView({
           style={{ background: `linear-gradient(90deg, transparent, ${FACTION_COLORS[card.faction]}, transparent)` }}
         />
 
-        {/* gas crystal — amber, top-left */}
-        <div className="card-cost absolute -top-2.5 -left-2.5 w-8 h-8 rotate-45 border-2 border-[#f5d76e] flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.6)] z-10" title={t(`Стоимость: ${card.cost} газа`, `Cost: ${card.cost} gas`)}>
-          <span className="-rotate-45 text-white font-mono font-bold text-sm drop-shadow">{card.cost}</span>
+        {/* blue hexagonal cost crystal */}
+        <div className="card-cost absolute flex items-center justify-center z-10" title={t(`Стоимость: ${card.cost} газа`, `Cost: ${card.cost} gas`)}>
+          <span className="text-white font-mono font-bold text-sm drop-shadow">{card.cost}</span>
         </div>
         {/* art — holo for epic/legendary, standard for others */}
-        <div className="card-art mx-1.5 mt-1 rounded-lg overflow-hidden border border-gold-dark/60 aspect-[3/4] bg-abyss">
-          {(card.rarity === 'epic' || card.rarity === 'legendary') && !reduced ? (
-            <HoloCard
-              url={`/cards/${card.id}.webp`}
-              width={size === 'lg' ? 200 : size === 'sm' ? 100 : 120}
-              height={size === 'lg' ? 267 : size === 'sm' ? 133 : 160}
-              radius="md"
-              showSparkles={card.rarity === 'legendary'}
-              maxTilt={18}
-              scale={1.03}
-              perspective={900}
-              gyro={false}
-              alt={name}
-              className="w-full h-full"
-            />
-          ) : (
-            <ArtImg
-              src={`/cards/${card.id}.webp`}
-              alt={name}
-              letter={name.charAt(0)}
-              className="w-full h-full"
-              imgClassName="w-full h-full object-cover"
-            />
-          )}
+        <div className="card-art bg-abyss">
+          <div className="hs-card-art-inner">
+            {(card.rarity === 'epic' || card.rarity === 'legendary') && !reduced ? (
+              <HoloCard
+                url={`/cards/${card.id}.webp`}
+                width={size === 'lg' ? 200 : size === 'sm' ? 100 : 120}
+                height={size === 'lg' ? 267 : size === 'sm' ? 133 : 160}
+                radius="md"
+                showSparkles={card.rarity === 'legendary'}
+                maxTilt={18}
+                scale={1.03}
+                perspective={900}
+                gyro={false}
+                alt={name}
+                className="w-full h-full"
+              />
+            ) : (
+              <ArtImg
+                src={`/cards/${card.id}.webp`}
+                alt={name}
+                letter={name.charAt(0)}
+                className="w-full h-full"
+                imgClassName="w-full h-full object-cover"
+              />
+            )}
+          </div>
         </div>
 
         {/* name plate */}
         <div className="card-name px-1.5 pt-1 text-center">
-          <div className={`font-display font-bold ${nameSize} text-parchment leading-tight`}>
+          <div className={`font-display font-bold ${nameSize} leading-tight`}>
             {name}
-          </div>
-          <div className="text-[8px] uppercase tracking-[0.18em] text-lavender/80">
-            {typeName(card.type)} · {card.faction}
           </div>
         </div>
 
-        <span className="rarity-coin" title={`${rarityName(card.rarity)} · $RUG`} aria-label={`${rarityName(card.rarity)} · $RUG`}>
-          <span>$RUG</span>{isLegendary && <span className="coin-laurels" aria-hidden><img src="/ornaments/laurel.svg" alt="" /><img src="/ornaments/laurel.svg" alt="" /></span>}
-        </span>
+        <span className="hs-card-gem" title={rarityName(card.rarity)} aria-label={rarityName(card.rarity)} />
 
         {/* rules text */}
-        <div className={`card-rules px-2 pt-1 pb-1 text-center text-parchment/80 ${textSize} flex-1`}>
-          {text}
+        <div className={`card-rules px-2 pt-1 pb-1 text-center ${textSize} flex-1`}>
+          {rulesText}
         </div>
 
         {/* keyword badges */}
         <div className="card-keywords flex justify-center gap-1 pb-1.5 flex-wrap px-1">
           {(['Taunt', 'Rush', 'Lifesteal'] as const).filter(word => card[word.toLowerCase() as 'taunt' | 'rush' | 'lifesteal']).map(word =>
-            <span key={word} aria-label={mechanicText(word)} className="keyword-chip">{keywordName(word)}</span>)}
+            <span key={word} tabIndex={0} aria-label={`${keywordName(word)}: ${mechanicText(word)}`} className="keyword-chip">
+              {keywordName(word)}
+              <span className="keyword-tooltip" role="tooltip">{mechanicText(word)}</span>
+            </span>)}
           {card.priority && (
-            <span className="text-[8px] px-1.5 py-0.5 rounded bg-blood/20 text-blood border border-blood/50 uppercase tracking-wide font-semibold">
+            <span tabIndex={0} aria-label={mechanicText("Priority")} className="keyword-chip text-[8px] px-1.5 py-0.5 rounded hs-card-priority border uppercase tracking-wide font-semibold">
               <BattleIcon kind="priority" /> {t('Приоритет', 'Priority')}
+              <span className="keyword-tooltip" role="tooltip">{mechanicText('Priority')}</span>
             </span>
           )}
           {card.halvingPeriod && (
-            <span className="text-[8px] px-1.5 py-0.5 rounded bg-mint/10 text-mint border border-mint/40 uppercase tracking-wide font-semibold">
+            <span tabIndex={0} aria-label={mechanicText("Halving")} className="keyword-chip text-[8px] px-1.5 py-0.5 rounded hs-card-halving border uppercase tracking-wide font-semibold">
               ◈ {t('Халвинг', 'Halving')} {card.halvingPeriod}
+              <span className="keyword-tooltip" role="tooltip">{mechanicText('Halving')}</span>
             </span>
           )}
         </div>
+
+        <div className="hs-card-type">{typeName(card.type)} · {card.faction}</div>
 
         {/* stat orbs */}
         {isMinion && (
           <>
             <div className="card-attack absolute -bottom-3 left-1 w-9 h-9 rounded-full bg-gradient-to-br from-gold-light to-gold-dark border-2 border-[#6b4e12] flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.6)] z-10" title={t('Атака', 'Attack')}>
-              <svg className="gladius" viewBox="0 0 12 24" aria-hidden><path d="M6 1 9 5 7 15H5L3 5ZM1 16h10M6 16v6M3 22h6" /></svg><span className="text-abyss font-mono font-bold text-sm">{card.attack}</span>
+              <svg className="gladius" viewBox="0 0 12 24" aria-hidden><path d="M6 1 9 5 7 15H5L3 5ZM1 16h10M6 16v6M3 22h6" /></svg><span className="text-white font-mono font-bold text-sm">{card.attack}</span>
             </div>
             <div className="card-health absolute -bottom-3 right-1 w-9 h-9 rounded-full bg-gradient-to-br from-[#ff8a94] to-blood border-2 border-[#7a1f28] flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.6)] z-10" title={t('Здоровье', 'Health')}>
               <span className="text-white font-mono font-bold text-sm">{card.health}</span>
