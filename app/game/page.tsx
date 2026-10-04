@@ -3,12 +3,12 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from '../../components/LocaleContext';
-import { BlockClock, BlockHistory, RivalHand, RomanCorners, ScrollDeck } from '../../components/BoardChrome';
+import { BlockClock, BlockHistory, RivalHand, ScrollDeck } from '../../components/BoardChrome';
 import BoardRank, { isBoardSlot } from '../../components/BoardRank';
 import AttackAim from '../../components/AttackAim';
 import AbilityFx from '../../components/AbilityFx';
 import AttackFlight, { type CombatFlight } from '../../components/AttackFlight';
-import { CoinPreview, VictoryCoin } from '../../components/3d/CoinPreview';
+import { CoinPreview } from '../../components/3d/CoinPreview';
 import { useSearchParams } from 'next/navigation';
 import {
   applyAction,
@@ -605,7 +605,6 @@ function GameBoard() {
             e.currentTarget.style.setProperty('--table-x', `${((e.clientX - r.left) / r.width - .5) * 6}px`);
             e.currentTarget.style.setProperty('--table-y', `${((e.clientY - r.top) / r.height - .5) * 4}px`);
           }} onPointerLeave={e => { e.currentTarget.style.setProperty('--table-x', '0px'); e.currentTarget.style.setProperty('--table-y', '0px'); }}>
-            <RomanCorners />
             <RivalHand count={foe.hand.length} />
             <ScrollDeck count={foe.deck.length} foe />
             <ScrollDeck count={me.deck.length} />
@@ -847,7 +846,7 @@ function Laurel() {
   return (
     <svg
       viewBox="0 0 220 70"
-      className="laurel-shimmer mx-auto w-56 md:w-72 text-gold"
+      className="laurel-shimmer mx-auto w-72 md:w-96 text-gold"
       fill="none"
       stroke="currentColor"
       strokeWidth="2.5"
@@ -890,7 +889,6 @@ function EndOverlay({
       <div className="rise-in text-center px-6 relative z-10 max-w-lg">
         {win ? (
           <>
-            <VictoryCoin size={156} label={t('Трофей победы', 'Victory trophy')} />
             <Laurel />
             <div className="font-display text-4xl md:text-7xl font-bold gold-text tracking-[0.12em]">
               {t('ПОБЕДА!', 'VICTORIA!')}
@@ -936,7 +934,7 @@ function EndOverlay({
         <div className="mt-7 flex gap-3 justify-center flex-wrap">
           <button
             onClick={onRematch}
-            className="px-8 py-3.5 rounded-lg bg-gradient-to-b from-gold-light to-gold-dark text-abyss font-bold text-lg tracking-wide hover:brightness-110 active:scale-[0.97] transition shadow-[0_0_28px_rgba(212,175,55,0.45)]"
+            className="px-8 py-3.5 rounded-lg bg-[#D4AF37] text-[#1A0B2E] font-bold text-lg tracking-wide hover:bg-[#F5D76E] active:scale-[0.97] transition shadow-[0_0_28px_rgba(212,175,55,0.45)] border-2 border-[#F5D76E]"
           >
             ⚔ {t('Ещё матч', 'Play again')}
           </button>
