@@ -627,12 +627,122 @@ html[data-imperivm-motion='off'] .chain-label b { animation: none; }
 .turn-status.your-turn { color: #91dfbd; }
 .cancel-target { border-bottom: 1px solid #a390ab; color: #b6a0b8; min-height: 28px; }
 .legal-target { outline: 2px solid #f25a76; border-radius: 12px; background: #79203444; }
-.gas-meter { flex-shrink: 0; min-width: 100px; text-align: right; color: #b2a4bb; font-size: 9px; letter-spacing: .1em; }
-.gas-meter b { display: block; color: #b695fd; font: 700 24px var(--font-mono); }
-.gas-meter small { font-size: 12px; color: #847594; }
-.gas-meter > div { display: flex; justify-content: flex-end; gap: 3px; margin-top: 4px; }
-.gas-meter i { width: 7px; height: 7px; border: 1px solid #a078df; transform: rotate(45deg); }
-.gas-meter i.filled { background: #a978ef; box-shadow: 0 0 7px #9945ff88; }
+/* Ten faceted gems keep the resource readable without a system label. */
+.mana-crystals {
+  --crystal-size: 30px;
+  position: absolute; right: -144px; bottom: 0;
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 7px; border: 1px solid #7889a755; border-radius: 8px;
+  background: linear-gradient(180deg, #161b2be8, #090d19f5);
+  box-shadow: inset 0 1px #c3daee22, inset 0 -2px 5px #0008, 0 3px 7px #0006;
+}
+.mana-crystals-row { display: flex; gap: 2px; }
+.mana-crystal { position: relative; display: block; flex: none; width: var(--crystal-size); height: calc(var(--crystal-size) * 1.12); }
+.mana-crystal-gem {
+  position: absolute; inset: 0; display: block;
+  clip-path: polygon(50% 0, 89% 22%, 100% 62%, 50% 100%, 0 62%, 11% 22%);
+  background: #3b405b;
+}
+.mana-crystal-gem::before, .mana-crystal-gem::after { content: ''; position: absolute; }
+.mana-crystal-gem::before {
+  inset: 2px; clip-path: inherit;
+  background: conic-gradient(from 30deg at 50% 48%, #25263e 0deg 90deg, #101222 90deg 150deg, #1a1a2e 150deg 240deg, #2b2c45 240deg 300deg, #1a1a2e 300deg);
+  box-shadow: inset 0 0 8px #0009;
+}
+.mana-crystal-gem::after {
+  left: 26%; top: 15%; width: 34%; height: 37%;
+  clip-path: polygon(0 0, 100% 14%, 64% 100%, 10% 70%);
+  background: linear-gradient(140deg, #ffffff12, transparent);
+}
+.mana-crystal.filled { filter: drop-shadow(0 0 5px #2e9be6aa); }
+.mana-crystal.filled .mana-crystal-gem { background: #9fe4ff; }
+.mana-crystal.filled .mana-crystal-gem::before {
+  background: radial-gradient(ellipse at 43% 36%, #c2f4ff99, transparent 58%), conic-gradient(from 30deg at 50% 48%, #53c7ff 0deg 90deg, #1764ae 90deg 150deg, #2e9be6 150deg 240deg, #91e5ff 240deg 300deg, #2e9be6 300deg);
+  box-shadow: inset 0 0 9px #b9efff88;
+}
+.mana-crystal.filled .mana-crystal-gem::after { background: linear-gradient(140deg, #fff, #d4f5ff44 55%, transparent); }
+.mana-crystal.spent .mana-crystal-gem { opacity: .5; background: #5787ab; }
+.mana-crystal.spent .mana-crystal-gem::before {
+  background: conic-gradient(from 30deg at 50% 48%, #376084 0deg 90deg, #17243b 90deg 150deg, #244364 150deg 240deg, #49769a 240deg 300deg, #244364 300deg);
+}
+.mana-crystals-count { min-width: 40px; color: #d9f3ff; font: 800 21px var(--font-display); white-space: nowrap; text-shadow: 0 1px 2px #000; }
+.mana-crystals-count small { color: #8ca3bd; font-size: 12px; }
+/* Specific HUD rules take precedence over the shared stone button texture. */
+.game-shell .battlefield > .end-turn-button {
+  width: 148px; min-width: 0; min-height: 86px; padding: 10px 6px;
+  right: 10px; display: flex; justify-content: center; align-items: center; gap: 4px;
+  isolation: isolate; border: 4px solid #9d6b27; border-radius: 16px 16px 11px 11px;
+  background-image: linear-gradient(155deg, #fff1b5 0%, #f2cd6b 24%, #dbaa3e 57%, #b77724 100%) !important;
+  background-blend-mode: normal; color: #3b240c;
+  font: 800 14px/1.2 var(--font-display); letter-spacing: .04em;
+  text-shadow: 0 1px #fff4ca99;
+  box-shadow: inset 0 2px 1px #fff4cacc, inset 0 -4px 3px #78501e88, 0 6px 0 #5a381b, 0 12px 18px #0009;
+  transition: transform 120ms ease, filter 160ms ease;
+}
+.game-shell .end-turn-button > span { flex: 1; min-width: 0; }
+.game-shell .end-turn-button .button-laurel { width: 10px; flex: none; filter: brightness(.55) sepia(1); }
+.game-shell .end-turn-button::after {
+  content: ''; position: absolute; inset: -9px; z-index: -1; pointer-events: none;
+  border: 2px solid #ffdc7399; border-radius: 22px;
+  box-shadow: 0 0 22px #ffd66b99, inset 0 0 12px #ffe5a066;
+  animation: end-turn-ready 2s ease-in-out infinite;
+}
+.game-shell .battlefield > .end-turn-button:not(:disabled):hover { filter: brightness(1.12); }
+.game-shell .battlefield > .end-turn-button:not(:disabled):active {
+  transform: translateY(4px) scale(.98);
+  box-shadow: inset 0 3px 7px #67431799, inset 0 -1px #ffeb9c77, 0 2px 0 #5a381b, 0 5px 8px #0008;
+}
+.game-shell .end-turn-button:focus-visible { outline: 3px solid #bdeeff; outline-offset: 7px; }
+.game-shell .battlefield > .end-turn-button:disabled {
+  opacity: 1; cursor: default; filter: none; transform: none;
+  border-color: #786343; color: #baab8e; text-shadow: 0 1px 2px #201811;
+  background-image: linear-gradient(155deg, #8a7959, #66553b 55%, #463627) !important;
+  box-shadow: inset 0 2px #c5b78e44, inset 0 -3px #211a1688, 0 5px 0 #392d22, 0 9px 14px #0008;
+}
+.game-shell .end-turn-button:disabled::after { display: none; }
+.game-shell .battlefield > .end-turn-button[data-turn='rival'] {
+  border-color: #51505b; color: #bbb9c5; text-shadow: 0 2px #16151d;
+  background-image: linear-gradient(155deg, #555560, #33333e 55%, #20202a) !important;
+  box-shadow: inset 0 2px #b7b6c333, inset 0 -3px #10101899, 0 5px 0 #24232b, 0 9px 14px #0008;
+}
+.game-shell .end-turn-button[data-turn='rival'] .button-laurel { filter: grayscale(1) brightness(.85); opacity: .55; }
+.game-shell .turn-banner .turn-banner-clock {
+  display: inline-flex; justify-content: center; align-items: center; gap: 6px;
+  margin-top: 6px; padding: 2px 12px; border: 1px solid #d4af3766; border-radius: 20px;
+  background: #130f1d99; color: #e8d6ae; font: 700 13px var(--font-display);
+}
+.game-shell .turn-banner-clock > span { color: #f2d17b; font-size: 17px; }
+@keyframes end-turn-ready { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+@media (min-width: 768px) and (max-width: 1199px) {
+  .mana-crystals { --crystal-size: 28px; right: -116px; gap: 6px; padding-inline: 5px; }
+  .mana-crystals-row { gap: 1px; }
+  .game-shell .battlefield > .end-turn-button { width: 124px; right: 6px; min-height: 80px; font-size: 12px; }
+  .game-shell .end-turn-button .button-laurel { width: 8px; }
+}
+@media (min-width: 768px) and (max-width: 999px) {
+  .mana-crystals { --crystal-size: 18px; }
+  .mana-crystals-count { min-width: 34px; font-size: 18px; }
+}
+@media (max-width: 767px) {
+  .mana-crystals {
+    --crystal-size: clamp(12px, 4vw, 18px);
+    left: 3px; right: auto; bottom: 0; gap: 0; padding: 4px;
+  }
+  .mana-crystals-row { gap: 1px; }
+  .mana-crystals-count {
+    position: absolute; left: 3px; bottom: calc(100% + 2px);
+    min-width: 0; font-size: 15px; color: #2e9be6; text-shadow: 0 1px #071324;
+  }
+  .mana-crystals-count small { font-size: 11px; color: #637ba4; }
+  .game-shell .battlefield > .end-turn-button {
+    width: clamp(130px, 37vw, 154px); min-height: 50px; right: 6px; bottom: 9px;
+    padding: 5px 4px; border-width: 3px; border-radius: 12px; font-size: 11px;
+    box-shadow: inset 0 2px #fff4caaa, inset 0 -3px #78501e88, 0 4px 0 #5a381b, 0 7px 10px #0008;
+  }
+  .game-shell .end-turn-button::after { inset: -5px; border-radius: 16px; box-shadow: 0 0 12px #ffd66b88; }
+}
+@media (prefers-reduced-motion: reduce) { .game-shell .end-turn-button::after { animation: none; opacity: .5; } }
+html[data-imperivm-motion='off'] .game-shell .end-turn-button::after { animation: none; opacity: .5; }
 .pavilion-tag { color: #d6ba66; font-size: 8px; letter-spacing: 0; margin-left: auto; }
 .hand-zone { margin-top: 6px; }
 .hand-heading { display: flex; justify-content: space-between; gap: 8px; font-size: 9px; letter-spacing: .13em; color: #a796b1; padding: 5px 4px 0; }
@@ -662,7 +772,6 @@ html[data-imperivm-motion='off'] .chain-label b { animation: none; }
 .power-button { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: 1; min-height: 46px; border: 1px solid #a88e584d; border-radius: 10px; padding: 9px 14px; color: #e0c27f; background: #281a355c; font-size: 12px; }
 .power-button b { font-family: var(--font-mono); font-size: 10px; color: #b6a3ca; white-space: nowrap; }
 .comeback-power { border-color: #6ef0ab; color: #9fe6ba; }
-.end-turn-button { min-width: 190px; font-family: var(--font-display); letter-spacing: .08em; }
 .dock-hint { color: #b5a5bc; font-size: 12px; }
 .arena-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .dialog-backdrop { position: fixed; inset: 0; z-index: 90; background: #0d071ccc; backdrop-filter: blur(7px); display: flex; align-items: center; justify-content: center; padding: 20px; }
@@ -725,10 +834,6 @@ html[data-imperivm-motion='off'] .chain-label b { animation: none; }
   .chain-label { font-size: 8px; letter-spacing: .06em; }
   .chain-empty { font-size: 10px; }
   .turn-status { min-height: 29px; font-size: 10px; line-height: 14px; }
-  .gas-meter { min-width: 87px; }
-  .gas-meter b { font-size: 20px; }
-  .gas-meter > div { gap: 2px; }
-  .gas-meter i { width: 6px; height: 6px; }
   .hand-cards { justify-content: flex-start; gap: 8px; }
   .hand-zone .card3d { width: 88px; }
   .hand-zone .card3d-inner { height: 118px; }
@@ -738,7 +843,6 @@ html[data-imperivm-motion='off'] .chain-label b { animation: none; }
   .action-dock { gap: 8px; }
   .power-button { gap: 6px; padding: 8px; font-size: 10px; }
   .power-button b { font-size: 8px; }
-  .end-turn-button { min-width: 136px; font-size: 12px; padding: 11px 10px; }
   .arena-bottom { gap: 2px; }
   .arena-bottom .quiet-link { font-size: 10px; min-height: 35px; }
   .imperial-dialog { padding: 16px; }
@@ -818,7 +922,7 @@ html[data-imperivm-motion='off'] .chain-label b { animation: none; }
 
 /* Package 9: stone, relief and perspective; every interactive piece stays DOM. */
 body { --font-display: var(--font-cinzel), var(--font-roman), Georgia, serif; }
-.game-shell .font-mono, .block-plaque, .gas-meter b, .rank-label span { font-family: var(--font-cinzel), var(--font-roman), serif; }
+.game-shell .font-mono, .block-plaque, .rank-label span { font-family: var(--font-cinzel), var(--font-roman), serif; }
 .game-content { width: min(1140px, 100%); padding-bottom: 6px; }
 .arena-toolbar { height: 46px; }
 .battlefield { padding: 9px 22px 11px; isolation: isolate; background: transparent; border-radius: 22px 22px 14px 14px; border-color: #c2a46477; box-shadow: 0 7px 0 #4f3a24, 0 11px 0 #1e1517, 0 18px 38px #0009; perspective: 1100px; }
@@ -853,11 +957,6 @@ body { --font-display: var(--font-cinzel), var(--font-roman), Georgia, serif; }
 .turn-status { min-height: 32px; font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: .05em; }
 .turn-status.your-turn { color: #f1d28a; text-shadow: 0 0 18px #efc66255; }
 .cancel-target { font-family: var(--font-sans); font-size: 10px; letter-spacing: 0; }
-.gas-meter { min-width: 145px; }
-.gas-meter b { font-size: 21px; line-height: 1.1; }
-.gas-meter > div { gap: 6px; padding: 0 3px 2px; }
-.gas-meter i { width: 10px; height: 10px; background: #100b1b; border: 1px solid #927cbb; box-shadow: inset 1px 1px 3px #000; }
-.gas-meter i.filled { background: linear-gradient(135deg,#e5d2ff,#b875ee 50%,#723ad5); border-color: #d4b7ff; box-shadow: 0 0 6px #b173ff66,inset 1px 1px #ffffff88; }
 .hand-zone { margin-top: 10px; }
 .hand-heading { letter-spacing: .06em; font-size: 10px; }
 .hand-scroll { padding-top: 10px; padding-bottom: 6px; }
@@ -865,8 +964,6 @@ body { --font-display: var(--font-cinzel), var(--font-roman), Georgia, serif; }
 .hand-card-wrap .playable-card { transform: translateY(-5px); box-shadow: 0 0 12px #22c55e99,0 6px 14px #0008 !important; }
 .hand-card-wrap .playable-card::before { content: ''; position: absolute; inset: -5px; border: 1px solid #22c55e99; border-radius: 13px; pointer-events: none; }
 .action-dock { min-height: 49px; padding-top: 2px; }
-.end-turn-button { min-width: 200px; text-shadow: 0 1px #fff6; font-family: var(--font-display); font-size: 15px; border: 1px solid #d3a04e; background: linear-gradient(120deg,#fbe3a2,#d9b565 37%,#f9db88 43%,#ab7737); box-shadow: inset 0 1px #fff9,inset 0 -3px #6c451a88,0 3px 0 #503720,0 6px 12px #0008; }
-.end-turn-button:disabled { filter: saturate(.4); opacity: .65; }
 .arena-bottom .quiet-link { min-height: 32px; font-size: 11px; }
 .context-coach { display: flex; align-items: center; gap: 8px; margin: 10px auto -3px; padding: 5px 9px; border: 1px solid #c49c5460; background: linear-gradient(110deg,#3a281e,#221725); border-radius: 8px; color: #eddaa9; max-width: 700px; font-size: 11px; }
 .context-coach > span { font-size: 20px; color: #f8d984; }
@@ -899,16 +996,11 @@ html[data-imperivm-motion='off'] *, html[data-imperivm-motion='off'] *::before, 
   .queued-spell > span { max-width: 65px; font-size: 8px; }
   .queued-spell small { display: block; max-width: 65px; font-size: 7px; }
   .turn-status { min-height: 28px; font-size: 11px; letter-spacing: .01em; }
-  .gas-meter { min-width: 107px; }
-  .gas-meter b { font-size: 19px; }
-  .gas-meter > div { gap: 4px; }
-  .gas-meter i { width: 7px; height: 7px; }
   .hand-heading { font-size: 8px; }
   .hand-scroll { padding-top: 9px; padding-bottom: 4px; }
   .hand-cards { gap: 12px; padding-bottom: 5px; }
   .action-dock { min-height: 50px; gap: 7px; }
   .action-dock .power-button { min-width: 0; }
-  .end-turn-button { min-width: 160px; font-size: 12px; }
   .arena-bottom .quiet-link { font-size: 10px; }
   .context-coach { margin-top: 7px; font-size: 10px; padding: 4px 7px; }
   .damage-preview { font-size: 17px; }
