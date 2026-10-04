@@ -236,7 +236,7 @@ interface DroppableBoardProps {
 
 /**
  * Дроп-зона «мой стол», id 'my-board'.
- * Зелёная рамка: пунктир — валидная цель во время драга,
+ * Золотая рамка: пунктир — валидная цель во время драга,
  * сплошная + свечение — карта прямо над столом.
  */
 export function DroppableBoard({ children, active }: DroppableBoardProps) {
@@ -249,9 +249,9 @@ export function DroppableBoard({ children, active }: DroppableBoardProps) {
       ref={setNodeRef}
       className={[
         'transition-shadow duration-150',
-        showHint && isValidTarget ? 'outline outline-2 outline-dashed outline-mint/60 outline-offset-2' : '',
+        showHint && isValidTarget ? 'outline outline-2 outline-dashed outline-gold/60 outline-offset-2' : '',
         isOver && isValidTarget
-          ? 'outline outline-2 outline-mint outline-offset-2 shadow-[0_0_28px_rgba(20,241,149,0.45)]'
+          ? 'outline outline-2 outline-gold outline-offset-2 shadow-[0_0_28px_rgba(212,175,55,0.4)]'
           : '',
       ].join(' ')}
     >
@@ -262,7 +262,7 @@ export function DroppableBoard({ children, active }: DroppableBoardProps) {
 
 interface DroppableMinionProps {
   uid: string;
-  /** true = вражеский миньон (цель атаки, красная пульсация) */
+  /** true = вражеский миньон (цель атаки, золотая рамка) */
   foe?: boolean;
   attackable?: boolean;
   children: React.ReactNode;
@@ -270,7 +270,7 @@ interface DroppableMinionProps {
 
 /**
  * Дроп-зона на миньоне, id `minion-<uid>` (враг) / `own-minion-<uid>` (свой).
- * Красная пульсация, когда атакующего тянут над вражеским миньоном.
+ * Золотая рамка, когда атакующего тянут над вражеским миньоном.
  * Совместимо с существующим `attackable`-хайлайтом page.tsx.
  */
 export function DroppableMinion({ uid, foe = true, attackable = true, children }: DroppableMinionProps) {
@@ -285,8 +285,8 @@ export function DroppableMinion({ uid, foe = true, attackable = true, children }
         'inline-block rounded-xl transition-shadow duration-150',
         isOver && isValidTarget
           ? foe
-            ? 'animate-pulse shadow-[0_0_24px_rgba(255,77,94,0.8)] ring-2 ring-blood/70'
-            : 'shadow-[0_0_24px_rgba(20,241,149,0.6)] ring-2 ring-mint/70'
+            ? 'shadow-[0_0_24px_rgba(212,175,55,0.5)] ring-2 ring-gold/70'
+            : 'shadow-[0_0_24px_rgba(212,175,55,0.4)] ring-2 ring-gold/70'
           : '',
       ].join(' ')}
     >
@@ -297,7 +297,7 @@ export function DroppableMinion({ uid, foe = true, attackable = true, children }
 
 /**
  * Дроп-зона на портрете вражеского героя, id 'foe-hero'.
- * Красная пульсация, когда атакующего тянут над монетой врага.
+ * Золотая рамка, когда атакующего тянут над монетой врага.
  */
 export function DroppableFoeHero({ children, attackable = true }: { children: React.ReactNode; attackable?: boolean }) {
   const { isOver, setNodeRef, active: currentActive } = useDroppable({ id: DROP_FOE_HERO_ID, disabled: !attackable });
@@ -309,7 +309,7 @@ export function DroppableFoeHero({ children, attackable = true }: { children: Re
       className={[
         'rounded-xl transition-shadow duration-150',
         isOver && isValidTarget
-          ? 'animate-pulse shadow-[0_0_24px_rgba(255,77,94,0.8)] ring-2 ring-blood/70'
+          ? 'shadow-[0_0_24px_rgba(212,175,55,0.5)] ring-2 ring-gold/70'
           : '',
       ].join(' ')}
     >

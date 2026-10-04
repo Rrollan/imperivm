@@ -26,11 +26,11 @@ A Roman crypto card battler. Read the mempool. Build your legion. Empty the riva
 
 Every turn creates a block. Spells wait in a public mempool until your next turn, giving your opponent time to counter them. Stake a creature for gas and lose its attack. Hold a RUG PULL long enough to reset the battlefield—or watch an Audit cancel it.
 
-The complete match runs locally against a heuristic AI. Browser collections, demo packs and custom decks accompany it. Optional Phantom and Metaplex flows target **Solana devnet**; live NFT deployment/minting and a configured iDos backend have **not been verified**. There is no live PvP, mainnet game or marketplace trading.
+The complete match runs locally against a heuristic AI. Browser collections, demo packs and custom decks accompany it. Optional Phantom and Metaplex flows target **Solana devnet**; live NFT deployment/minting and a configured iDos backend have **not been verified**. Arena gates provide online-stake and private-room previews without deductions; networking is the next stage. There is no live PvP, mainnet game or marketplace trading. [Scene and lobby report](docs/arena-gates.md).
 
 ## Play in 60 seconds
 
-1. Run the app, open `/`, choose Whale, Builder, Degen or Validator, and start a match. Russian is the default; **RU / EN** switches languages and remembers your choice.
+1. Run the app, open `/`, choose Whale, Builder, Degen or Validator, then choose **Training** at `/arena`. Russian is the default; **RU / EN** switches languages and remembers your choice.
 2. Keep your opening hand or choose cards to replace. Each Treasury starts at **30 HP**.
 3. Spend gas on creatures, queued spells or your hero power. Drag a card to the board, or inspect it and choose **Play card**. Select an allied creature, then a glowing target to attack; dragging also works.
 4. Choose **End turn**. The AI answers, the next block arrives, and your queued spells resolve at the start of your next turn. Reduce the rival's Treasury to zero.
@@ -56,7 +56,7 @@ Deck **30** · hand **10** · board **7**. Overflow cards burn. Empty-deck draws
 
 - **DeFi, NFT, DePIN and Meme:** the original 40 Genesis cards plus **Audit**, with four preset decks and a custom deck builder.
 - **48 manifested illustrations:** 41 cards, four hero portraits and three painted arenas—Marble, Lava and Neon. A separate card back supports hands and pack reveals. [Art provenance](Artifacts/asset-manifest.json) · [Style bible](docs/art-direction/style-bible.md).
-- **A real Whale coin:** the supplied GLB is optimized from 30.3 MB to 2.83 MB and loaded lazily, with a static fallback. It is the first available 3D accent; other models remain explicitly unavailable. [Model details](docs/3d-models.md).
+- **Nine local 3D accents:** all four heroes, the $RUG coin, trophy, pack chest, column and bust load lazily, with static WebP/PNG fallbacks. Missing models, unavailable WebGL and context loss preserve the 2D interface. The board stays in the DOM. [Model details](docs/3d-models.md).
 - **Distinct card families:** sculpted arches for creatures, crystal tablets for spells and gilded laurels for legendaries. A marble arena, centered hero medallions and a fanned desktop hand keep combat readable.
 - **Procedural audio and readable combat:** independent effects/music controls, card inspection, attack feedback, minion staking and localized battle logs.
 
@@ -96,6 +96,7 @@ See [verification](docs/verification.md) for focused checks, observed results an
 | Route | Purpose |
 | --- | --- |
 | `/` | Choose a hero; inspect the Whale 3D coin |
+| `/arena?hero=whale` | Arena gates: free AI training; preview online stakes and private rooms |
 | `/game?hero=whale` | Local match against AI |
 | `/collection` | Catalog, browser collection, NFT ownership and deck builder |
 | `/packs` | Five-card demo packs; separate devnet NFT-pack flow |
@@ -150,7 +151,7 @@ scripts/            Smoke, content validation and focused regression checks
 
 - Verify the complete devnet wallet → pack → NFT → playable card journey with public metadata and approved wallet transactions.
 - Configure an iDos Title when the owner chooses to create one; exercise the existing SDK path against its backend.
-- Run human balance sessions; add more supplied hero/trophy/chest models.
+- Run human balance sessions and profile the supplied 3D accents on physical mobile GPUs.
 - Explore authoritative multiplayer and broader Genesis editions. Mainnet, live PvP, payouts and marketplace trading are future work.
 
 Competition eligibility and event deadlines are not asserted by this README.

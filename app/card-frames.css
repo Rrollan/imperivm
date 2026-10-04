@@ -59,3 +59,32 @@
 .hand-zone .imperial-card .card-cost span { font-size: 17px; }
 .hand-zone .imperial-card .card-attack, .hand-zone .imperial-card .card-health { width: 27px; height: 29px; }
 .hand-zone .imperial-card .card-attack span, .hand-zone .imperial-card .card-health span { font-size: 17px; }
+
+/* Amber gas and struck $RUG rarity coins; pavilion hues live in the metal inlay. */
+.imperial-card { --frame-metal: #b18a46; --frame-light: #f5d76e; border-color: var(--card-faction); box-shadow: inset 0 0 0 2px #8a6d1f,inset 3px 3px 3px #fff3,0 5px 0 #211824,0 9px 15px #0009; }
+.imperial-card .card-faction-ribbon { background: var(--card-faction) !important; height: 4px; }
+.imperial-card .card-art { border-color: #b18a46; }
+.imperial-card .card-cost { background: conic-gradient(from 35deg,#8a6d1f,#f5d76e,#ffb52e,#ffe8a1,#a86a16); border-color: #f5d76e; }
+.imperial-card .card-cost span { color: #2a1f14; text-shadow: 0 1px #fff8; }
+.rarity-coin { align-self: center; display: grid; place-items: center; position: relative; z-index: 5; width: 23px; height: 23px; margin: -2px auto -8px; border: 3px ridge #9a6843; border-radius: 50%; background: radial-gradient(circle at 35% 20%,#dfaa7e,#b97845 55%,#6f472a); box-shadow: 0 1px 2px #0008,inset 0 0 0 1px #61381d; color: #4e2c18; }
+.rarity-coin > span:first-child { font: 800 6px var(--font-display); }
+.card-tier-rare .rarity-coin { border-color: #c2c7d0; background: radial-gradient(circle at 35% 20%,#f2ede6,#c2c7d0 55%,#797b84); color: #3c3941; }
+.card-tier-epic .rarity-coin,.card-tier-legendary .rarity-coin { border-color: #f5d76e; background: radial-gradient(circle at 35% 20%,#f5d76e,#d4af37 55%,#8a6d1f); color: #594019; }
+.coin-laurels { position: absolute; bottom: -4px; color: #4a7c3a; font-size: 28px; transform: rotate(-25deg); text-shadow: 0 1px #263e1c; }
+.imperial-card .card-rules { padding-top: 13px; font-family: Georgia,var(--font-roman),serif; color: #2a1f14; background: radial-gradient(ellipse at top,#f4ead4,#e8dcc0 75%,#ccba97); }
+.imperial-card .card-name { border-block: 1px solid #8a6d1f; }
+.card-family-spell .card-name { background: linear-gradient(#f5d76e,#d4af37,#8a6d1f); }
+.card-family-spell .card-name > div:first-child { color: #2a1f14; text-shadow: 0 1px #fff5; }
+.card-family-spell .card-name > div:last-child { color: #5c4133; }
+.imperial-card .card-health { border-radius: 5px 5px 48% 48%; }
+.gladius { width: 11px; height: 24px; fill: #6f4d21; stroke: #6f4d21; stroke-width: 1.5; margin-left: -3px; }
+.imperial-card .card-attack span { position: relative; }
+.hand-zone .rarity-coin { position: absolute; width: 16px; height: 16px; right: 2px; top: 5px; margin: 0; border-width: 2px; }
+.hand-zone .rarity-coin > span:first-child { font-size: 4px; }
+.hand-zone .coin-laurels { font-size: 20px; }
+.hand-zone .gladius { width: 8px; height: 18px; }
+.card-size-lg .rarity-coin { width: 30px; height: 30px; }
+.card-size-lg .rarity-coin > span:first-child { font-size: 8px; }
+.coin-laurels { inset: -4px; bottom: auto; display: flex; justify-content: space-between; transform: none; }
+.coin-laurels img { width: 8px; height: 27px; }.coin-laurels img:last-child { transform: scaleX(-1); }
+.hand-zone .coin-laurels { inset: -3px; }.hand-zone .coin-laurels img { width: 6px; height: 19px; }

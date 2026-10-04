@@ -11,6 +11,7 @@ import { useLocale } from '../components/LocaleContext';
 import { CoinPreview, Whale3D } from '../components/3d/CoinPreview';
 import type { ModelKey } from '../components/3d/modelManifest';
 import styles from './Landing.module.css';
+import ArenaSettings, { useBoardSkin } from '../components/ArenaSettings';
 
 const STYLES: Record<string, [string, string]> = {
   whale: ['Управляйте рынком. Зачищайте поле. Оставьте последний ход за собой.', 'Control the market. Clear the board. Make the last move.'],
@@ -19,6 +20,8 @@ const STYLES: Record<string, [string, string]> = {
   validator: ['Наращивайте газ. Отправляйте войска в стейкинг. Встречайте бурю во всеоружии.', 'Grow your gas. Stake your ranks. Counter the coming storm.'],
 };
 export default function LandingPage() {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [skin, setSkin] = useBoardSkin();
   const [selected, select] = useState('whale'); const hero = HEROES[selected];
   const { t, heroName, heroTitle, powerName, powerText } = useLocale();
   useEffect(() => {
@@ -55,12 +58,14 @@ export default function LandingPage() {
       <div className={`hero-brief ${styles.briefWithArt}`}>
         <CoinPreview key={selected} model={`hero-${selected}` as ModelKey} size={160} speed={0.18} className={styles.briefArt} label={t(`Монета героя: ${heroName(hero.id)}`, `Hero coin: ${heroName(hero.id)}`)} />
         <div className={styles.briefCopy}><h3>{powerName(hero.id)} <span>2 {t('ГАЗА', 'GAS')}</span></h3><p>{powerText(hero.id)}</p><small>{t(...STYLES[selected])}</small></div>
-        <Link className="gold-button" href={`/game?hero=${selected}`}>{t('Играть за', 'Play as')} {t(({ whale: 'Кита', builder: 'Строителя', degen: 'Дегена', validator: 'Валидатора' } as Record<string, string>)[hero.id], heroName(hero.id))} →</Link>
+        <Link className="gold-button" href={`/arena?hero=${selected}`}>{t('Играть за', 'Play as')} {t(({ whale: 'Кита', builder: 'Строителя', degen: 'Дегена', validator: 'Валидатора' } as Record<string, string>)[hero.id], heroName(hero.id))} →</Link>
       </div>
     </section>
     <section className="strategy-triptych"><article><span>I</span><h3>{t('Готовьте заклинания', 'Commit your spells')}</h3><p>{t('Заклинание ждёт в открытом мемпуле. Соперник видит угрозу и получает ход, чтобы ответить.', 'Your spell waits in a public mempool. Your rival sees it coming and has a turn to answer.')}</p></article>
       <article><span>II</span><h3>{t('Выбирайте экономику', 'Choose your economy')}</h3><p>{t('Атакуйте сейчас или отправьте воина в стейкинг ради газа. Легион в стейкинге всё ещё уязвим.', 'Attack now, or stake a minion for extra gas. A staked legion is still vulnerable.')}</p></article>
       <article><span>III</span><h3>{t('Остерегайтесь рагпула', 'Never trust the rug')}</h3><p>{t('Халвинг умножает ваши войска. Рагпул уничтожает их. Сохраните приоритетный контрспелл для решающего момента.', 'Halving grows your ranks. RUG PULL erases them. Hold a Priority counter for the moment that matters.')}</p></article></section>
     <footer className="landing-footer"><Link href="/packs">✦ {t('Открыть паки', 'Open packs')} →</Link><Link href="/collection">{t('Коллекция и колоды', 'Collection & decks')}</Link><Link href="/leaderboard">{t('Зал побед', 'Hall of victories')}</Link><span>Crypto World’s Fair · {t('Дуэли с ИИ вне блокчейна', 'Off-chain AI gameplay')}</span><a href="https://github.com/Rrollan/imperivm" target="_blank" rel="noreferrer">{t('Исходный код', 'Source')} ↗</a></footer>
+    <button className="menu-settings secondary-button" onClick={() => setSettingsOpen(true)}>⚙ {t('Настройки', 'Settings')}</button>
+    {settingsOpen && <ArenaSettings skin={skin} onChange={setSkin} onClose={() => setSettingsOpen(false)} />}
   </main></div>;
 }

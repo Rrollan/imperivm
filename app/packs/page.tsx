@@ -13,6 +13,7 @@ import { useCollection } from '../../components/CollectionContext';
 import { PACK_COST, RARITY_WEIGHTS } from '../../lib/collection/gateway';
 import NftPack from '../../components/NftPack';
 import { useLocale } from '../../components/LocaleContext';
+import { CoinPreview } from '../../components/3d/CoinPreview';
 
 export default function PacksPage() {
   const { t, rarityName, errorText } = useLocale();
@@ -110,7 +111,7 @@ export default function PacksPage() {
               )
             : (
               <div className="flex flex-col items-center gap-4 py-8">
-                <CardBack />
+                <CoinPreview model="chest" size={200} autoRotate={false} label={t('Сундук с картами', 'Card pack chest')} />
                 <p className="text-lavender/60 text-sm italic">{t('Пак ждёт вашего приказа, Император.', 'The pack awaits your command, Imperator.')}</p>
               </div>
             )}
@@ -120,7 +121,7 @@ export default function PacksPage() {
           <button
             onClick={handleOpen}
             disabled={collection.busy || !collection.snapshot || collection.snapshot.rug < PACK_COST || (opened && revealed < pack.length)}
-            className="px-10 py-3.5 rounded-lg bg-gradient-to-b from-gold-light to-gold-dark text-abyss font-bold text-lg tracking-wide hover:brightness-110 transition shadow-[0_0_24px_rgba(212,175,55,0.35)]"
+            className="gold-button"
           >
             {collection.busy ? t('Открываем…', 'Opening…') : opened ? t('✦ Ещё один пак · 50 $RUG', '✦ Open another · 50 $RUG') : t('✦ Открыть пак · 50 $RUG', '✦ Open pack · 50 $RUG')}
           </button>

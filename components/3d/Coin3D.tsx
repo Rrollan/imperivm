@@ -91,14 +91,13 @@ export default function Coin3D({
   model = 'hero-whale', size, speed = 0.18, autoRotate = true, active = true, onReady, onFailure,
 }: Coin3DProps) {
   const [supported, setSupported] = useState(false);
-  const available = MODEL_MANIFEST[model].available;
   useEffect(() => {
     // Three r170 requires WebGL2. Renderer creation errors are caught by PreviewBoundary.
     if (!('WebGL2RenderingContext' in window)) { onFailure?.(); return; }
     setSupported(true);
   }, [onFailure]);
   const rotating = active && autoRotate && Number.isFinite(speed) && speed !== 0;
-  if (!supported || !available) return null;
+  if (!supported) return null;
 
   return <div className={styles.canvas} style={size === undefined ? undefined : { width: size, height: size }} aria-hidden="true">
     <Canvas dpr={[1, 1.5]} frameloop={rotating ? 'always' : 'demand'}
