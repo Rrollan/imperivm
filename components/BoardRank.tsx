@@ -21,13 +21,13 @@ function EmptySlot({ index, own, next }: { index: number; own: boolean; next: bo
 }
 
 /** DOM slots keep keyboard/touch hit areas intact; only their layout animates. */
-export default function BoardRank({ cards, own, ghosts }: { cards: { uid: string; node: React.ReactNode }[]; own?: boolean; ghosts?: React.ReactNode }) {
+export default function BoardRank({ cards, own, ghosts }: { cards: { uid: string; node: React.ReactNode }[]; own?: boolean; ghosts?: { uid: string; slot: number; node: React.ReactNode }[] }) {
   const reduced = useReducedMotion();
   const { dragType, cardType } = useDragState();
   return <motion.div layoutScroll className={`rank-scroll thin-scroll ${own && dragType === 'hand-card' && cardType !== 'spell' ? 'welcoming' : ''}`}>
     <AnimatePresence initial={false}>
       {cards.map(card => <motion.div key={card.uid} layout={reduced ? false : 'position'} className="board-slot occupied-slot"
-        initial={reduced ? false : { opacity: 0, y: -35, scale: 1.08 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+        initial={reduced ? false : { opacity: 0, y: -25, scale: 1.08, rotate: -7 }} animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
         exit={reduced ? { opacity: 0 } : { opacity: 0, scale: .78, filter: 'blur(5px)' }}
         transition={{ type: 'spring', stiffness: 330, damping: 21, mass: .6, opacity: { duration: .2 } }}>
         {card.node}
@@ -36,6 +36,6 @@ export default function BoardRank({ cards, own, ghosts }: { cards: { uid: string
         <EmptySlot index={cards.length + i} own={!!own} next={i === 0} />
       </motion.div>)}
     </AnimatePresence>
-    {ghosts && <div className="rank-ghosts">{ghosts}</div>}
+    {!!ghosts?.length && <div className="rank-ghosts" aria-hidden>{Array.from({ length: 7 }, (_, slot) => <div className="ghost-slot" key={slot}>{ghosts.filter(ghost => ghost.slot === slot).map(ghost => <div className="ghost-token" key={ghost.uid}>{ghost.node}</div>)}</div>)}</div>}
   </motion.div>;
 }

@@ -1,7 +1,9 @@
 import './globals.css';
 import './card-frames.css';
 import './arena.css';
+import './scene.css';
 import Providers from '../components/Providers';
+import SceneTextures from '../components/SceneTextures';
 import type { Metadata } from 'next';
 import { Cinzel, Cormorant_Garamond, Manrope, JetBrains_Mono } from 'next/font/google';
 
@@ -26,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ru">
       <body className={`${display.variable} ${roman.variable} ${sans.variable} ${mono.variable} font-sans`}>
-        <Providers>{children}</Providers>
+        <Providers><SceneTextures />{children}</Providers>
       </body>
     </html>
   );

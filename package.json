@@ -38,7 +38,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "smoke": "tsx scripts/smoke.ts",
+    "smoke": "node --import tsx scripts/smoke.ts",
     "start": "next start"
   },
   "version": "0.1.0"

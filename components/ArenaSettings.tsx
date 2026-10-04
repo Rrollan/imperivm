@@ -19,7 +19,7 @@ export default function ArenaSettings({ skin, onChange, onClose }: { skin: Board
   const [animations, setAnimations] = useAnimationPreference();
   useEffect(() => { initMute(); const sync = () => { setSound(isSfxEnabled()); setMusic(isMusicEnabled()); }; sync(); return onAudioPreferenceChange(sync); }, []);
   const labels: Record<BoardSkin, string> = { marble: t('Мрамор', 'Marble'), lava: t('Лава', 'Lava'), neon: t('Неон', 'Neon') };
-  return <Dialog title={t('Ваша арена', 'Your arena')} onClose={onClose}>
+  return <Dialog title={t('Настройки', 'Settings')} onClose={onClose}>
     <p className="dialog-copy">{t('Империи нужен дом. Выберите поле сражения.', 'An empire deserves a home. Choose your battlefield.')}</p>
     <div className="skin-picker">{SKINS.map(value => <button key={value} className={skin === value ? 'skin-option selected' : 'skin-option'} onClick={() => onChange(value)} aria-pressed={skin === value}>
       <img src={`/boards/${value}.webp`} alt="" /><span>{labels[value]}</span>{skin === value && <b>✓</b>}
@@ -29,5 +29,6 @@ export default function ArenaSettings({ skin, onChange, onClose }: { skin: Board
     <div className="setting-row"><span>{t('Музыка', 'Music')}</span><button className="secondary-button" aria-pressed={music} onClick={() => { setMusicEnabled(!music); if (!music) void unlockAudio().then(() => startAmbient()); }}>{music ? t('Включена', 'On') : t('Выключена', 'Off')}</button></div>
     <div className="setting-row"><span>{t('Анимации', 'Animations')}</span><button className="secondary-button" aria-pressed={animations} onClick={() => setAnimations(!animations)}>{animations ? t('Включены', 'On') : t('Выключены', 'Off')}</button></div>
     <p className="small-note">{t('Настройки сохраняются в этом браузере. Предпочтение устройства «уменьшить движение» действует всегда. Кнопка звука в верхней панели выключает всё аудио.', 'Settings are saved in this browser. Your device’s reduced motion preference is always honored. The header mute button silences all audio.')}</p>
+    <div className="dialog-actions"><button className="gold-button" onClick={onClose}>{t('Готово', 'Done')}</button></div>
   </Dialog>;
 }

@@ -5,7 +5,6 @@
  * Run: npm run smoke
  */
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 import { createGame, applyAction, isGameOver } from '../lib/engine/engine';
 import { DECKS } from '../lib/decks';
 import { chooseAiAction } from '../lib/ai';
@@ -42,9 +41,8 @@ if (!isGameOver(state) || state.winner === null) {
 }
 console.log('SMOKE OK');
 
-// Use the installed runner directly: verification never downloads packages.
-const runner = fileURLToPath(new URL('../node_modules/tsx/dist/cli.mjs', import.meta.url));
+// Use the installed loader directly; it needs no CLI IPC socket or package download.
 for (const script of ['scripts/validate-content.ts', 'scripts/regressions.ts']) {
-  const result = spawnSync(process.execPath, [runner, script], { stdio: 'inherit' });
+  const result = spawnSync(process.execPath, ['--import', 'tsx', script], { stdio: 'inherit' });
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
