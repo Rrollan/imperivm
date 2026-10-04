@@ -1,6 +1,8 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
+import { useReducedMotion } from '../lib/prefersReducedMotion';
+import { MECHANICS } from './MechanicsGuide';
 import type { CardDef, Faction, Minion, Rarity } from '../lib/engine/types';
 import { CARDS } from '../lib/cards';
 import ArtImg from './ArtImg';
@@ -19,15 +21,6 @@ export const RARITY_COLORS: Record<Rarity, string> = {
   epic: '#A855F7',
   legendary: '#D4AF37',
 };
-
-function useReducedMotion(): boolean {
-  const [reduced] = useState<boolean>(() =>
-    typeof window !== 'undefined' && window.matchMedia
-      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      : false,
-  );
-  return reduced;
-}
 
 interface CardViewProps {
   card: CardDef;
@@ -64,7 +57,7 @@ export default function CardView({
     size === 'sm'
       ? 'w-28'
       : size === 'lg'
-        ? 'w-40 md:w-44'
+        ? 'w-52 md:w-56'
         : 'w-32 md:w-36';
   const nameSize = size === 'sm' ? 'text-[10px]' : 'text-xs md:text-sm';
   const textSize = size === 'sm' ? 'text-[8.5px] leading-tight' : 'text-[10px] md:text-[11px] leading-snug';
@@ -87,7 +80,7 @@ export default function CardView({
         role={onClick ? 'button' : undefined}
         tabIndex={onClick ? 0 : undefined}
         onClick={onClick}
-        onKeyDown={onClick ? e => (e.key === 'Enter' || e.key === ' ' ? onClick() : undefined) : undefined}
+        onKeyDown={onClick ? e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
         onMouseMove={onMove}
         onMouseLeave={onLeave}
         className={[
@@ -125,7 +118,7 @@ export default function CardView({
         />
 
         {/* art */}
-        <div className="mx-1.5 mt-1 rounded-lg overflow-hidden border border-gold-dark/60 aspect-[4/3] bg-abyss">
+        <div className="card-art mx-1.5 mt-1 rounded-lg overflow-hidden border border-gold-dark/60 aspect-[3/4] bg-abyss">
           <ArtImg
             src={`/cards/${card.id}.webp`}
             alt={card.name}
@@ -136,7 +129,7 @@ export default function CardView({
         </div>
 
         {/* name plate */}
-        <div className="px-1.5 pt-1 text-center">
+        <div className="card-name px-1.5 pt-1 text-center">
           <div className={`font-display font-bold ${nameSize} text-parchment leading-tight`}>
             {card.name}
           </div>
@@ -146,12 +139,14 @@ export default function CardView({
         </div>
 
         {/* rules text */}
-        <div className={`px-2 pt-1 pb-1 text-center text-parchment/80 ${textSize} flex-1`}>
+        <div className={`card-rules px-2 pt-1 pb-1 text-center text-parchment/80 ${textSize} flex-1`}>
           {card.text}
         </div>
 
         {/* keyword badges */}
-        <div className="flex justify-center gap-1 pb-1.5 flex-wrap px-1">
+        <div className="card-keywords flex justify-center gap-1 pb-1.5 flex-wrap px-1">
+          {(['Taunt', 'Rush', 'Lifesteal'] as const).filter(word => card[word.toLowerCase() as 'taunt' | 'rush' | 'lifesteal']).map(word =>
+            <span key={word} title={MECHANICS[word]} className="keyword-chip">{word}</span>)}
           {card.priority && (
             <span className="text-[8px] px-1.5 py-0.5 rounded bg-blood/20 text-blood border border-blood/50 uppercase tracking-wide font-semibold">
               ⚡ Priority
@@ -231,13 +226,14 @@ export function MinionToken({
   const rarityColor = def ? RARITY_COLORS[def.rarity] : '#A89BC0';
 
   return (
-    <div className="flex flex-col items-center relative">
+    <div className="minion-token flex flex-col items-center relative">
       <div
         data-minion-uid={minion.uid}
         role={onClick ? 'button' : undefined}
         tabIndex={onClick ? 0 : undefined}
         onClick={onClick}
-        onKeyDown={onClick ? e => (e.key === 'Enter' || e.key === ' ' ? onClick() : undefined) : undefined}
+        onKeyDown={onClick ? e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
+        aria-label={`${minion.name}, ${minion.attack} attack, ${minion.health} health${minion.taunt ? ", Taunt" : ""}${minion.staked ? ", staked" : ""}`}
         title={def ? `${def.name} — ${def.text}` : minion.name}
         className={[
           'relative w-[4.6rem] h-[5.4rem] md:w-20 md:h-[6rem] rounded-xl bg-gradient-to-b from-[#2a1745] to-abyss',
@@ -279,6 +275,9 @@ export function MinionToken({
 
         {/* status icons */}
         <div className="flex items-center gap-1 mt-0.5">
+          {minion.taunt && <span title={MECHANICS.Taunt} aria-label="Taunt" className="token-keyword">◆</span>}
+          {minion.rush && <span title={MECHANICS.Rush} aria-label="Rush" className="token-keyword">↯</span>}
+          {minion.lifesteal && <span title={MECHANICS.Lifesteal} aria-label="Lifesteal" className="token-keyword">♥</span>}
           {minion.staked && (
             <span className="text-[8px] uppercase tracking-widest text-gold-dark font-bold">⛓ staked</span>
           )}

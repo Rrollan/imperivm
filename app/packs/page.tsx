@@ -6,7 +6,6 @@ import { CARDS } from '../../lib/cards';
 import type { CardDef, Rarity } from '../../lib/engine/types';
 import CardView, { CardBack, RARITY_COLORS } from '../../components/CardView';
 import WalletBar from '../../components/WalletBar';
-import MuteButton from '../../components/MuteButton';
 import { play } from '../../lib/audio/sfx';
 import { markAmbientStarted, shouldStartAmbient } from '../../lib/audio/events';
 import { startAmbient } from '../../lib/audio/sfx';
@@ -94,14 +93,11 @@ export default function PacksPage() {
   return (
     <div className="min-h-screen bg-abyss text-parchment">
       <WalletBar />
-      <div className="absolute right-4 top-3 z-30">
-        <MuteButton />
-      </div>
 
       <main className="max-w-5xl mx-auto px-6 py-12 text-center">
         <h1 className="font-display text-5xl font-bold gold-text tracking-widest">PACKS</h1>
         <p className="mt-3 text-lavender italic font-display text-lg">
-          Five cards. Weighted by rarity. The chain decides.
+          Five cards. Weighted by rarity. Rolled locally in demo mode.
         </p>
 
         <div className="mt-6 flex justify-center gap-4 text-xs">

@@ -8,6 +8,8 @@ import {
   createGame,
   legalActions,
   mempoolOf,
+  effectivePowerCost,
+  mulliganAvailable,
 } from '../../lib/engine/engine';
 import { chooseAiAction } from '../../lib/ai';
 import { CARDS } from '../../lib/cards';
@@ -40,7 +42,11 @@ import {
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import WalletBar from '../../components/WalletBar';
 import HeroPortrait from '../../components/HeroPortrait';
-import GasColumn from '../../components/GasColumn';
+import Dialog from '../../components/Dialog';
+import ArenaSettings, { useBoardSkin } from '../../components/ArenaSettings';
+import MechanicsGuide, { MECHANICS } from '../../components/MechanicsGuide';
+import { emptyMatchStats, updateMatchStats, type MatchStats } from '../../lib/ui/matchStats';
+import { play as playSound } from '../../lib/audio/sfx';
 import {
   diffBattleFx,
   type DyingMinion,
@@ -99,6 +105,16 @@ function GameBoard() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [zoomUid, setZoomUid] = useState<string | null>(null);
   const isDesktop = useIsDesktop();
+  const [skin, setSkin] = useBoardSkin();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [inspectUid, setInspectUid] = useState<string | null>(null);
+  const [inspectCardId, setInspectCardId] = useState<string | null>(null);
+  const [mulliganPicks, setMulliganPicks] = useState<string[]>([]);
+  const [stats, setStats] = useState<MatchStats>(emptyMatchStats);
+  const [autoplay, setAutoplay] = useState(false);
+  const aiSteps = useRef(0);
+
 
   // battle FX state (all derived from state diffs — engine untouched)
   const [floats, setFloats] = useState<UiFloat[]>([]);
@@ -135,10 +151,17 @@ function GameBoard() {
         DECKS[heroId] ?? DECKS.whale,
         aiHeroId,
         DECKS[aiHeroId] ?? DECKS.degen,
+        { enableMulligan: true },
         seed,
       );
       prevRef.current = null;
       setState(s);
+      setStats(emptyMatchStats());
+      setMulliganPicks([]);
+      setAutoplay(false);
+      aiSteps.current = 0;
+      setZoomUid(null);
+      setInspectUid(null);
       setAttackerUid(null);
       setAiThinking(false);
       setFloats([]);
@@ -207,14 +230,15 @@ function GameBoard() {
 
   // AI loop: one action every ~600ms until the AI ends its turn.
   useEffect(() => {
-    if (!state || state.winner !== null || state.turn !== FOE || !aiThinking) return;
+    if (!state || state.winner !== null || showOnboarding || !(state.turn === FOE || autoplay)) return;
     const t = setTimeout(() => {
       try {
-        const action = chooseAiAction(state);
+        aiSteps.current++;
+        const action: Action = aiSteps.current > 100 && !mulliganAvailable(state) ? { type: 'end-turn' } : chooseAiAction(state);
         lastActionRef.current = action;
         stateBeforeActionRef.current = state;
         setState(applyAction(state, action));
-        if (action.type === 'end-turn') setAiThinking(false);
+        if (action.type === 'end-turn') { setAiThinking(state.turn === ME); aiSteps.current = 0; }
       } catch {
         const fallback: Action = { type: 'end-turn' };
         lastActionRef.current = fallback;
@@ -222,9 +246,9 @@ function GameBoard() {
         setState(applyAction(state, fallback));
         setAiThinking(false);
       }
-    }, 600);
+    }, autoplay ? 380 : 520);
     return () => clearTimeout(t);
-  }, [state, aiThinking]);
+  }, [state, autoplay, showOnboarding]);
 
   // Derive battle animations from the diff between consecutive states.
   useEffect(() => {
@@ -235,7 +259,9 @@ function GameBoard() {
     // diffBattleFx still takes (prev, next, action) so the engine contract
     // stays unchanged. When the caller forgot to record an action (the
     // AI loop does this), we fall back to a heuristic.
-    const fx = diffBattleFx(prev, state, lastActionRef.current ?? undefined);
+    const action = lastActionRef.current;
+    const fx = diffBattleFx(prev, state, action ?? undefined);
+    setStats(old => updateMatchStats(old, prev, state, action, diffAction(prev, state, action ?? undefined)));
 
     // ── structured event payload (lib/events.ts) ──
     if (stateBeforeActionRef.current) {
@@ -332,7 +358,7 @@ function GameBoard() {
   useEffect(() => {
     const el = logBoxRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [logLength, logOpen]);
+  }, [state?.log, logOpen]);
 
   const legal = useMemo<Action[]>(() => (state ? legalActions(state) : []), [state]);
 
@@ -360,7 +386,7 @@ function GameBoard() {
   const hpAction = legal.find(a => a.type === 'hero-power');
 
   const act = (action: Action, opts?: { collectPlayRects?: boolean }) => {
-    if (!myTurn) return;
+    if (!myTurn || stateBeforeActionRef.current) return;
     try {
       // Capture before-state + the action so the post-state diff can use
       // them. This replaces the old log-slice approach (which broke once
@@ -377,15 +403,18 @@ function GameBoard() {
         }
       }
 
-      setState(applyAction(state, action));
+      const next = applyAction(state, action);
+      if (action.type === 'end-turn') { setAiThinking(true); playSound('end-turn'); }
+      else if (action.type === 'stake' || action.type === 'unstake') playSound('stake');
+      else if (action.type === 'hero-power') playSound('ui-click');
+      setState(next);
     } catch {
-      /* illegal action — ignore */
+      stateBeforeActionRef.current = null; lastActionRef.current = null;
     }
   };
 
   const endTurn = () => {
     if (!myTurn) return;
-    setAiThinking(true);
     act({ type: 'end-turn' });
   };
 
@@ -501,6 +530,8 @@ function GameBoard() {
   const phaseText =
     state.winner !== null
       ? 'Game over'
+      : mulliganAvailable(state)
+        ? state.turn === ME ? 'Mulligan · keep or replace your opening cards' : 'Rival chooses an opening hand…'
       : myTurn
         ? attackerUid && selectedAttacker
           ? `Choose a target for ${selectedAttacker.name} — or click it again to cancel`
@@ -512,403 +543,142 @@ function GameBoard() {
 
   return (
     <DndProvider onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
-    <div className={`min-h-screen arena-bg text-parchment select-none ${screenFx?.kind === 'rug' ? 'rug-shake' : ''}`}>
-      <WalletBar />
-
-      {/* screen-wide flashes */}
-      {screenFx?.kind === 'rug' && (
-        <div key={screenFx.key} className="rug-flash fixed inset-0 z-40 pointer-events-none" />
-      )}
-      {screenFx?.kind === 'halving' && (
-        <div key={screenFx.key} className="fixed inset-0 z-40 pointer-events-none flex items-center justify-center">
-          <div className="halving-flash absolute inset-0" />
-          <div className="relative font-display text-3xl md:text-5xl font-bold gold-text tracking-[0.2em] drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
-            ◈ HALVING +1/+1
-          </div>
-        </div>
-      )}
-
-      <div className="mx-auto max-w-6xl px-2 md:px-4 pb-28 md:pb-10">
-        {/* ── top bar: brand · block plaque · restart ── */}
-        <div className="flex items-center justify-between gap-2 pt-3 pb-2">
-          <Link href="/" className="font-display text-lg md:text-xl font-bold gold-text tracking-[0.25em] shrink-0">
-            IMPERIVM
-          </Link>
-          <div className="flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-1.5 rounded-md border-2 border-gold/60 bg-gradient-to-b from-[#2a1745] to-abyss shadow-[0_0_14px_rgba(212,175,55,0.25)]">
-            <span className="text-gold text-sm">❧</span>
-            <span className="font-mono font-bold text-gold-light tracking-[0.2em] text-xs md:text-sm">
-              BLOCK #{state.block}
-            </span>
-            <span className="text-gold text-sm">❧</span>
-          </div>
-          <div className="flex items-center gap-1.5 md:gap-2">
-            <MuteButton className="hidden sm:inline-flex" />
-            <button
-              onClick={() => startGame(Date.now() & 0x7fffffff)}
-              className="text-xs px-2.5 py-1.5 rounded border border-lavender/40 text-lavender hover:bg-lavender/10 shrink-0"
-              title="Restart the game"
-            >
-              ↺ <span className="hidden sm:inline">Restart</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-2 md:gap-3">
-          {/* ── gas column (left on desktop, strip on mobile) ── */}
-          <GasColumn gas={me.gas} maxGas={me.maxGas} />
-
-          <div className="flex-1 min-w-0 space-y-2 md:space-y-2.5">
-            {/* ── foe hero ── */}
-            <DroppableFoeHero>
-            <div className="rounded-xl border border-blood/25 bg-void/70 px-3 py-2.5 md:px-4 md:py-3">
-              <HeroPortrait
-                hero={foeHero}
-                treasury={foe.treasury}
-                foe
-                deckCount={foe.deck.length}
-                handCount={foe.hand.length}
-                showHandBacks
-                floats={floatsFor('hero-1')}
-                highlight={canHitFoeHero}
-                shaking={attackAnim?.targetUid === 'hero-1'}
+      <div className={`game-shell board-${skin}`} style={{ ['--board-art' as string]: `url('/boards/${skin}.webp')` }}>
+        <WalletBar />
+        <main className="game-content">
+          <nav className="arena-toolbar" aria-label="Match controls">
+            <Link href="/" className="quiet-link">← Heroes</Link>
+            <span className="block-plaque">BLOCK <b>{state.block.toString().padStart(2, '0')}</b></span>
+            <div className="toolbar-actions">
+              <button className="icon-button" onClick={() => setHelpOpen(true)} aria-label="Open rulebook">?</button>
+              <button className="icon-button" onClick={() => setSettingsOpen(true)} aria-label="Arena settings">⚙</button>
+              <button className="icon-button" onClick={() => startGame(Date.now() & 0x7fffffff)} aria-label="Restart match">↻</button>
+            </div>
+          </nav>
+          <section className="battlefield" aria-label="Battlefield">
+            <DroppableFoeHero><div className={`combatant rival ${canHitFoeHero ? 'legal-target' : ''}`}>
+              <HeroPortrait hero={foeHero} treasury={foe.treasury} foe deckCount={foe.deck.length} handCount={foe.hand.length}
+                floats={floatsFor('hero-1')} highlight={canHitFoeHero} shaking={attackAnim?.targetUid === 'hero-1'}
                 onClick={canHitFoeHero ? onFoeHeroClick : undefined}
-                onKeyDown={canHitFoeHero ? e => (e.key === 'Enter' ? onFoeHeroClick() : undefined) : undefined}
-              />
-            </div>
-            </DroppableFoeHero>
-
-            {/* ── foe board on marble ── */}
-            <div className="marble marble-edge rounded-xl px-2 py-2.5 md:py-3 min-h-[6.5rem] md:min-h-[7.5rem]">
-              {foe.board.length === 0 && dying.filter(d => d.owner === FOE).length === 0 ? (
-                <div className="text-center text-[#6b5a35]/70 text-xs md:text-sm italic py-5">
-                  No enemy minions on the field.
-                </div>
-              ) : (
-                <div className="flex flex-wrap justify-center items-start gap-x-1.5 gap-y-5 md:gap-x-2.5">
-                  {foe.board.map(m => (
-                    <DroppableMinion key={m.uid} uid={m.uid} foe>
-                    <LungeWrap active={attackAnim?.attackerUid === m.uid} up={false}>
-                      <MinionToken
-                        minion={m}
-                        attackable={foeAttackable(m)}
-                        shaking={attackAnim?.targetUid === m.uid}
-                        justPlayed={playedUids.has(m.uid)}
-                        floats={floatsFor(m.uid)}
-                        onClick={attackerUid ? () => onFoeMinionClick(m) : undefined}
-                      />
-                    </LungeWrap>
-                    </DroppableMinion>
-                  ))}
-                  {dying
-                    .filter(d => d.owner === FOE)
-                    .map(d => (
-                      <MinionToken key={`dying-${d.key}`} minion={ghostOf(d)} dying />
-                    ))}
-                </div>
-              )}
-            </div>
-
-            {/* ── mempool band ── */}
-            <section
-              title="Spells resolve next block — both sides see everything"
-              className={`mempool-band rounded-lg px-3 py-2 ${mempoolFx ? 'mempool-flash-resolve' : ''}`}
-              key={mempoolFx ? `flash-${mempoolFx.key}` : 'idle'}
-            >
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <span className="text-[11px] uppercase tracking-[0.25em] text-[#7df9e8] font-bold">
-                  ⛓ Mempool
-                </span>
-                <span className="text-[10px] text-lavender/80 italic">
-                  resolves next block — both sides see everything
-                </span>
+                onKeyDown={canHitFoeHero ? e => { if (e.key === 'Enter' || e.key === ' ') onFoeHeroClick(); } : undefined} />
+              <span className="combatant-label">RIVAL · AI</span>
+            </div></DroppableFoeHero>
+            <div className="rank-row enemy-rank" aria-label="Rival minions">
+              <div className="rank-label">Rival ranks <span>{foe.board.length}/7</span></div>
+              <div className="rank-scroll thin-scroll">
+                {foe.board.length === 0 && <div className="empty-rank">The rival’s ranks are quiet.</div>}
+                {foe.board.map(m => <DroppableMinion key={m.uid} uid={m.uid} foe><LungeWrap active={attackAnim?.attackerUid === m.uid} up={false}>
+                  <MinionToken minion={m} attackable={foeAttackable(m)} shaking={attackAnim?.targetUid === m.uid}
+                    justPlayed={playedUids.has(m.uid)} floats={floatsFor(m.uid)}
+                    onClick={() => attackerUid && foeAttackable(m) ? onFoeMinionClick(m) : setInspectUid(m.uid)} />
+                </LungeWrap></DroppableMinion>)}
+                {dying.filter(d => d.owner === FOE).map(d => <MinionToken key={`dying-${d.key}`} minion={ghostOf(d)} dying floats={floatsFor(d.uid)} />)}
               </div>
-              <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-3 min-h-[3rem]">
-                {myMempool.length === 0 && foeMempool.length === 0 ? (
-                  <span className="text-[11px] text-lavender/50 italic">
-                    Empty — the chain is quiet… for now.
-                  </span>
-                ) : (
-                  <>
-                    {foeMempool.map(e => (
-                      <MempoolCard key={e.uid} entry={e} ownerLabel={foeHero.name} mine={false} />
-                    ))}
-                    {myMempool.map(e => (
-                      <MempoolCard key={e.uid} entry={e} ownerLabel="you" mine />
-                    ))}
-                  </>
-                )}
-                {mempoolFx?.kind === 'resolve' && (
-                  <span className="text-[10px] text-mint font-bold uppercase tracking-widest animate-pulse">
-                    ✓ resolving
-                  </span>
-                )}
-                {mempoolFx?.kind === 'counter' && (
-                  <span className="text-[10px] text-blood font-bold uppercase tracking-widest animate-pulse">
-                    ⚡ countered
-                  </span>
-                )}
+            </div>
+            <section className={`chain-strip ${mempoolFx ? 'mempool-flash-resolve' : ''}`} aria-label="Public mempool">
+              <button className="chain-label" onClick={() => setHelpOpen(true)} title={MECHANICS.Mempool}>⛓ MEMPOOL <b>{myMempool.length + foeMempool.length}</b></button>
+              <div className="chain-entries thin-scroll">
+                {!myMempool.length && !foeMempool.length && <span className="chain-empty">Cast now. Resolve next own turn.</span>}
+                {[...foeMempool, ...myMempool].map(e => <button key={e.uid} className={`queued-spell ${e.owner === ME ? 'mine' : 'theirs'} mempool-glow`}
+                  onClick={() => setInspectCardId(e.cardId)} title={CARDS[e.cardId].text}>
+                  <img src={`/cards/${e.cardId}.webp`} alt="" /><span>{e.name}</span><small>{e.owner === ME ? 'YOU' : 'RIVAL'}</small>
+                </button>)}
               </div>
             </section>
-
-            {/* ── phase label ── */}
-            <div className="text-center">
-              <span
-                className={`inline-block text-xs md:text-sm font-semibold px-3 py-1 rounded-full border ${
-                  state.winner !== null
-                    ? 'text-lavender border-lavender/30'
-                    : myTurn
-                      ? 'text-mint border-mint/40 bg-mint/5'
-                      : 'text-gold-light border-gold/40 bg-gold/5'
-                }`}
-              >
-                {phaseText}
-              </span>
+            <div className={`turn-status ${myTurn ? 'your-turn' : ''}`} role="status" aria-live="polite">
+              {autoplay ? 'Demo autoplay · pause below to take control' : phaseText}
+              {attackerUid && <button onClick={() => setAttackerUid(null)} className="cancel-target">Cancel</button>}
             </div>
-
-            {/* ── my board on marble ── */}
-            <DroppableBoard>
-            <div id="my-board-slot" className="marble marble-edge rounded-xl px-2 py-2.5 md:py-3 min-h-[7rem] md:min-h-[8rem]">
-              {me.board.length === 0 && dying.filter(d => d.owner === ME).length === 0 ? (
-                <div className="text-center text-[#6b5a35]/70 text-xs md:text-sm italic py-6">
-                  Your ranks are empty. Play a minion!
-                </div>
-              ) : (
-                <div className="flex flex-wrap justify-center items-start gap-x-1.5 gap-y-5 md:gap-x-2.5">
-                  {me.board.map(m => {
-                    const canActNow = myTurn && m.canAttack && !m.staked;
-                    const token = (
-                      <LungeWrap key={m.uid} active={attackAnim?.attackerUid === m.uid} up>
-                        <MinionToken
-                          minion={m}
-                          selected={attackerUid === m.uid}
-                          canAct={canActNow}
-                          shaking={attackAnim?.targetUid === m.uid}
-                          justPlayed={playedUids.has(m.uid)}
-                          floats={floatsFor(m.uid)}
-                          onClick={() => onMyMinionClick(m)}
-                          onStake={
-                            myTurn && !m.staked && legal.some(a => a.type === 'stake' && a.uid === m.uid)
-                              ? () => onStake(m.uid)
-                              : undefined
-                          }
-                          onUnstake={
-                            myTurn && m.staked && legal.some(a => a.type === 'unstake' && a.uid === m.uid)
-                              ? () => onUnstake(m.uid)
-                              : undefined
-                          }
-                        />
-                      </LungeWrap>
-                    );
-                    return canActNow ? (
-                      <DraggableAttacker key={m.uid} uid={m.uid}>{token}</DraggableAttacker>
-                    ) : (
-                      token
-                    );
-                  })}
-                  {dying
-                    .filter(d => d.owner === ME)
-                    .map(d => (
-                      <MinionToken key={`dying-${d.key}`} minion={ghostOf(d)} dying />
-                    ))}
-                </div>
-              )}
-            </div>
-            </DroppableBoard>
-
-            {/* ── my hero row: portrait · hero power · END TURN ── */}
-            {/* mobile: vertical stack (portrait + treasury); hero power + END TURN
-                live in the fixed bottom action bar so they are always reachable.
-                desktop: classic row with portrait · hero power · END TURN. */}
-            <div className="rounded-xl border border-gold/25 bg-void/70 px-3 py-2.5 md:px-4 md:py-3 flex flex-col md:flex-row md:items-center gap-2.5 md:gap-4">
-              <div className="min-w-0 md:flex-1">
-                <HeroPortrait
-                  hero={myHero}
-                  treasury={me.treasury}
-                  deckCount={me.deck.length}
-                  handCount={me.hand.length}
-                  floats={floatsFor('hero-0')}
-                  shaking={attackAnim?.targetUid === 'hero-0'}
-                />
+            <DroppableBoard><div id="my-board-slot" className="rank-row own-rank" aria-label="Your minions">
+              <div className="rank-label">Your ranks <span>{me.board.length}/7</span>
+                {!!me.pavilionBonuses?.length && <b className="pavilion-tag" title={MECHANICS.Pavilion}>Pavilion +1 gas</b>}
               </div>
-              <div className="hidden md:flex items-center gap-4">
-                <button
-                  onClick={() => hpAction && act(hpAction)}
-                  disabled={!myTurn || !hpAction}
-                  title={myHero.powerText}
-                  className="px-3 md:px-4 py-2.5 rounded-lg border-2 border-gold/60 text-gold-light font-semibold text-xs md:text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gold/10 transition shrink-0"
-                >
-                  ⚡ {myHero.powerName}{' '}
-                  <span className="text-lavender font-mono">(2)</span>
-                  {me.heroPowerUsed && <span className="block text-[9px] text-lavender/60 font-normal">used</span>}
-                </button>
-                <button
-                  onClick={endTurn}
-                  disabled={!myTurn}
-                  className="px-6 md:px-10 py-3 md:py-4 rounded-xl bg-gradient-to-b from-gold-light via-gold to-gold-dark text-abyss font-display font-bold text-base md:text-xl tracking-[0.15em] disabled:opacity-30 disabled:cursor-not-allowed hover:brightness-110 active:scale-[0.97] transition shadow-[0_0_28px_rgba(212,175,55,0.45)] border-2 border-[#6b4e12] shrink-0"
-                >
-                  {aiThinking ? 'Ending…' : 'END TURN'}
-                </button>
+              <div className="rank-scroll thin-scroll">
+                {me.board.length === 0 && <div className="empty-rank">Raise your legion. Play a minion.</div>}
+                {me.board.map(m => {
+                  const ready = myTurn && legal.some(a => a.type === 'attack' && a.attackerUid === m.uid);
+                  const token = <LungeWrap active={attackAnim?.attackerUid === m.uid} up><MinionToken minion={m}
+                    selected={attackerUid === m.uid} canAct={ready} shaking={attackAnim?.targetUid === m.uid}
+                    justPlayed={playedUids.has(m.uid)} floats={floatsFor(m.uid)}
+                    onClick={() => ready && attackerUid !== m.uid ? onMyMinionClick(m) : setInspectUid(m.uid)} /></LungeWrap>;
+                  return ready && isDesktop ? <DraggableAttacker key={m.uid} uid={m.uid}>{token}</DraggableAttacker> : <div key={m.uid}>{token}</div>;
+                })}
+                {dying.filter(d => d.owner === ME).map(d => <MinionToken key={`dying-${d.key}`} minion={ghostOf(d)} dying floats={floatsFor(d.uid)} />)}
+              </div>
+            </div></DroppableBoard>
+            <div className="combatant own"><HeroPortrait hero={myHero} treasury={me.treasury} deckCount={me.deck.length}
+              handCount={me.hand.length} floats={floatsFor('hero-0')} shaking={attackAnim?.targetUid === 'hero-0'} />
+              <div className="gas-meter" title={MECHANICS.Gas}><span>GAS</span><b>{me.gas}<small>/{me.maxGas}</small></b>
+                <div aria-hidden>{Array.from({ length: Math.min(me.maxGas, 10) }, (_, i) => <i key={i} className={i < me.gas ? 'filled' : ''} />)}</div>
               </div>
             </div>
-
-            {/* ── hand fan ── */}
-            {/* mobile: horizontal snap carousel — every card fully visible, no
-                overlap; tap a card to open the zoom modal (hover tooltips are
-                disabled on touch). desktop: classic fan, tap/click plays. */}
-            <div>
-              <div className="text-[10px] uppercase tracking-[0.25em] text-lavender mb-0.5 px-1">
-                Your hand ({me.hand.length})
-              </div>
-              {me.hand.length === 0 ? (
-                <div className="text-lavender/40 text-xs md:text-sm italic px-1 py-2">
-                  Empty hand — top-deck like a degen.
-                </div>
-              ) : (
-                <div className="overflow-x-auto thin-scroll snap-x snap-mandatory md:snap-none">
-                  <div className="hand-fan mx-auto flex w-max items-end gap-3 px-4 pb-8 pt-5 md:gap-0 md:px-3 md:pb-9 md:pt-6">
-                    {me.hand.map((hc, i) => {
-                      const def = CARDS[hc.cardId];
-                      if (!def) return null;
-                      const playable = myTurn && playableUids.has(hc.uid);
-                      const spread = me.hand.length > 1 ? i - (me.hand.length - 1) / 2 : 0;
-                      const dealt = dealtUids.has(hc.uid);
-                      return (
-                        <DraggableHandCard key={hc.uid} id={hc.uid} disabled={!playable}>
-                        <div
-                          data-hand-uid={hc.uid}
-                          style={
-                            isDesktop
-                              ? {
-                                  transform: `rotate(${(spread * 3.2).toFixed(1)}deg) translateY(${Math.abs(spread) * 3}px)`,
-                                  transformOrigin: 'bottom center',
-                                  zIndex: i,
-                                }
-                              : undefined
-                          }
-                          className="shrink-0 snap-start"
-                        >
-                          <div
-                            className={dealt ? 'deal-in' : ''}
-                            style={dealt ? { animationDelay: `${Math.min(i, 9) * 70}ms` } : undefined}
-                          >
-                            <CardView
-                              card={def}
-                              size="sm"
-                              playable={playable}
-                              disabled={!playable}
-                              onClick={
-                                isDesktop
-                                  ? playable
-                                    ? () => onHandClick(hc.uid)
-                                    : undefined
-                                  : () => setZoomUid(hc.uid)
-                              }
-                            />
-                          </div>
-                        </div>
-                        </DraggableHandCard>
-                      );
-                    })}
+          </section>
+          <section className="hand-zone" aria-label="Your hand">
+            <div className="hand-heading"><span>YOUR HAND <b>{me.hand.length}/10</b></span><span>{mulliganAvailable(state) ? 'Select cards to replace' : 'Tap to inspect · drag to deploy'}</span></div>
+            <div className="hand-scroll thin-scroll"><div className="hand-cards">
+              {me.hand.length === 0 && <p className="empty-hand">An empty hand. A full empire of possibilities.</p>}
+              {me.hand.map((hc, i) => {
+                const def = CARDS[hc.cardId]; const playable = myTurn && playableUids.has(hc.uid);
+                const selecting = mulliganAvailable(state) && state.turn === ME;
+                const picked = mulliganPicks.includes(hc.uid);
+                return <DraggableHandCard key={hc.uid} id={hc.uid} disabled={!playable || !isDesktop}>
+                  <div data-hand-uid={hc.uid} className={`hand-card-wrap ${dealtUids.has(hc.uid) ? 'deal-in' : ''}`} style={{ animationDelay: `${i * 45}ms` }}>
+                    <CardView card={def} size="sm" playable={playable} selected={picked}
+                      onClick={() => selecting ? setMulliganPicks(old => old.includes(hc.uid) ? old.filter(u => u !== hc.uid) : [...old, hc.uid]) : setZoomUid(hc.uid)} />
+                    {selecting && <span className={`mulligan-choice ${picked ? 'replace' : ''}`}>{picked ? 'REPLACE' : 'KEEP'}</span>}
                   </div>
-                </div>
-              )}
-            </div>
-
-            {/* ── battle log (collapsible) ── */}
-            <div className="rounded-xl border border-white/10 bg-black/30">
-              <button
-                onClick={() => setLogOpen(o => !o)}
-                className="w-full flex items-center justify-between px-4 py-2 text-[11px] uppercase tracking-[0.2em] text-lavender hover:text-parchment transition"
-                aria-expanded={logOpen}
-              >
-                <span>Battle log</span>
-                <span>{logOpen ? '▾ collapse' : '▸ expand'}</span>
+                </DraggableHandCard>;
+              })}
+            </div></div>
+          </section>
+          <div className="action-dock">
+            {mulliganAvailable(state) && state.turn === ME ? <>
+              <span className="dock-hint">Build your opening hand.</span>
+              <button className="gold-button" onClick={() => { act({ type: 'mulligan', uids: mulliganPicks }); setMulliganPicks([]); }}>
+                {mulliganPicks.length ? `Replace ${mulliganPicks.length}` : 'Keep hand'}
               </button>
-              {logOpen && (
-                <div ref={logBoxRef} className="thin-scroll max-h-36 overflow-y-auto px-4 pb-3 space-y-0.5">
-                  {state.log.slice(-60).map((line, i) => (
-                    <div key={i} className="text-[11px] text-parchment/70 font-mono">
-                      {line}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="text-center pt-1">
-              <Link href="/" className="text-xs text-lavender/60 hover:text-lavender">
-                ← Back to hero select
-              </Link>
-            </div>
+            </> : <>
+              <button className={`power-button ${effectivePowerCost(state, ME) === 1 ? 'comeback-power' : ''}`} disabled={!myTurn || !hpAction || autoplay}
+                onClick={() => hpAction && act(hpAction)} title={myHero.powerText}>
+                <span>⚡ {myHero.powerName}</span><b>{effectivePowerCost(state, ME)} GAS</b>
+              </button>
+              <button className="gold-button end-turn-button" onClick={endTurn} disabled={!myTurn || autoplay}>
+                {aiThinking ? 'Rival’s turn' : 'END TURN'}
+              </button>
+            </>}
           </div>
-        </div>
-      </div>
-
-      {/* ── mobile action bar: gas · hero power · END TURN ──
-          fixed to the viewport bottom on phones so END TURN is always
-          reachable without scrolling; hidden on md+ (buttons live in the
-          hero row there). */}
-      <div className="fixed inset-x-0 bottom-0 z-30 md:hidden border-t-2 border-gold/30 bg-void/95 backdrop-blur px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-        <div className="mx-auto flex max-w-xl items-center gap-2">
-          <div
-            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-solana/40 bg-void px-2 py-2"
-            title="Gas: mana for this block. Refills each block."
-          >
-            <span className="gas-crystal gas-crystal-lit w-4 h-5" aria-hidden />
-            <span className="font-mono text-sm font-bold text-solana">
-              {me.gas}
-              <span className="text-xs text-lavender/60">/{me.maxGas}</span>
-            </span>
+          <div className="arena-bottom"><button className="quiet-link" onClick={() => setLogOpen(true)}>Battle log ↗</button>
+            <button className="quiet-link" onClick={() => setAutoplay(a => !a)}>{autoplay ? 'Ⅱ Pause demo' : '▷ Autoplay demo'}</button>
+            <button className="quiet-link" onClick={() => setShowOnboarding(true)}>Learn to play</button>
           </div>
-          <button
-            onClick={() => hpAction && act(hpAction)}
-            disabled={!myTurn || !hpAction}
-            title={myHero.powerText}
-            className="min-w-0 flex-1 truncate rounded-lg border-2 border-gold/60 px-2 py-2.5 text-xs font-semibold text-gold-light disabled:cursor-not-allowed disabled:opacity-30"
-          >
-            ⚡ {myHero.powerName} <span className="font-mono text-lavender">(2)</span>
-          </button>
-          <button
-            onClick={endTurn}
-            disabled={!myTurn}
-            className="flex-1 rounded-lg border-2 border-[#6b4e12] bg-gradient-to-b from-gold-light via-gold to-gold-dark px-4 py-2.5 font-display text-sm font-bold tracking-[0.12em] text-abyss shadow-[0_0_20px_rgba(212,175,55,0.45)] transition hover:brightness-110 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-30"
-          >
-            {aiThinking ? 'Ending…' : 'END TURN'}
-          </button>
-        </div>
+        </main>
+        {showOnboarding && <OnboardingOverlay onClose={closeOnboarding} />}
+        {settingsOpen && <ArenaSettings skin={skin} onChange={setSkin} onClose={() => setSettingsOpen(false)} />}
+        {helpOpen && <MechanicsGuide onClose={() => setHelpOpen(false)} />}
+        {logOpen && <Dialog title="Battle log" onClose={() => setLogOpen(false)}><div ref={logBoxRef} className="battle-log thin-scroll">
+          {state.log.map((line, i) => <p key={`${state.block}-${i}`}>{line}</p>)}
+        </div></Dialog>}
+        {zoomUid && (() => { const h = me.hand.find(h => h.uid === zoomUid); return h ? <CardZoomModal card={CARDS[h.cardId]}
+          playable={myTurn && playableUids.has(h.uid) && !autoplay} onPlay={() => onHandClick(h.uid)} onClose={() => setZoomUid(null)} /> : null; })()}
+        {inspectCardId && <CardZoomModal card={CARDS[inspectCardId]} playable={false} onPlay={() => {}} onClose={() => setInspectCardId(null)} />}
+        {inspectUid && (() => {
+          const m = [...me.board, ...foe.board].find(m => m.uid === inspectUid); if (!m) return null;
+          const own = me.board.some(x => x.uid === m.uid); const canAttack = legal.some(a => a.type === 'attack' && a.attackerUid === m.uid);
+          return <Dialog title={m.name} onClose={() => setInspectUid(null)}><div className="minion-detail">
+            <CardView card={CARDS[m.cardId]} size="lg" tilt={false} />
+            <p>Current stats: <b>{m.attack} attack · {m.health}/{m.maxHealth} health</b></p>
+            <p>{m.staked ? 'Staked: +1 gas each own turn. Still attackable.' : m.canAttack ? 'Ready for combat.' : 'Cannot attack this turn.'}</p>
+            {own && myTurn && !autoplay && <div className="dialog-actions">
+              {canAttack && <button className="gold-button" onClick={() => { setAttackerUid(m.uid); setInspectUid(null); }}>Choose target</button>}
+              {legal.some(a => a.type === 'stake' && a.uid === m.uid) && <button className="outline-button" onClick={() => { onStake(m.uid); setInspectUid(null); }}>Stake</button>}
+              {legal.some(a => a.type === 'unstake' && a.uid === m.uid) && <button className="outline-button" onClick={() => { onUnstake(m.uid); setInspectUid(null); }}>Unstake</button>}
+            </div>}
+          </div></Dialog>;
+        })()}
+        {state.winner !== null && <EndOverlay winner={state.winner} blocks={state.block} stats={stats} onRematch={() => startGame(Date.now() & 0x7fffffff)} />}
+        <DragPreview hand={me.hand} board={me.board} />
+        <MotionFx events={events} playRects={playRects} reduced={reduced} />
       </div>
-
-      {/* ── first-game onboarding ── */}
-      {showOnboarding && myTurn && <OnboardingOverlay onClose={closeOnboarding} />}
-
-      {/* ── card zoom modal (mobile tap on a hand card) ── */}
-      {(() => {
-        const zoomHc = zoomUid ? me.hand.find(h => h.uid === zoomUid) : undefined;
-        const zoomDef = zoomHc ? CARDS[zoomHc.cardId] : undefined;
-        if (!zoomDef || !zoomHc) return null;
-        return (
-          <CardZoomModal
-            card={zoomDef}
-            playable={myTurn && playableUids.has(zoomHc.uid)}
-            onPlay={() => onHandClick(zoomHc.uid)}
-            onClose={() => setZoomUid(null)}
-          />
-        );
-      })()}
-
-      {/* ── end-of-game overlay ── */}
-      {state.winner !== null && (
-        <EndOverlay winner={state.winner} blocks={state.block} onRematch={() => startGame(Date.now() & 0x7fffffff)} />
-      )}
-
-      {/* ── drag preview (portal) ── */}
-      <DragPreview hand={me.hand} board={me.board} />
-
-      {/* ── package 2: motion overlay (play-flight, halving +1/+1, RUG PULL
-            vortex + screen shake, VICTORIA laurels + coin confetti, RUGGED
-            crack). Driven by the same structured event adapter as audio. */}
-      <MotionFx events={events} playRects={playRects} reduced={reduced} />
-    </div>
     </DndProvider>
   );
 }
@@ -951,40 +721,21 @@ function MempoolCard({ entry, ownerLabel, mine }: { entry: MempoolEntry; ownerLa
 /** First-game onboarding: 3 numbered steps over a dimmed backdrop, shown once
  *  (localStorage key imperivm-onboarding-seen). Replaces the old hint. */
 function OnboardingOverlay({ onClose }: { onClose: () => void }) {
-  const steps = [
-    'Tap a card in your hand to play it',
-    'Tap your minion, then tap an enemy to attack',
-    'Empty the enemy Treasury (30 HP) to win',
+  const [step, setStep] = useState(0);
+  const lessons = [
+    { icon: 'I', title: 'Raise your legion', body: 'Keep or replace your opening hand. Tap a card to inspect it, then pay its gas cost to deploy. Your gas refills and grows each own turn.' },
+    { icon: 'II', title: 'Strike. Or stake.', body: 'Select a ready minion, then a glowing enemy target. Taunt guards must fall first. Tap your selected minion again to inspect or stake it for extra gas.' },
+    { icon: 'III', title: 'Read the mempool', body: 'Spells resolve on your next own turn. A rival can counter them first with Priority. Watch for RUG PULL: it destroys both armies. Empty the rival’s 30 HP Treasury to win.' },
   ];
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-abyss/70 backdrop-blur-[2px] p-6"
-      onClick={onClose}
-    >
-      <div
-        className="rise-in w-full max-w-sm rounded-2xl border-2 border-gold/60 bg-void/95 p-6 text-center shadow-[0_0_40px_rgba(212,175,55,0.3)]"
-        onClick={e => e.stopPropagation()}
-      >
-        <div className="font-display text-2xl font-bold gold-text">How to play</div>
-        <ol className="mt-5 space-y-3.5 text-left">
-          {steps.map((step, i) => (
-            <li key={i} className="flex items-center gap-3">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-gold bg-gold/15 font-display text-base font-bold text-gold-light">
-                {i + 1}
-              </span>
-              <span className="text-sm leading-snug text-parchment/90">{step}</span>
-            </li>
-          ))}
-        </ol>
-        <button
-          className="mt-6 w-full px-8 py-3 rounded-lg bg-gradient-to-b from-gold-light to-gold-dark text-abyss font-bold hover:brightness-110 transition"
-          onClick={onClose}
-        >
-          Got it, let&apos;s play
-        </button>
-      </div>
+  const lesson = lessons[step];
+  return <Dialog title="Welcome, Imperator" onClose={onClose}>
+    <div className="onboarding-lesson"><span className="lesson-number">{lesson.icon}</span>
+      <h3>{lesson.title}</h3><p>{lesson.body}</p>
+      <div className="lesson-progress" aria-label={`Step ${step + 1} of 3`}>{lessons.map((_, i) => <i key={i} className={i === step ? 'active' : ''} />)}</div>
+      <button className="gold-button" onClick={() => step < 2 ? setStep(step + 1) : onClose()}>{step < 2 ? 'Next →' : 'Enter the arena'}</button>
+      <button className="quiet-link" onClick={onClose}>Skip tutorial</button>
     </div>
-  );
+  </Dialog>;
 }
 
 /** Mobile zoom modal for a hand card: full readable card + Play / Close. */
@@ -999,49 +750,13 @@ function CardZoomModal({
   onPlay: () => void;
   onClose: () => void;
 }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-abyss/80 backdrop-blur-[2px] p-6"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label={card.name}
-    >
-      <div
-        className="rise-in thin-scroll flex max-h-full flex-col items-center overflow-y-auto"
-        onClick={e => e.stopPropagation()}
-      >
-        <CardView card={card} size="lg" tilt={false} playable={playable} />
-        <div className="mt-4 flex w-full max-w-[16rem] gap-3 pb-1">
-          <button
-            onClick={() => {
-              onPlay();
-              onClose();
-            }}
-            disabled={!playable}
-            title={playable ? 'Play this card' : 'Not enough gas or not your turn'}
-            className="flex-1 rounded-lg bg-gradient-to-b from-gold-light to-gold-dark px-4 py-3 font-bold text-abyss transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-30"
-          >
-            Play
-          </button>
-          <button
-            onClick={onClose}
-            className="flex-1 rounded-lg border-2 border-lavender/50 px-4 py-3 font-semibold text-lavender transition hover:bg-lavender/10"
-          >
-            Close
-          </button>
-        </div>
-      </div>
+  return <Dialog title={card.name} onClose={onClose}>
+    <div className="minion-detail"><CardView card={card} size="lg" tilt={false} playable={playable} />
+      <div className="dialog-actions"><button className="gold-button" disabled={!playable} onClick={() => { onPlay(); onClose(); }}>Play card</button>
+        <button className="outline-button" onClick={onClose}>Close</button></div>
+      {!playable && <p className="small-note">Inspect anytime. Playing requires your turn, enough gas and a free minion slot.</p>}
     </div>
-  );
+  </Dialog>;
 }
 
 /** Falling gold coins for the victory screen. */
@@ -1109,21 +824,24 @@ function Laurel() {
 function EndOverlay({
   winner,
   blocks,
+  stats,
   onRematch,
 }: {
   winner: PlayerId | 'draw';
   blocks: number;
+  stats: MatchStats;
   onRematch: () => void;
 }) {
   const win = winner === ME;
+  const reduced = useReducedMotion();
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-abyss/92 backdrop-blur-sm overflow-hidden">
-      {win && <CoinConfetti />}
+    <div className="end-overlay fixed inset-0 z-[80] flex items-center justify-center bg-abyss/95 backdrop-blur-sm overflow-hidden">
+      {win && !reduced && <CoinConfetti />}
       <div className="rise-in text-center px-6 relative z-10 max-w-lg">
         {win ? (
           <>
             <Laurel />
-            <div className="font-display text-6xl md:text-8xl font-bold gold-text tracking-[0.12em]">
+            <div className="font-display text-4xl md:text-7xl font-bold gold-text tracking-[0.12em]">
               VICTORIA!
             </div>
             <p className="mt-3 text-lavender italic font-display text-lg">
@@ -1132,7 +850,7 @@ function EndOverlay({
           </>
         ) : winner === 'draw' ? (
           <>
-            <div className="font-display text-6xl md:text-8xl font-bold text-lavender tracking-[0.12em]">
+            <div className="font-display text-4xl md:text-7xl font-bold text-lavender tracking-[0.12em]">
               DRAW
             </div>
             <p className="mt-3 text-lavender italic font-display text-lg">
@@ -1150,7 +868,7 @@ function EndOverlay({
                 <line x1="28" y1="6" x2="62" y2="90" stroke="#FF4D5E" strokeWidth="1.5" opacity="0.8" />
               </svg>
             </div>
-            <div className="mt-4 font-display text-6xl md:text-8xl font-bold text-blood tracking-[0.12em]">
+            <div className="mt-4 font-display text-4xl md:text-7xl font-bold text-blood tracking-[0.12em]">
               RUGGED
             </div>
             <p className="mt-3 text-lavender italic font-display text-lg">
@@ -1159,6 +877,11 @@ function EndOverlay({
           </>
         )}
         <p className="mt-2 text-xs text-lavender/60 font-mono">decided in {blocks} blocks</p>
+        <div className="match-stats">
+          {[[stats.cardsPlayed, 'Cards played'], [stats.attacks, 'Attacks'], [stats.treasuryDamage, 'Treasury damage'],
+            [stats.treasuryHealed, 'HP restored'], [stats.minionsLost, 'Minions lost'], [stats.counters, 'Counters']].map(([value, label]) =>
+            <div key={label}><b>{value}</b><span>{label}</span></div>)}
+        </div>
         <div className="mt-7 flex gap-3 justify-center flex-wrap">
           <button
             onClick={onRematch}

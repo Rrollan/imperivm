@@ -96,7 +96,7 @@ interface DndProviderProps {
 export function DndProvider({ children, onDragEnd, onDragStart, onDragCancel }: DndProviderProps) {
   const sensors = useSensors(
     useSensor(TouchSensor, {
-      activationConstraint: { delay: 120, tolerance: 6 },
+      activationConstraint: { delay: 280, tolerance: 8 },
     }),
     useSensor(MouseSensor, {
       activationConstraint: { distance: 6 },
@@ -164,6 +164,9 @@ export function DraggableHandCard({ id, disabled = false, children }: DraggableH
     <div
       ref={setNodeRef}
       {...attributes}
+      role="group"
+      tabIndex={undefined}
+      aria-disabled={undefined}
       {...listeners}
       style={{
         flexShrink: 0,
@@ -198,6 +201,9 @@ export function DraggableAttacker({ uid, children }: DraggableAttackerProps) {
     <div
       ref={setNodeRef}
       {...attributes}
+      role="group"
+      tabIndex={undefined}
+      aria-disabled={undefined}
       {...listeners}
       className="inline-block"
       style={{

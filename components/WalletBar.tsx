@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { FC, ReactNode } from 'react';
+import Link from 'next/link';
+import MuteButton from './MuteButton';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
@@ -45,10 +47,11 @@ export default function WalletBar() {
   }, []);
 
   return (
-    <header className="border-b border-gold/20 bg-void/70 backdrop-blur">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-        <span className="font-display text-lg md:text-xl tracking-[0.25em] gold-text font-bold">IMPERIVM</span>
-        <div className="flex items-center gap-3">
+    <header className="app-header border-b border-gold/20 bg-void/70 backdrop-blur">
+      <div className="max-w-6xl mx-auto px-3 py-1.5 flex items-center justify-between gap-2">
+        <Link href="/" className="header-brand font-display tracking-[0.18em] gold-text font-bold">IMPERIVM</Link>
+        <div className="wallet-controls flex items-center gap-2">
+          <MuteButton />
           <span className="hidden sm:inline-block text-[11px] px-2.5 py-1 rounded-full border border-mint/40 text-mint uppercase tracking-widest">
             Demo mode — wallet optional
           </span>
