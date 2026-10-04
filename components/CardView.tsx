@@ -10,16 +10,16 @@ import ArtImg from './ArtImg';
 import type { UiFloat } from './battleFx';
 
 export const FACTION_COLORS: Record<Faction, string> = {
-  DeFi: '#9945FF',
-  NFT: '#A89BC0',
-  DePIN: '#14F195',
-  Meme: '#D4AF37',
+  DeFi: '#795297',
+  NFT: '#57718c',
+  DePIN: '#587d82',
+  Meme: '#a56855',
 };
 
 export const RARITY_COLORS: Record<Rarity, string> = {
-  common: '#6B7280',
-  rare: '#53C7DB',
-  epic: '#A855F7',
+  common: '#b97845',
+  rare: '#c2c7d0',
+  epic: '#d4af37',
   legendary: '#D4AF37',
 };
 
@@ -35,7 +35,7 @@ interface CardViewProps {
 
 /**
  * Full card with 3D tilt on hover, rarity frame, art from /cards/<id>.webp,
- * cost gem (blue, top-left), attack orb (gold, bottom-left), health orb
+ * gas crystal (amber, top-left), attack orb (gold, bottom-left), health shield
  * (red, bottom-right), name + rules text, Priority/Halving badges,
  * and a hover tooltip with the full rules text.
  */
@@ -113,17 +113,10 @@ export default function CardView({
           style={{ background: `linear-gradient(90deg, transparent, ${FACTION_COLORS[card.faction]}, transparent)` }}
         />
 
-        {/* cost gem — blue, top-left */}
-        <div className="card-cost absolute -top-2.5 -left-2.5 w-8 h-8 rotate-45 bg-gradient-to-br from-[#7dd3fc] to-[#1d4ed8] border-2 border-[#bfdbfe] flex items-center justify-center shadow-[0_0_10px_rgba(59,130,246,0.7)] z-10" title={t(`Стоимость: ${card.cost} газа`, `Cost: ${card.cost} gas`)}>
+        {/* gas crystal — amber, top-left */}
+        <div className="card-cost absolute -top-2.5 -left-2.5 w-8 h-8 rotate-45 border-2 border-[#f5d76e] flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.6)] z-10" title={t(`Стоимость: ${card.cost} газа`, `Cost: ${card.cost} gas`)}>
           <span className="-rotate-45 text-white font-mono font-bold text-sm drop-shadow">{card.cost}</span>
         </div>
-        {/* rarity gem — top-right */}
-        <div
-          className="card-rarity-gem absolute top-1.5 right-1.5 w-3 h-3 rotate-45 border border-black/50 z-10"
-          style={{ background: rarityColor, boxShadow: `0 0 6px ${rarityColor}` }}
-          title={rarityName(card.rarity)}
-        />
-
         {/* art */}
         <div className="card-art mx-1.5 mt-1 rounded-lg overflow-hidden border border-gold-dark/60 aspect-[3/4] bg-abyss">
           <ArtImg
@@ -144,6 +137,10 @@ export default function CardView({
             {typeName(card.type)} · {card.faction}
           </div>
         </div>
+
+        <span className="rarity-coin" title={`${rarityName(card.rarity)} · $RUG`} aria-label={`${rarityName(card.rarity)} · $RUG`}>
+          <span>$RUG</span>{isLegendary && <span className="coin-laurels" aria-hidden><img src="/ornaments/laurel.svg" alt="" /><img src="/ornaments/laurel.svg" alt="" /></span>}
+        </span>
 
         {/* rules text */}
         <div className={`card-rules px-2 pt-1 pb-1 text-center text-parchment/80 ${textSize} flex-1`}>
@@ -170,7 +167,7 @@ export default function CardView({
         {isMinion && (
           <>
             <div className="card-attack absolute -bottom-3 left-1 w-9 h-9 rounded-full bg-gradient-to-br from-gold-light to-gold-dark border-2 border-[#6b4e12] flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.6)] z-10" title={t('Атака', 'Attack')}>
-              <span className="text-abyss font-mono font-bold text-sm">{card.attack}</span>
+              <svg className="gladius" viewBox="0 0 12 24" aria-hidden><path d="M6 1 9 5 7 15H5L3 5ZM1 16h10M6 16v6M3 22h6" /></svg><span className="text-abyss font-mono font-bold text-sm">{card.attack}</span>
             </div>
             <div className="card-health absolute -bottom-3 right-1 w-9 h-9 rounded-full bg-gradient-to-br from-[#ff8a94] to-blood border-2 border-[#7a1f28] flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.6)] z-10" title={t('Здоровье', 'Health')}>
               <span className="text-white font-mono font-bold text-sm">{card.health}</span>
@@ -245,23 +242,24 @@ export function MinionToken({
         aria-label={`${name}, ${minion.attack} ${t("атака", "attack")}, ${minion.health} ${t("здоровье", "health")}${minion.taunt ? `, ${keywordName("Taunt")}` : ""}${minion.staked ? `, ${t("в стейкинге", "staked")}` : ""}`}
         title={def ? `${name} — ${cardText(minion.cardId)}` : name}
         className={[
+          `board-token ${attackable ? 'valid-minion-target' : ''}`,
           'relative w-[4.6rem] h-[5.4rem] md:w-20 md:h-[6rem] rounded-xl bg-gradient-to-b from-[#2a1745] to-abyss',
           'flex flex-col items-center justify-start pt-1 pb-4',
           onClick && !dying ? 'cursor-pointer' : '',
           selected
             ? 'shadow-[0_0_18px_rgba(212,175,55,0.7)]'
             : attackable
-              ? 'animate-pulse shadow-[0_0_14px_rgba(255,77,94,0.55)]'
+              ? 'shadow-[0_0_10px_rgba(212,175,55,0.4)]'
               : canAct
                 ? 'shadow-[0_0_10px_rgba(212,175,55,0.35)]'
                 : '',
-          dying ? 'death-fade grayscale' : '',
+          dying ? 'death-fade' : '',
           shaking ? 'target-shake' : '',
           justPlayed ? 'play-to-board' : '',
         ].join(' ')}
         style={{
           border: `2px ${minion.staked ? 'dashed' : 'solid'} ${
-            selected ? '#D4AF37' : attackable ? '#FF4D5E' : canAct ? 'rgba(212,175,55,0.65)' : minion.staked ? '#8C6A1F' : rarityColor
+            selected ? '#D4AF37' : attackable ? '#f5d76e' : canAct ? 'rgba(212,175,55,0.65)' : minion.staked ? '#8C6A1F' : rarityColor
           }`,
         }}
       >
@@ -322,6 +320,7 @@ export function MinionToken({
         ))}
       </div>
 
+      {dying && <span className="golden-death-dust" aria-hidden>{Array.from({ length: 12 }, (_, i) => <i key={i} style={{ '--dust-x': `${Math.cos(i * Math.PI / 6) * (25 + i * 2)}px`, '--dust-y': `${Math.sin(i * Math.PI / 6) * 34 - 18}px`, animationDelay: `${i % 3 * 35}ms` } as CSSProperties} />)}</span>}
       {(onStake || onUnstake) && !dying && (
         <div className="mt-3.5 flex gap-1">
           {onStake && (
