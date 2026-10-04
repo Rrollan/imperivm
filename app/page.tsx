@@ -7,6 +7,7 @@ import { startAmbient } from '../lib/audio/sfx';
 import { markAmbientStarted, shouldStartAmbient } from '../lib/audio/events';
 import { unlockAudio } from '../lib/audio/manager';
 import { useLocale } from '../components/LocaleContext';
+import HeroArt from '../components/HeroArt';
 
 export default function LandingPage() {
   const [selected, select] = useState('whale');
@@ -43,7 +44,7 @@ export default function LandingPage() {
               aria-pressed={h.id === selected}
               onClick={() => select(h.id)}
             >
-              <img className="menu-coin" src={`/heroes/${h.id}.webp`} alt="" width={112} height={112} />
+              <HeroArt heroId={h.id} name={heroName(h.id)} decorative className="menu-coin" />
               <span className="font-display">{heroName(h.id)}</span>
             </button>
           ))}
@@ -113,7 +114,7 @@ export default function LandingPage() {
           cursor: pointer;
           border-radius: 12px;
         }
-        .menu-coin {
+        .game-menu :global(.menu-coin) {
           width: 112px;
           height: 112px;
           object-fit: cover;
@@ -122,13 +123,13 @@ export default function LandingPage() {
           box-shadow: 0 4px 0 #77501f, 0 8px 16px #55361255;
           transition: transform .2s ease, box-shadow .2s ease;
         }
-        .menu-hero[aria-pressed='true'] .menu-coin {
+        .menu-hero[aria-pressed='true'] :global(.menu-coin) {
           transform: scale(1.12);
           border-color: #f6d578;
           box-shadow: 0 0 0 3px #a87728, 0 0 24px 8px #e7b947aa, 0 8px 16px #55361266;
         }
         .menu-hero span {
-          font-size: 17px;
+          font-size: 20px;
           font-weight: 700;
           color: #ffe19a;
           text-shadow: 0 1px 2px #2a1a10, 0 0 4px #2a1a10, 1px 1px 1px #2a1a10, -1px -1px 1px #2a1a10;
@@ -143,7 +144,7 @@ export default function LandingPage() {
           .menu-heroes { grid-template-columns: repeat(2, 136px); gap: 28px 20px; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .menu-coin { transition: none; }
+          .game-menu :global(.menu-coin) { transition: none; }
         }
       `}</style>
     </main>

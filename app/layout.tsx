@@ -2,6 +2,7 @@ import './globals.css';
 import './card-frames.css';
 import './arena.css';
 import './scene.css';
+import './design-polish.css';
 import Providers from '../components/Providers';
 import SceneTextures from '../components/SceneTextures';
 import type { Metadata } from 'next';

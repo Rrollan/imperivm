@@ -1,0 +1,276 @@
+/* Presentation layer shared by the forum, gates and game. Loaded after legacy skins.
+   Game rules and card markup are deliberately independent of this stylesheet. */
+:root {
+  --ui-ink: #2d241c;
+  --ui-muted: #5b4b3b;
+  --ui-ivory: #f7e8cc;
+  --ui-gold: #f4d18a;
+}
+body { font-size: 16px; line-height: 1.5; }
+.hero-art { position: relative; display: block; flex: none; width: 100%; height: 100%; overflow: hidden; border-radius: 50%; background: #281b25; }
+.hero-art > img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+/* Builder is a landscape illustration; cover crops the scenery without squeezing the coin. */
+.hero-art[data-hero='builder'] > img { transform: scale(1.12); }
+.hero-art-fallback { display: grid; place-items: center; width: 100%; height: 100%; background: radial-gradient(circle at 35% 20%, #f5d78e, #a27631 65%, #4c311c); color: #2d1b0d; font: 700 40px var(--font-display); }
+.hero-choice, .hero-choice:hover, .hero-choice:active { background-image: none !important; background-color: #21171d; }
+
+/* One architectural image per scene, with a stable crop and no tiled columns. */
+.game-shell, .arena-scene {
+  background-color: #1c1219;
+  background-image: linear-gradient(#1c10174a, #1c1219c9), var(--board-art);
+  background-size: cover; background-position: center top; background-repeat: no-repeat;
+  color: var(--ui-ivory);
+}
+.game-content { width: min(1480px, 100%); margin: auto; padding: 0 28px 24px; }
+.arena-frieze { background-repeat: no-repeat; background-size: cover; }
+.arena-frieze .header-brand { color: #ffebc0; text-shadow: 0 2px 3px #160d08; }
+.arena-frieze .wallet-button { font-size: 14px; }
+.arena-frieze .language-switch b { font-size: 14px; }
+.arena-toolbar { position: relative; min-height: 66px; height: auto; padding: 10px 0; }
+.game-shell .quiet-link { color: #f2e3c8; font-size: 14px; }
+.block-clock { top: 8px; gap: 2px; }
+.block-plaque { color: #f1dfbd; font: 700 13px var(--font-sans); letter-spacing: .06em; }
+.block-plaque b { color: #ffe0a0; font: 700 24px var(--font-display); }
+.halving-clock { font-size: 12px; color: #f0ddbd; }
+.halving-track { background: #26191b; }
+
+/* Raised walnut chassis, bronze bevel, recessed stone floor, separate hand rail. */
+.battle-table {
+  position: relative; isolation: isolate; border: 7px ridge #b08a4d; border-radius: 36px 36px 20px 20px;
+  background: radial-gradient(ellipse at 50% 0, #8b613e44, transparent 60%), linear-gradient(100deg, #38251c, #5b3e2a 16%, #412b20 50%, #583a28 85%, #302018);
+  box-shadow: inset 0 2px 0 #f5d89d88, inset 0 0 0 3px #20140e, inset 0 0 24px #120a08bb, 0 7px 0 #80542c, 0 13px 0 #28180f, 0 24px 40px #0009;
+}
+.battle-table .battlefield {
+  --minion-width: 82px; --minion-height: 96px;
+  --board-slot-width: 102px; --board-slot-height: 120px; --rank-padding: 10px;
+  --rank-scroll-height: 146px; --rank-row-height: 172px;
+  position: relative; padding: 14px 174px 14px 164px;
+  grid-template-rows: 112px var(--rank-row-height) 58px 52px var(--rank-row-height) 124px;
+  border: 0; border-radius: 28px 28px 0 0; box-shadow: none; perspective: none;
+}
+.battle-table .battlefield::before {
+  content: ''; position: absolute; z-index: -2; inset: 16px 160px 16px 150px;
+  border: 7px ridge #b89560; border-radius: 24px;
+  background-color: #e6d5b4;
+  background-image: linear-gradient(#f5ead4ed, #e5d2aef0), url('/boards/marble-light.webp');
+  background-size: cover; background-repeat: no-repeat; transform: none;
+  box-shadow: 0 0 0 2px #24160f, 0 2px 0 3px #d8b77666, inset 0 6px 18px #37261b66, inset 0 -3px 7px #fff5;
+}
+.battle-table .battlefield::after {
+  content: ''; position: absolute; z-index: -1; inset: 30px 174px 30px 164px; height: auto;
+  border: 1px solid #b4996955; border-radius: 16px; background: none;
+  box-shadow: inset 0 0 0 4px #f4e6c033; pointer-events: none;
+}
+.battle-table .combatant { height: 112px; }
+.battle-table .combatant.own { height: 124px; }
+.battle-table .hero-profile { width: 104px; height: 104px; }
+.battle-table .hero-medallion { width: 104px; height: 104px; border-width: 4px; border-color: #d7b25d; background: #291a14; box-shadow: 0 0 0 3px #53381f, 0 3px 0 4px #ca9f5755, 0 10px 15px #37211666; }
+.battle-table .hero-profile::before { inset: -8px; border: 4px ridge #a78b5e; box-shadow: inset 0 4px 8px #21160c99, 0 2px 0 #ffedc766; }
+.hero-caption { top: 29px; right: calc(100% + 24px); min-width: 120px; max-width: 160px; }
+.battle-table .hero-caption strong { color: #32251b; font: 700 24px/1.15 var(--font-display); }
+.battle-table .hero-caption small { margin-top: 5px; color: #574332; font-size: 13px; line-height: 1.35; }
+.battle-table .hero-treasury { width: 78px; height: 62px; right: -27px; bottom: -5px; grid-template-rows: 32px 16px 5px; background: linear-gradient(#37261c, #21140e); border-color: #d7b25d; border-radius: 8px; }
+.battle-table .hero-treasury strong { font-size: 28px; color: #ffe0a0; }
+.battle-table .hero-treasury small { font: 700 12px/1.2 var(--font-sans); color: #fff0d3; letter-spacing: .04em; }
+.battle-table .hero-power-medallion { top: 20px; left: calc(50% + 103px); width: 62px; height: 62px; }
+.battle-table .hero-power-medallion b { top: 65px; width: 132px; color: #36271c; font: 700 13px/1.2 var(--font-display); text-shadow: none; }
+.battle-table .hero-power-medallion:disabled { opacity: .85; }
+.battle-table .hero-power-medallion small { font-size: 18px; }
+.battle-table .combatant-label { top: 4px; left: calc(50% - 168px); transform: none; font: 700 12px var(--font-sans); color: #5b4630; letter-spacing: .06em; }
+.battle-table .valid-hero-target .hero-medallion { border-color: #ef4444; outline: 2px solid #ef4444; outline-offset: 4px; box-shadow: 0 0 16px #ef444499; }
+.battle-table .rank-row { position: relative; margin: 0 6px; border-radius: 12px; background: linear-gradient(#a68a5920, #fbefd322); box-shadow: inset 0 1px 0 #92734455, inset 0 5px 12px #6c4f2920, 0 1px 0 #ffefcd66; }
+.battle-table .rank-label { height: 26px; padding: 4px 10px; font: 700 13px/18px var(--font-sans); color: #51402d; letter-spacing: .04em; }
+.rank-label span { font: 700 13px var(--font-sans); }
+.battle-table .rank-scroll, .battle-table .rank-scroll.welcoming { gap: 8px; }
+.battle-table .board-slot { border: 0; background: none; box-shadow: none; }
+.battle-table .empty-slot { border: 1px solid #92784c44; border-radius: 50%; background: radial-gradient(ellipse, #d9c5a130, #b5966530); box-shadow: inset 0 4px 9px #6b4f3126, 0 1px 0 #fff0cc88; }
+.battle-table .empty-slot > span { color: #8a6b3d; text-shadow: 0 1px #fff2d3; opacity: .65; }
+.battle-table .empty-slot.receiving { border: 2px solid #398154; background: #4b9a6922; }
+.battle-table .empty-slot.receiving > span, .battle-table .empty-slot.receiving small { color: #225738; opacity: 1; }
+.battle-table .empty-slot.over { background: #4b9a6944; }
+.battle-table .chain-strip { min-height: 58px; height: auto; padding: 5px 10px; gap: 10px; border-block: 2px ridge #c4a573; background: linear-gradient(#57402a, #35241b); box-shadow: inset 0 3px 8px #1b100a77; border-radius: 5px; }
+.battle-table .chain-strip::before, .mempool-runes { display: none; }
+.battle-table .chain-label { color: #ffdfa0; font: 700 13px var(--font-sans); letter-spacing: .02em; min-height: 44px; flex: none; }
+.battle-table .chain-empty { color: #fff0d4; font-size: 13px; line-height: 1.4; white-space: normal; }
+.battle-table .queued-spell { color: #fff0d4; border: 1px solid #b89457; background-color: #21160f; }
+.battle-table .queued-spell small { color: #f0d4a0; font-size: 11px; }
+.battle-table .turn-status { gap: 8px; min-height: 52px; color: #3b2b1c; font: 600 14px/1.4 var(--font-sans); letter-spacing: 0; }
+.battle-table .turn-status .context-coach { color: #3b2b1c; font: 600 14px/1.4 var(--font-sans); background: none; padding: 4px 8px; }
+.context-coach button { flex: none; width: 36px; height: 36px; }
+.cancel-target { min-height: 36px; padding: 4px 8px; font-size: 13px; color: #fff0d4; }
+.battle-table .block-history { left: 12px; top: 142px; width: 128px; max-height: 342px; color: #f8e7c5; text-shadow: none; }
+.battle-table .block-history > button { font: 700 12px/1.4 var(--font-display); color: #ffe0a0; text-shadow: none; min-height: 44px; border-bottom-color: #bc9359; }
+.battle-table .block-history li { font-size: 12px; line-height: 1.5; color: #f8e7c5; }
+.battle-table .block-history li b { color: #c8a66b; }
+.battle-table .block-history li span { -webkit-line-clamp: 4; }
+.rival-hand { left: 18px; top: 20px; width: 118px; }
+.rival-hand small { font-size: 11px; color: #f4dbb1; }
+.scroll-deck { right: 24px; width: 100px; }
+.scroll-deck small { color: #f7e4c3; font-size: 12px; }
+.scroll-deck strong { color: #ffdfa0; font-size: 20px; }
+.foe-deck { top: 35px; } .own-deck { bottom: 122px; }
+.game-shell .battlefield > .end-turn-button { right: 14px; width: 140px; min-height: 78px; font: 700 16px/1.25 var(--font-display); }
+.game-shell .end-turn-button .button-laurel { display: none; }
+.game-shell .end-turn-button > span { width: 100%; font-size: 15px; text-align: center; }
+.game-shell .end-turn-button:disabled { opacity: .8; }
+.battle-table .mana-crystals { right: -155px; --crystal-size: 20px; flex-direction: column; justify-content: center; width: 142px; max-width: 142px; gap: 5px; }
+.battle-table .mana-crystals-row { display: grid; grid-template-columns: repeat(5, var(--crystal-size)); gap: 2px 3px; }
+.mana-crystals-count { font-size: 22px; color: #e1f3ff; }
+.mana-crystals-count small { font-size: 16px; }
+.battle-table .hand-zone { margin: 6px 12px 0; padding: 14px 12px 8px; border-top: 4px ridge #ac864e; border-radius: 0 0 10px 10px; background: linear-gradient(#281a14, #493121 85%); box-shadow: inset 0 7px 14px #170c0899; }
+.battle-table .hand-heading { color: #ffe5b1; font: 700 13px/1.5 var(--font-sans); letter-spacing: .04em; gap: 16px; }
+.battle-table .hand-heading > span:last-child { color: #efdfc8; font-size: 13px; }
+.battle-table .hand-heading b { color: #ffdfa0; }
+.battle-table .empty-hand { color: #f3ddbd; font-size: 15px; }
+.hand-scroll { padding: 22px 12px 44px; }
+.hand-cards { gap: 0; }
+.hand-cards > * + * { margin-left: -12px; }
+.hand-zone .card3d { width: 146px; }
+.hand-zone .card3d-inner { min-height: 186px; }
+.hand-zone .imperial-card.hs-card .card-art { height: 86px; }
+/* CardView now has one name child. The old :last-child rule hid that same child. */
+.imperial-card.hs-card .card-name > div:first-child { display: block; font-size: 15px; line-height: 1.2; color: #2a1d12; }
+.hand-zone .imperial-card.hs-card .card-name { max-width: none; padding: 7px 6px; }
+.hand-zone .imperial-card.hs-card .card-name > div:first-child { display: block; font-size: 14px; line-height: 1.2; min-height: 34px; overflow-wrap: normal; }
+.hand-zone .hs-card-type { font-size: 12px; line-height: 1.3; max-width: calc(100% - 20px); margin-bottom: 18px; }
+.hand-zone .mulligan-choice { font-size: 12px; font-weight: 700; color: #fff0d4; bottom: -24px; padding: 4px; letter-spacing: .02em; }
+.hand-zone .mulligan-choice.replace { color: #ffbdab; }
+.imperial-card.hs-card .card-rules { font-size: 13px; line-height: 1.5; }
+.card-size-lg .imperial-card.hs-card .card-name > div:first-child, .hand-full-preview .imperial-card.hs-card .card-name > div:first-child { font-size: 19px; }
+.card-size-lg .imperial-card.hs-card .card-rules, .hand-full-preview .imperial-card.hs-card .card-rules { font-size: 16px; line-height: 1.5; }
+.card-size-lg .hs-card-type, .hand-full-preview .hs-card-type { font-size: 12px; }
+.card-size-lg .imperial-card.hs-card .keyword-chip, .hand-full-preview .imperial-card.hs-card .keyword-chip { font-size: 12px; }
+.action-dock { min-height: 60px; padding: 14px 0 6px; color: #f7e8cc; }
+.dock-hint { color: #f7e8cc; font-size: 15px; }
+.action-dock .gold-button { font-size: 20px; }
+.arena-bottom { padding-top: 8px; flex-wrap: wrap; gap: 12px; }
+.game-shell .arena-bottom .quiet-link { min-height: 44px; padding: 10px 16px; font-size: 14px; color: #f7e8cc; background-color: #241719; }
+.imperial-dialog .dialog-copy, .imperial-dialog .small-note, .imperial-dialog .setting-row,
+.imperial-dialog .mechanics-guide p, .imperial-dialog .mechanics-guide summary,
+.imperial-dialog .battle-log p, .imperial-dialog .minion-detail > p { font-size: 15px; line-height: 1.65; color: #eedfcb; }
+.dialog-heading h2 { font-size: 30px; }
+.setting-row button, .skin-option { font-size: 14px; min-height: 44px; }
+/* Landing CTA must not inherit dark glyphs over the dark tablet texture. */
+html[data-imperivm-tablet='ready'] .game-menu .menu-play { color: #fff0c8; text-shadow: 0 2px 3px #120b08; }
+.game-menu .menu-hero { background-image: none !important; background-color: #2c1c16; padding: 12px 8px; border: 1px solid #a78347; }
+.game-menu .menu-hero > span:last-child { color: #ffebbd; font-size: 20px; }
+
+/* Supporting screens use the same reading scale as the game and dialogs. */
+.integration-note, .integration-error, .collection-nav, .collection-wallet > span,
+.collection-card-caption, .recent-match, .receipt-link, .wallet-balance span { font-size: 14px; line-height: 1.6; color: #dbcdbd; }
+.collection-filters input, .collection-filters select, .deck-panel select,
+.mode-tabs button, .deck-row, .collection-wallet button, .dialog-actions > * { font-size: 14px; }
+.eyebrow { font-size: 12px; }
+.min-h-screen > main > .text-xs, .min-h-screen > main > .text-xs span { font-size: 14px; }
+.min-h-screen > main > .flex.text-xs { flex-wrap: wrap; }
+.min-h-screen > main > .text-lavender\/60, .min-h-screen > main > .text-lavender\/70 { color: #c8b8d9; }
+.collection-grid { grid-template-columns: repeat(auto-fill, minmax(184px, 1fr)); gap: 28px 18px; }
+.collection-card .card3d { width: 176px; max-width: 100%; }
+.collection-card-caption { max-width: 184px; }
+.collection-card .imperial-card.hs-card .card-rules { font-size: 14px; }
+.collection-card .hs-card-type { font-size: 11px; }
+.collection-card .imperial-card.hs-card .keyword-chip { font-size: 11px; }
+.hs-card .keyword-tooltip { display: none; font-size: 13px; line-height: 1.5; }
+.hs-card .keyword-chip:is(:hover, :focus-visible) .keyword-tooltip { display: block; }
+.card-tip { display: none; }
+.collection-card .card-tip { top: calc(100% + 14px); left: 50%; right: auto; }
+.collection-card .card-tip p { font-size: 14px; line-height: 1.5; }
+.collection-card .card-tip > div { font-size: 12px; }
+.match-stats span, .integration-panel .text-xs, .imperial-dialog .text-xs { font-size: 14px; }
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .group\/card:hover .card-tip, .group\/card:focus-within .card-tip { display: block; }
+  .collection-card .group\/card:is(:hover, :focus-within) .card-tip { transform: translateX(-50%); }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .game-content { padding-inline: 16px; }
+  .battle-table .battlefield { padding-inline: 20px 154px; }
+  .battle-table .battlefield::before { left: 10px; right: 144px; }
+  .battle-table .battlefield::after { left: 24px; right: 158px; }
+  .battle-table .block-history { display: none; }
+  .rival-hand { left: 25px; width: 100px; }
+  .battle-table .hero-caption { min-width: 100px; }
+  .battle-table .hero-caption strong { font-size: 22px; }
+  .battle-table .hero-caption small { max-width: 130px; }
+  .battle-table .mana-crystals { right: -141px; }
+  .game-shell .battlefield > .end-turn-button { right: 8px; width: 132px; font-size: 15px; }
+  .scroll-deck { right: 16px; }
+}
+@media (max-width: 767px) {
+  .game-content { padding: 0 8px 22px; }
+  .app-header .frieze-inner { gap: 4px; padding-inline: 8px; min-height: 58px; }
+  .arena-frieze .header-brand { font-size: clamp(15px, 4vw, 21px); letter-spacing: .04em; }
+  .arena-frieze .wallet-controls { gap: 4px; }
+  .arena-frieze .frieze-control { width: 34px; min-width: 34px; height: 40px; }
+  .arena-toolbar { min-height: 84px; align-items: flex-start; padding-top: 10px; }
+  .game-shell .arena-toolbar .quiet-link { font-size: 13px; }
+  .block-clock { top: 42px; display: flex; align-items: center; gap: 10px; width: max-content; max-width: 100%; }
+  .block-plaque { font-size: 12px; } .block-plaque b { font-size: 21px; }
+  .halving-clock { font-size: 12px; } .halving-track { display: none; }
+  .battle-table { border-width: 4px; border-radius: 22px 22px 12px 12px; }
+  .battle-table .battlefield {
+    --minion-width: 44px; --minion-height: 60px; --board-slot-width: 46px; --board-slot-height: 82px;
+    --rank-padding: 6px; --rank-scroll-height: 100px; --rank-row-height: 126px;
+    padding: 12px 6px; grid-template-rows: 122px var(--rank-row-height) 80px 68px var(--rank-row-height) 228px;
+  }
+  .battle-table .battlefield::before { inset: 8px 3px 10px; border-width: 4px; border-radius: 16px; }
+  .battle-table .battlefield::after { inset: 18px 13px 20px; border-radius: 10px; }
+  .battle-table .combatant { height: 122px; }
+  .battle-table .combatant.own { height: 228px; align-items: flex-start; padding-top: 12px; }
+  .battle-table .hero-profile, .battle-table .hero-medallion { width: 84px; height: 84px; }
+  .battle-table .hero-profile::before { inset: -5px; border-width: 3px; }
+  .battle-table .hero-caption { top: 20px; right: calc(100% + 13px); min-width: 68px; max-width: 90px; }
+  .battle-table .hero-caption strong { font-size: 20px; }
+  .battle-table .hero-caption small { display: none; }
+  .battle-table .hero-treasury { width: 70px; height: 56px; right: -15px; bottom: -8px; grid-template-columns: 25px 1fr; grid-template-rows: 28px 14px 5px; }
+  .battle-table .hero-treasury strong { font-size: 26px; }
+  .battle-table .hero-treasury small { font-size: 12px; }
+  .battle-table .hero-power-medallion { width: 46px; height: 46px; top: 26px; left: calc(50% + 66px); border-width: 3px; }
+  .battle-table .hero-power-medallion b { top: 50px; font-size: 12px; width: 88px; }
+  .battle-table .hero-power-medallion small { width: 23px; height: 23px; font-size: 16px; }
+  .battle-table .combatant-label { display: none; }
+  .rival-hand, .battle-table .block-history, .scroll-deck { display: none; }
+  .battle-table .rank-label { font-size: 12px; padding-inline: 6px; letter-spacing: 0; }
+  .rank-label span { font-size: 12px; }
+  .battle-table .rank-scroll, .battle-table .rank-scroll.welcoming { gap: 4px; padding-inline: 4px; }
+  .rank-scroll > .occupied-slot, .rank-scroll > div:has(> .empty-slot) { width: 46px; min-width: 46px; }
+  .battle-table .rank-scroll .hs-minion, .battle-table .rank-ghosts .hs-minion { width: 44px; max-width: none; height: 60px; }
+  .rank-ghosts { gap: 4px; left: 4px; right: 4px; } .ghost-slot { width: 46px; }
+  .battle-table .chain-strip { min-height: 80px; padding: 6px; gap: 8px; }
+  .battle-table .chain-label { font-size: 12px; padding-inline: 0; }
+  .battle-table .chain-empty { font-size: 12px; }
+  .battle-table .queued-spell small { font-size: 11px; }
+  .battle-table .turn-status, .battle-table .turn-status .context-coach { font-size: 13px; min-height: 68px; line-height: 1.45; }
+  .context-coach > span { display: none; }
+  .battle-table .mana-crystals { left: 4px; right: auto; bottom: 6px; max-width: none; width: calc(100% - 8px); flex-direction: row; justify-content: center; --crystal-size: clamp(15px, 4vw, 22px); gap: 4px; padding: 8px; }
+  .battle-table .mana-crystals-row { display: flex; gap: 1px; }
+  .battle-table .mana-crystals-count { position: static; font-size: 22px; color: #e1f3ff; min-width: 40px; text-shadow: none; }
+  .battle-table .mana-crystals-count small { color: #b8d6f4; font-size: 15px; }
+  .game-shell .battlefield > .end-turn-button { left: calc(50% - 93px); right: auto; transform: none; bottom: 76px; width: 186px; min-height: 46px; padding: 5px 12px; font-size: 15px; }
+  .game-shell .battlefield > .end-turn-button:active { transform: translateY(2px); }
+  .battle-table .hand-zone { margin-inline: 4px; padding: 12px 6px 4px; }
+  .battle-table .hand-heading { flex-wrap: wrap; gap: 3px; font-size: 13px; }
+  .battle-table .hand-heading > span:last-child { text-align: left; font-size: 12px; width: 100%; }
+  .hand-scroll { padding: 16px 8px 42px; }
+  .hand-cards { gap: 14px; }
+  .hand-cards > * + * { margin-left: 0; }
+  .hand-zone .card3d { width: 140px; }
+  .hand-zone .card3d-inner { min-height: 182px; }
+  .hand-zone .imperial-card.hs-card .card-art { height: 82px; }
+  .hand-fan { transform: none !important; }
+  .action-dock { gap: 10px; flex-wrap: wrap; }
+  .dock-hint { font-size: 14px; }
+  .action-dock .gold-button { flex: 1; font-size: 20px; }
+  .arena-bottom { gap: 8px; justify-content: center; }
+  .game-shell .arena-bottom .quiet-link { font-size: 13px; padding-inline: 10px; }
+  .game-menu .menu-hero > span:last-child { font-size: 20px; }
+  .collection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; }
+  .collection-card .card3d { width: 100%; }
+  .collection-card .imperial-card.hs-card .card-name > div:first-child { font-size: 14px; }
+  .collection-card .imperial-card.hs-card .card-rules { font-size: 13px; padding-inline: 5px; }
+  .collection-card .keyword-tooltip { width: 120px; }
+  .collection-filters .mode-tabs { width: 100%; flex-wrap: wrap; }
+  .collection-filters .mode-tabs button { flex: 1; padding-inline: 8px; min-height: 44px; }
+}
+@media (hover: none), (pointer: coarse) { .hand-cards > * + * { margin-left: 0; } .hand-cards { gap: 14px; } }

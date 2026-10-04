@@ -4,6 +4,7 @@ import type { HeroDef } from '../lib/engine/types';
 import { useLocale } from './LocaleContext';
 import type { UiFloat } from './battleFx';
 import NumberFlow from '@number-flow/react';
+import HeroArt from './HeroArt';
 
 interface HeroPortraitProps {
   hero: HeroDef;
@@ -49,7 +50,7 @@ export default function HeroPortrait({
         aria-label={`${name} · ${t('Казна', 'Treasury')} ${treasury}`}
         title={foe ? t('Опустошите вражескую казну для победы', 'Empty the rival Treasury to win') : name}
         className={`hero-medallion ${onClick ? 'cursor-pointer' : ''}`}>
-        <img src={`/heroes/${hero.id}.webp`} alt={name} />
+        <HeroArt key={hero.id} heroId={hero.id} name={name} />
       </div>
       <div className={`hero-treasury-motion ${damaged ? 'target-shake' : ''}`}><div key={hits[hits.length - 1]?.key ?? 'treasury'} className={`hero-treasury ${damaged ? 'treasury-hit' : ''}`}
         title={t('Казна: прочность империи', 'Treasury: the strength of your empire')}>
