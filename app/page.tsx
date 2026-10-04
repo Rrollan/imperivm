@@ -1,29 +1,17 @@
 'use client';
+
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { HEROES } from '../lib/heroes';
-import { CARDS } from '../lib/cards';
-import WalletBar from '../components/WalletBar';
 import { startAmbient } from '../lib/audio/sfx';
 import { markAmbientStarted, shouldStartAmbient } from '../lib/audio/events';
 import { unlockAudio } from '../lib/audio/manager';
 import { useLocale } from '../components/LocaleContext';
-import { CoinPreview, Whale3D } from '../components/3d/CoinPreview';
-import type { ModelKey } from '../components/3d/modelManifest';
-import styles from './Landing.module.css';
-import ArenaSettings, { useBoardSkin } from '../components/ArenaSettings';
 
-const STYLES: Record<string, [string, string]> = {
-  whale: ['Управляйте рынком. Зачищайте поле. Оставьте последний ход за собой.', 'Control the market. Clear the board. Make the last move.'],
-  builder: ['Держите строй. Восстанавливайте казну. Стройте армию надолго.', 'Hold the line. Heal your Treasury. Build an army that lasts.'],
-  degen: ['Заполняйте поле. Атакуйте первыми. Каждая карта — новый шанс.', 'Go wide. Strike early. Every draw is another chance.'],
-  validator: ['Наращивайте газ. Отправляйте войска в стейкинг. Встречайте бурю во всеоружии.', 'Grow your gas. Stake your ranks. Counter the coming storm.'],
-};
 export default function LandingPage() {
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [skin, setSkin] = useBoardSkin();
-  const [selected, select] = useState('whale'); const hero = HEROES[selected];
-  const { t, heroName, heroTitle, powerName, powerText } = useLocale();
+  const [selected, select] = useState('whale');
+  const { t, heroName } = useLocale();
+
   useEffect(() => {
     if (!shouldStartAmbient()) return;
     const handler = () => {
@@ -33,39 +21,131 @@ export default function LandingPage() {
     window.addEventListener('pointerdown', handler, { once: true }); window.addEventListener('keydown', handler, { once: true });
     return () => { window.removeEventListener('pointerdown', handler); window.removeEventListener('keydown', handler); };
   }, []);
-  return <div className="landing-shell"><WalletBar /><main className="landing-main">
-    <section className="landing-hero">
-      <div className="landing-copy"><p className="eyebrow">{t('РИМСКАЯ КАРТОЧНАЯ БИТВА · SOLANA DEVNET', 'A ROMAN CARD BATTLER · SOLANA DEVNET')}</p>
-        <h1>Veni.<br />Vidi.<br /><em>Rugi.</em></h1>
-        <p className="hero-description">{t('Соберите легион. Читайте мемпул.', 'Raise a legion. Read the mempool.')}<br />{t('Обрушьте империю.', 'Rug an empire.')}</p>
-        <p className="hero-subcopy">{t('Тактическая дуэль с ИИ, где газ, стейкинг и фронтран становятся вашим оружием. Кошелёк необязателен. Каждый ход решает.', 'A tactical duel against AI where gas, staking and front-running become your weapons. Your wallet is optional. Your next move matters.')}</p>
-        <a className="gold-button hero-cta" href="#heroes">{t('Выберите императора', 'Choose your Imperator')} <span>↗</span></a>
-        <div className="hero-facts"><span><b>{Object.keys(CARDS).length}</b> {t('карта', 'cards')}</span><span><b>4</b> {t('фракции', 'factions')}</span><span><b>30</b> {t('здоровья казны', 'Treasury HP')}</span></div>
+
+  return (
+    <main className="game-menu">
+      <header className="menu-wordmark">
+        <h1 className="font-display">IMPERIVM</h1>
+        <p className="font-display">Veni. Vidi. Rugi.</p>
+      </header>
+
+      <div className="menu-controls">
+        <Link className="gold-button menu-play font-display" href={`/arena?hero=${selected}`}>
+          {t('ИГРАТЬ', 'PLAY')}
+        </Link>
+
+        <div className="menu-heroes" role="group" aria-label={t('Выберите героя', 'Choose your hero')}>
+          {Object.values(HEROES).map(h => (
+            <button
+              key={h.id}
+              type="button"
+              className="menu-hero"
+              aria-pressed={h.id === selected}
+              onClick={() => select(h.id)}
+            >
+              <img className="menu-coin" src={`/heroes/${h.id}.webp`} alt="" width={112} height={112} />
+              <span className="font-display">{heroName(h.id)}</span>
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="imperator-art" aria-label={t('Иллюстрации римских имперских карт', 'Imperial Roman card illustrations')}>
-        <img className="imperator-main" src="/cards/imperator-liquidus.webp" alt={t('Император Ликвидус в золотой броне среди имперских колонн', 'Imperator Liquidus in gold armor beneath imperial columns')} />
-        <div className="art-caption"><span>{t('ИМПЕРАТОР ЛИКВИДУС', 'IMPERATOR LIQUIDUS')}</span><small>DeFi · {t('Легендарная', 'Legendary')}</small></div>
-        <img className="hero-card hero-card-left" src="/cards/fud-hydra.webp" alt={t('Иллюстрация карты FUD Гидра', 'FUD Hydra card illustration')} />
-        <img className="hero-card hero-card-right" src="/cards/genesis-pfp.webp" alt={t('Иллюстрация карты Genesis PFP', 'Genesis PFP card illustration')} />
-        <span className="art-orbit orbit-one" /><span className="art-orbit orbit-two" />
-      </div>
-    </section>
-    <section id="heroes" className="hero-select-section">
-      <div className="section-heading"><div><p className="eyebrow">{t('ЧЕТЫРЕ КОШЕЛЬКА. ЧЕТЫРЕ ПУТИ К ВЛАСТИ.', 'FOUR WALLETS. FOUR WAYS TO RULE.')}</p><h2>{t('Выберите императора', 'Choose your Imperator')}</h2></div><span className="demo-label">{t('Бесплатное демо · без кошелька', 'Free demo · no wallet needed')}</span></div>
-      <div className="hero-select-grid">{Object.values(HEROES).map(h => <button key={h.id} className={`hero-select ${h.id === selected ? 'active' : ''}`} onClick={() => select(h.id)} aria-pressed={h.id === selected}>
-        <img src={`/heroes/${h.id}.webp`} alt="" /><div><b>{heroName(h.id)}</b><span>{heroTitle(h.id)}</span></div><i>{h.id === selected ? '✓' : '↗'}</i>
-      </button>)}</div>
-      <div className={`hero-brief ${styles.briefWithArt}`}>
-        <CoinPreview key={selected} model={`hero-${selected}` as ModelKey} size={160} speed={0.18} className={styles.briefArt} label={t(`Монета героя: ${heroName(hero.id)}`, `Hero coin: ${heroName(hero.id)}`)} />
-        <div className={styles.briefCopy}><h3>{powerName(hero.id)} <span>2 {t('ГАЗА', 'GAS')}</span></h3><p>{powerText(hero.id)}</p><small>{t(...STYLES[selected])}</small></div>
-        <Link className="gold-button" href={`/arena?hero=${selected}`}>{t('Играть за', 'Play as')} {t(({ whale: 'Кита', builder: 'Строителя', degen: 'Дегена', validator: 'Валидатора' } as Record<string, string>)[hero.id], heroName(hero.id))} →</Link>
-      </div>
-    </section>
-    <section className="strategy-triptych"><article><span>I</span><h3>{t('Готовьте заклинания', 'Commit your spells')}</h3><p>{t('Заклинание ждёт в открытом мемпуле. Соперник видит угрозу и получает ход, чтобы ответить.', 'Your spell waits in a public mempool. Your rival sees it coming and has a turn to answer.')}</p></article>
-      <article><span>II</span><h3>{t('Выбирайте экономику', 'Choose your economy')}</h3><p>{t('Атакуйте сейчас или отправьте воина в стейкинг ради газа. Легион в стейкинге всё ещё уязвим.', 'Attack now, or stake a minion for extra gas. A staked legion is still vulnerable.')}</p></article>
-      <article><span>III</span><h3>{t('Остерегайтесь рагпула', 'Never trust the rug')}</h3><p>{t('Халвинг умножает ваши войска. Рагпул уничтожает их. Сохраните приоритетный контрспелл для решающего момента.', 'Halving grows your ranks. RUG PULL erases them. Hold a Priority counter for the moment that matters.')}</p></article></section>
-    <footer className="landing-footer"><Link href="/packs">✦ {t('Открыть паки', 'Open packs')} →</Link><Link href="/collection">{t('Коллекция и колоды', 'Collection & decks')}</Link><Link href="/leaderboard">{t('Зал побед', 'Hall of victories')}</Link><span>Crypto World’s Fair · {t('Дуэли с ИИ вне блокчейна', 'Off-chain AI gameplay')}</span><a href="https://github.com/Rrollan/imperivm" target="_blank" rel="noreferrer">{t('Исходный код', 'Source')} ↗</a></footer>
-    <button className="menu-settings secondary-button" onClick={() => setSettingsOpen(true)}>⚙ {t('Настройки', 'Settings')}</button>
-    {settingsOpen && <ArenaSettings skin={skin} onChange={setSkin} onClose={() => setSettingsOpen(false)} />}
-  </main></div>;
+
+      <style jsx>{`
+        .game-menu {
+          min-height: 100svh;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: clamp(32px, 7vh, 76px) 24px 48px;
+          color: #2a1a10;
+          background-color: #e8dbc2;
+          background-image: radial-gradient(ellipse at 50% 0%, #fff6d9e6 0%, #ffe3a54d 45%, transparent 78%), url('/boards/marble-light.webp');
+          background-size: 100% 100%, 512px 512px;
+          background-repeat: no-repeat, repeat;
+        }
+        .menu-wordmark { text-align: center; }
+        .menu-wordmark h1 {
+          margin: 0;
+          font-size: clamp(40px, 8vw, 80px);
+          font-weight: 800;
+          line-height: 1.15;
+          letter-spacing: .08em;
+          color: #bc8e32;
+          text-shadow: 0 2px 1px #fff4c9, 0 -2px 1px #624118, 0 4px 7px #60411d66;
+        }
+        .menu-wordmark p {
+          margin-top: 12px;
+          font-size: 15px;
+          font-weight: 700;
+          letter-spacing: .16em;
+          color: #2a1a10;
+        }
+        .menu-controls {
+          width: 100%;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 48px;
+          padding-top: 48px;
+          padding-bottom: clamp(0px, 8vh, 90px);
+        }
+        .game-menu :global(.menu-play) {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 240px;
+          height: 68px;
+          font-size: 22px;
+          letter-spacing: .16em;
+          color: #2a1a10;
+          text-shadow: 0 1px 1px #fff4c9;
+          box-shadow: inset 0 2px 1px #fff4c9, inset 0 -3px 2px #87551b, 0 6px 0 #704819, 0 12px 24px #70481955;
+        }
+        .menu-heroes { display: grid; grid-template-columns: repeat(4, 136px); gap: 24px; }
+        .menu-hero {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 22px;
+          cursor: pointer;
+          border-radius: 12px;
+        }
+        .menu-coin {
+          width: 112px;
+          height: 112px;
+          object-fit: cover;
+          border: 4px solid #bd913e;
+          border-radius: 50%;
+          box-shadow: 0 4px 0 #77501f, 0 8px 16px #55361255;
+          transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .menu-hero[aria-pressed='true'] .menu-coin {
+          transform: scale(1.12);
+          border-color: #f6d578;
+          box-shadow: 0 0 0 3px #a87728, 0 0 24px 8px #e7b947aa, 0 8px 16px #55361266;
+        }
+        .menu-hero span {
+          font-size: 17px;
+          font-weight: 700;
+          color: #ffe19a;
+          text-shadow: 0 1px 2px #2a1a10, 0 0 4px #2a1a10, 1px 1px 1px #2a1a10, -1px -1px 1px #2a1a10;
+        }
+        .menu-hero:focus-visible, .game-menu :global(.menu-play:focus-visible) {
+          outline: 3px solid #704819;
+          outline-offset: 8px;
+        }
+        @media (max-width: 639px) {
+          .menu-controls { gap: 36px; padding-bottom: 0; }
+          .game-menu :global(.menu-play) { width: 100%; max-width: 360px; }
+          .menu-heroes { grid-template-columns: repeat(2, 136px); gap: 28px 20px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .menu-coin { transition: none; }
+        }
+      `}</style>
+    </main>
+  );
 }

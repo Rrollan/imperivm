@@ -639,6 +639,7 @@ function GameBoard() {
               <button className="icon-button" onClick={() => startGame(Date.now() & 0x7fffffff)} aria-label={t('Начать матч заново', 'Restart match')}>↻</button>
             </div>
           </nav>
+          <div className="battle-table">
           <section className="battlefield" aria-label={t('Поле боя', 'Battlefield')} onPointerMove={e => {
             if (reduced || e.pointerType !== 'mouse') return;
             const r = e.currentTarget.getBoundingClientRect();
@@ -671,6 +672,7 @@ function GameBoard() {
               </DroppableMinion> }))} ghosts={dying.filter(d => d.owner === FOE).map(d => ({ uid: `dying-${d.key}`, slot: d.slot, node: <MinionToken inFlight={combatFlight?.minion.uid === d.uid} minion={ghostOf(d)} dying floats={floatsFor(d.uid)} /> }))} />
             </div>
             <DroppableMempool><section className={`chain-strip ${mempoolFx ? 'mempool-flash-resolve' : ''}`} aria-label={t('Публичный мемпул', 'Public mempool')}>
+              <span className="mempool-runes" aria-hidden>ᚠ · ᚢ · ᚦ · ᚨ · ᚱ · ᚲ · ᚷ · ᚹ</span>
               <button className="chain-label" onClick={() => setHelpOpen(true)} title={mechanicText('Mempool')}><BattleIcon kind="chain" /> {t('МЕМПУЛ', 'MEMPOOL')} <b>{myMempool.length + foeMempool.length}</b></button>
               <div className="chain-entries thin-scroll">
                 {!myMempool.length && !foeMempool.length && <span className="chain-empty">{t('Заклинание сработает в следующем вашем блоке.', 'Resolves at the start of your next block.')}</span>}
@@ -740,6 +742,7 @@ function GameBoard() {
               })}
             </div></div>
           </section>
+          </div>
           <div className="action-dock">
             {mulliganAvailable(state) && state.turn === ME ? <>
               <span className="dock-hint">{t('Собери стартовую руку.', 'Build your opening hand.')}</span>

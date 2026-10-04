@@ -1,7 +1,6 @@
 'use client';
 
 import type { HeroDef } from '../lib/engine/types';
-import { CoinPreview, type ModelKey } from './3d/CoinPreview';
 import { useLocale } from './LocaleContext';
 import type { UiFloat } from './battleFx';
 import NumberFlow from '@number-flow/react';
@@ -21,7 +20,7 @@ interface HeroPortraitProps {
   onKeyDown?: (e: React.KeyboardEvent) => void;
 }
 
-/** Coin portrait of a hero + treasury chest with a visual coin pile. */
+/** Inset hero portrait + treasury chest with a visual coin pile. */
 export default function HeroPortrait({
   hero,
   treasury,
@@ -50,7 +49,7 @@ export default function HeroPortrait({
         aria-label={`${name} · ${t('Казна', 'Treasury')} ${treasury}`}
         title={foe ? t('Опустошите вражескую казну для победы', 'Empty the rival Treasury to win') : name}
         className={`hero-medallion ${onClick ? 'cursor-pointer' : ''}`}>
-        <CoinPreview model={`hero-${hero.id}` as ModelKey} size="100%" autoRotate={false} label={name} />
+        <img src={`/heroes/${hero.id}.webp`} alt={name} />
       </div>
       <div className={`hero-treasury-motion ${damaged ? 'target-shake' : ''}`}><div key={hits[hits.length - 1]?.key ?? 'treasury'} className={`hero-treasury ${damaged ? 'treasury-hit' : ''}`}
         title={t('Казна: прочность империи', 'Treasury: the strength of your empire')}>
