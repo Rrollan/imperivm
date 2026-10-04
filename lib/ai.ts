@@ -49,6 +49,11 @@ export function chooseAiAction(state: GameState): Action {
       ?? mulligans[0];
   }
 
+  // Preserve an available lethal before spending gas or trading creatures.
+  const faceAttacks = acts.filter((a): a is Extract<Action, { type: 'attack' }> => a.type === 'attack' && a.target === 'hero');
+  const faceDamage = faceAttacks.reduce((sum, a) => sum + (me.board.find(m => m.uid === a.attackerUid)?.attack ?? 0), 0);
+  if (faceDamage >= foe.treasury && faceAttacks.length) return faceAttacks.sort((a, b) => (me.board.find(m => m.uid === b.attackerUid)?.attack ?? 0) - (me.board.find(m => m.uid === a.attackerUid)?.attack ?? 0))[0];
+
   // 1. Answer enemy mempool spells with a priority card (cheapest first).
   //    Prefer counter-mempool answers that specifically target a RUG PULL
   //    in the enemy mempool — Audit (or any future priority counter) wins
@@ -79,7 +84,13 @@ export function chooseAiAction(state: GameState): Action {
   // 2. Spend gas along the curve: play the most expensive playable card.
   //    Ties: minions before spells, then hand order (stable sort).
   const plays = acts
-    .filter(a => a.type === 'play-minion' || a.type === 'cast-spell')
+    .filter(a => {
+      if (a.type !== 'play-minion' && a.type !== 'cast-spell') return false;
+      if (cardOf(state, a.uid)?.id !== 'rug-pull') return true;
+      // A delayed reset should recover a losing board, not erase our winning army.
+      const value = (board: typeof me.board) => board.reduce((sum, m) => sum + m.attack + m.health / 2, 0);
+      return foe.board.length > 0 && (value(foe.board) > value(me.board) + 3 || foe.board.reduce((sum, m) => sum + (m.staked ? 0 : m.attack), 0) >= me.treasury);
+    })
     .sort((x, y) => {
       const d = playCost(state, y) - playCost(state, x);
       if (d !== 0) return d;
@@ -128,6 +139,18 @@ export function chooseAiAction(state: GameState): Action {
       }
     }
     if (face !== undefined) return face;
+    // Legal face attacks are absent behind Taunt. Chip the guard instead of
+    // waiting forever for a one-hit kill; legality also enforces Rush targets.
+    const pressure = attacks.filter((a): a is Extract<Action, { type: 'attack' }> => a.type === 'attack' && a.target !== 'hero');
+    pressure.sort((x, y) => {
+      const score = (a: Extract<Action, { type: 'attack' }>) => {
+        const attacker = me.board.find(m => m.uid === a.attackerUid), target = foe.board.find(m => m.uid === a.target);
+        if (!attacker || !target) return -Infinity;
+        return Math.min(attacker.attack, target.health) * 10 - Math.min(attacker.health, target.attack) + (attacker.health > target.attack ? 20 : 0);
+      };
+      return score(y) - score(x);
+    });
+    if (pressure[0]) return pressure[0];
   }
 
   // 4. Hero power when there is nothing left to play. Use the comeback-
@@ -139,29 +162,30 @@ export function chooseAiAction(state: GameState): Action {
     const power = HEROES[me.heroId]?.power;
     const suicidal = power === 'draw-burn' && me.treasury <= 2;
     const wastedHeal = power === 'heal-treasury' && me.treasury >= 30;
-    if (!suicidal && !wastedHeal) return hp;
+    const wastedDraw = power === 'draw-burn' && (me.deck.length === 0 || me.hand.length >= 10);
+    if (!suicidal && !wastedHeal && !wastedDraw) return hp;
     // package 4A: if the discounted cost makes the power affordable
     // while the base 2-gas cost blocked it earlier, legalActions
     // already includes it — nothing to do here.
     void effectivePowerCost(state, state.turn);
   }
 
-  // 5. Stake a minion that can no longer attack this turn (already
-  //    attacked or summoning-sick; cheapest damage loss first):
-  //    +1 gas each at turn start. Never unstake.
-  const stakes = acts.filter(a => a.type === 'stake');
-  let stakePick: Action | undefined;
-  let lowestAtk = Infinity;
-  for (const a of stakes) {
-    if (a.type !== 'stake') continue;
-    const m = me.board.find(mm => mm.uid === a.uid);
-    if (m === undefined || m.canAttack) continue;
-    if (m.attack < lowestAtk) {
-      lowestAtk = m.attack;
-      stakePick = a;
-    }
+  // 5. A single low-attack income unit can bridge an early expensive hand.
+  // Release it once normal gas pays the curve. Never stake/unstake the same
+  // minion in a loop: desired count is constant within the action sequence.
+  const peakCost = Math.max(0, ...me.hand.map(h => CARDS[h.cardId].cost));
+  const desiredStakes = me.maxGas < 8 && peakCost > Math.min(10, me.maxGas + 1) ? 1 : 0;
+  const staked = me.board.filter(m => m.staked).length;
+  if (staked > desiredStakes) {
+    const release = acts.find(a => a.type === 'unstake');
+    if (release) return release;
   }
-  if (stakePick !== undefined) return stakePick;
+  if (staked < desiredStakes) {
+    const stakes = acts.filter((a): a is Extract<Action, { type: 'stake' }> => a.type === 'stake');
+    const candidates = stakes.filter(a => { const m = me.board.find(m => m.uid === a.uid); return !!m && !m.canAttack && m.attack <= 1; });
+    candidates.sort((a, b) => (me.board.find(m => m.uid === a.uid)?.attack ?? 0) - (me.board.find(m => m.uid === b.uid)?.attack ?? 0));
+    if (candidates[0]) return candidates[0];
+  }
 
   return endTurn;
 }
