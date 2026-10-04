@@ -103,10 +103,16 @@ html[data-imperivm-motion='off'] .treasury-hit, html[data-imperivm-motion='off']
 .deck-scroll b { position: absolute; width: 100%; top: 20px; font: 800 12px var(--font-display); color: #3f2932; text-align: center; background: #e8dcc0; }
 .scroll-deck small { color: #d2bd97; font-size: 8px; }
 .scroll-deck strong { color: #f5d76e; font-size: 14px; }
-.block-history { position: absolute; z-index: 5; left: 13px; top: 150px; width: 112px; max-height: 264px; overflow: hidden; }
-.block-history > button { color: #d4af37; font: 700 9px var(--font-display); min-height: 32px; }
-.block-history li { display: flex; gap: 6px; padding: 6px 1px; border-top: 1px solid #a88a4940; color: #bbae94; font-size: 9px; line-height: 1.4; }
-.block-history li b { color: #d4af37; font-size: 8px; }
+/* Carved into the reserved 138px left rail, clear of the rim and rival hand.
+   Allow all five three-line entries to fit below the inscription. */
+.block-history { position: absolute; z-index: 5; left: 26px; top: 124px; width: 100px; max-height: 300px; overflow: hidden; background: transparent; border: 0; box-shadow: none; color: #5a4a30; text-shadow: 0 1px 0 #fff8; }
+/* Override the global stone-button texture in scene.css in every state. */
+.block-history > button { width: 100%; padding: 4px 0; background: transparent; background-image: none !important; border: 0; border-bottom: 1px solid #b18b3b; border-radius: 0; box-shadow: none; color: #4a3a24; text-shadow: 0 1px 0 #fff8; font: 700 9px/1.2 var(--font-display); min-height: 32px; text-align: left; }
+.block-history > button:hover { border-bottom-color: #8a6d1f; }
+.block-history > button:focus-visible { outline: 2px solid #8a6d1f; outline-offset: -2px; }
+.block-history ol { margin: 8px 0 0; padding: 0; list-style: none; }
+.block-history li { display: flex; gap: 6px; padding: 6px 0; color: #5a4a30; font-size: 9px; line-height: 1.4; }
+.block-history li b { flex: none; color: #4a3a24; font-size: 8px; }
 .block-history li span { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .roman-corners { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
 .roman-corner { position: absolute; pointer-events: auto; width: 66px; height: 66px; opacity: .7; transition: filter .2s,opacity .2s; }
@@ -193,7 +199,7 @@ button:focus-visible,[role='button']:focus-visible,a:focus-visible { outline: 2p
   .battlefield > .end-turn-button { top: auto; bottom: 9px; right: 7px; width: 141px; min-height: 40px; padding: 4px; font-size: 10px; }.button-laurel { font-size: 19px; }
   .gas-meter { right: auto; left: 15px; bottom: 5px; text-align: left; min-width: 130px; }.gas-meter b { font-size: 17px; }.gas-meter small { font-size: 10px; }.gas-meter > div { justify-content: flex-start; gap: 5px; }.gas-meter i { width: 7px; height: 9px; }
   .rival-hand { top: 5px; left: 20px; width: 88px; }.rival-hand > div { height: 18px; }.rival-hand img { height: 18px; width: 13px; margin-left: -7px; border-width: 1px; }.rival-hand small { display: none; }
-  .block-history { top: 39px; left: 4px; width: 35px; height: 36px; }.block-history > button { width: 35px; font-size: 7px; min-height: 32px; }.block-history ol { display: none; }
+  .block-history { top: 39px; left: 14px; width: 35px; height: 36px; }.block-history > button { width: 35px; font-size: 7px; min-height: 32px; }.block-history ol { display: none; }
   .scroll-deck { right: 6px; width: 28px; gap: 1px; }.foe-deck { top: 3px; }.own-deck { bottom: 76px; }.deck-scroll { width: 21px; height: 25px; border-width: 1px; box-shadow: 2px 2px #594832; }.deck-scroll i { height: 5px; left: -2px; right: -2px; border-width: 1px; }.deck-scroll i:first-child { top: -1px; }.deck-scroll i:nth-child(2) { bottom: -1px; }.deck-scroll i:nth-child(3) { display: none; }.deck-scroll b { font-size: 5px; top: 8px; }.scroll-deck small { font-size: 0; }.scroll-deck strong { font-size: 10px; }
   .roman-corner { width: 28px; height: 28px; }.corner-column { left: -9px; top: -3px; width: 30px; height: 41px; }.corner-bust { right: 26px; top: -5px; }.corner-brazier { left: 3px; bottom: 84px; width: 32px; height: 40px; }.brazier { transform: scale(.5); transform-origin: left top; }.corner-coins { right: 37px; bottom: 72px; }
   .hand-zone { margin: 7px 0 0; }.hand-scroll { padding: 8px 8px 9px; scroll-snap-type: x proximity; }.hand-cards { gap: 0; justify-content: flex-start; gap: 12px; padding: 3px 0 14px; }.hand-cards > * + * { margin-left: 0; }.hand-card-wrap { scroll-snap-align: center; }
