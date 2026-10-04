@@ -9,7 +9,7 @@
  * shared AudioContext (see manager.ts). All functions are SSR-safe (early
  * return when window / AudioContext is missing).
  */
-import { getContext, masterOut, now, setAmbientController } from './manager';
+import { getContext, masterOut, now, setAmbientController, isMusicEnabled, isSfxEnabled } from './manager';
 
 export type SfxName =
   | 'ui-click'
@@ -304,7 +304,7 @@ function makeAmbient(): AmbientController {
   function startImpl(): void {
     if (isPlaying) return;
     c = getContext();
-    if (!c) return;
+    if (!c || c.state !== 'running' || !isMusicEnabled()) return;
     isPlaying = true;
     const t0 = now();
     // Drone: two detuned saws through a slow low-pass.
@@ -365,6 +365,7 @@ function makeAmbient(): AmbientController {
 let ambientInst: AmbientController | null = null;
 
 export function startAmbient(): void {
+  if (!getContext()) return;
   if (!ambientInst) {
     ambientInst = makeAmbient();
     setAmbientController({
@@ -382,7 +383,7 @@ export function stopAmbient(): void {
 /** Play a named cue. SSR-safe. Returns true if scheduled, false on no-op. */
 export function play(name: SfxName): boolean {
   const c = getContext();
-  if (!c) return false;
+  if (!c || c.state !== 'running' || !isSfxEnabled()) return false;
   const out = masterOut();
   if (!out) return false;
   const t = now() + 0.01;

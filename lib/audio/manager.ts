@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react';
-
 /**
  * IMPERIVM — single AudioContext + master gain + limiter.
  *
@@ -13,6 +11,11 @@ import type { ReactNode } from 'react';
  */
 
 const LS_MUTE = 'imperivm.audio.muted';
+const LS_SFX = 'imperivm.audio.sfx';
+const LS_MUSIC = 'imperivm.audio.music';
+let sfxEnabled = true;
+let musicEnabled = true;
+let preferenceListeners: (() => void)[] = [];
 
 type AudioCtor = typeof AudioContext;
 type WindowLike = { webkitAudioContext?: AudioCtor } & Window;
@@ -54,8 +57,11 @@ function writeMute(v: boolean): void {
   }
 }
 
-/** Returns the AudioContext, creating it lazily on first gesture. */
-export function getContext(): AudioContext | null {
+/** Query only. Rendering, dealing cards and AI actions never create audio. */
+export function getContext(): AudioContext | null { return ctx; }
+
+/** Called exclusively by unlockAudio inside a deliberate user gesture. */
+function createContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
   // A gesture that reaches `getContext` before `MuteButton` mounts
   // would otherwise start with `muted=false` and ignore the persisted
@@ -90,7 +96,7 @@ export function getContext(): AudioContext | null {
 
 /** Must be called from a user-gesture handler (pointerdown / keydown). */
 export async function unlockAudio(): Promise<void> {
-  const c = getContext();
+  const c = createContext();
   if (!c) return;
   if (c.state === 'suspended') {
     try {
@@ -138,6 +144,7 @@ export function setMuted(v: boolean): void {
 export function initMute(): void {
   if (muteInitialized) return;
   muted = readMute();
+  if (typeof window !== 'undefined') { try { sfxEnabled = localStorage.getItem(LS_SFX) !== '0'; musicEnabled = localStorage.getItem(LS_MUSIC) !== '0'; } catch {} }
   muteInitialized = true;
   // Apply the loaded value to an already-created gain, in case the
   // AudioContext was created in a previous session (HMR, SPA nav).
@@ -149,9 +156,6 @@ export function initMute(): void {
 
 /** Internal — get the master gain. Returns null if no context. */
 export function masterOut(): GainNode | null {
-  if (!masterGain) {
-    getContext();
-  }
   return masterGain;
 }
 
@@ -179,9 +183,17 @@ function attachVisibilityOnce(): void {
     if (!ambient) return;
     if (document.hidden) {
       ambient.stop();
-    } else if (!muted) {
+    } else if (!muted && musicEnabled && ctx?.state === 'running') {
       ambient.resume();
     }
   });
 }
 
+
+/** Independent, persisted effects/music preferences; master mute silences both. */
+export function isSfxEnabled(): boolean { initMute(); return sfxEnabled; }
+export function isMusicEnabled(): boolean { initMute(); return musicEnabled; }
+export function onAudioPreferenceChange(fn: () => void): () => void { preferenceListeners.push(fn); return () => { preferenceListeners = preferenceListeners.filter(x => x !== fn); }; }
+function persistPreference(key: string, value: boolean) { if (typeof window !== 'undefined') { try { localStorage.setItem(key, value ? '1' : '0'); } catch {} } for (const fn of preferenceListeners) fn(); }
+export function setSfxEnabled(value: boolean): void { initMute(); sfxEnabled = value; persistPreference(LS_SFX, value); }
+export function setMusicEnabled(value: boolean): void { initMute(); musicEnabled = value; if (!value) ambient?.stop(); else if (ctx?.state === 'running' && !document.hidden) ambient?.resume(); persistPreference(LS_MUSIC, value); }
