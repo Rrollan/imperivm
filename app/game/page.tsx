@@ -3,11 +3,12 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from '../../components/LocaleContext';
+import { BlockClock, BlockHistory, RivalHand, RomanCorners, ScrollDeck } from '../../components/BoardChrome';
 import BoardRank, { isBoardSlot } from '../../components/BoardRank';
 import AttackAim from '../../components/AttackAim';
 import AbilityFx from '../../components/AbilityFx';
 import AttackFlight, { type CombatFlight } from '../../components/AttackFlight';
-import { VictoryCoin } from '../../components/3d/CoinPreview';
+import { CoinPreview, VictoryCoin } from '../../components/3d/CoinPreview';
 import { useSearchParams } from 'next/navigation';
 import {
   applyAction,
@@ -150,7 +151,7 @@ function GameBoard() {
 
   // battle FX state (all derived from state diffs — engine untouched)
   const [floats, setFloats] = useState<UiFloat[]>([]);
-  const [dying, setDying] = useState<(DyingMinion & { key: number })[]>([]);
+  const [dying, setDying] = useState<(DyingMinion & { key: number; slot: number })[]>([]);
   const [attackAnim, setAttackAnim] = useState<{ attackerUid: string; targetUid: string; key: number } | null>(null);
   const [playedUids, setPlayedUids] = useState<Set<string>>(new Set());
   const [dealtUids, setDealtUids] = useState<Set<string>>(new Set());
@@ -333,7 +334,7 @@ function GameBoard() {
       schedule(() => setFloats(cur => cur.filter(f => !keys.includes(f.key))), 1450);
     }
     if (fx.deaths.length > 0) {
-      const keyed = fx.deaths.map(d => ({ ...d, key: ++fxKey.current }));
+      const keyed = fx.deaths.map(d => ({ ...d, key: ++fxKey.current, slot: prev.players[d.owner].board.findIndex(m => m.uid === d.uid) }));
       const keys = keyed.map(k => k.key);
       setDying(cur => [...cur, ...keyed]);
       schedule(() => setDying(cur => cur.filter(d => !keys.includes(d.key))), 900);
@@ -519,7 +520,7 @@ function GameBoard() {
       const canAttackNow = legal.some(a => a.type === 'attack' && a.attackerUid === data.uid);
       if (canAttackNow) setAttackerUid(data.uid);
       // existing attackable/highlight states pick up the selection automatically,
-      // so valid targets glow red while dragging
+      // so legal targets are highlighted while dragging
     }
   };
 
@@ -589,14 +590,12 @@ function GameBoard() {
   return (
     <DndProvider onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
       <div className={`game-shell board-${skin}`} style={{ ['--board-art' as string]: `url('/boards/${skin}.webp')` }}>
-        <WalletBar />
+        <WalletBar onSettings={() => setSettingsOpen(true)} onHelp={() => setHelpOpen(true)} />
         <main className="game-content">
           <nav className="arena-toolbar" aria-label={t('Управление матчем', 'Match controls')}>
-            <Link href="/" className="quiet-link">{t('← Герои', '← Heroes')}</Link>
-            <span className="block-plaque">{t('БЛОК', 'BLOCK')} <b>{state.block.toString().padStart(2, '0')}</b></span>
+            <Link href={`/arena?hero=${heroId}`} className="quiet-link">{t('← Врата арены', '← Arena gates')}</Link>
+            <BlockClock block={state.block} minions={[...me.board, ...foe.board]} />
             <div className="toolbar-actions">
-              <button className="icon-button" onClick={() => setHelpOpen(true)} aria-label={t('Правила игры', 'Open rulebook')}>?</button>
-              <button className="icon-button" onClick={() => setSettingsOpen(true)} aria-label={t('Настройки арены', 'Arena settings')}>⚙</button>
               <button className="icon-button" onClick={() => startGame(Date.now() & 0x7fffffff)} aria-label={t('Начать матч заново', 'Restart match')}>↻</button>
             </div>
           </nav>
@@ -606,11 +605,22 @@ function GameBoard() {
             e.currentTarget.style.setProperty('--table-x', `${((e.clientX - r.left) / r.width - .5) * 6}px`);
             e.currentTarget.style.setProperty('--table-y', `${((e.clientY - r.top) / r.height - .5) * 4}px`);
           }} onPointerLeave={e => { e.currentTarget.style.setProperty('--table-x', '0px'); e.currentTarget.style.setProperty('--table-y', '0px'); }}>
+            <RomanCorners />
+            <RivalHand count={foe.hand.length} />
+            <ScrollDeck count={foe.deck.length} foe />
+            <ScrollDeck count={me.deck.length} />
+            <BlockHistory lines={state.log} onOpen={() => setLogOpen(true)} />
+            {!mulliganAvailable(state) && state.winner === null && <div key={`turn-${state.block}-${state.turn}`} className="turn-banner" role="status">{state.turn === ME ? t('ВАШ ХОД', 'YOUR TURN') : t('ХОД ПРОТИВНИКА', 'RIVAL’S TURN')}<small>{t('БЛОК', 'BLOCK')} #{state.block}</small></div>}
+            <button className="gold-button end-turn-button" onClick={endTurn} disabled={!myTurn || autoplay || mulliganAvailable(state)}
+              aria-label={!myTurn ? t('Ход противника', 'Rival’s turn') : t('Завершить ход', 'End turn')}>
+              <img className="button-laurel" src="/ornaments/laurel.svg" alt="" /><span>{!myTurn ? t('ХОД ПРОТИВНИКА', 'RIVAL’S TURN') : t('ЗАВЕРШИТЬ ХОД', 'END TURN')}</span><img className="button-laurel" src="/ornaments/laurel.svg" alt="" />
+            </button>
             <DroppableFoeHero attackable={canHitFoeHero}><div id="foe-treasury-target" className={`combatant rival ${canHitFoeHero ? 'legal-target' : ''}`}>
               <HeroPortrait hero={foeHero} treasury={foe.treasury} foe deckCount={foe.deck.length} handCount={foe.hand.length} showHandBacks
                 floats={floatsFor('hero-1')} highlight={canHitFoeHero} shaking={attackAnim?.targetUid === 'hero-1'}
                 onClick={canHitFoeHero ? onFoeHeroClick : undefined}
                 onKeyDown={canHitFoeHero ? e => { if (e.key === 'Enter' || e.key === ' ') onFoeHeroClick(); } : undefined} />
+              <button className="hero-power-medallion rival-power" disabled title={powerText(foeHero.id)} aria-label={`${powerName(foeHero.id)} · ${powerText(foeHero.id)}`}><img src="/ornaments/coin-rug.svg" alt="" /><b>{powerName(foeHero.id)}</b><small>{effectivePowerCost(state, FOE)}</small></button>
               <span className="combatant-label">{t('ПРОТИВНИК · ИИ', 'RIVAL · AI')}</span>
             </div></DroppableFoeHero>
             <div className="rank-row enemy-rank" aria-label={t('Существа противника', 'Rival minions')}>
@@ -619,7 +629,7 @@ function GameBoard() {
                 <MinionToken minion={m} attackable={foeAttackable(m)} shaking={attackAnim?.targetUid === m.uid}
                   justPlayed={playedUids.has(m.uid)} floats={floatsFor(m.uid)}
                   onClick={() => attackerUid && foeAttackable(m) ? onFoeMinionClick(m) : setInspectUid(m.uid)} />
-              </LungeWrap></DroppableMinion> }))} ghosts={dying.filter(d => d.owner === FOE).map(d => <MinionToken key={`dying-${d.key}`} minion={ghostOf(d)} dying floats={floatsFor(d.uid)} />)} />
+              </LungeWrap></DroppableMinion> }))} ghosts={dying.filter(d => d.owner === FOE).map(d => ({ uid: `dying-${d.key}`, slot: d.slot, node: <MinionToken minion={ghostOf(d)} dying floats={floatsFor(d.uid)} /> }))} />
             </div>
             <DroppableMempool><section className={`chain-strip ${mempoolFx ? 'mempool-flash-resolve' : ''}`} aria-label={t('Публичный мемпул', 'Public mempool')}>
               <button className="chain-label" onClick={() => setHelpOpen(true)} title={mechanicText('Mempool')}>⛓ {t('МЕМПУЛ', 'MEMPOOL')} <b>{myMempool.length + foeMempool.length}</b></button>
@@ -632,7 +642,7 @@ function GameBoard() {
               </div>
             </section></DroppableMempool>
             <div className={`turn-status ${myTurn ? 'your-turn' : ''}`} role="status" aria-live="polite">
-              {autoplay ? t('Автобой: пауза вернёт управление', 'Autoplay: pause to take control') : phaseText}
+              {autoplay ? t('Автобой: пауза вернёт управление', 'Autoplay: pause to take control') : showOnboarding && !attackerUid ? <ContextCoach phase={mulliganAvailable(state) ? 'opening' : me.board.length === 0 ? 'play' : legal.some(a => a.type === 'attack') ? 'attack' : 'end'} onClose={closeOnboarding} /> : phaseText}
               {attackerUid && <button onClick={() => setAttackerUid(null)} className="cancel-target">{t('Отмена', 'Cancel')}</button>}
               {attackerUid && <button className="cancel-target" onClick={() => setInspectUid(attackerUid)}>{t('Карта / стейкинг', 'Card / staking')}</button>}
             </div>
@@ -647,17 +657,16 @@ function GameBoard() {
                   justPlayed={playedUids.has(m.uid)} floats={floatsFor(m.uid)}
                   onClick={() => ready ? onMyMinionClick(m) : setInspectUid(m.uid)} /></LungeWrap>;
                 return { uid: m.uid, node: ready && isDesktop ? <DraggableAttacker uid={m.uid}>{token}</DraggableAttacker> : token };
-              })} ghosts={dying.filter(d => d.owner === ME).map(d => <MinionToken key={`dying-${d.key}`} minion={ghostOf(d)} dying floats={floatsFor(d.uid)} />)} />
+              })} ghosts={dying.filter(d => d.owner === ME).map(d => ({ uid: `dying-${d.key}`, slot: d.slot, node: <MinionToken minion={ghostOf(d)} dying floats={floatsFor(d.uid)} /> }))} />
             </div></DroppableBoard>
             <div className="combatant own"><HeroPortrait hero={myHero} treasury={me.treasury} deckCount={me.deck.length}
               handCount={me.hand.length} floats={floatsFor('hero-0')} shaking={attackAnim?.targetUid === 'hero-0'} />
-              <button className="hero-power-medallion" disabled={!myTurn || !hpAction || autoplay} onClick={() => hpAction && act(hpAction)} title={powerText(myHero.id)} aria-label={`${powerName(myHero.id)} · ${powerText(myHero.id)} · ${effectivePowerCost(state, ME)} ${t('газа', 'gas')}`}><span aria-hidden>⚡</span><b>{powerName(myHero.id)}</b><small>{effectivePowerCost(state, ME)}</small></button>
+              <button className="hero-power-medallion" disabled={!myTurn || !hpAction || autoplay} onClick={() => hpAction && act(hpAction)} title={powerText(myHero.id)} aria-label={`${powerName(myHero.id)} · ${powerText(myHero.id)} · ${effectivePowerCost(state, ME)} ${t('газа', 'gas')}`}><CoinPreview model="coin-rug" size="100%" autoRotate={false} label={t('Монета силы героя', 'Hero power coin')} /><b>{powerName(myHero.id)}</b><small>{effectivePowerCost(state, ME)}</small></button>
               <div className="gas-meter" title={mechanicText('Gas')}><span>{t('ГАЗ', 'GAS')}</span><b>{me.gas}<small>/{me.maxGas}</small></b>
-                <div aria-hidden>{Array.from({ length: Math.min(me.maxGas, 10) }, (_, i) => <i key={i} className={i < me.gas ? 'filled' : ''} />)}</div>
+                <div aria-hidden>{Array.from({ length: 10 }, (_, i) => <i key={i} className={i < me.gas ? 'filled' : i < me.maxGas ? 'spent' : ''} />)}</div>
               </div>
             </div>
           </section>
-          {showOnboarding && state.winner === null && <ContextCoach phase={mulliganAvailable(state) ? 'opening' : attackerUid ? 'target' : me.board.length === 0 ? 'play' : legal.some(a => a.type === 'attack') ? 'attack' : 'end'} onClose={closeOnboarding} />}
           <section className="hand-zone" aria-label={t('Ваша рука', 'Your hand')}>
             <div className="hand-heading"><span>{t('ВАША РУКА', 'YOUR HAND')} <b>{me.hand.length}/10</b></span><span>{mulliganAvailable(state) ? t('Выберите карты для замены', 'Select cards to replace') : t('Нажми или перетащи', 'Tap or drag to play')}</span></div>
             <div className="hand-scroll thin-scroll"><div className="hand-cards">
@@ -682,15 +691,7 @@ function GameBoard() {
               <button className="gold-button" onClick={() => { act({ type: 'mulligan', uids: mulliganPicks }); setMulliganPicks([]); }}>
                 {mulliganPicks.length ? t(`Заменить ${mulliganPicks.length}`, `Replace ${mulliganPicks.length}`) : t('Оставить руку', 'Keep hand')}
               </button>
-            </> : <>
-              <button className={`power-button ${effectivePowerCost(state, ME) === 1 ? 'comeback-power' : ''}`} disabled={!myTurn || !hpAction || autoplay}
-                onClick={() => hpAction && act(hpAction)} title={powerText(myHero.id)}>
-                <span>⚡ {powerName(myHero.id)}</span><b>{effectivePowerCost(state, ME)} {t('ГАЗ', 'GAS')}</b>
-              </button>
-              <button className="gold-button end-turn-button" onClick={endTurn} disabled={!myTurn || autoplay}>
-                {!myTurn ? t('ХОД ПРОТИВНИКА', 'RIVAL’S TURN') : t('ЗАВЕРШИТЬ ХОД', 'END TURN')}
-              </button>
-            </>}
+            </> : null}
           </div>
           <div className="arena-bottom"><button className="quiet-link" onClick={() => setLogOpen(true)}>{t('Журнал боя ↗', 'Battle log ↗')}</button>
             <button className="quiet-link" onClick={() => setAutoplay(a => !a)}>{autoplay ? t('Ⅱ Пауза автобоя', 'Ⅱ Pause demo') : t('▷ Автобой', '▷ Autoplay demo')}</button>
@@ -889,7 +890,7 @@ function EndOverlay({
       <div className="rise-in text-center px-6 relative z-10 max-w-lg">
         {win ? (
           <>
-            <VictoryCoin size={156} label={t('Монета победы', 'Victory coin')} />
+            <VictoryCoin size={156} label={t('Трофей победы', 'Victory trophy')} />
             <Laurel />
             <div className="font-display text-4xl md:text-7xl font-bold gold-text tracking-[0.12em]">
               {t('ПОБЕДА!', 'VICTORIA!')}
