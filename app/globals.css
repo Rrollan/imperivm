@@ -646,9 +646,7 @@ html[data-imperivm-motion='off'] .chain-label b { animation: none; }
 .hand-heading b { color: #d2b371; }
 .hand-scroll { overflow-x: auto; padding: 11px 7px 10px; }
 .hand-cards { display: flex; align-items: start; justify-content: center; gap: 14px; width: max-content; min-width: 100%; padding: 3px 4px 11px; }
-.hand-card-wrap { position: relative; transition: transform .2s; }
-.hand-card-wrap:hover .card3d { transform: translateY(-14px) scale(1.07); }
-.hand-card-wrap:hover .card3d-inner { box-shadow: 0 12px 28px rgba(0,0,0,0.55), 0 0 20px rgba(212,175,55,0.45); }
+.hand-card-wrap { position: relative; }
 .hand-card-wrap .card3d { transition: transform .18s ease-out; }
 .hand-zone .card3d { width: 112px; }
 .hand-zone .card3d-inner { height: 144px; border-width: 2px !important; }
@@ -756,7 +754,6 @@ html[data-imperivm-motion='off'] .chain-label b { animation: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
-  .hand-card-wrap:hover .card3d { transform: none; }
 }
 .app-header > div { min-height: 54px; max-width: 1120px; }
 .header-brand { font-size: 18px; }
@@ -881,7 +878,7 @@ body { --font-display: var(--font-cinzel), var(--font-roman), Georgia, serif; }
 .context-coach p { flex: 1; line-height: 1.4; }
 .context-coach button { width: 32px; min-height: 28px; color: #c9b799; font-size: 19px; }
 .attack-aim { position: fixed; inset: 0; z-index: 35; pointer-events: none; }
-.attack-aim path { filter: drop-shadow(0 2px 3px #0009); }
+.attack-aim path { filter: drop-shadow(0 2px 3px #0009) drop-shadow(0 0 9px #f8d478aa); }
 .damage-preview { position: absolute; transform: translate(-50%,-50%); padding: 3px 7px; border: 1px solid #f68b7a; background: #30151af0; border-radius: 6px; font: 700 20px var(--font-cinzel),serif; color: #ffb9a3; white-space: nowrap; box-shadow: 0 3px 10px #000b; }
 .damage-preview small { display: block; font: 500 9px var(--font-sans); color: #e7bd8f; }
 .damage-preview.lethal { border-color: #fcdfa0; color: #ffe2a0; }
@@ -978,3 +975,130 @@ html[data-imperivm-motion='off'] *, html[data-imperivm-motion='off'] *::before, 
 .combat-flight { position: fixed; z-index: 42; border: 2px solid #e3c17d; border-radius: 11px; overflow: hidden; box-shadow: 0 8px 28px #000b,0 0 16px #ddb86066; pointer-events: none; animation: combat-flight 620ms cubic-bezier(.22,1,.36,1) both; }
 .combat-flight img { width: 100%; height: 100%; object-fit: cover; object-position: center 34%; }
 @keyframes combat-flight { 0%,100% { opacity: 0; transform: translate(0,0) scale(1); } 12% { opacity: 1; transform: translate(0,8px) scale(1.06); } 43% { opacity: 1; transform: translate(var(--combat-dx),var(--combat-dy)) scale(1.12); } 60% { opacity: 1; transform: translate(var(--combat-dx),var(--combat-dy)) scale(1.05); } 90% { opacity: 1; transform: translate(0,0) scale(1); } }
+
+/* ===== Hearthstone-style oval minion medallions ===== */
+.hs-minion { position: relative; width: 88px; height: 106px; }
+@media (min-width: 768px) { .hs-minion { width: 96px; height: 116px; } }
+
+.hs-minion-oval {
+  position: relative;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #1a0f2e;
+  border: 4px solid #c0c0c0;
+  box-shadow:
+    inset 0 3px 6px rgba(255,255,255,0.35),
+    inset 0 -4px 8px rgba(0,0,0,0.5),
+    0 6px 16px rgba(0,0,0,0.55),
+    0 2px 4px rgba(0,0,0,0.4);
+  transition: box-shadow .2s, transform .15s;
+}
+.hs-minion-oval[data-rarity="common"] { border-color: #b8b8c8; }
+.hs-minion-oval[data-rarity="rare"] { border-color: #d7dde8; box-shadow: inset 0 3px 6px rgba(255,255,255,0.4), inset 0 -4px 8px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.55), 0 0 10px rgba(180,200,255,0.35); }
+.hs-minion-oval[data-rarity="epic"] { border-color: #d4af37; box-shadow: inset 0 3px 6px rgba(255,255,255,0.4), inset 0 -4px 8px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.55), 0 0 12px rgba(212,175,55,0.45); }
+.hs-minion-oval[data-rarity="legendary"] {
+  border-color: #ffd700;
+  border-width: 5px;
+  box-shadow:
+    inset 0 3px 8px rgba(255,255,255,0.5),
+    inset 0 -4px 10px rgba(0,0,0,0.5),
+    0 6px 18px rgba(0,0,0,0.6),
+    0 0 18px rgba(255,215,0,0.55);
+}
+
+/* ready to attack: green pulsing glow */
+.hs-minion-oval.hs-can-act {
+  animation: hs-ready-pulse 1.6s ease-in-out infinite;
+}
+@keyframes hs-ready-pulse {
+  0%, 100% { box-shadow: inset 0 3px 6px rgba(255,255,255,0.35), inset 0 -4px 8px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.55), 0 0 12px rgba(34,197,94,0.55); }
+  50% { box-shadow: inset 0 3px 6px rgba(255,255,255,0.35), inset 0 -4px 8px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.55), 0 0 22px rgba(34,197,94,0.85); }
+}
+
+/* taunt: massive shield frame */
+.hs-minion-oval.hs-taunt {
+  border-width: 7px;
+  border-color: #8b7355;
+  box-shadow:
+    inset 0 3px 6px rgba(255,255,255,0.25),
+    0 0 0 3px #4a3d2e,
+    0 8px 20px rgba(0,0,0,0.65);
+}
+
+/* staked: chains overlay + dashed bronze rim */
+.hs-minion-oval.hs-staked { border-style: dashed; border-color: #8C6A1F; }
+.hs-staked-overlay {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: repeating-linear-gradient(45deg, transparent 0 8px, rgba(140,106,31,0.25) 8px 10px);
+  pointer-events: none;
+}
+
+/* selected / attackable */
+.hs-minion-oval.hs-selected { box-shadow: inset 0 3px 6px rgba(255,255,255,0.35), inset 0 -4px 8px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.55), 0 0 20px rgba(212,175,55,0.9); transform: scale(1.06); }
+.hs-minion-oval.hs-attackable { box-shadow: inset 0 3px 6px rgba(255,255,255,0.35), inset 0 -4px 8px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.55), 0 0 16px rgba(245,215,110,0.7); cursor: crosshair; }
+
+/* attack shield: round, bottom-left */
+.hs-attack {
+  position: absolute; left: -8px; bottom: -4px; z-index: 5;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #ffe9a8, #d4a017 55%, #8a5f0b);
+  border: 2px solid #5e420a;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.5);
+}
+.hs-attack span {
+  font-family: var(--font-mono); font-weight: 900; font-size: 17px; color: #fff;
+  text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+  line-height: 1;
+}
+
+/* hp crystal: ruby, bottom-right */
+.hs-hp {
+  position: absolute; right: -8px; bottom: -4px; z-index: 5;
+  width: 34px; height: 38px;
+  background: linear-gradient(135deg, #ff8a94 0%, #e63950 45%, #a01228 100%);
+  clip-path: polygon(50% 0%, 92% 30%, 78% 100%, 22% 100%, 8% 30%);
+  display: flex; align-items: center; justify-content: center;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.6));
+}
+.hs-hp span {
+  font-family: var(--font-mono); font-weight: 900; font-size: 16px; color: #fff;
+  text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
+  line-height: 1; padding-top: 6px;
+}
+
+/* keyword pips along the top rim */
+.hs-pips {
+  position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 3px; z-index: 4;
+}
+.hs-pip {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(10,6,20,0.85); border: 1px solid #d4af37;
+  color: #ffd76e; font-size: 10px; line-height: 16px; text-align: center;
+}
+
+/* summoning sickness */
+.hs-sleep {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 26px; z-index: 4; opacity: 0.9;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.7));
+}
+
+/* stake buttons under the medallion */
+.hs-stake-row { display: flex; gap: 4px; justify-content: center; margin-top: 6px; }
+.hs-stake-btn, .hs-unstake-btn {
+  font-size: 9px; padding: 2px 7px; border-radius: 6px; font-weight: 700;
+}
+.hs-stake-btn { background: rgba(212,175,55,0.2); color: #ffd76e; border: 1px solid rgba(212,175,55,0.5); }
+.hs-unstake-btn { background: rgba(255,77,94,0.2); color: #ff8a94; border: 1px solid rgba(255,77,94,0.5); }
+
+/* mobile: slightly smaller medallions */
+@media (max-width: 767px) {
+  .hs-minion { width: 72px; height: 88px; }
+  .hs-attack { width: 28px; height: 28px; left: -6px; }
+  .hs-attack span { font-size: 14px; }
+  .hs-hp { width: 28px; height: 32px; right: -6px; }
+  .hs-hp span { font-size: 13px; }
+}
