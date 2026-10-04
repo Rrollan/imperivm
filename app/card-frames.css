@@ -38,7 +38,8 @@
 .card-family-spell .card-name > div:last-child { color: #e4d2e8; }
 .card-family-spell .card-rules { margin: 0 7px 5px; border-radius: 0 0 10px 10px; background: linear-gradient(90deg,#bda17b,#efdfb6 10%,#e4cfa4 88%,#b49a76); }
 .card-family-spell .card-keywords { border-top: 1px solid #b795cc66; margin: 0 7px; padding-top: 6px; }
-.card-tier-rare { --frame-metal: #6da6b1; --frame-light: #b6e6e5; }
+.card-tier-common { --frame-metal: #a3a3a3; --frame-light: #e5e5e5; }
+.card-tier-rare { --frame-metal: #3b82f6; --frame-light: #bfdbfe; }
 .card-tier-epic { --frame-metal: #a57ccb; --frame-light: #e3bef9; }
 .card-tier-legendary { --frame-metal: #d3a444; --frame-light: #ffe4a0; border-width: 4px; background: radial-gradient(ellipse at 35% 0,#dfb76566,transparent 60%),repeating-linear-gradient(115deg,#ffe7a211 0 1px,transparent 1px 5px),linear-gradient(135deg,#8b6630,#31212b 42%,#ba8f3f 75%,#36202b); }
 .card-tier-legendary .card-art { border-color: #f1c869; box-shadow: 0 0 0 2px #5b3925,0 0 13px #dcaf3d33; }
@@ -53,8 +54,8 @@
 .card-size-lg .card-attack span, .card-size-lg .card-health span { font-size: 26px; }
 .hand-zone .imperial-card .card-art { margin: 6px 6px 0; border-width: 2px; }
 .hand-zone .imperial-card .card-name { margin: -5px 0 0; padding: 5px 4px 4px; }
-.hand-zone .imperial-card .card-name > div:first-child { font-size: 9px; line-height: 11px; height: 22px; }
-.hand-zone .imperial-card .card-name > div:last-child { margin-top: 1px; font-size: 6px; }
+.hand-zone .imperial-card .card-name > div:first-child { font-size: 12px; line-height: 14px; min-height: 28px; height: auto; }
+.hand-zone .imperial-card .card-name > div:last-child { display: none; }
 .hand-zone .imperial-card .card-cost { width: 29px; height: 29px; top: 2px; left: -6px; }
 .hand-zone .imperial-card .card-cost span { font-size: 17px; }
 .hand-zone .imperial-card .card-attack, .hand-zone .imperial-card .card-health { width: 27px; height: 29px; }
@@ -66,10 +67,11 @@
 .imperial-card .card-art { border-color: #b18a46; }
 .imperial-card .card-cost { background: conic-gradient(from 35deg,#8a6d1f,#f5d76e,#ffb52e,#ffe8a1,#a86a16); border-color: #f5d76e; }
 .imperial-card .card-cost span { color: #2a1f14; text-shadow: 0 1px #fff8; }
-.rarity-coin { align-self: center; display: grid; place-items: center; position: relative; z-index: 5; width: 23px; height: 23px; margin: -2px auto -8px; border: 3px ridge #9a6843; border-radius: 50%; background: radial-gradient(circle at 35% 20%,#dfaa7e,#b97845 55%,#6f472a); box-shadow: 0 1px 2px #0008,inset 0 0 0 1px #61381d; color: #4e2c18; }
+.rarity-coin { align-self: center; display: grid; place-items: center; position: relative; z-index: 5; width: 23px; height: 23px; margin: -2px auto -8px; border: 3px ridge #a3a3a3; border-radius: 50%; background: radial-gradient(circle at 35% 20%,#eeeeee,#a3a3a3 55%,#525252); box-shadow: 0 1px 2px #0008,inset 0 0 0 1px #525252; color: #262626; }
 .rarity-coin > span:first-child { font: 800 6px var(--font-display); }
-.card-tier-rare .rarity-coin { border-color: #c2c7d0; background: radial-gradient(circle at 35% 20%,#f2ede6,#c2c7d0 55%,#797b84); color: #3c3941; }
-.card-tier-epic .rarity-coin,.card-tier-legendary .rarity-coin { border-color: #f5d76e; background: radial-gradient(circle at 35% 20%,#f5d76e,#d4af37 55%,#8a6d1f); color: #594019; }
+.card-tier-rare .rarity-coin { border-color: #3b82f6; background: radial-gradient(circle at 35% 20%,#bfdbfe,#3b82f6 55%,#1e40af); color: #172554; }
+.card-tier-epic .rarity-coin { border-color: #a855f7; background: radial-gradient(circle at 35% 20%,#e9d5ff,#a855f7 55%,#6b21a8); color: #3b0764; }
+.card-tier-legendary .rarity-coin { border-color: #f5d76e; background: radial-gradient(circle at 35% 20%,#f5d76e,#d4af37 55%,#8a6d1f); color: #594019; }
 .coin-laurels { position: absolute; bottom: -4px; color: #4a7c3a; font-size: 28px; transform: rotate(-25deg); text-shadow: 0 1px #263e1c; }
 .imperial-card .card-rules { padding-top: 13px; font-family: Georgia,var(--font-roman),serif; color: #2a1f14; background: radial-gradient(ellipse at top,#f4ead4,#e8dcc0 75%,#ccba97); }
 .imperial-card .card-name { border-block: 1px solid #8a6d1f; }

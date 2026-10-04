@@ -27,8 +27,7 @@ button:disabled { --button-texture: url('/ui/buttons/tablet-disabled.png'); }
 .arena-frieze .wallet-button .frieze-wallet-label { display: inline!important; }
 .game-shell, .arena-scene { --board-art: url('/boards/marble.webp'); min-height: 100dvh; background-color: #332d32; background-image: radial-gradient(ellipse at 50% 45%,#15101b18 20%,#100a15b8 100%),var(--board-art); background-size: cover; background-position: center; color: #eee5d3; isolation: isolate; }
 .game-content { width: 100%; padding: 0 24px 8px; }
-.battlefield { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-.battlefield::before,.battlefield::after { display: none; }
+/* Table geometry and raised edges are owned by arena.css. */
 .arena-toolbar { height: 46px; }
 .game-shell .arena-bottom .quiet-link { padding: 3px 10px; border: 1px ridge #a58a52; border-radius: 2px; }
 @media (max-width: 767px) {
@@ -40,7 +39,6 @@ button:disabled { --button-texture: url('/ui/buttons/tablet-disabled.png'); }
   .arena-frieze .wallet-button .frieze-wallet-label { display: none!important; }
   .game-content { padding: 0 7px calc(6px + env(safe-area-inset-bottom)); }
   .arena-toolbar { height: 44px; }
-  .battlefield { border: 0; border-radius: 0; }
 }
 /* The gates are architectural scenery; action text always remains live DOM. */
 .gates-main { max-width: 1180px; margin: auto; padding: 20px 38px 12px; }

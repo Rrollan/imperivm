@@ -52,11 +52,12 @@ export default function HeroPortrait({
         className={`hero-medallion ${onClick ? 'cursor-pointer' : ''}`}>
         <CoinPreview model={`hero-${hero.id}` as ModelKey} size="100%" autoRotate={false} label={name} />
       </div>
-      <div key={hits[hits.length - 1]?.key ?? 'treasury'} className={`hero-treasury ${damaged ? 'target-shake treasury-hit' : ''}`}
+      <div className={`hero-treasury-motion ${damaged ? 'target-shake' : ''}`}><div key={hits[hits.length - 1]?.key ?? 'treasury'} className={`hero-treasury ${damaged ? 'treasury-hit' : ''}`}
         title={t('Казна: прочность империи', 'Treasury: the strength of your empire')}>
         <img src="/ornaments/chest.svg" alt="" /><strong><NumberFlow value={treasury} /></strong>
         <small>{t('КАЗНА', 'TREASURY')}</small>
         <span className="treasury-reserve" aria-hidden>{Array.from({ length: 5 }, (_, i) => <i key={i} className={i < Math.ceil(Math.max(0, treasury) / maxTreasury * 5) ? 'filled' : ''} />)}</span>
+      </div>
       </div>
       {hits.map(hit => <span key={hit.key} className="treasury-spill" aria-hidden>{Array.from({ length: 6 }, (_, i) => <i key={i} style={{ '--coin-x': `${(i - 2.5) * 17}px`, '--coin-y': `${-32 - (i % 3) * 18}px` } as React.CSSProperties}>$</i>)}</span>)}
     </div>

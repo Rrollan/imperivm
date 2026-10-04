@@ -1,0 +1,35 @@
+.scene { position: relative; overflow: hidden; background-image: radial-gradient(ellipse at 50% 40%, #17101b30, #100a15e8 85%), var(--board-art); }
+.main { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; padding: 18px 20px 28px; }
+.heading { margin: 0 0 22px; color: #e8d6ac; font: 700 30px/1.2 var(--font-display); letter-spacing: .12em; text-shadow: 0 2px 8px #000; }
+.portal { position: relative; display: flex; flex-direction: column; justify-content: flex-end; width: min(360px, 88vw); height: clamp(310px, 47dvh, 460px); border: 13px ridge #aa8a55; border-bottom: 5px ridge #aa8a55; border-radius: 190px 190px 5px 5px; background: #140f16; box-shadow: 0 0 35px #dc9e3338, inset 0 0 45px #e5ac3c25, 0 20px 35px #0009; transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease; text-align: center; }
+.portal::before { content: ''; position: absolute; inset: -22px; border: 1px solid #bc945846; border-radius: 205px 205px 6px 6px; pointer-events: none; }
+.portal:hover, .portal:focus-visible { transform: scale(1.025); border-color: #e2be76; box-shadow: 0 0 65px #efaf4c70, inset 0 0 65px #e5ac3c40, 0 20px 35px #0009; outline: 3px solid #f4d999; outline-offset: 7px; }
+.portal:active { transform: scale(.99); }
+.keystone { position: absolute; top: -20px; left: calc(50% - 24px); z-index: 2; width: 48px; padding: 8px; border: 2px ridge #ceb079; background: #32271c; color: #f5d389; font-size: 24px; }
+.interior { position: absolute; inset: 0; overflow: hidden; border-radius: 170px 170px 0 0; background: radial-gradient(ellipse at 50% 42%, #eba44a40, transparent 65%), linear-gradient(0deg, #171019 5%, transparent 65%); pointer-events: none; }
+.brazier { position: absolute; width: 220px; height: 220px; top: 4%; left: calc(50% - 110px); opacity: .85; filter: drop-shadow(0 0 22px #ee9f3860); }
+.portalCopy { position: relative; padding: 22px 12px 24px; background: linear-gradient(transparent, #140e17db 25%); }
+.portalCopy h2 { margin: 0; font: 700 27px/1.3 var(--font-display); color: #f5dfb3; }
+.portalCopy p { margin: 7px 0 18px; font-size: 13px; color: #c9baa2; }
+.action { display: inline-flex; align-items: center; justify-content: center; gap: 28px; min-height: 48px; padding: 10px 35px; background: linear-gradient(#f4d992, #b98538); color: #23160e; border: 1px solid #ffdf94; box-shadow: 0 0 24px #dca53b40; font: 700 22px var(--font-display); }
+.heroes { margin: 24px 0 20px; text-align: center; }
+.heroes p { margin: 0 0 9px; font-size: 13px; color: #d6c4a2; }
+.heroOptions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.hero { position: relative; width: 48px; height: 48px; border-radius: 50%; border: 2px solid #77644e; transition: border-color .2s, transform .2s; }
+.hero img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.hero[aria-pressed='true'] { border-color: #f0cd7f; box-shadow: 0 0 12px #e4af4a50; }
+.hero:hover { transform: translateY(-3px); border-color: #f0cd7f; }
+.hero:focus-visible { outline: 2px solid #f4d999; outline-offset: 4px; }
+.hero span { position: absolute; right: -3px; bottom: -3px; border-radius: 50%; background: #e2bc67; color: #241a13; font-size: 10px; width: 16px; height: 16px; }
+.futureModes { display: flex; gap: 12px; width: min(520px, 100%); }
+.futureModes > div { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 10px; border-top: 1px solid #a18c6233; color: #b0a596; font-size: 12px; }
+.futureModes small { font-size: 10px; color: #c3ae82; border: 1px solid #a18c6240; padding: 2px 5px; border-radius: 3px; }
+.dust { position: absolute; inset: 0; pointer-events: none; }
+.dust i, .embers i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #f4d79b; box-shadow: 0 0 6px #ffcb71; animation: drift 16s linear infinite; opacity: 0; }
+.embers { position: absolute; inset: 0; }
+.embers i { bottom: 20%; background: #ffc674; animation: ember 5s linear infinite; }
+.portal:hover .embers i, .portal:focus-visible .embers i { width: 4px; height: 4px; box-shadow: 0 0 10px #ffb940; }
+@keyframes drift { 0%, 100% { opacity: 0; transform: translate(0, 25px); } 25%, 75% { opacity: .3; } 95% { transform: translate(35px, -90px); } }
+@keyframes ember { 0% { opacity: 0; transform: translate(0, 0); } 20% { opacity: .7; } 100% { opacity: 0; transform: translate(14px, -210px); } }
+@media (max-width: 480px) { .main { padding-top: 12px; } .heading { font-size: 25px; margin-bottom: 22px; } .futureModes { gap: 8px; } .futureModes > div { flex-wrap: wrap; gap: 6px; font-size: 11px; } .brazier { width: 180px; height: 180px; left: calc(50% - 90px); } }
+@media (prefers-reduced-motion: reduce) { .portal, .hero { transition: none; } .portal:hover, .portal:focus-visible, .hero:hover { transform: none; } .dust i, .embers i { animation: none; opacity: .2; } }

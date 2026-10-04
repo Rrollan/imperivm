@@ -8,14 +8,16 @@
 .halving-clock { font-size: 9px; color: #c4b194; white-space: nowrap; }
 .halving-track { width: 120px; height: 3px; background: #392c3e; }
 .halving-track i { display: block; height: 100%; background: #d4af37; transition: width .25s; }
-.battlefield { display: grid; grid-template-columns: minmax(0,1fr); grid-template-rows: 116px 124px 38px 24px 124px 116px; padding: 8px 166px 8px 138px; border: 4px ridge #a98a52; border-radius: 40px 40px 16px 16px; isolation: isolate; box-shadow: 0 5px 0 #473323,0 9px 0 #1b101e,0 16px 28px #0009; }
-.battlefield::before { inset: 0; border-radius: inherit; background-image: radial-gradient(ellipse at center,#24174322 25%,#100719cc 85%),repeating-linear-gradient(118deg,transparent 0 83px,#e7d9bc0d 84px,transparent 86px 151px),var(--board-art); background-size: cover; transform: translate(var(--table-x,0px),var(--table-y,0px)); box-shadow: inset 0 0 50px #0d071bbc,inset 0 0 0 2px #dec08250; }
+.battlefield { display: grid; grid-template-columns: minmax(0,1fr); grid-template-rows: 100px var(--rank-row-height) 38px 24px var(--rank-row-height) 100px; padding: 8px 166px 8px 138px; border: 4px ridge #a98a52; border-radius: 40px 40px 16px 16px; isolation: isolate; box-shadow: 0 5px 0 #473323,0 9px 0 #1b101e,0 16px 28px #0009; }
+/* Opaque stone keeps the bright playing surface independent of the page vignette. */
+.battlefield::before { inset: 0; border-radius: inherit; pointer-events: none; background-color: #e7ddc9; background-image: radial-gradient(ellipse at center,transparent 38%,#45352b55 76%,#241b24c9 100%),repeating-linear-gradient(116deg,transparent 0 72px,#998b7520 74px,#fff9 76px,transparent 80px 153px),repeating-linear-gradient(8deg,#fff2 0 2px,transparent 3px 19px),radial-gradient(ellipse at 48% 48%,#faf5e7 0%,#e7ddc9 58%,#b5a58b 100%); background-size: cover; transform: translate(var(--table-x,0px),var(--table-y,0px)); box-shadow: inset 0 0 0 2px #f7e7bd99,inset 0 0 24px #37291f66; }
+.battlefield::after { pointer-events: none; }
 .battlefield > * { min-width: 0; }
-.combatant { position: relative; display: flex; justify-content: center; align-items: center; height: 116px; min-height: 0; padding: 0; gap: 0; }
+.combatant { position: relative; display: flex; justify-content: center; align-items: center; height: 100px; min-height: 0; padding: 0; gap: 0; }
 .hero-profile { position: relative; width: 116px; height: 116px; flex: none; }
 .hero-coin { position: relative; width: 100%; height: 100%; }
 .hero-medallion { width: 116px; height: 116px; border: 5px solid #d4af37; border-radius: 50%; overflow: hidden; background: #1a1030; box-shadow: 0 0 0 2px #8a6d1f, 0 0 18px rgba(212,175,55,0.45), 0 8px 12px #000a; }
-.hero-coin::before,.hero-coin::after { content: '❧'; position: absolute; top: 52px; color: #4a7c3a; font-size: 32px; pointer-events: none; text-shadow: 0 1px #132811; z-index: 2; }
+.hero-coin::before,.hero-coin::after { content: ''; position: absolute; top: 52px; width: 14px; height: 14px; background: url('/ornaments/battle-laurel.svg') center/contain no-repeat; pointer-events: none; z-index: 2; }
 .hero-coin::before { left: -12px; transform: rotate(55deg); }
 .hero-coin::after { right: -12px; transform: scaleX(-1) rotate(55deg); }
 .hero-caption { position: absolute; right: calc(100% + 23px); top: 35px; min-width: 110px; text-align: right; }
@@ -54,12 +56,11 @@ html[data-imperivm-motion='off'] .treasury-hit, html[data-imperivm-motion='off']
 .hero-power-medallion:not(:disabled):active { transform: translateY(2px) scale(.96); }
 .rank-row { padding: 0; background: none; }
 .rank-label { height: 18px; padding: 1px 4px; color: #d1be9f; font-size: 9px; }
-.rank-scroll { height: 106px; min-height: 0; padding: 3px 4px 12px; gap: 8px; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; justify-content: center; }
-.board-slot { width: 100px; height: 94px; border-radius: 14px 14px 8px 8px; }
-.minion-token > [data-minion-uid] { width: 98px; height: 94px; }
+/* Keep stats, state outlines and stake buttons inside the scroll viewport.
+   Safe centering falls back to start when seven slots overflow the board. */
+.rank-scroll { height: var(--rank-scroll-height); min-height: 0; box-sizing: border-box; padding: var(--rank-padding); gap: 8px; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; justify-content: safe center; }
+.board-slot { box-sizing: border-box; width: var(--board-slot-width); height: var(--board-slot-height); display: flex; justify-content: center; border-radius: 14px 14px 8px 8px; }
 .board-minion-art { width: 87px; height: 57px; }
-.minion-token [data-minion-uid] > .line-clamp-2 { font-size: 8px; }
-.minion-token [data-minion-uid] > .flex.items-center.gap-1 { margin-top: 0; }
 .empty-slot.receiving { color: #f5d76e; border-color: #d4af37; background: #d4af3710; box-shadow: inset 0 0 12px #d4af3720; }
 .empty-slot.receiving small { color: #f5d76e; }
 .empty-slot.over { background: #d4af3733; box-shadow: inset 0 0 14px #d4af3733; }
@@ -75,7 +76,7 @@ html[data-imperivm-motion='off'] .treasury-hit, html[data-imperivm-motion='off']
 .mempool-drop-hint { background: #21162cf0; color: #f5d76e; }
 .turn-status { min-height: 24px; font-size: 10px; }
 .legal-target { outline: none; background: none; }
-.valid-hero-target .hero-medallion { border-color: #f5d76e; outline: 2px solid #d4af37; outline-offset: 4px; }
+.valid-hero-target .hero-medallion { border-color: #ef4444; outline: 2px solid #ef4444; outline-offset: 4px; box-shadow: 0 0 16px #ef444499; animation: hs-target-pulse 1.2s ease-in-out infinite; }
 .turn-banner { position: absolute; z-index: 25; top: 46%; left: 50%; width: 310px; transform: translate(-50%,-50%); padding: 15px; background: linear-gradient(90deg,#33212a,#53422b,#33212a); border-block: 3px ridge #d4af37; box-shadow: 0 8px 20px #000a; text-align: center; font: 800 24px var(--font-display); color: #f5d76e; pointer-events: none; animation: turn-announce 1.8s ease both; }
 .turn-banner small { display: block; font: 600 10px var(--font-mono); color: #e8dcc0; }
 .battlefield > .end-turn-button { position: absolute; z-index: 8; right: 14px; top: 46%; width: 138px; min-width: 0; max-width: none; min-height: 66px; padding: 8px; display: flex; gap: 4px; align-items: center; border-radius: 7px 7px 3px 3px; font-size: 12px; letter-spacing: .04em; }
@@ -124,19 +125,19 @@ html[data-imperivm-motion='off'] .treasury-hit, html[data-imperivm-motion='off']
 .hand-zone { margin: 7px 146px 0 120px; }
 .hand-scroll { padding: 8px 12px 6px; }
 .hand-cards { gap: 0; padding-bottom: 4px; }
-/* веер: нахлёст — отрицательным margin (шаг 32px при карте 126px);
+/* веер: нахлёст — отрицательным margin (шаг 102px при карте 126px);
    transform через margin не ломает layout и не плодит мёртвую зону скролла */
-.hand-cards > * + * { margin-left: -94px; }
+.hand-cards > * + * { margin-left: -24px; }
 /* внешний слой веера: rotate/translateY задаются инлайном из page.tsx,
    точка веера — под картой */
 .hand-fan { position: relative; z-index: 1; transform-origin: 50% 120%; transition: transform .22s ease; will-change: transform; }
 /* внутренний слой: ховер-подъём, веерный transform внешнего не трогает */
 .hand-card-hover { transition: transform .18s ease-out; will-change: transform; }
 .hand-fan.is-hover { z-index: 50; }
-.hand-fan.is-hover .hand-card-hover { transform: translateY(-70px) scale(1.35); }
+.hand-fan.is-hover .hand-card-hover { transform: translateY(-12px); }
 .hand-fan.is-hover .card3d-inner { box-shadow: 0 18px 40px rgba(0,0,0,.6), 0 0 26px rgba(212,175,55,.55); }
-/* на десктопе веер всегда влезает: отдаём вертикаль наружу, чтобы ховер не обрезался скроллом */
-@media (min-width: 768px) { .hand-scroll { overflow-x: visible; } }
+/* Длинная рука прокручивается; полный просмотр рендерится вне скролла. */
+@media (min-width: 768px) { .hand-scroll { overflow-x: auto; padding-top: 28px; padding-bottom: 42px; } }
 .hand-zone .card3d { width: 126px; }
 .hand-zone .card3d-inner { height: 134px; }
 .hand-zone .card-art { height: 71px; }
@@ -164,10 +165,9 @@ button:focus-visible,[role='button']:focus-visible,a:focus-visible { outline: 2p
 @media (min-width: 768px) and (max-width: 1199px) {
   .battlefield { padding-left: 34px; padding-right: 132px; }
   .block-history { display: none; }
-  .board-slot { width: 80px; }.minion-token > [data-minion-uid] { width: 78px; }.board-minion-art { width: 69px; }
   .battlefield > .end-turn-button { right: 7px; width: 117px; font-size: 10px; }
   .gas-meter { right: -116px; min-width: 115px; }.gas-meter > div { gap: 3px; }.gas-meter i { width: 7px; }
-  .hand-zone { margin-inline: 30px 110px; }.hand-cards > * + * { margin-left: -94px; }
+  .hand-zone { margin-inline: 30px 110px; }.hand-cards > * + * { margin-left: -24px; }
   .hero-caption { min-width: 80px; }.hero-caption strong { font-size: 16px; }
   .rival-hand { left: 32px; width: 125px; }
 }
@@ -176,7 +176,7 @@ button:focus-visible,[role='button']:focus-visible,a:focus-visible { outline: 2p
   .arena-toolbar { height: 50px; gap: 3px; }.arena-toolbar .quiet-link { font-size: 10px; padding-inline: 0; }
   .toolbar-actions { gap: 2px; }.toolbar-actions .icon-button { width: 32px; height: 38px; }
   .block-clock { top: 4px; }.block-plaque { font-size: 8px; }.block-plaque b { font-size: 15px; margin-left: 2px; }.halving-clock { font-size: 8px; }.halving-track { width: 90px; }
-  .battlefield { grid-template-rows: 82px 112px 36px 22px 112px 124px; padding: 6px 3px; border-width: 3px; border-radius: 24px 24px 8px 8px; }
+  .battlefield { grid-template-rows: 82px var(--rank-row-height) 36px 22px var(--rank-row-height) 124px; padding: 6px 3px; border-width: 3px; border-radius: 24px 24px 8px 8px; }
   .battlefield::before { transform: none; background-position: center; }
   .combatant { height: 82px; }.combatant.own { height: 124px; align-items: flex-start; padding-top: 3px; }
   .hero-profile { width: 82px; height: 82px; }.hero-medallion { width: 82px; height: 82px; border-width: 4px; }
@@ -185,9 +185,8 @@ button:focus-visible,[role='button']:focus-visible,a:focus-visible { outline: 2p
   .hero-treasury { width: 58px; height: 45px; right: -17px; bottom: -3px; grid-template-columns: 23px 1fr; grid-template-rows: 25px 10px 4px; border-width: 2px; padding: 1px 4px; }.hero-treasury img { width: 24px; height: 25px; }.hero-treasury strong { font-size: 22px; }.hero-treasury small { font-size: 6px; }
   .combatant-label { display: none; }
   .hero-power-medallion { width: 52px; height: 52px; left: calc(50% + 69px); top: 12px; border-width: 3px; }.hero-power-medallion b { top: 50px; font-size: 8px; width: 87px; }.hero-power-medallion small { width: 22px; height: 22px; font-size: 14px; right: -8px; bottom: -6px; }
-  .rank-label { height: 16px; font-size: 8px; }.rank-scroll { height: 96px; justify-content: flex-start; padding: 2px 3px 11px; gap: 7px; }
+  .rank-label { height: 16px; font-size: 8px; }.rank-scroll { justify-content: safe center; gap: 7px; }
   .rank-scroll.welcoming { gap: 9px; }
-  .board-slot { width: 70px; height: 82px; }.minion-token > [data-minion-uid] { width: 68px; height: 82px; }.board-minion-art { width: 59px; height: 46px; }
   .chain-strip { min-height: 36px; height: 36px; padding: 2px 4px; gap: 5px; }.chain-label { font-size: 8px; }.chain-empty { font-size: 8px; }.queued-spell small { font-size: 6px; }
   .turn-status { min-height: 22px; font-size: 9px; }.cancel-target { min-height: 22px; font-size: 9px; }
   .turn-banner { width: 255px; font-size: 21px; }
@@ -197,7 +196,7 @@ button:focus-visible,[role='button']:focus-visible,a:focus-visible { outline: 2p
   .block-history { top: 39px; left: 4px; width: 35px; height: 36px; }.block-history > button { width: 35px; font-size: 7px; min-height: 32px; }.block-history ol { display: none; }
   .scroll-deck { right: 6px; width: 28px; gap: 1px; }.foe-deck { top: 3px; }.own-deck { bottom: 76px; }.deck-scroll { width: 21px; height: 25px; border-width: 1px; box-shadow: 2px 2px #594832; }.deck-scroll i { height: 5px; left: -2px; right: -2px; border-width: 1px; }.deck-scroll i:first-child { top: -1px; }.deck-scroll i:nth-child(2) { bottom: -1px; }.deck-scroll i:nth-child(3) { display: none; }.deck-scroll b { font-size: 5px; top: 8px; }.scroll-deck small { font-size: 0; }.scroll-deck strong { font-size: 10px; }
   .roman-corner { width: 28px; height: 28px; }.corner-column { left: -9px; top: -3px; width: 30px; height: 41px; }.corner-bust { right: 26px; top: -5px; }.corner-brazier { left: 3px; bottom: 84px; width: 32px; height: 40px; }.brazier { transform: scale(.5); transform-origin: left top; }.corner-coins { right: 37px; bottom: 72px; }
-  .hand-zone { margin: 7px 0 0; }.hand-scroll { padding: 8px 8px 9px; scroll-snap-type: x proximity; }.hand-cards { gap: 0; justify-content: flex-start; padding: 3px 0 64px; }.hand-cards > * + * { margin-left: -76px; }.hand-card-wrap { scroll-snap-align: center; }
+  .hand-zone { margin: 7px 0 0; }.hand-scroll { padding: 8px 8px 9px; scroll-snap-type: x proximity; }.hand-cards { gap: 0; justify-content: flex-start; gap: 12px; padding: 3px 0 14px; }.hand-cards > * + * { margin-left: 0; }.hand-card-wrap { scroll-snap-align: center; }
   .hand-zone .card3d { width: 108px; }.hand-zone .card3d-inner { height: 130px; }.hand-zone .card-art { height: 67px; }.hand-heading { font-size: 8px; }
   .arena-bottom { gap: 9px; justify-content: space-between; }.arena-bottom .quiet-link { min-height: 28px; padding-inline: 2px; font-size: 9px; }
   .context-coach { font-size: 9px; padding: 1px 5px; margin-top: 6px; }.context-coach > span { font-size: 14px; }
@@ -207,7 +206,7 @@ button:focus-visible,[role='button']:focus-visible,a:focus-visible { outline: 2p
 html[data-imperivm-motion='off'] .turn-banner { display: none; }
 
 /* Action feedback uses engine-derived deltas and keeps clear hit areas. */
-.valid-minion-target { outline: 2px solid #f5d76e; outline-offset: 2px; }
+.valid-minion-target { outline: 2px solid #ef4444; outline-offset: 2px; }
 .golden-death-dust { position: absolute; left: 50%; top: 40%; z-index: 15; pointer-events: none; }
 .golden-death-dust i { position: absolute; width: 4px; height: 4px; background: #f5d76e; box-shadow: 0 0 2px #d4af37; animation: golden-dust .7s ease-out both; }
 .death-fade { animation: golden-death .75s ease-out both; }
@@ -218,15 +217,46 @@ html[data-imperivm-motion='off'] .turn-banner { display: none; }
 @keyframes roman-card-land { 0% { transform: translateY(-18px) rotate(-7deg) scale(1.15); } 70% { transform: translateY(2px) rotate(2deg) scale(.97); } 100% { transform: none; } }
 html[data-imperivm-motion='off'] .golden-death-dust,html[data-imperivm-motion='off'] .treasury-spill { display: none; }
 @media (prefers-reduced-motion: reduce) { .golden-death-dust,.treasury-spill { display: none; } }
-.rank-ghosts { left: 4px; right: 4px; top: 3px; justify-content: center; gap: 8px; }
-.ghost-slot { width: 100px; height: 94px; flex-shrink: 0; position: relative; }
-.ghost-token { position: absolute; inset: 0; }
-@media (min-width: 768px) and (max-width: 1199px) { .ghost-slot { width: 80px; } }
-@media (max-width: 767px) { .rank-ghosts { justify-content: flex-start; left: 3px; top: 2px; gap: 7px; }.ghost-slot { width: 70px; height: 82px; } }
+.rank-ghosts { left: var(--rank-padding); right: var(--rank-padding); top: var(--rank-padding); justify-content: safe center; gap: 8px; min-width: max-content; }
+.ghost-slot { width: var(--board-slot-width); height: var(--board-slot-height); flex-shrink: 0; position: relative; }
+.ghost-token { position: absolute; inset: 0; display: flex; justify-content: center; }
+@media (max-width: 767px) { .rank-ghosts { gap: 7px; } }
 .button-laurel { width: 17px; height: 38px; flex-shrink: 0; object-fit: contain; }
-.hero-coin::before,.hero-coin::after { content: ''; width: 22px; height: 55px; top: 42px; background: url('/ornaments/laurel.svg') center/contain no-repeat; filter: saturate(.5); }
+.hero-coin::before,.hero-coin::after { content: ''; width: 14px; height: 14px; top: 42px; background: url('/ornaments/battle-laurel.svg') center/contain no-repeat; }
 .hero-coin::before { transform: rotate(-15deg); }.hero-coin::after { transform: scaleX(-1) rotate(-15deg); }
 .hero-select { background: #241b2e; border: 3px ridge #8a6d1f; border-radius: 8px 8px 3px 3px; box-shadow: inset 0 1px #d4af3733,0 3px 0 #12071f; }
 .hero-select.active { background: #332735; border-color: #d4af37; }
 .skin-option { border: 3px ridge #8a6d1f; border-radius: 6px 6px 2px 2px; }
-@media (max-width: 767px) { .button-laurel { width: 13px; height: 26px; }.hero-coin::before,.hero-coin::after { top: 29px; width: 17px; height: 44px; } }
+@media (max-width: 767px) { .button-laurel { width: 13px; height: 26px; }.hero-coin::before,.hero-coin::after { top: 29px; width: 14px; height: 14px; } }
+
+/* The exposed 102px contains the complete name plate and mana crystal. */
+.hand-zone .card-name { max-width: 102px; }
+.hand-zone .imperial-card .card-name > div:first-child { height: auto; min-height: 24px; overflow: visible; overflow-wrap: anywhere; }
+.hand-zone .card3d-inner { height: auto; min-height: 144px; padding-bottom: 12px; }
+.hand-heading > span:last-child { text-align: right; }
+.hand-cards { justify-content: safe center; }
+@media (hover: none), (pointer: coarse) {
+  .hand-cards > * + * { margin-left: 0; }
+  .hand-cards { gap: 12px; }
+  .hand-fan { transform: none !important; }
+}
+
+/* Quiet labels remain legible on the light stone. */
+.rank-label, .combatant-label { color: #514435; }
+.hero-caption strong { color: #342b27; }
+.hero-caption small { color: #625449; }
+html[data-imperivm-motion='off'] .valid-hero-target .hero-medallion { animation: none; }
+@media (prefers-reduced-motion: reduce) { .valid-hero-target .hero-medallion { animation: none; } }
+
+@media (max-height: 900px) and (min-width: 768px) {
+  .hand-scroll { padding-top: 16px; padding-bottom: 20px; }
+}
+@media (max-width: 767px) {
+  .rank-scroll, .rank-scroll.welcoming { gap: 2px; padding-inline: 6px; }
+  .rank-scroll > .occupied-slot, .rank-scroll > div:has(> .empty-slot) { width: calc((100% - 12px) / 7); min-width: 44px; flex-shrink: 0; }
+  .rank-scroll:not(.welcoming) > div:has(> .empty-slot) { display: none; }
+  .rank-scroll .empty-slot { width: 100%; }
+  .rank-scroll .hs-minion, .rank-ghosts .hs-minion { width: 100%; max-width: 48px; height: 64px; }
+  .rank-ghosts { left: 6px; right: 6px; gap: 2px; min-width: 0; }
+  .ghost-slot { width: calc((100% - 12px) / 7); }
+}

@@ -1,6 +1,9 @@
 'use client';
 
-import { useRef, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
+import BattleIcon from './BattleIcon';
+import NumberFlow from '@number-flow/react';
 import CardOrnament from './CardOrnament';
 import { useReducedMotion } from '../lib/prefersReducedMotion';
 import { useLocale } from './LocaleContext';
@@ -18,10 +21,10 @@ export const FACTION_COLORS: Record<Faction, string> = {
 };
 
 export const RARITY_COLORS: Record<Rarity, string> = {
-  common: '#b97845',
-  rare: '#c2c7d0',
-  epic: '#d4af37',
-  legendary: '#D4AF37',
+  common: '#a3a3a3',
+  rare: '#3b82f6',
+  epic: '#a855f7',
+  legendary: '#f59e0b',
 };
 
 interface CardViewProps {
@@ -91,10 +94,10 @@ export default function CardView({
           'card3d-inner card-shine relative rounded-xl flex flex-col',
           `imperial-card card-family-${card.type} card-tier-${card.rarity} card-faction-${card.faction.toLowerCase()}`,
           'bg-gradient-to-b from-[#2a1745] via-void to-abyss',
-          selected ? '-translate-y-2' : '',
+          selected ? 'card-selected -translate-y-2' : '',
           playable ? 'playable-card' : '',
           onClick && !disabled ? 'cursor-pointer' : '',
-          disabled ? 'opacity-40 saturate-50' : '',
+          disabled ? 'card-unavailable' : '',
           isLegendary ? 'legendary-glow' : '',
         ].join(' ')}
         style={{
@@ -103,7 +106,7 @@ export default function CardView({
           boxShadow: selected
             ? '0 0 22px rgba(212,175,55,0.65)'
             : playable
-              ? '0 0 12px rgba(212,175,55,0.4)'
+              ? '0 0 16px rgba(34,197,94,0.65)'
               : undefined,
         } as CSSProperties}
       >
@@ -167,10 +170,10 @@ export default function CardView({
         {/* keyword badges */}
         <div className="card-keywords flex justify-center gap-1 pb-1.5 flex-wrap px-1">
           {(['Taunt', 'Rush', 'Lifesteal'] as const).filter(word => card[word.toLowerCase() as 'taunt' | 'rush' | 'lifesteal']).map(word =>
-            <span key={word} title={mechanicText(word)} className="keyword-chip">{keywordName(word)}</span>)}
+            <span key={word} aria-label={mechanicText(word)} className="keyword-chip">{keywordName(word)}</span>)}
           {card.priority && (
             <span className="text-[8px] px-1.5 py-0.5 rounded bg-blood/20 text-blood border border-blood/50 uppercase tracking-wide font-semibold">
-              ⚡ {t('Приоритет', 'Priority')}
+              <BattleIcon kind="priority" /> {t('Приоритет', 'Priority')}
             </span>
           )}
           {card.halvingPeriod && (
@@ -202,7 +205,7 @@ export default function CardView({
           <p className="mt-1.5 text-[11px] leading-snug text-parchment/90">{text}</p>
           {isMinion && (
             <div className="mt-1 text-[10px] font-mono text-lavender">
-              ⚔ {card.attack} / ♥ {card.health}
+              <BattleIcon kind="attack" /> {card.attack} / <BattleIcon kind="health" /> {card.health}
             </div>
           )}
         </div>
@@ -213,6 +216,8 @@ export default function CardView({
 
 interface MinionTokenProps {
   minion: Minion;
+  inFlight?: boolean;
+  visualOnly?: boolean;
   selected?: boolean;
   attackable?: boolean;
   canAct?: boolean;
@@ -231,6 +236,8 @@ interface MinionTokenProps {
  */
 export function MinionToken({
   minion,
+  inFlight = false,
+  visualOnly = false,
   selected = false,
   attackable = false,
   canAct = false,
@@ -242,22 +249,54 @@ export function MinionToken({
   onStake,
   onUnstake,
 }: MinionTokenProps) {
-  const { t, cardName, cardText, keywordName, mechanicText } = useLocale();
+  const { t, cardName, keywordName, mechanicText } = useLocale();
+  const reduced = useReducedMotion();
   const def = CARDS[minion.cardId];
   const name = def ? cardName(minion.cardId) : minion.name;
   const rarity = def?.rarity ?? 'common';
+  const [previewPosition, setPreviewPosition] = useState<{ left: number; top: number } | null>(null);
+  const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const focused = useRef(false);
+  const hovered = useRef(false);
+  const cancelPreviewTimer = () => {
+    if (previewTimer.current) clearTimeout(previewTimer.current);
+    previewTimer.current = null;
+  };
+  const closePreview = () => {
+    cancelPreviewTimer();
+    if (!focused.current && !hovered.current) setPreviewPosition(null);
+  };
+  const openPreview = (element: HTMLElement) => {
+    cancelPreviewTimer();
+    if (!def || visualOnly || dying || inFlight) return;
+    const rect = element.getBoundingClientRect();
+    setPreviewPosition({
+      left: Math.max(12, Math.min(rect.right + 16, window.innerWidth - 292)),
+      top: Math.max(12, Math.min(rect.top, window.innerHeight - 484)),
+    });
+  };
+  useEffect(() => () => { if (previewTimer.current) clearTimeout(previewTimer.current); }, []);
 
   return (
-    <div className="hs-minion relative">
+    <div className="hs-minion relative" style={inFlight ? { visibility: 'hidden' } : undefined}>
       <div
-        data-minion-uid={minion.uid}
+        data-minion-uid={visualOnly ? undefined : minion.uid}
         data-rarity={rarity}
         role={onClick ? 'button' : undefined}
-        tabIndex={onClick ? 0 : undefined}
+        tabIndex={!visualOnly ? 0 : undefined}
         onClick={onClick}
         onKeyDown={onClick ? e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
         aria-label={`${name}, ${minion.attack} ${t("атака", "attack")}, ${minion.health} ${t("здоровье", "health")}${minion.taunt ? `, ${keywordName("Taunt")}` : ""}${minion.staked ? `, ${t("в стейкинге", "staked")}` : ""}`}
-        title={def ? `${name} — ${cardText(minion.cardId)}` : name}
+        onPointerEnter={e => {
+          if (e.pointerType === 'touch') return;
+          hovered.current = true;
+          const element = e.currentTarget;
+          cancelPreviewTimer();
+          previewTimer.current = setTimeout(() => openPreview(element), 180);
+        }}
+        onPointerLeave={() => { hovered.current = false; closePreview(); }}
+        onFocus={e => { focused.current = true; openPreview(e.currentTarget); }}
+        onBlur={() => { focused.current = false; closePreview(); }}
         className={[
           'hs-minion-oval',
           minion.taunt ? 'hs-taunt' : '',
@@ -265,6 +304,7 @@ export function MinionToken({
           selected ? 'hs-selected' : '',
           attackable ? 'hs-attackable' : '',
           canAct && !dying ? 'hs-can-act' : '',
+          !minion.canAttack && !dying ? 'hs-exhausted' : '',
           minion.staked ? 'hs-staked' : '',
           dying ? 'death-fade' : '',
           shaking ? 'target-shake' : '',
@@ -279,32 +319,37 @@ export function MinionToken({
           imgClassName="w-full h-full object-cover"
         />
         {minion.staked && <div className="hs-staked-overlay" aria-hidden />}
-        {!minion.canAttack && !minion.staked && !dying && (
-          <div className="hs-sleep" title={t('Не может атаковать в ход призыва', 'Summoning sickness')}>💤</div>
+        {minion.fresh && !minion.rush && !minion.staked && !dying && (
+          <div className="hs-sleep" aria-label={t('Не может атаковать в ход призыва', 'Summoning sickness')}><BattleIcon kind="sleep" /></div>
         )}
         <div className="hs-pips">
-          {minion.rush && <span title={mechanicText("Rush")} className="hs-pip">↯</span>}
-          {minion.lifesteal && <span title={mechanicText("Lifesteal")} className="hs-pip">♥</span>}
-          {def?.halvingPeriod && <span title={t(`Халвинг каждые ${def.halvingPeriod} блока: +1/+1`, `Halving every ${def.halvingPeriod} blocks: +1/+1`)} className="hs-pip">◈</span>}
-          {def?.priority && <span title={keywordName("Priority")} className="hs-pip">⚡</span>}
+          {minion.rush && <span aria-label={mechanicText("Rush")} className="hs-pip"><BattleIcon kind="priority" /></span>}
+          {minion.lifesteal && <span aria-label={mechanicText("Lifesteal")} className="hs-pip"><BattleIcon kind="health" /></span>}
+          {def?.halvingPeriod && <span aria-label={t(`Халвинг каждые ${def.halvingPeriod} блока: +1/+1`, `Halving every ${def.halvingPeriod} blocks: +1/+1`)} className="hs-pip">◈</span>}
+          {def?.priority && <span aria-label={keywordName("Priority")} className="hs-pip"><BattleIcon kind="priority" /></span>}
         </div>
-        {floats.map(f => (
-          <span
-            key={f.key}
-            className={`damage-float absolute top-0 left-1/2 font-mono font-black text-3xl z-30 ${
-              f.kind === 'damage' ? 'text-blood' : 'text-mint'
-            }`}
-            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 12px currentColor' }}
-          >
-            {f.kind === 'damage' ? `-${f.amount}` : `+${f.amount}`}
-          </span>
-        ))}
       </div>
+      <span data-rarity-gem={rarity} aria-label={rarity} />
+      {def && previewPosition && !visualOnly && !dying && !inFlight && <CardPreview
+        card={{ ...def, attack: minion.attack, health: minion.health, taunt: minion.taunt, rush: minion.rush, lifesteal: minion.lifesteal }}
+        position={previewPosition}
+      />}
+      {floats.map(f => (
+        <span
+          key={f.key}
+          className={`damage-float font-mono font-black text-3xl ${
+            f.kind === 'damage' ? 'text-blood' : 'text-mint'
+          }`}
+          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 12px currentColor' }}
+        >
+          {f.kind === 'damage' ? `-${f.amount}` : `+${f.amount}`}
+        </span>
+      ))}
       <div className="hs-attack" aria-hidden>
         <span>{minion.attack}</span>
       </div>
       <div className="hs-hp" aria-hidden>
-        <span>{minion.health}</span>
+        <span><NumberFlow value={minion.health} animated={!reduced} /></span>
       </div>
       {dying && <span className="golden-death-dust" aria-hidden>{Array.from({ length: 12 }, (_, i) => <i key={i} style={{ '--dust-x': `${Math.cos(i * Math.PI / 6) * (25 + i * 2)}px`, '--dust-y': `${Math.sin(i * Math.PI / 6) * 34 - 18}px`, animationDelay: `${i % 3 * 35}ms` } as CSSProperties} />)}</span>}
       {(onStake || onUnstake) && !dying && (
@@ -332,23 +377,6 @@ export function MinionToken({
 }
 
 
-/** Attack-lunge wrapper: moves the whole token (art + orbs + buttons) toward the target. */
-export function LungeWrap({
-  active,
-  up,
-  children,
-}: {
-  active: boolean;
-  up: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={active ? `attack-lunge ${up ? 'lunge-up' : 'lunge-down'}` : ''}>
-      {children}
-    </div>
-  );
-}
-
 /** Card back used in the mempool strip and pack openings. */
 export function CardBack({ size = 'md' }: { size?: 'sm' | 'md' }) {
   const { t } = useLocale();
@@ -366,4 +394,12 @@ export function CardBack({ size = 'md' }: { size?: 'sm' | 'md' }) {
       />
     </div>
   );
+}
+
+/** Shared portal for hand and battlefield cards. */
+export function CardPreview({ card, position }: { card: CardDef; position: { left: number; top: number } }) {
+  if (typeof document === 'undefined') return null;
+  return createPortal(<div className="hand-full-preview" style={position}>
+    <CardView card={card} size="lg" tilt={false} />
+  </div>, document.body);
 }
