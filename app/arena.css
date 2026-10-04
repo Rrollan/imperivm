@@ -124,9 +124,19 @@ html[data-imperivm-motion='off'] .treasury-hit, html[data-imperivm-motion='off']
 .hand-zone { margin: 7px 146px 0 120px; }
 .hand-scroll { padding: 8px 12px 6px; }
 .hand-cards { gap: 0; padding-bottom: 4px; }
-.hand-cards > * + * { margin-left: -28px; }
-.hand-card-wrap { transform: rotate(var(--fan-angle,0deg)) translateY(var(--fan-lift,0px)); transform-origin: 50% 135%; }
-.hand-card-wrap:hover,.hand-card-wrap:focus-within { transform: translateY(-9px); z-index: 20; }
+/* веер: нахлёст — отрицательным margin (шаг 32px при карте 126px);
+   transform через margin не ломает layout и не плодит мёртвую зону скролла */
+.hand-cards > * + * { margin-left: -94px; }
+/* внешний слой веера: rotate/translateY задаются инлайном из page.tsx,
+   точка веера — под картой */
+.hand-fan { position: relative; z-index: 1; transform-origin: 50% 120%; transition: transform .22s ease; will-change: transform; }
+/* внутренний слой: ховер-подъём, веерный transform внешнего не трогает */
+.hand-card-hover { transition: transform .18s ease-out; will-change: transform; }
+.hand-fan.is-hover { z-index: 50; }
+.hand-fan.is-hover .hand-card-hover { transform: translateY(-70px) scale(1.35); }
+.hand-fan.is-hover .card3d-inner { box-shadow: 0 18px 40px rgba(0,0,0,.6), 0 0 26px rgba(212,175,55,.55); }
+/* на десктопе веер всегда влезает: отдаём вертикаль наружу, чтобы ховер не обрезался скроллом */
+@media (min-width: 768px) { .hand-scroll { overflow-x: visible; } }
 .hand-zone .card3d { width: 126px; }
 .hand-zone .card3d-inner { height: 134px; }
 .hand-zone .card-art { height: 71px; }
@@ -157,7 +167,7 @@ button:focus-visible,[role='button']:focus-visible,a:focus-visible { outline: 2p
   .board-slot { width: 80px; }.minion-token > [data-minion-uid] { width: 78px; }.board-minion-art { width: 69px; }
   .battlefield > .end-turn-button { right: 7px; width: 117px; font-size: 10px; }
   .gas-meter { right: -116px; min-width: 115px; }.gas-meter > div { gap: 3px; }.gas-meter i { width: 7px; }
-  .hand-zone { margin-inline: 30px 110px; }.hand-cards > * + * { margin-left: -47px; }
+  .hand-zone { margin-inline: 30px 110px; }.hand-cards > * + * { margin-left: -94px; }
   .hero-caption { min-width: 80px; }.hero-caption strong { font-size: 16px; }
   .rival-hand { left: 32px; width: 125px; }
 }
@@ -187,7 +197,7 @@ button:focus-visible,[role='button']:focus-visible,a:focus-visible { outline: 2p
   .block-history { top: 39px; left: 4px; width: 35px; height: 36px; }.block-history > button { width: 35px; font-size: 7px; min-height: 32px; }.block-history ol { display: none; }
   .scroll-deck { right: 6px; width: 28px; gap: 1px; }.foe-deck { top: 3px; }.own-deck { bottom: 76px; }.deck-scroll { width: 21px; height: 25px; border-width: 1px; box-shadow: 2px 2px #594832; }.deck-scroll i { height: 5px; left: -2px; right: -2px; border-width: 1px; }.deck-scroll i:first-child { top: -1px; }.deck-scroll i:nth-child(2) { bottom: -1px; }.deck-scroll i:nth-child(3) { display: none; }.deck-scroll b { font-size: 5px; top: 8px; }.scroll-deck small { font-size: 0; }.scroll-deck strong { font-size: 10px; }
   .roman-corner { width: 28px; height: 28px; }.corner-column { left: -9px; top: -3px; width: 30px; height: 41px; }.corner-bust { right: 26px; top: -5px; }.corner-brazier { left: 3px; bottom: 84px; width: 32px; height: 40px; }.brazier { transform: scale(.5); transform-origin: left top; }.corner-coins { right: 37px; bottom: 72px; }
-  .hand-zone { margin: 7px 0 0; }.hand-scroll { padding: 8px 8px 9px; scroll-snap-type: x proximity; }.hand-cards { gap: 12px; justify-content: flex-start; padding: 3px 0 9px; }.hand-cards > * + * { margin-left: 0; }.hand-card-wrap { transform: none; scroll-snap-align: center; }.hand-card-wrap:hover,.hand-card-wrap:focus-within { transform: none; }
+  .hand-zone { margin: 7px 0 0; }.hand-scroll { padding: 8px 8px 9px; scroll-snap-type: x proximity; }.hand-cards { gap: 0; justify-content: flex-start; padding: 3px 0 64px; }.hand-cards > * + * { margin-left: -76px; }.hand-card-wrap { scroll-snap-align: center; }
   .hand-zone .card3d { width: 108px; }.hand-zone .card3d-inner { height: 130px; }.hand-zone .card-art { height: 67px; }.hand-heading { font-size: 8px; }
   .arena-bottom { gap: 9px; justify-content: space-between; }.arena-bottom .quiet-link { min-height: 28px; padding-inline: 2px; font-size: 9px; }
   .context-coach { font-size: 9px; padding: 1px 5px; margin-top: 6px; }.context-coach > span { font-size: 14px; }

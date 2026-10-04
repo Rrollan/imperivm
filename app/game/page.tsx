@@ -155,6 +155,10 @@ function GameBoard() {
   const [attackAnim, setAttackAnim] = useState<{ attackerUid: string; targetUid: string; key: number } | null>(null);
   const [playedUids, setPlayedUids] = useState<Set<string>>(new Set());
   const [dealtUids, setDealtUids] = useState<Set<string>>(new Set());
+  // веер руки: uid карты под курсором (ховер-подъём, только десктоп)
+  const [fanHoverUid, setFanHoverUid] = useState<string | null>(null);
+  // true пока атакующий миньон тащится (стрелка прицеливания следует за курсором)
+  const [draggingAttacker, setDraggingAttacker] = useState(false);
   const [mempoolFx, setMempoolFx] = useState<{ kind: 'resolve' | 'counter'; key: number } | null>(null);
   const [screenFx, setScreenFx] = useState<{ kind: 'rug' | 'halving'; key: number } | null>(null);
   // package 2 + 3 wiring
@@ -519,6 +523,7 @@ function GameBoard() {
       // same check as onMyMinionClick: the attacker must be able to attack
       const canAttackNow = legal.some(a => a.type === 'attack' && a.attackerUid === data.uid);
       if (canAttackNow) setAttackerUid(data.uid);
+      setDraggingAttacker(true); // стрелка прицеливания потянется за курсором
       // existing attackable/highlight states pick up the selection automatically,
       // so legal targets are highlighted while dragging
     }
@@ -539,9 +544,11 @@ function GameBoard() {
       }
     }
     setAttackerUid(null);
+    setDraggingAttacker(false);
+    setFanHoverUid(null);
   };
 
-  const handleDragCancel = () => setAttackerUid(null);
+  const handleDragCancel = () => { setAttackerUid(null); setDraggingAttacker(false); };
 
   const onStake = (uid: string) => {
     const a = legal.find(x => x.type === 'stake' && x.uid === uid);
@@ -674,11 +681,27 @@ function GameBoard() {
                 const def = CARDS[hc.cardId]; const playable = myTurn && playableUids.has(hc.uid);
                 const selecting = mulliganAvailable(state) && state.turn === ME;
                 const picked = mulliganPicks.includes(hc.uid);
+                // веер: дуга вокруг точки под рукой; нахлёст — margin в CSS (шаг 32px).
+                // на мобиле веер компактнее (меньше дуга), чтобы карты не обрезались скроллом
+                const total = me.hand.length, middle = (total - 1) / 2, offset = i - middle;
+                const fanRot = offset * (isDesktop ? 4.5 : 3.2);
+                const fanY = Math.pow(Math.abs(offset), 1.8) * (isDesktop ? 6 : 4);
+                const hovered = isDesktop && fanHoverUid === hc.uid;
+                const clearHover = () => setFanHoverUid(cur => cur === hc.uid ? null : cur);
                 return <DraggableHandCard key={hc.uid} id={hc.uid} cardType={def.type} disabled={!playable}>
-                  <div data-hand-uid={hc.uid} className={`hand-card-wrap ${dealtUids.has(hc.uid) ? 'deal-in' : ''}`} style={{ animationDelay: `${i * 45}ms`, '--fan-angle': `${(i - (me.hand.length - 1) / 2) * Math.min(4, 20 / Math.max(1, me.hand.length))}deg`, '--fan-lift': `${Math.abs(i - (me.hand.length - 1) / 2) * 3}px` } as React.CSSProperties}>
-                    <CardView card={def} size="sm" playable={playable} disabled={!playable && !selecting} selected={picked}
-                      onClick={() => selecting ? setMulliganPicks(old => old.includes(hc.uid) ? old.filter(u => u !== hc.uid) : [...old, hc.uid]) : setZoomUid(hc.uid)} />
-                    {selecting && <span className={`mulligan-choice ${picked ? 'replace' : ''}`}>{picked ? t('ЗАМЕНИТЬ', 'REPLACE') : t('ОСТАВИТЬ', 'KEEP')}</span>}
+                  <div className={`hand-fan${hovered ? ' is-hover' : ''}`}
+                    style={{ transform: `rotate(${hovered ? 0 : fanRot}deg) translateY(${hovered ? 0 : fanY}px)` }}
+                    onMouseEnter={isDesktop ? () => setFanHoverUid(hc.uid) : undefined}
+                    onMouseLeave={isDesktop ? clearHover : undefined}
+                    onFocus={isDesktop ? () => setFanHoverUid(hc.uid) : undefined}
+                    onBlur={isDesktop ? clearHover : undefined}>
+                    <div data-hand-uid={hc.uid} className={`hand-card-wrap ${dealtUids.has(hc.uid) ? 'deal-in' : ''}`} style={{ animationDelay: `${i * 45}ms` }}>
+                      <div className="hand-card-hover">
+                        <CardView card={def} size="sm" playable={playable} disabled={!playable && !selecting} selected={picked}
+                          onClick={() => selecting ? setMulliganPicks(old => old.includes(hc.uid) ? old.filter(u => u !== hc.uid) : [...old, hc.uid]) : setZoomUid(hc.uid)} />
+                        {selecting && <span className={`mulligan-choice ${picked ? 'replace' : ''}`}>{picked ? t('ЗАМЕНИТЬ', 'REPLACE') : t('ОСТАВИТЬ', 'KEEP')}</span>}
+                      </div>
+                    </div>
                   </div>
                 </DraggableHandCard>;
               })}
@@ -697,7 +720,7 @@ function GameBoard() {
             <button className="quiet-link" onClick={() => setShowOnboarding(true)}>{t('Подсказки', 'Learn to play')}</button>
           </div>
         </main>
-        {myTurn && selectedAttacker && <AttackAim attacker={selectedAttacker} targets={[...foe.board.filter(foeAttackable).map(m => ({ uid: m.uid, health: m.health, attack: m.attack })), ...(canHitFoeHero ? [{ uid: 'hero', health: foe.treasury, attack: 0 }] : [])]} />}
+        {myTurn && selectedAttacker && <AttackAim attacker={selectedAttacker} followPointer={draggingAttacker} targets={[...foe.board.filter(foeAttackable).map(m => ({ uid: m.uid, health: m.health, attack: m.attack })), ...(canHitFoeHero ? [{ uid: 'hero', health: foe.treasury, attack: 0 }] : [])]} />}
         {proofPending && <Dialog title={t('Подтверждение игры · devnet', 'Proof of play · devnet')} onClose={() => setProofPending(false)}>
           <p className="text-sm text-parchment/80 leading-relaxed">{t('Подпишите бесплатное сообщение для матча за', 'Sign a free match message as')} <b>{heroName(myHero.id)}</b>. {t('Phantom покажет домен, ID матча, одноразовый код, время и сеть devnet.', 'Phantom shows the domain, match ID, nonce, timestamp and devnet label.')}</p>
           <p className="integration-note">{t('Матч', 'Match')} {match.current.id}<br />{t('Без транзакций и оплаты. Подпись подтверждает кошелёк; матч проходит локально против ИИ.', 'No transaction or payment. The signature verifies your wallet; gameplay runs locally against AI.')}</p>
@@ -883,6 +906,20 @@ function EndOverlay({
   const { t } = useLocale();
   const win = winner === ME;
   const reduced = useReducedMotion();
+
+  // Canvas confetti burst on victory
+  useEffect(() => {
+    if (!win || reduced) return;
+    let cancelled = false;
+    import('canvas-confetti').then(({ default: confetti }) => {
+      if (cancelled) return;
+      const gold = ['#D4AF37', '#F5D76E', '#FFD700', '#FFF8DC'];
+      confetti({ particleCount: 120, spread: 100, origin: { y: 0.6 }, colors: gold, disableForReducedMotion: true });
+      setTimeout(() => { if (!cancelled) confetti({ particleCount: 60, spread: 120, origin: { y: 0.4 }, colors: gold, disableForReducedMotion: true }); }, 400);
+    });
+    return () => { cancelled = true; };
+  }, [win, reduced]);
+
   return (
     <div className="end-overlay fixed inset-0 z-[80] flex items-center justify-center bg-abyss/95 backdrop-blur-sm overflow-hidden">
       {win && !reduced && <CoinConfetti />}
