@@ -9,6 +9,8 @@ A Roman crypto card battler. Read the mempool. Build your legion. Empty the riva
 ![Next.js 14.2.35](https://img.shields.io/badge/Next.js-14.2.35-0B0A14?logo=nextdotjs&logoColor=white)
 ![React 18.3.1](https://img.shields.io/badge/React-18.3.1-3B1F6B?logo=react&logoColor=white)
 ![TypeScript 5.9.3](https://img.shields.io/badge/TypeScript-5.9.3-3B1F6B?logo=typescript&logoColor=white)
+[![Local build verified](https://img.shields.io/badge/build-local%20checks%20passed-2C784C)](docs/verification.md)
+![Hackathon prototype](https://img.shields.io/badge/Hackathon-prototype-D4A24C)
 ![Solana devnet](https://img.shields.io/badge/Solana-devnet-14F195?logo=solana&logoColor=0B0A14)
 ![Russian and English](https://img.shields.io/badge/UI-RU%20%2F%20EN-D4A24C)
 
