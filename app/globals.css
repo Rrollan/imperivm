@@ -221,6 +221,33 @@ body {
   animation: target-shake 0.5s var(--ease-imperial) both;
 }
 
+/* impact burst: expanding golden ring + flash on hit */
+@keyframes impact-burst {
+  0% { transform: translate(-50%,-50%) scale(0.25); opacity: 1; }
+  60% { opacity: 0.9; }
+  100% { transform: translate(-50%,-50%) scale(2.4); opacity: 0; }
+}
+@keyframes impact-flash {
+  0% { opacity: 0.85; transform: translate(-50%,-50%) scale(0.5); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(1.6); }
+}
+.impact-burst {
+  position: absolute; left: 50%; top: 42%; width: 64px; height: 64px;
+  border: 4px solid #f5d76e; border-radius: 50%;
+  box-shadow: 0 0 18px rgba(245,215,110,0.8), inset 0 0 12px rgba(245,215,110,0.5);
+  animation: impact-burst 0.45s ease-out both;
+  pointer-events: none; z-index: 35;
+}
+.impact-flash {
+  position: absolute; left: 50%; top: 42%; width: 90px; height: 90px;
+  background: radial-gradient(circle, rgba(255,240,200,0.9) 0%, rgba(245,215,110,0.4) 45%, transparent 70%);
+  border-radius: 50%;
+  animation: impact-flash 0.35s ease-out both;
+  pointer-events: none; z-index: 34;
+}
+html[data-imperivm-motion='off'] .impact-burst, html[data-imperivm-motion='off'] .impact-flash { display: none; }
+@media (prefers-reduced-motion: reduce) { .impact-burst, .impact-flash { display: none; } }
+
 /* floating damage / heal numbers */
 @keyframes damage-float {
   0% { transform: translate(-50%, 8px) scale(0.7); opacity: 0; }
@@ -541,6 +568,15 @@ body {
   0%, 100% { box-shadow: 0 0 10px rgba(20, 241, 225, 0.3), inset 0 0 10px rgba(20, 241, 225, 0.15); }
   50% { box-shadow: 0 0 20px rgba(20, 241, 225, 0.7), inset 0 0 18px rgba(20, 241, 225, 0.3); }
 }
+/* mempool timer tick: the count badge pulses like a ticking clock */
+@keyframes mempool-tick {
+  0%, 100% { transform: scale(1); }
+  10% { transform: scale(1.25); }
+  20% { transform: scale(1); }
+}
+.chain-label b { animation: mempool-tick 1.2s ease-in-out infinite; display: inline-block; }
+html[data-imperivm-motion='off'] .chain-label b { animation: none; }
+@media (prefers-reduced-motion: reduce) { .chain-label b { animation: none; } }
 
 /* resolved flash — used on mempool resolution */
 .mempool-resolved-flash {
@@ -611,7 +647,9 @@ body {
 .hand-scroll { overflow-x: auto; padding: 11px 7px 10px; }
 .hand-cards { display: flex; align-items: start; justify-content: center; gap: 14px; width: max-content; min-width: 100%; padding: 3px 4px 11px; }
 .hand-card-wrap { position: relative; transition: transform .2s; }
-.hand-card-wrap:hover { transform: translateY(-3px); }
+.hand-card-wrap:hover .card3d { transform: translateY(-14px) scale(1.07); }
+.hand-card-wrap:hover .card3d-inner { box-shadow: 0 12px 28px rgba(0,0,0,0.55), 0 0 20px rgba(212,175,55,0.45); }
+.hand-card-wrap .card3d { transition: transform .18s ease-out; }
 .hand-zone .card3d { width: 112px; }
 .hand-zone .card3d-inner { height: 144px; border-width: 2px !important; }
 .hand-zone .card-art { aspect-ratio: auto; height: 83px; flex-shrink: 0; margin: 3px 3px 0; }
@@ -718,7 +756,7 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
-  .hand-card-wrap:hover { transform: none; }
+  .hand-card-wrap:hover .card3d { transform: none; }
 }
 .app-header > div { min-height: 54px; max-width: 1120px; }
 .header-brand { font-size: 18px; }

@@ -319,6 +319,13 @@ export function MinionToken({
             {f.kind === 'damage' ? `-${f.amount}` : `+${f.amount}`}
           </span>
         ))}
+        {/* impact burst on hit */}
+        {shaking && (
+          <>
+            <span className="impact-flash" aria-hidden />
+            <span className="impact-burst" aria-hidden />
+          </>
+        )}
       </div>
 
       {dying && <span className="golden-death-dust" aria-hidden>{Array.from({ length: 12 }, (_, i) => <i key={i} style={{ '--dust-x': `${Math.cos(i * Math.PI / 6) * (25 + i * 2)}px`, '--dust-y': `${Math.sin(i * Math.PI / 6) * 34 - 18}px`, animationDelay: `${i % 3 * 35}ms` } as CSSProperties} />)}</span>}

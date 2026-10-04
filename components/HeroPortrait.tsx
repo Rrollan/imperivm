@@ -51,7 +51,7 @@ export default function HeroPortrait({
         className={`hero-medallion ${onClick ? 'cursor-pointer' : ''}`}>
         <CoinPreview model={`hero-${hero.id}` as ModelKey} size="100%" autoRotate={false} label={name} />
       </div>
-      <div key={hits[hits.length - 1]?.key ?? 'treasury'} className={`hero-treasury ${damaged ? 'target-shake' : ''}`}
+      <div key={hits[hits.length - 1]?.key ?? 'treasury'} className={`hero-treasury ${damaged ? 'target-shake treasury-hit' : ''}`}
         title={t('Казна: прочность империи', 'Treasury: the strength of your empire')}>
         <img src="/ornaments/chest.svg" alt="" /><strong>{treasury}</strong>
         <small>{t('КАЗНА', 'TREASURY')}</small>

@@ -14,20 +14,33 @@
 .combatant { position: relative; display: flex; justify-content: center; align-items: center; height: 116px; min-height: 0; padding: 0; gap: 0; }
 .hero-profile { position: relative; width: 116px; height: 116px; flex: none; }
 .hero-coin { position: relative; width: 100%; height: 100%; }
-.hero-medallion { width: 116px; height: 116px; border: 5px ridge #d4af37; border-radius: 48% 48% 42% 42%; overflow: hidden; background: #1a1030; box-shadow: inset 0 0 0 3px #634422,0 4px 0 #513c22,0 8px 12px #000a; }
+.hero-medallion { width: 116px; height: 116px; border: 5px solid #d4af37; border-radius: 50%; overflow: hidden; background: #1a1030; box-shadow: 0 0 0 2px #8a6d1f, 0 0 18px rgba(212,175,55,0.45), 0 8px 12px #000a; }
 .hero-coin::before,.hero-coin::after { content: '❧'; position: absolute; top: 52px; color: #4a7c3a; font-size: 32px; pointer-events: none; text-shadow: 0 1px #132811; z-index: 2; }
 .hero-coin::before { left: -12px; transform: rotate(55deg); }
 .hero-coin::after { right: -12px; transform: scaleX(-1) rotate(55deg); }
 .hero-caption { position: absolute; right: calc(100% + 23px); top: 35px; min-width: 110px; text-align: right; }
 .hero-caption strong { display: block; font: 700 19px var(--font-display); color: #e8dcc0; }
 .hero-caption small { display: block; font-size: 9px; color: #b6a5b7; }
-.hero-treasury { position: absolute; right: -27px; bottom: -3px; width: 68px; height: 56px; z-index: 3; display: grid; grid-template-columns: 28px 1fr; grid-template-rows: 31px 12px 5px; align-items: center; padding: 2px 5px; background: #1a1030; border: 3px ridge #ae8a3f; border-radius: 7px 7px 17px 7px; box-shadow: 0 4px 5px #000b; }
+.hero-treasury { position: absolute; right: -27px; bottom: -3px; width: 68px; height: 56px; z-index: 3; display: grid; grid-template-columns: 28px 1fr; grid-template-rows: 31px 12px 5px; align-items: center; padding: 2px 5px; background: linear-gradient(180deg, #2a1f3d 0%, #1a1030 100%); border: 2px solid #d4af37; border-radius: 10px; box-shadow: 0 0 12px rgba(212,175,55,0.35), 0 4px 8px rgba(0,0,0,0.5); }
 .hero-treasury img { width: 31px; height: 32px; }
 .hero-treasury strong { font: 800 25px var(--font-display); color: #f5d76e; text-shadow: 0 2px #4c3718; }
 .hero-treasury small { grid-column: 1/-1; font-size: 7px; text-align: center; letter-spacing: .1em; color: #e8dcc0; }
 .treasury-reserve { grid-column: 1/-1; display: flex; justify-content: center; gap: 3px; }
-.treasury-reserve i { width: 5px; height: 4px; border: 1px solid #8a6d1f; border-radius: 50%; }
+.treasury-reserve i { width: 5px; height: 4px; border: 1px solid #8a6d1f; border-radius: 50%; transition: background 0.4s ease, transform 0.4s ease; }
 .treasury-reserve .filled { background: #d4af37; }
+/* treasury damage: red flash melt */
+@keyframes treasury-hit-flash {
+  0% { box-shadow: 0 0 0 0 rgba(255,77,94,0.9), 0 0 12px rgba(212,175,55,0.35), 0 4px 8px rgba(0,0,0,0.5); }
+  100% { box-shadow: 0 0 22px 6px rgba(255,77,94,0), 0 0 12px rgba(212,175,55,0.35), 0 4px 8px rgba(0,0,0,0.5); }
+}
+.treasury-hit { animation: treasury-hit-flash 0.6s ease-out both; }
+.treasury-hit strong { animation: treasury-number-pop 0.5s ease-out both; }
+@keyframes treasury-number-pop {
+  0% { transform: scale(1.35); color: #ff8a94; }
+  100% { transform: scale(1); }
+}
+html[data-imperivm-motion='off'] .treasury-hit, html[data-imperivm-motion='off'] .treasury-hit strong { animation: none; }
+@media (prefers-reduced-motion: reduce) { .treasury-hit, .treasury-hit strong { animation: none; } }
 .hero-float { position: absolute; top: 35px; left: 65%; z-index: 10; font: 800 26px var(--font-mono); }
 .treasury-spill { position: absolute; right: 0; bottom: 20px; z-index: 5; pointer-events: none; }
 .treasury-spill i { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: linear-gradient(#f5d76e,#8a6d1f); border: 1px solid #f5d76e; color: #6a4718; font-size: 8px; text-align: center; animation: treasury-spill .75s ease-out both; }
