@@ -195,21 +195,6 @@ body {
   animation: play-to-board 0.45s cubic-bezier(.2,.9,.3,1.15) both;
 }
 
-/* attacker lunges toward its target and returns */
-@keyframes attack-lunge {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  30% { transform: translate(var(--lunge-x, 0px), var(--lunge-y, -52px)) scale(1.18); }
-  45% { transform: translate(var(--lunge-x, 0px), var(--lunge-y, -52px)) scale(1.18); }
-}
-.attack-lunge {
-  --lunge-y: -52px;
-  animation: attack-lunge 0.5s cubic-bezier(.3,.7,.4,1) both;
-  z-index: 20;
-}
-.lunge-down { --lunge-y: 52px; }
-.lunge-up { --lunge-y: -52px; }
-
-/* target shudders when hit */
 @keyframes target-shake {
   0%, 100% { transform: translateX(0); }
   20% { transform: translateX(-7px) rotate(-2deg); }
@@ -592,6 +577,7 @@ html[data-imperivm-motion='off'] .chain-label b { animation: none; }
 .card-shine { overflow: visible; }
 .card-shine::after { border-radius: inherit; pointer-events: none; }
 .card-art img { object-position: 50% 37%; }
+.card-unavailable .card-art { filter: saturate(.65) brightness(.85); }
 .keyword-chip { border: 1px solid #c7a55666; border-radius: 4px; padding: 2px 5px; font-size: 9px; color: #e7cb86; background: #1c122b; }
 .game-shell { min-height: 100dvh; color: #eee5d3; background: #100919; }
 .game-content { width: min(1080px, 100%); margin: auto; padding: 0 18px 12px; }
@@ -618,7 +604,6 @@ html[data-imperivm-motion='off'] .chain-label b { animation: none; }
 .rank-scroll > * { flex-shrink: 0; }
 .rank-scroll:has(> :nth-child(1):last-child) { justify-content: center; }
 .empty-rank { margin: auto; color: #a99bba; font-size: 12px; font-style: italic; padding: 28px 0; }
-.minion-token > [data-minion-uid] { width: 78px; height: 86px; }
 .token-keyword { color: #e0be72; font-size: 10px; line-height: 10px; }
 .chain-strip { display: flex; align-items: center; gap: 12px; margin: 7px 0; padding: 5px 12px; min-height: 46px; border: 1px solid #62d4c332; border-radius: 10px; background: #0b1b2299; }
 .chain-label { color: #72d7c9; font-size: 9px; font-weight: 700; letter-spacing: .13em; min-height: 36px; white-space: nowrap; }
@@ -725,8 +710,6 @@ html[data-imperivm-motion='off'] .chain-label b { animation: none; }
   .combatant-label { font-size: 8px; }
   .rank-row { padding: 0 0 2px; }
   .rank-scroll { min-height: 110px; gap: 8px; padding: 7px 8px 15px; }
-  .minion-token > [data-minion-uid] { width: 67px; height: 82px; }
-  .minion-token .w-10 { width: 34px; height: 34px; }
   .rank-label { font-size: 8px; padding: 2px 8px; }
   .empty-rank { font-size: 11px; padding: 28px 0; }
   .chain-strip { gap: 7px; min-height: 42px; margin: 3px 0; padding: 3px 7px; }
@@ -837,16 +820,15 @@ body { --font-display: var(--font-cinzel), var(--font-roman), Georgia, serif; }
 .combatant .font-display { font-size: 14px; }
 .rank-row { padding: 0; background: transparent; }
 .rank-label { height: 17px; padding: 1px 8px; letter-spacing: .11em; }
-.rank-scroll { position: relative; height: 128px; min-height: 0; gap: 8px; padding: 4px 8px 12px; justify-content: center; perspective: 900px; }
+.rank-scroll { position: relative; height: var(--rank-scroll-height); min-height: 0; gap: 8px; padding: var(--rank-padding); justify-content: safe center; perspective: 900px; }
 .rank-scroll:has(> :nth-child(1):last-child) { justify-content: center; }
-.board-slot { width: 104px; height: 110px; flex-shrink: 0; border-radius: 12px; position: relative; background: linear-gradient(135deg,#05030bb0,#3b2a3150 48%,#05030bba); box-shadow: inset 0 3px 8px #000b,inset 0 -1px #e0c28b38,0 1px #dbc29130; border: 1px solid #b39c633a; }
+.board-slot { width: var(--board-slot-width); height: var(--board-slot-height); flex-shrink: 0; border-radius: 12px; position: relative; background: linear-gradient(135deg,#05030bb0,#3b2a3150 48%,#05030bba); box-shadow: inset 0 3px 8px #000b,inset 0 -1px #e0c28b38,0 1px #dbc29130; border: 1px solid #b39c633a; }
 .occupied-slot { background: #08061077; border-color: #be9b5955; }
 .empty-slot { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 2px; color: #c6aa6b40; }
 .empty-slot > span { font: 400 24px var(--font-display); text-shadow: 0 1px #000; }
 .empty-slot small { font-size: 11px; color: #a6edb9; }
 .empty-slot.receiving { color: #97edbc; border: 2px dashed #a2edb4a0; box-shadow: inset 0 0 20px #5de2ae18; }
 .empty-slot.over { background: #375b3a66; box-shadow: 0 0 25px #71e1a944,inset 0 0 12px #97edbc33; }
-.minion-token > [data-minion-uid] { width: 102px; height: 110px; border-radius: 11px; background: linear-gradient(#3d2a36,#130d1d); box-shadow: 0 5px 8px #0009,inset 0 1px #f4d79766; }
 .board-minion-art { width: 91px; height: 70px; border-radius: 7px; }
 .board-minion-art img { object-position: center 34%; }
 .rank-ghosts { display: flex; position: absolute; left: 8px; top: 4px; gap: 8px; pointer-events: none; z-index: 12; }
@@ -867,8 +849,8 @@ body { --font-display: var(--font-cinzel), var(--font-roman), Georgia, serif; }
 .hand-heading { letter-spacing: .06em; font-size: 10px; }
 .hand-scroll { padding-top: 10px; padding-bottom: 6px; }
 .hand-cards { padding-bottom: 8px; }
-.hand-card-wrap .playable-card { transform: translateY(-5px); box-shadow: 0 0 12px #e8c65d70,0 6px 14px #0008 !important; }
-.hand-card-wrap .playable-card::before { content: ''; position: absolute; inset: -5px; border: 1px solid #f4db8b40; border-radius: 13px; pointer-events: none; }
+.hand-card-wrap .playable-card { transform: translateY(-5px); box-shadow: 0 0 12px #22c55e99,0 6px 14px #0008 !important; }
+.hand-card-wrap .playable-card::before { content: ''; position: absolute; inset: -5px; border: 1px solid #22c55e99; border-radius: 13px; pointer-events: none; }
 .action-dock { min-height: 49px; padding-top: 2px; }
 .end-turn-button { min-width: 200px; text-shadow: 0 1px #fff6; font-family: var(--font-display); font-size: 15px; border: 1px solid #d3a04e; background: linear-gradient(120deg,#fbe3a2,#d9b565 37%,#f9db88 43%,#ab7737); box-shadow: inset 0 1px #fff9,inset 0 -3px #6c451a88,0 3px 0 #503720,0 6px 12px #0008; }
 .end-turn-button:disabled { filter: saturate(.4); opacity: .65; }
@@ -895,12 +877,9 @@ html[data-imperivm-motion='off'] *, html[data-imperivm-motion='off'] *::before, 
   .combatant .w-14 { width: 38px; height: 38px; }
   .combatant .font-display { font-size: 12px; }
   .combatant-label { font-size: 8px; }
-  .rank-scroll { height: 112px; justify-content: flex-start; gap: 7px; padding: 4px 5px 10px; }
-  .board-slot { width: 79px; height: 95px; }
-  .minion-token > [data-minion-uid] { width: 77px; height: 95px; }
+  .rank-scroll { height: var(--rank-scroll-height); justify-content: safe center; gap: 7px; padding: var(--rank-padding); }
+  .board-slot { width: var(--board-slot-width); height: var(--board-slot-height); }
   .board-minion-art { width: 67px; height: 59px; border-radius: 6px; }
-  .minion-token [data-minion-uid] > .line-clamp-2 { font-size: 8px; margin-top: 1px; }
-  .minion-token [data-minion-uid] > .flex.items-center.gap-1 { gap: 3px; margin-top: 1px; }
   .chain-strip { min-height: 40px; margin: 3px 0; gap: 5px; padding: 2px 6px; }
   .chain-label { font-size: 8px; letter-spacing: .04em; }
   .chain-empty { font-size: 9px; }
@@ -949,7 +928,7 @@ html[data-imperivm-motion='off'] *, html[data-imperivm-motion='off'] *::before, 
 @keyframes ability-solar { 0% { opacity: 0; transform: scaleX(.05) rotate(-10deg); } 20% { opacity: 1; } 100% { opacity: 0; transform: scaleX(1.2) rotate(10deg); } }
 @keyframes audit-stamp { 0% { opacity: 0; transform: scale(2.2) rotate(-12deg); } 20%,65% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.1); } }
 /* A fixed six-row board prevents rich hero content from pushing controls offscreen. */
-.battlefield { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 54px 145px 40px 32px 145px 54px; }
+.battlefield { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 54px var(--rank-row-height) 40px 32px var(--rank-row-height) 54px; }
 .battlefield > * { min-width: 0; }
 .rank-row, .rank-scroll { min-width: 0; max-width: 100%; }
 .wallet-controls .language-switch { width: auto; flex-shrink: 0; white-space: nowrap; }
@@ -963,7 +942,7 @@ html[data-imperivm-motion='off'] *, html[data-imperivm-motion='off'] *::before, 
 .combatant { height: 54px; min-height: 0; }
 .chain-strip { margin: 0; }
 @media (max-width: 767px) {
-  .battlefield { grid-template-rows: 46px 129px 40px 28px 129px 46px; }
+  .battlefield { grid-template-rows: 46px var(--rank-row-height) 40px 28px var(--rank-row-height) 46px; }
   .combatant { height: 46px; }
 }
 .rank-scroll.welcoming { gap: 12px; }
@@ -972,15 +951,28 @@ html[data-imperivm-motion='off'] *, html[data-imperivm-motion='off'] *::before, 
 .accepting-spell .chain-strip { outline: 2px dashed #be9cf6; outline-offset: -1px; }
 .spell-over .chain-strip { box-shadow: 0 0 20px #a477ef55,inset 0 0 16px #b795f344; }
 .mempool-drop-hint { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; border-radius: 10px; background: #251437ee; color: #e0c4ff; font-size: 12px; pointer-events: none; }
-.combat-flight { position: fixed; z-index: 42; border: 2px solid #e3c17d; border-radius: 11px; overflow: hidden; box-shadow: 0 8px 28px #000b,0 0 16px #ddb86066; pointer-events: none; animation: combat-flight 620ms cubic-bezier(.22,1,.36,1) both; }
-.combat-flight img { width: 100%; height: 100%; object-fit: cover; object-position: center 34%; }
-@keyframes combat-flight { 0%,100% { opacity: 0; transform: translate(0,0) scale(1); } 12% { opacity: 1; transform: translate(0,8px) scale(1.06); } 43% { opacity: 1; transform: translate(var(--combat-dx),var(--combat-dy)) scale(1.12); } 60% { opacity: 1; transform: translate(var(--combat-dx),var(--combat-dy)) scale(1.05); } 90% { opacity: 1; transform: translate(0,0) scale(1); } }
+.combat-flight { position: fixed; z-index: 70; pointer-events: none; transform-origin: center; }
+.combat-flight .hs-minion { width: 100%; height: 100%; }
+.combat-contact { position: fixed; z-index: 71; width: 100px; height: 100px; margin: -50px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff7cf 0%, #f8cf6b99 28%, transparent 70%); animation: combat-contact 180ms ease-out both; }
+@keyframes combat-contact { from { opacity: 1; transform: scale(.5); } to { opacity: 0; transform: scale(1.5); } }
+
 
 /* ===== Hearthstone-style oval minion medallions ===== */
-.hs-minion { position: relative; width: 88px; height: 106px; }
-@media (min-width: 768px) { .hs-minion { width: 96px; height: 116px; } }
+/* Shared geometry includes protruding stats, stake controls and scroll clearance. */
+:root {
+  --minion-width: 96px;
+  --minion-height: 116px;
+  --board-slot-width: calc(var(--minion-width) + 24px);
+  --board-slot-height: calc(var(--minion-height) + 26px);
+  --rank-padding: 12px;
+  /* Reserve room for a non-overlay horizontal scrollbar as well. */
+  --rank-scroll-height: calc(var(--board-slot-height) + var(--rank-padding) * 2 + 12px);
+  --rank-row-height: calc(var(--rank-scroll-height) + 18px);
+}
+.hs-minion { box-sizing: border-box; position: relative; width: var(--minion-width); height: var(--minion-height); flex-shrink: 0; }
 
 .hs-minion-oval {
+  box-sizing: border-box;
   position: relative;
   width: 100%; height: 100%;
   border-radius: 50%;
@@ -994,18 +986,14 @@ html[data-imperivm-motion='off'] *, html[data-imperivm-motion='off'] *::before, 
     0 2px 4px rgba(0,0,0,0.4);
   transition: box-shadow .2s, transform .15s;
 }
-.hs-minion-oval[data-rarity="common"] { border-color: #b8b8c8; }
-.hs-minion-oval[data-rarity="rare"] { border-color: #d7dde8; box-shadow: inset 0 3px 6px rgba(255,255,255,0.4), inset 0 -4px 8px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.55), 0 0 10px rgba(180,200,255,0.35); }
-.hs-minion-oval[data-rarity="epic"] { border-color: #d4af37; box-shadow: inset 0 3px 6px rgba(255,255,255,0.4), inset 0 -4px 8px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.55), 0 0 12px rgba(212,175,55,0.45); }
-.hs-minion-oval[data-rarity="legendary"] {
-  border-color: #ffd700;
-  border-width: 5px;
-  box-shadow:
-    inset 0 3px 8px rgba(255,255,255,0.5),
-    inset 0 -4px 10px rgba(0,0,0,0.5),
-    0 6px 18px rgba(0,0,0,0.6),
-    0 0 18px rgba(255,215,0,0.55);
-}
+.hs-minion-oval[data-rarity] { border-color: #b8b8c8; }
+.hs-minion-oval[data-rarity="legendary"] { border-color: #f59e0b; border-width: 5px; }
+[data-rarity-gem] { position: absolute; top: 12px; right: 8px; width: 8px; height: 8px; z-index: 6; transform: rotate(45deg); border: 1px solid #b8b8c8; background: #a3a3a3; pointer-events: none; }
+[data-rarity-gem="rare"] { background: #3b82f6; }
+[data-rarity-gem="epic"] { background: #a855f7; }
+[data-rarity-gem="legendary"] { background: #f59e0b; }
+.battle-icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+.hs-pip { display: inline-flex; align-items: center; justify-content: center; }
 
 /* ready to attack: green pulsing glow */
 .hs-minion-oval.hs-can-act {
@@ -1036,7 +1024,7 @@ html[data-imperivm-motion='off'] *, html[data-imperivm-motion='off'] *::before, 
 
 /* selected / attackable */
 .hs-minion-oval.hs-selected { box-shadow: inset 0 3px 6px rgba(255,255,255,0.35), inset 0 -4px 8px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.55), 0 0 20px rgba(212,175,55,0.9); transform: scale(1.06); }
-.hs-minion-oval.hs-attackable { box-shadow: inset 0 3px 6px rgba(255,255,255,0.35), inset 0 -4px 8px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.55), 0 0 16px rgba(245,215,110,0.7); cursor: crosshair; }
+.hs-minion-oval.hs-attackable { box-shadow: inset 0 3px 6px rgba(255,255,255,0.35), inset 0 -4px 8px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.55), 0 0 16px rgba(239,68,68,0.7); cursor: crosshair; }
 
 /* attack shield: round, bottom-left */
 .hs-attack {
@@ -1081,10 +1069,11 @@ html[data-imperivm-motion='off'] *, html[data-imperivm-motion='off'] *::before, 
 
 /* summoning sickness */
 .hs-sleep {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  font-size: 26px; z-index: 4; opacity: 0.9;
+  position: absolute; top: 8px; right: 4px;
+  width: 18px; height: 18px; font-size: 18px; z-index: 4; opacity: 0.9;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.7));
 }
+.hs-sleep .battle-icon { width: 18px; height: 18px; }
 
 /* stake buttons under the medallion */
 .hs-stake-row { display: flex; gap: 4px; justify-content: center; margin-top: 6px; }
@@ -1096,9 +1085,44 @@ html[data-imperivm-motion='off'] *, html[data-imperivm-motion='off'] *::before, 
 
 /* mobile: slightly smaller medallions */
 @media (max-width: 767px) {
-  .hs-minion { width: 72px; height: 88px; }
-  .hs-attack { width: 28px; height: 28px; left: -6px; }
-  .hs-attack span { font-size: 14px; }
-  .hs-hp { width: 28px; height: 32px; right: -6px; }
-  .hs-hp span { font-size: 13px; }
+  :root {
+    --minion-width: 48px;
+    --minion-height: 64px;
+    --rank-row-height: calc(var(--rank-scroll-height) + 16px);
+  }
+  .hs-attack { width: 22px; height: 26px; left: 0; }
+  .hs-attack span { font-size: 15px; }
+  .hs-hp { width: 22px; height: 28px; right: 0; }
+  .hs-hp span { font-size: 15px; }
+}
+
+/* Portal preview is independent of the compact cards inside .hand-zone. */
+.hand-full-preview { position: fixed; z-index: 80; width: 280px; max-height: calc(100dvh - 24px); pointer-events: none; padding: 0; background: transparent; border: 0; border-radius: 14px; box-shadow: none; }
+.hand-full-preview .card3d { width: 100%; }
+.hand-full-preview .card-art { aspect-ratio: auto; height: clamp(60px, 22vh, 180px); flex-shrink: 0; }
+.hand-full-preview .card-rules { display: block; font-size: 13px; line-height: 1.45; padding: 8px 10px; }
+.hand-full-preview .card-keywords { display: flex; }
+.hand-full-preview .card-name > div:first-child { font-size: 16px; }
+.hand-full-preview .card-tip { display: none; }
+
+
+/* Shake has its own transform layer; the chest retains its flash animation. */
+.hero-treasury-motion { position: absolute; inset: 0; pointer-events: none; }
+
+/* State precedence: exhaustion < readiness < selection < legal target. */
+.hs-minion-oval.hs-exhausted:not(.hs-selected):not(.hs-attackable) { filter: saturate(.25) brightness(.72); }
+.hs-minion-oval.hs-can-act:not(.hs-selected):not(.hs-attackable) { box-shadow: 0 6px 16px #0008,0 0 0 2px #22c55e,0 0 18px #22c55eaa; }
+.hs-minion-oval.hs-selected { animation: none; border-color: #f5d76e; outline: 3px solid #d4af37; outline-offset: 2px; }
+.hs-minion-oval.hs-attackable { filter: none; outline: 3px solid #ef4444; outline-offset: 3px; box-shadow: 0 6px 16px #0008,0 0 18px #ef444499; animation: hs-target-pulse 1.2s ease-in-out infinite; }
+@keyframes hs-target-pulse { 0%,100% { box-shadow: 0 6px 16px #0008,0 0 12px #ef444488; } 50% { box-shadow: 0 6px 16px #0008,0 0 24px 4px #ef4444cc; } }
+.hand-card-wrap .playable-card.card-selected { box-shadow: 0 0 0 3px #d4af37,0 0 20px #d4af3799,0 6px 14px #0008 !important; }
+.imperial-card.card-selected { outline: 3px solid #d4af37; outline-offset: 2px; }
+.hand-card-wrap .card-selected::before { border-color: #d4af37; }
+html[data-imperivm-motion='off'] .hs-minion-oval.hs-can-act,
+html[data-imperivm-motion='off'] .hs-minion-oval.hs-attackable { animation: none; }
+@media (prefers-reduced-motion: reduce) { .hs-minion-oval.hs-can-act, .hs-minion-oval.hs-attackable { animation: none; } }
+
+.hs-minion > .damage-float { position: absolute; left: 50%; top: 20%; pointer-events: none; z-index: 10; }
+@media (max-height: 900px) and (min-width: 768px) {
+  :root { --minion-width: 84px; --minion-height: 102px; }
 }

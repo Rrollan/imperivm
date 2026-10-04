@@ -31,7 +31,8 @@ import type {
   Minion,
   PlayerId,
 } from '../../lib/engine/types';
-import CardView, { CardBack, LungeWrap, MinionToken } from '../../components/CardView';
+import BattleIcon from '../../components/BattleIcon';
+import CardView, { CardBack, CardPreview, MinionToken } from '../../components/CardView';
 import {
   DndProvider,
   DraggableHandCard,
@@ -139,14 +140,38 @@ function GameBoard() {
   const match = useRef({ id: '', owner: 'demo', startedAt: '', exhibition: false });
   if (autoplay) match.current.exhibition = true;
   const aiSteps = useRef(0);
+  const reduced = useReducedMotion();
   const [combatFlight, setCombatFlight] = useState<CombatFlight | null>(null);
-  const captureCombat = useCallback((action: Action, game: GameState) => {
-    if (action.type !== 'attack') return;
-    const from = document.querySelector<HTMLElement>(`[data-minion-uid="${action.attackerUid}"]`);
-    const to = document.querySelector<HTMLElement>(action.target === 'hero' ? game.turn === ME ? '#foe-treasury-target' : '.combatant.own' : `[data-minion-uid="${action.target}"]`);
-    const minion = game.players[game.turn].board.find(m => m.uid === action.attackerUid);
-    if (from && to && minion) setCombatFlight({ uid: minion.uid, cardId: minion.cardId, from: from.getBoundingClientRect(), to: to.getBoundingClientRect() });
+  const combatBusy = useRef(false);
+  const pendingCombat = useRef<GameState | null>(null);
+  const commitCombat = useCallback(() => {
+    const next = pendingCombat.current;
+    pendingCombat.current = null;
+    if (next) setState(next);
   }, []);
+  const finishCombat = useCallback(() => {
+    combatBusy.current = false;
+    setCombatFlight(null);
+  }, []);
+  // Calculate once, but keep the before-state visible until physical contact.
+  const presentAction = useCallback((action: Action, game: GameState) => {
+    if (combatBusy.current) return;
+    const next = applyAction(game, action);
+    lastActionRef.current = action;
+    stateBeforeActionRef.current = game;
+    if (action.type === 'attack' && !reduced) {
+      const from = document.querySelector<HTMLElement>(`[data-minion-uid="${action.attackerUid}"]`)?.closest<HTMLElement>('.hs-minion');
+      const to = document.querySelector<HTMLElement>(action.target === 'hero' ? game.turn === ME ? '#foe-treasury-target .hero-treasury' : '.combatant.own .hero-treasury' : `[data-minion-uid="${action.target}"]`);
+      const minion = game.players[game.turn].board.find(m => m.uid === action.attackerUid);
+      if (from && to && minion) {
+        combatBusy.current = true;
+        pendingCombat.current = next;
+        setCombatFlight({ minion, survives: next.players[game.turn].board.some(m => m.uid === minion.uid), from: from.getBoundingClientRect(), to: to.getBoundingClientRect() });
+        return;
+      }
+    }
+    setState(next);
+  }, [reduced]);
 
 
   // battle FX state (all derived from state diffs — engine untouched)
@@ -157,6 +182,25 @@ function GameBoard() {
   const [dealtUids, setDealtUids] = useState<Set<string>>(new Set());
   // веер руки: uid карты под курсором (ховер-подъём, только десктоп)
   const [fanHoverUid, setFanHoverUid] = useState<string | null>(null);
+  const [handPreviewUid, setHandPreviewUid] = useState<string | null>(null);
+  const handPreviewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelHandPreviewTimer = () => {
+    if (handPreviewTimer.current) clearTimeout(handPreviewTimer.current);
+    handPreviewTimer.current = null;
+  };
+  useEffect(() => () => { if (handPreviewTimer.current) clearTimeout(handPreviewTimer.current); }, []);
+  const [handPreviewPosition, setHandPreviewPosition] = useState({ left: 12, top: 12 });
+  const previewHandCard = (uid: string, element: HTMLElement, delay = 0) => {
+    cancelHandPreviewTimer();
+    const rect = element.getBoundingClientRect();
+    setHandPreviewPosition({
+      left: Math.max(12, Math.min(rect.left - 70, window.innerWidth - 292)),
+      top: Math.max(12, rect.top - Math.min(460, window.innerHeight - 24) - 16),
+    });
+    setFanHoverUid(uid);
+    if (delay) handPreviewTimer.current = setTimeout(() => setHandPreviewUid(uid), delay);
+    else setHandPreviewUid(uid);
+  };
   // true пока атакующий миньон тащится (стрелка прицеливания следует за курсором)
   const [draggingAttacker, setDraggingAttacker] = useState(false);
   const [mempoolFx, setMempoolFx] = useState<{ kind: 'resolve' | 'counter'; key: number } | null>(null);
@@ -167,7 +211,6 @@ function GameBoard() {
   const [bodyShakeKey, setBodyShakeKey] = useState(0);
   const lastActionRef = useRef<Action | null>(null);
   const stateBeforeActionRef = useRef<GameState | null>(null);
-  const reduced = useReducedMotion();
 
   const prevRef = useRef<GameState | null>(null);
   const fxKey = useRef(0);
@@ -208,6 +251,7 @@ function GameBoard() {
       setDying([]);
       setAttackAnim(null);
       setCombatFlight(null);
+      combatBusy.current = false; pendingCombat.current = null;
       setPlayedUids(new Set());
       setMempoolFx(null);
       setScreenFx(null);
@@ -270,15 +314,12 @@ function GameBoard() {
 
   // AI loop: one action every ~600ms until the AI ends its turn.
   useEffect(() => {
-    if (!state || state.winner !== null || proofPending || !(state.turn === FOE || autoplay)) return;
+    if (!state || combatFlight || combatBusy.current || state.winner !== null || proofPending || !(state.turn === FOE || autoplay)) return;
     const t = setTimeout(() => {
       try {
         aiSteps.current++;
         const action: Action = aiSteps.current > 100 && !mulliganAvailable(state) ? { type: 'end-turn' } : chooseAiAction(state);
-        captureCombat(action, state);
-        lastActionRef.current = action;
-        stateBeforeActionRef.current = state;
-        setState(applyAction(state, action));
+        presentAction(action, state);
         if (action.type === 'end-turn') { setAiThinking(state.turn === ME); aiSteps.current = 0; }
       } catch {
         const fallback: Action = mulliganAvailable(state) ? { type: 'mulligan', uids: [] } : { type: 'end-turn' };
@@ -289,7 +330,7 @@ function GameBoard() {
       }
     }, autoplay ? 380 : 520);
     return () => clearTimeout(t);
-  }, [state, autoplay, showOnboarding, proofPending]);
+  }, [state, autoplay, showOnboarding, proofPending, combatFlight, presentAction]);
 
   // Derive battle animations from the diff between consecutive states.
   useEffect(() => {
@@ -338,7 +379,7 @@ function GameBoard() {
       schedule(() => setFloats(cur => cur.filter(f => !keys.includes(f.key))), 1450);
     }
     if (fx.deaths.length > 0) {
-      const keyed = fx.deaths.map(d => ({ ...d, key: ++fxKey.current, slot: prev.players[d.owner].board.findIndex(m => m.uid === d.uid) }));
+      const keyed = fx.deaths.filter(d => d.uid !== combatFlight?.minion.uid).map(d => ({ ...d, key: ++fxKey.current, slot: prev.players[d.owner].board.findIndex(m => m.uid === d.uid) }));
       const keys = keyed.map(k => k.key);
       setDying(cur => [...cur, ...keyed]);
       schedule(() => setDying(cur => cur.filter(d => !keys.includes(d.key))), 900);
@@ -432,7 +473,7 @@ function GameBoard() {
   const foe = state.players[FOE];
   const myHero = HEROES[me.heroId];
   const foeHero = HEROES[foe.heroId];
-  const myTurn = state.turn === ME && !aiThinking && state.winner === null && !proofPending;
+  const myTurn = state.turn === ME && !aiThinking && state.winner === null && !proofPending && !combatFlight;
 
   const playableUids = new Set<string>();
   for (const a of legal) {
@@ -441,15 +482,8 @@ function GameBoard() {
   const hpAction = legal.find(a => a.type === 'hero-power');
 
   const act = (action: Action, opts?: { collectPlayRects?: boolean }) => {
-    if (!myTurn || stateBeforeActionRef.current) return;
+    if (!myTurn || combatBusy.current || stateBeforeActionRef.current) return;
     try {
-      // Capture before-state + the action so the post-state diff can use
-      // them. This replaces the old log-slice approach (which broke once
-      // the log cap kicked in).
-      captureCombat(action, state);
-      stateBeforeActionRef.current = state;
-      lastActionRef.current = action;
-
       // For card plays: capture source (hand) and target (board) rects.
       if (opts?.collectPlayRects && state && (action.type === 'play-minion' || action.type === 'cast-spell')) {
         const fromEl = document.querySelector<HTMLElement>(`[data-hand-uid="${action.uid}"]`);
@@ -459,11 +493,10 @@ function GameBoard() {
         }
       }
 
-      const next = applyAction(state, action);
       if (action.type === 'end-turn') { setAiThinking(true); playSound('end-turn'); }
       else if (action.type === 'stake' || action.type === 'unstake') playSound('stake');
       else if (action.type === 'hero-power') playSound('ui-click');
-      setState(next);
+      presentAction(action, state);
     } catch {
       stateBeforeActionRef.current = null; lastActionRef.current = null;
     }
@@ -631,14 +664,14 @@ function GameBoard() {
             </div></DroppableFoeHero>
             <div className="rank-row enemy-rank" aria-label={t('Существа противника', 'Rival minions')}>
               <div className="rank-label">{t('Ряды противника', 'Rival ranks')} <span>{foe.board.length}/7</span></div>
-              <BoardRank cards={foe.board.map(m => ({ uid: m.uid, node: <DroppableMinion uid={m.uid} foe attackable={foeAttackable(m)}><LungeWrap active={attackAnim?.attackerUid === m.uid} up={false}>
-                <MinionToken minion={m} attackable={foeAttackable(m)} shaking={attackAnim?.targetUid === m.uid}
+              <BoardRank cards={foe.board.map(m => ({ uid: m.uid, node: <DroppableMinion uid={m.uid} foe attackable={foeAttackable(m)}>
+                <MinionToken inFlight={combatFlight?.minion.uid === m.uid} minion={m} attackable={foeAttackable(m)} shaking={attackAnim?.targetUid === m.uid}
                   justPlayed={playedUids.has(m.uid)} floats={floatsFor(m.uid)}
                   onClick={() => attackerUid && foeAttackable(m) ? onFoeMinionClick(m) : setInspectUid(m.uid)} />
-              </LungeWrap></DroppableMinion> }))} ghosts={dying.filter(d => d.owner === FOE).map(d => ({ uid: `dying-${d.key}`, slot: d.slot, node: <MinionToken minion={ghostOf(d)} dying floats={floatsFor(d.uid)} /> }))} />
+              </DroppableMinion> }))} ghosts={dying.filter(d => d.owner === FOE).map(d => ({ uid: `dying-${d.key}`, slot: d.slot, node: <MinionToken inFlight={combatFlight?.minion.uid === d.uid} minion={ghostOf(d)} dying floats={floatsFor(d.uid)} /> }))} />
             </div>
             <DroppableMempool><section className={`chain-strip ${mempoolFx ? 'mempool-flash-resolve' : ''}`} aria-label={t('Публичный мемпул', 'Public mempool')}>
-              <button className="chain-label" onClick={() => setHelpOpen(true)} title={mechanicText('Mempool')}>⛓ {t('МЕМПУЛ', 'MEMPOOL')} <b>{myMempool.length + foeMempool.length}</b></button>
+              <button className="chain-label" onClick={() => setHelpOpen(true)} title={mechanicText('Mempool')}><BattleIcon kind="chain" /> {t('МЕМПУЛ', 'MEMPOOL')} <b>{myMempool.length + foeMempool.length}</b></button>
               <div className="chain-entries thin-scroll">
                 {!myMempool.length && !foeMempool.length && <span className="chain-empty">{t('Заклинание сработает в следующем вашем блоке.', 'Resolves at the start of your next block.')}</span>}
                 {[...foeMempool, ...myMempool].map(e => <button key={e.uid} className={`queued-spell ${e.owner === ME ? 'mine' : 'theirs'} mempool-glow`}
@@ -658,12 +691,12 @@ function GameBoard() {
               </div>
               <BoardRank own cards={me.board.map(m => {
                 const ready = myTurn && legal.some(a => a.type === 'attack' && a.attackerUid === m.uid);
-                const token = <LungeWrap active={attackAnim?.attackerUid === m.uid} up><MinionToken minion={m}
+                const token = <MinionToken inFlight={combatFlight?.minion.uid === m.uid} minion={m}
                   selected={attackerUid === m.uid} canAct={ready} shaking={attackAnim?.targetUid === m.uid}
                   justPlayed={playedUids.has(m.uid)} floats={floatsFor(m.uid)}
-                  onClick={() => ready ? onMyMinionClick(m) : setInspectUid(m.uid)} /></LungeWrap>;
+                  onClick={() => ready ? onMyMinionClick(m) : setInspectUid(m.uid)} />;
                 return { uid: m.uid, node: ready && isDesktop ? <DraggableAttacker uid={m.uid}>{token}</DraggableAttacker> : token };
-              })} ghosts={dying.filter(d => d.owner === ME).map(d => ({ uid: `dying-${d.key}`, slot: d.slot, node: <MinionToken minion={ghostOf(d)} dying floats={floatsFor(d.uid)} /> }))} />
+              })} ghosts={dying.filter(d => d.owner === ME).map(d => ({ uid: `dying-${d.key}`, slot: d.slot, node: <MinionToken inFlight={combatFlight?.minion.uid === d.uid} minion={ghostOf(d)} dying floats={floatsFor(d.uid)} /> }))} />
             </div></DroppableBoard>
             <div className="combatant own"><HeroPortrait hero={myHero} treasury={me.treasury} deckCount={me.deck.length}
               handCount={me.hand.length} floats={floatsFor('hero-0')} shaking={attackAnim?.targetUid === 'hero-0'} />
@@ -674,26 +707,26 @@ function GameBoard() {
             </div>
           </section>
           <section className="hand-zone" aria-label={t('Ваша рука', 'Your hand')}>
-            <div className="hand-heading"><span>{t('ВАША РУКА', 'YOUR HAND')} <b>{me.hand.length}/10</b></span><span>{mulliganAvailable(state) ? t('Выберите карты для замены', 'Select cards to replace') : t('Нажми или перетащи', 'Tap or drag to play')}</span></div>
+            <div className="hand-heading"><span>{t('ВАША РУКА', 'YOUR HAND')} <b>{me.hand.length}/10</b></span><span>{mulliganAvailable(state) ? t('Выберите карты для замены', 'Select cards to replace') : isDesktop ? t('Наведи — просмотр · клик — детали · перетащи — розыгрыш', 'Hover to preview · click for details · drag to play') : t('Тап — просмотр · «Разыграть» — розыгрыш', 'Tap to inspect · “Play” to play')}</span></div>
             <div className="hand-scroll thin-scroll"><div className="hand-cards">
               {me.hand.length === 0 && <p className="empty-hand">{t('Рука пуста. Легион ещё в строю.', 'An empty hand. Your legion still stands.')}</p>}
               {me.hand.map((hc, i) => {
                 const def = CARDS[hc.cardId]; const playable = myTurn && playableUids.has(hc.uid);
                 const selecting = mulliganAvailable(state) && state.turn === ME;
                 const picked = mulliganPicks.includes(hc.uid);
-                // веер: дуга вокруг точки под рукой; нахлёст — margin в CSS (шаг 32px).
-                // на мобиле веер компактнее (меньше дуга), чтобы карты не обрезались скроллом
+                // Веер с небольшим нахлёстом; на touch — карусель без поворота.
+                // На touch карты не перекрываются и не поворачиваются.
                 const total = me.hand.length, middle = (total - 1) / 2, offset = i - middle;
-                const fanRot = offset * (isDesktop ? 4.5 : 3.2);
-                const fanY = Math.pow(Math.abs(offset), 1.8) * (isDesktop ? 6 : 4);
+                const fanRot = offset * (isDesktop ? 1.5 : 0);
+                const fanY = Math.pow(Math.abs(offset), 1.8) * (isDesktop ? 2 : 0);
                 const hovered = isDesktop && fanHoverUid === hc.uid;
-                const clearHover = () => setFanHoverUid(cur => cur === hc.uid ? null : cur);
+                const clearHover = () => { cancelHandPreviewTimer(); setFanHoverUid(cur => cur === hc.uid ? null : cur); setHandPreviewUid(cur => cur === hc.uid ? null : cur); };
                 return <DraggableHandCard key={hc.uid} id={hc.uid} cardType={def.type} disabled={!playable}>
                   <div className={`hand-fan${hovered ? ' is-hover' : ''}`}
                     style={{ transform: `rotate(${hovered ? 0 : fanRot}deg) translateY(${hovered ? 0 : fanY}px)` }}
-                    onMouseEnter={isDesktop ? () => setFanHoverUid(hc.uid) : undefined}
-                    onMouseLeave={isDesktop ? clearHover : undefined}
-                    onFocus={isDesktop ? () => setFanHoverUid(hc.uid) : undefined}
+                    onPointerEnter={isDesktop ? e => { if (e.pointerType === 'mouse') previewHandCard(hc.uid, e.currentTarget, 180); } : undefined}
+                    onPointerLeave={isDesktop ? clearHover : undefined}
+                    onFocus={isDesktop ? e => previewHandCard(hc.uid, e.currentTarget) : undefined}
                     onBlur={isDesktop ? clearHover : undefined}>
                     <div data-hand-uid={hc.uid} className={`hand-card-wrap ${dealtUids.has(hc.uid) ? 'deal-in' : ''}`} style={{ animationDelay: `${i * 45}ms` }}>
                       <div className="hand-card-hover">
@@ -749,14 +782,24 @@ function GameBoard() {
             </div>}
           </div></Dialog>;
         })()}
-        {state.winner !== null && <EndOverlay winner={state.winner} blocks={state.block} stats={stats} onRematch={() => startGame(Date.now() & 0x7fffffff)} />}
+        {state.winner !== null && !combatFlight && <EndOverlay winner={state.winner} blocks={state.block} stats={stats} onRematch={() => startGame(Date.now() & 0x7fffffff)} />}
+        <HandHoverPreview card={isDesktop && handPreviewUid ? CARDS[me.hand.find(h => h.uid === handPreviewUid)?.cardId ?? ''] : undefined} position={handPreviewPosition} />
         <DragPreview hand={me.hand} board={me.board} />
-        <AttackFlight flight={combatFlight} events={events} reduced={reduced} />
+        <AttackFlight flight={combatFlight}
+          currentMinion={combatFlight ? [...me.board, ...foe.board].find(m => m.uid === combatFlight.minion.uid) : undefined}
+          floats={combatFlight ? floatsFor(combatFlight.minion.uid) : []} onContact={commitCombat} onComplete={finishCombat} />
         <AbilityFx events={events} floats={floats} reduced={reduced} />
         <MotionFx events={events} playRects={playRects} reduced={reduced} />
       </div>
     </DndProvider>
   );
+}
+
+/** Full card outside the compact hand styles; never intercepts drag targets. */
+function HandHoverPreview({ card, position }: { card?: CardDef; position: { left: number; top: number } }) {
+  const { active } = useDragState();
+  if (!card || active || typeof document === 'undefined') return null;
+  return <CardPreview card={card} position={position} />;
 }
 
 /** Floating preview of the dragged card, rendered in a portal. */
@@ -800,7 +843,7 @@ function ContextCoach({ phase, onClose }: { phase: 'opening' | 'play' | 'attack'
   const { t } = useLocale();
   const hints = {
     opening: t('Нажми на карты для замены. Затем оставь или обнови руку.', 'Tap cards to replace, then keep or refresh your hand.'),
-    play: t('Золотая карта доступна. Перетащи её в нишу или нажми, чтобы разыграть.', 'A golden card is ready. Drag it into a slot or tap to play.'),
+    play: t('Карта с зелёным свечением доступна. Перетащи её в нишу или открой просмотр и нажми «Разыграть».', 'A card with a green glow is ready. Drag it into a slot or inspect it and press “Play”.'),
     attack: t('Нажми на готовое существо → выбери подсвеченную цель.', 'Tap a ready minion → choose a glowing target.'),
     target: t('Цифры — урон цели и ответный удар. Нажми на цель для атаки.', 'Numbers preview damage and retaliation. Tap a target to attack.'),
     end: t('Существо отдыхает до следующего хода. Заверши ход, когда будешь готов.', 'New minions rest until next turn. End your turn when ready.'),
@@ -973,7 +1016,7 @@ function EndOverlay({
             onClick={onRematch}
             className="px-8 py-3.5 rounded-lg bg-[#D4AF37] text-[#1A0B2E] font-bold text-lg tracking-wide hover:bg-[#F5D76E] active:scale-[0.97] transition shadow-[0_0_28px_rgba(212,175,55,0.45)] border-2 border-[#F5D76E]"
           >
-            ⚔ {t('Ещё матч', 'Play again')}
+            <BattleIcon kind="attack" /> {t('Ещё матч', 'Play again')}
           </button>
           <Link
             href="/"
