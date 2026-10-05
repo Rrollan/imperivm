@@ -39,6 +39,11 @@ export const MODEL_MANIFEST = {
   dice: { path: '/models/dice.glb', fallback: '/ornaments/ornament-dice.png', rotation: [0, 0, 0] as [number, number, number] },
   'laurel-wreath': { path: '/models/laurel-wreath.glb', fallback: '/ornaments/ornament-laurel-wreath.png', rotation: [0, 0, 0] as [number, number, number] },
   'water-clock': { path: '/models/water-clock.glb', fallback: '/ornaments/ornament-water-clock.png', rotation: [0, 0, 0] as [number, number, number] },
+  'roman-table': { path: '/models/roman-table.glb', rotation: [0, 0, 0] as [number, number, number] },
+  'hero-frame': { path: '/models/hero-frame.glb', rotation: [0, 0, 0] as [number, number, number] },
+  'gas-crystal-small': { path: '/models/gas-crystal-small.glb', rotation: [0, 0, 0] as [number, number, number] },
+  'mempool-scroll': { path: '/models/mempool-scroll.glb', rotation: [0, 0, 0] as [number, number, number] },
+  'end-turn-hourglass': { path: '/models/end-turn-hourglass.glb', rotation: [0, 0, 0] as [number, number, number] },
 } as const;
 
 export type ModelKey = keyof typeof MODEL_MANIFEST;
