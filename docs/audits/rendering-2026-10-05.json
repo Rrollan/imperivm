@@ -1,0 +1,1008 @@
+{
+  "date": "2026-10-05",
+  "branch": "rebirth",
+  "sourceCommit": "8a712b7",
+  "method": {
+    "assets": "Local filesystem byte counts. GLB JSON accessors: triangle-list index count / 3, summed per mesh primitive; not a GPU frame capture. Embedded image headers supply dimensions.",
+    "textureEstimate": "width * height * 4 assuming RGBA8. Full mip chain estimate base * 4/3; not measured VRAM.",
+    "browser": "Live Vercel; DOM rectangles and screenshots at 1440x900. Source/deployment SHA equivalence was not verified. Canvas count is a DOM observation, geometry counts come from source assets.",
+    "build": "npm run build passed on 8a712b7; npm run smoke passed with 61 regression groups."
+  },
+  "models": [
+    {
+      "file": "public/models/aquila.glb",
+      "bytes": 2620632,
+      "trianglesInMeshes": 137904,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/brazier.glb",
+      "bytes": 2173012,
+      "trianglesInMeshes": 138766,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/bust.glb",
+      "bytes": 764400,
+      "trianglesInMeshes": 76504,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/chest.glb",
+      "bytes": 875128,
+      "trianglesInMeshes": 76226,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/column.glb",
+      "bytes": 1130148,
+      "trianglesInMeshes": 77042,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/dice.glb",
+      "bytes": 2054148,
+      "trianglesInMeshes": 138792,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/gas-crystal.glb",
+      "bytes": 1930312,
+      "trianglesInMeshes": 138478,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/hero-builder.glb",
+      "bytes": 831808,
+      "trianglesInMeshes": 68330,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/hero-degen.glb",
+      "bytes": 983364,
+      "trianglesInMeshes": 78642,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/hero-validator.glb",
+      "bytes": 955592,
+      "trianglesInMeshes": 76116,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/hero-whale.glb",
+      "bytes": 2832516,
+      "trianglesInMeshes": 118534,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/laurel-wreath.glb",
+      "bytes": 2313520,
+      "trianglesInMeshes": 137150,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/scales.glb",
+      "bytes": 2423796,
+      "trianglesInMeshes": 138919,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/treasury.glb",
+      "bytes": 2011924,
+      "trianglesInMeshes": 133891,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/trophy.glb",
+      "bytes": 819260,
+      "trianglesInMeshes": 75303,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    },
+    {
+      "file": "public/models/water-clock.glb",
+      "bytes": 1986988,
+      "trianglesInMeshes": 133786,
+      "primitives": 1,
+      "materials": 1,
+      "images": 3,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "KHR_materials_volume",
+        "KHR_mesh_quantization"
+      ],
+      "generator": "glTF-Transform v4.5.1"
+    }
+  ],
+  "assetGroups": [
+    {
+      "group": "models",
+      "files": 17,
+      "bytes": 26812854
+    },
+    {
+      "group": "cards",
+      "files": 42,
+      "bytes": 14117616
+    },
+    {
+      "group": "heroes",
+      "files": 4,
+      "bytes": 1578108
+    },
+    {
+      "group": "boards",
+      "files": 4,
+      "bytes": 986916
+    },
+    {
+      "group": "ui",
+      "files": 17,
+      "bytes": 6940663
+    },
+    {
+      "group": "audio",
+      "files": 0,
+      "bytes": 0
+    }
+  ],
+  "textures": [
+    {
+      "file": "aquila.glb",
+      "images": [
+        {
+          "format": "image/jpeg",
+          "bytes": 250975,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/jpeg",
+          "bytes": 186591,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/png",
+          "bytes": 1302220,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "brazier.glb",
+      "images": [
+        {
+          "format": "image/jpeg",
+          "bytes": 212729,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/jpeg",
+          "bytes": 254312,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/png",
+          "bytes": 779471,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "bust.glb",
+      "images": [
+        {
+          "format": "image/webp",
+          "bytes": 121918,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 79004,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 40616,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "chest.glb",
+      "images": [
+        {
+          "format": "image/webp",
+          "bytes": 149044,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 108058,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 18830,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "column.glb",
+      "images": [
+        {
+          "format": "image/webp",
+          "bytes": 191116,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 85316,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 20984,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "dice.glb",
+      "images": [
+        {
+          "format": "image/jpeg",
+          "bytes": 186698,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/jpeg",
+          "bytes": 178586,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/png",
+          "bytes": 851454,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "gas-crystal.glb",
+      "images": [
+        {
+          "format": "image/jpeg",
+          "bytes": 150458,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/jpeg",
+          "bytes": 104862,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/png",
+          "bytes": 908054,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "hero-builder.glb",
+      "images": [
+        {
+          "format": "image/webp",
+          "bytes": 206840,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 60440,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 102216,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "hero-degen.glb",
+      "images": [
+        {
+          "format": "image/webp",
+          "bytes": 236018,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 98636,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 122548,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "hero-validator.glb",
+      "images": [
+        {
+          "format": "image/webp",
+          "bytes": 250340,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 65592,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 128302,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "hero-whale.glb",
+      "images": [
+        {
+          "format": "image/jpeg",
+          "bytes": 289569,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/jpeg",
+          "bytes": 229994,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/png",
+          "bytes": 1520108,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "laurel-wreath.glb",
+      "images": [
+        {
+          "format": "image/jpeg",
+          "bytes": 207046,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/jpeg",
+          "bytes": 112130,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/png",
+          "bytes": 1122112,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "scales.glb",
+      "images": [
+        {
+          "format": "image/jpeg",
+          "bytes": 225496,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/jpeg",
+          "bytes": 160008,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/png",
+          "bytes": 1138159,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "treasury.glb",
+      "images": [
+        {
+          "format": "image/jpeg",
+          "bytes": 218150,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/jpeg",
+          "bytes": 230182,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/png",
+          "bytes": 535764,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "trophy.glb",
+      "images": [
+        {
+          "format": "image/webp",
+          "bytes": 175786,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 25708,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/webp",
+          "bytes": 90766,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    },
+    {
+      "file": "water-clock.glb",
+      "images": [
+        {
+          "format": "image/jpeg",
+          "bytes": 216910,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/jpeg",
+          "bytes": 213605,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "format": "image/png",
+          "bytes": 607608,
+          "dimensions": [
+            1024,
+            1024
+          ]
+        }
+      ],
+      "rgbaBaseBytesEstimate": 12582912
+    }
+  ],
+  "npmRegistrySnapshot": [
+    {
+      "name": "three",
+      "latest": "0.186.1",
+      "published": "2026-09-24T14:42:21.301Z",
+      "license": "MIT",
+      "engines": null,
+      "peerDependencies": null
+    },
+    {
+      "name": "@react-three/fiber",
+      "latest": "9.8.1",
+      "published": "2026-09-24T21:45:00.941Z",
+      "license": "MIT",
+      "engines": null,
+      "peerDependencies": {
+        "expo": ">=43.0",
+        "react": ">=19 <19.4",
+        "three": ">=0.156",
+        "expo-gl": ">=11.0",
+        "react-dom": ">=19 <19.4",
+        "expo-asset": ">=8.4",
+        "react-native": ">=0.78",
+        "expo-file-system": ">=11.0"
+      }
+    },
+    {
+      "name": "@react-three/drei",
+      "latest": "10.7.9",
+      "published": "2026-09-25T15:34:13.763Z",
+      "license": "MIT",
+      "engines": null,
+      "peerDependencies": {
+        "react": "^19",
+        "three": ">=0.159",
+        "react-dom": "^19",
+        "@react-three/fiber": "^9.0.0"
+      }
+    },
+    {
+      "name": "phaser",
+      "latest": "4.2.1",
+      "published": "2026-07-09T14:35:35.104Z",
+      "license": "MIT",
+      "engines": null,
+      "peerDependencies": null
+    },
+    {
+      "name": "pixi.js",
+      "latest": "8.22.0",
+      "published": "2026-10-01T21:58:04.868Z",
+      "license": "MIT",
+      "engines": null,
+      "peerDependencies": null
+    },
+    {
+      "name": "@pixi/react",
+      "latest": "8.0.5",
+      "published": "2025-12-01T17:58:55.156Z",
+      "license": "MIT",
+      "engines": null,
+      "peerDependencies": {
+        "pixi.js": "^8.2.6",
+        "react": ">=19.0.0"
+      }
+    },
+    {
+      "name": "@babylonjs/core",
+      "latest": "9.29.0",
+      "published": "2026-10-01T07:52:04.003Z",
+      "license": "Apache-2.0",
+      "engines": null,
+      "peerDependencies": null
+    },
+    {
+      "name": "playcanvas",
+      "latest": "2.23.0",
+      "published": "2026-10-01T12:24:24.014Z",
+      "license": "MIT",
+      "engines": {
+        "node": ">=18.3.0"
+      },
+      "peerDependencies": null
+    },
+    {
+      "name": "boardgame.io",
+      "latest": "0.50.2",
+      "published": "2022-11-10T00:06:58.455Z",
+      "license": "MIT",
+      "engines": {
+        "npm": ">=6.0",
+        "node": ">=10.0"
+      },
+      "peerDependencies": null
+    },
+    {
+      "name": "colyseus",
+      "latest": "0.18.9",
+      "published": "2026-09-30T21:47:53.821Z",
+      "license": "MIT",
+      "engines": {
+        "node": ">= 22.x"
+      },
+      "peerDependencies": {
+        "vite": ">=6.0.0",
+        "@colyseus/auth": "0.18.x",
+        "@colyseus/core": "0.18.x",
+        "@colyseus/schema": "^5.0.8",
+        "@colyseus/redis-driver": "0.18.x",
+        "@colyseus/ws-transport": "0.18.x",
+        "@colyseus/redis-presence": "0.18.x",
+        "@colyseus/uwebsockets-transport": "0.18.x"
+      }
+    },
+    {
+      "name": "gsap",
+      "latest": "3.15.0",
+      "published": "2026-04-13T13:15:35.800Z",
+      "license": "Standard 'no charge' license: https://gsap.com/standard-license.",
+      "engines": null,
+      "peerDependencies": null
+    },
+    {
+      "name": "@gltf-transform/cli",
+      "latest": "4.5.1",
+      "published": "2026-09-28T12:48:27.788Z",
+      "license": "MIT",
+      "engines": {
+        "node": ">=20"
+      },
+      "peerDependencies": null
+    },
+    {
+      "name": "howler",
+      "latest": "2.2.4",
+      "published": "2023-09-19T14:59:40.091Z",
+      "license": "MIT",
+      "engines": null,
+      "peerDependencies": null
+    }
+  ],
+  "browserObservations": {
+    "landing": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "documentHeight": 900,
+      "canvasCount": 4,
+      "heroPreviewCssPixels": 104
+    },
+    "gameOpeningHand": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "documentHeight": 1348,
+      "canvasCount": 0,
+      "battlefield": {
+        "x": 35,
+        "y": 139,
+        "width": 1370,
+        "height": 718
+      },
+      "hand": {
+        "x": 47,
+        "y": 863,
+        "width": 1346,
+        "height": 324.09375
+      },
+      "battleTable": {
+        "x": 28,
+        "y": 132,
+        "width": 1384,
+        "height": 1062.09375
+      }
+    },
+    "gameAfterKeepHand": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "documentHeight": 1270,
+      "battleTableHeight": 1062.09375,
+      "handHeight": 324.09375,
+      "smallTextSamples": {
+        "opponentHand": 11,
+        "history": 12,
+        "heroPower": 13,
+        "halvingStatus": 12,
+        "mempoolHint": 13
+      }
+    },
+    "fullSizeImages": {
+      "cardBack": {
+        "native": [
+          1280,
+          1920
+        ],
+        "displayApprox": [
+          35,
+          50
+        ]
+      },
+      "heroPortrait": {
+        "native": [
+          1254,
+          1254
+        ],
+        "displayApprox": [
+          100,
+          100
+        ]
+      },
+      "cardArtExample": {
+        "native": [
+          1024,
+          1536
+        ],
+        "displayApprox": [
+          131,
+          87
+        ]
+      }
+    }
+  },
+  "notMeasured": [
+    "FPS and p95 frame time on real devices",
+    "GPU draw calls and allocated VRAM",
+    "Network transfer including lazy chunks and GLBs",
+    "CPU profile under full board load"
+  ],
+  "additionalReference": {
+    "repository": "https://github.com/Shipow/react-hearthstone",
+    "commit": "a8e6d43f6fb2748a0938d08be97a63464d2e0cdc",
+    "commitDate": "2016-04-28T01:18:51Z",
+    "versionInRepository": "0.4.2",
+    "archived": false,
+    "licenseDeclared": "MIT in README/package.json; no standalone root LICENSE file",
+    "peerDependencies": {
+      "react": "^15.0.1",
+      "jquery": "^2.2.3"
+    },
+    "scope": [
+      "CardGallery",
+      "CardList",
+      "DeckBuilder"
+    ],
+    "sourceInspected": true,
+    "installedOrExecuted": false
+  }
+}
