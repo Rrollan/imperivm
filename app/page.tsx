@@ -7,7 +7,7 @@ import { startAmbient } from '../lib/audio/sfx';
 import { markAmbientStarted, shouldStartAmbient } from '../lib/audio/events';
 import { unlockAudio } from '../lib/audio/manager';
 import { useLocale } from '../components/LocaleContext';
-import HeroArt from '../components/HeroArt';
+import HeroModel3D from '../components/HeroModel3D';
 
 export default function LandingPage() {
   const [selected, select] = useState('whale');
@@ -44,7 +44,7 @@ export default function LandingPage() {
               aria-pressed={h.id === selected}
               onClick={() => select(h.id)}
             >
-              <HeroArt heroId={h.id} name={heroName(h.id)} decorative className="menu-coin" />
+              <HeroModel3D heroId={h.id as 'whale' | 'builder' | 'degen' | 'validator'} name={heroName(h.id)} className="menu-coin" />
               <span className="font-display">{heroName(h.id)}</span>
             </button>
           ))}
@@ -120,6 +120,8 @@ export default function LandingPage() {
           object-fit: cover;
           border: 4px solid #bd913e;
           border-radius: 50%;
+          overflow: hidden;
+          background: radial-gradient(circle at 50% 38%, #f7e3a1 0%, #dcb455 58%, #9a6b23 100%);
           box-shadow: 0 4px 0 #77501f, 0 8px 16px #55361255;
           transition: transform .2s ease, box-shadow .2s ease;
         }
