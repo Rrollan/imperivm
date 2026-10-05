@@ -45,6 +45,7 @@ export class ArenaAssets {
           painted.diffuseTexture = pbr.albedoTexture;
           painted.diffuseColor = Color3.Black();
           painted.emissiveTexture = pbr.albedoTexture;
+          if(id.startsWith('hero-')&&painted.emissiveTexture)painted.emissiveTexture.level=1.12;
           painted.emissiveColor = Color3.Black();
           painted.disableLighting = true;
           painted.useEmissiveAsIllumination = true;

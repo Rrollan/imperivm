@@ -25,11 +25,12 @@ import { PresentationScheduler } from './PresentationScheduler';
 import { ArenaAssets, type ModelId, type ModelFit, type ModelHandle } from './ArenaAssets';
 import { ArenaEffects } from './ArenaEffects';
 import { ArenaSpriteEffects } from './ArenaSpriteEffects';
-import { videoCues } from './videoCue';
+import { videoCues, VIDEO_IDS } from './videoCue';
 import type { PresentationBatch } from './GameSession';
 import {MOTION, smooth, settle, attackTravel} from './motionSpec';
 import {ArenaAbilityEffects} from './ArenaAbilityEffects';
 import {pixelRatio, type RenderQuality} from './renderQuality';
+import nativeUV from '../../public/ui/arena-lab/native/uv.json';
 
 export type ArenaTarget = { kind: 'hand' | 'minion' | 'hero' | 'power' | 'command' | 'gas' | 'block' | 'deck' | 'scroll'; uid: string; owner: 0 | 1; cardId?: string };
 export interface ArenaMetrics { meshes: number; triangles: number; drawCalls: number; renderScale: number; renderWidth: number; renderHeight: number; models: number; failedModels: number; frames: number; frameMedianMs: number; frameP95Ms: number; renderP95Ms: number; gpu: string; pending: string[] }
@@ -42,6 +43,7 @@ export interface ArenaOptions {
   onAttack: (attackerUid: string, target: string) => void;
   onMetrics: (metrics: ArenaMetrics) => void;
   onFailure: (message: string) => void;
+  onReady?: () => void;
   measure?: boolean;
   quality?: RenderQuality;
 }
@@ -97,12 +99,12 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   let nextMetricAt=0;
   const percentile=(samples:number[],fraction:number)=>samples.length?Math.round([...samples].sort((a,b)=>a-b)[Math.floor((samples.length-1)*fraction)]*10)/10:0;
   const scheduler = new PresentationScheduler();
-  let disposed = false, running = false, dirty = 3, last = 0, portrait = false;
+  let disposed = false, running = false, dirty = 3, last = 0, portrait = false, readyReported=false;
   let shown: GameState | null = null, selected: string | null = null;
   let hovered: string | null = null, reportedHover: string | null = null;
   let activeBatch: PresentationBatch | null = null;
   const rowY=(owner:number)=>owner===0?535:portrait?260:335;
-  const heroY=(owner:number)=>owner===0?(portrait?783:705):(portrait?20:153);
+  const heroY=(owner:number)=>owner===0?(portrait?779:705):(portrait?26:153);
   const queueX=()=>portrait?470:385;
   const handY=()=>portrait?1020:865;
   const entities = new Map<string, Entity>();
@@ -119,8 +121,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   const effects = new ArenaEffects(scene,request);
   const abilities = new ArenaAbilityEffects(scene,request);
   const videoEffects = new ArenaSpriteEffects(scene,request);
-  // Upload the shared strike once during loading; playback only changes texture UVs.
-  if(!options.reducedMotion)videoEffects.prepare([{id:'01-impact',anchor:'arena-center',width:9}]);
+  // Warm every small combat atlas during loading, before its first contact.
+  if(!options.reducedMotion)videoEffects.prepare(VIDEO_IDS.filter(id=>id!=='06-victory').map(id=>({id,anchor:'arena-center',width:4})));
   const assets = new ArenaAssets(scene, shadows, () => { shadowMap?.resetRefreshCounter();if (shown && !activeBatch) sync(shown); request(); });
 
   function material(name: string, color: string, specular = .2) {
@@ -144,45 +146,65 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     void assets.attach(id, root, { width: width/50, height: height/50, ...fit }, target).then(request);
     return root;
   }
-  const hourglass = prop('end-turn-hourglass', 1425, 355, 76, 98, {kind:'command',uid:'turn-command',owner:0},false,{yaw:Math.PI*.42,pitch:-.10});
-  const clock = prop('water-clock', 223, 210, 85, 104, {kind:'block',uid:'block-counter',owner:0},false,{yaw:Math.PI,pitch:-.08});
-  const deckStack = new TransformNode('imperial deck',scene);deckStack.position.copyFrom(point(1410,185,-.2));deckStack.rotation.z=-.12;
+  function paintedProp(id:keyof typeof nativeUV,width:number,height:number,target:ArenaTarget){
+    const root=new TransformNode(`painted:${id}`,scene);
+    const texture=new Texture(`/ui/arena-lab/native/${id}.webp`,scene,false,true,Texture.TRILINEAR_SAMPLINGMODE,request,request);
+    const uv=nativeUV[id];texture.uOffset=uv.left;texture.vOffset=uv.bottom;texture.uScale=uv.width;texture.vScale=uv.height;
+    texture.hasAlpha=true;texture.wrapU=Texture.CLAMP_ADDRESSMODE;texture.wrapV=Texture.CLAMP_ADDRESSMODE;
+    const ink=material(`painted:${id}`,'#000000',0);ink.diffuseTexture=texture;ink.emissiveTexture=texture;
+    ink.emissiveColor=Color3.Black();ink.useEmissiveAsIllumination=true;ink.disableLighting=true;ink.useAlphaFromDiffuseTexture=true;
+    const face=MeshBuilder.CreatePlane(`painted:${id}:face`,{width:width/50,height:height/50},scene);
+    face.parent=root;face.material=ink;face.metadata=target;face.isPickable=true;
+    return root;
+  }
+  const hourglass=paintedProp('hourglass-native',54,102,{kind:'command',uid:'turn-command',owner:0});
+  const clock=paintedProp('water-clock-native',74,106,{kind:'block',uid:'block-counter',owner:0});
+  // The pivot is the foot on the painted plinth, so a small tilt cannot slide it.
+  (hourglass.getChildMeshes()[0] as Mesh).position.y=102*.38/50;
+  (clock.getChildMeshes()[0] as Mesh).position.y=106*.38/50;
+  const deckStack = new TransformNode('imperial deck',scene);deckStack.position.copyFrom(point(1378,184,-.2));deckStack.rotation.z=-.09;
   const deckInk=textures.make('imperial deck backs',{kind:'back'});
   const deckMaterial=material('imperial card backs','#000000',0);deckMaterial.diffuseTexture=deckInk.texture;deckMaterial.emissiveTexture=deckInk.texture;deckMaterial.emissiveColor=Color3.White();deckMaterial.disableLighting=true;deckMaterial.useAlphaFromDiffuseTexture=true;
   for(let i=0;i<5;i++){
-    const leaf=MeshBuilder.CreatePlane(`deck leaf ${i}`,{width:1.32,height:1.84},scene);leaf.parent=deckStack;
-    leaf.position.set(i*.035,i*.027,-i*.045);leaf.material=deckMaterial;leaf.metadata={kind:'deck',uid:'own-deck',owner:0};
+    const leaf=MeshBuilder.CreatePlane(`deck leaf ${i}`,{width:1.8,height:2.4},scene);leaf.parent=deckStack;
+    leaf.position.set(i*.025,i*.018,-i*.025);leaf.material=deckMaterial;leaf.metadata={kind:'deck',uid:'own-deck',owner:0};
   }
   const sandMaterial=material('hourglass sand','#c69c60',0);sandMaterial.emissiveColor=Color3.FromHexString('#725635');
   const sandTop=MeshBuilder.CreateCylinder('upper sand',{diameterTop:.35,diameterBottom:.03,height:.31,tessellation:10},scene);
   const sandBottom=MeshBuilder.CreateCylinder('lower sand',{diameterTop:.03,diameterBottom:.35,height:.28,tessellation:10},scene);
   const sandStream=MeshBuilder.CreateCylinder('falling sand',{diameter:.018,height:.32,tessellation:6},scene);
   for(const sand of [sandTop,sandBottom,sandStream]){sand.parent=hourglass;sand.material=sandMaterial;sand.isPickable=false;sand.position.z=-.82;}
-  sandTop.position.y=.21;sandBottom.position.y=-.22;sandBottom.scaling.y=.3;sandStream.setEnabled(false);
+  sandTop.position.y=.21;sandBottom.position.y=-.22;sandBottom.scaling.y=.3;sandStream.position.y=.75;sandStream.setEnabled(false);
+  // The illustration owns the two sand heaps; only a thin falling stream moves.
+  sandTop.setEnabled(false);sandBottom.setEnabled(false);
   const history = prop('mempool-scroll', 155, 480, 110, 80, {kind:'scroll',uid:'battle-scroll',owner:0}, false, {pitch:Math.PI/2,yaw:Math.PI/2});
   prop('brazier', 1220, 150, 80, 110, undefined, true);
   const queueTray = new TransformNode('mempool tray', scene); queueTray.position.copyFrom(point(385,445,.4)); queueTray.setEnabled(false);
   void assets.attach('mempool-scroll',queueTray,{width:5.2,height:2,pitch:Math.PI/2,yaw:Math.PI/2}).then(request);
   const gasRack = new TransformNode('gas rack', scene);
+  const gasPlate=paintedProp('gas-rack-native',430,75,{kind:'gas',uid:'gas-counter',owner:0});gasPlate.parent=gasRack;gasPlate.position.z=.05;
   const gasCells: {mesh:Mesh;target:number}[]=[];
   let gasInitialized=false;
   const gasTexture = new Texture('/ui/arena-lab/gas-socket.webp',scene,false,true,Texture.TRILINEAR_SAMPLINGMODE,request,request);
   gasTexture.hasAlpha=true; gasTexture.wrapU=Texture.CLAMP_ADDRESSMODE; gasTexture.wrapV=Texture.CLAMP_ADDRESSMODE;
+  // The new rack supplies the bronze rim; sample only the stone inside the old art.
+  gasTexture.uOffset=.15;gasTexture.vOffset=.15;gasTexture.uScale=.70;gasTexture.vScale=.70;
   const gasMaterial=material('painted gas sockets','#000000',0);
   gasMaterial.diffuseTexture=gasTexture; gasMaterial.emissiveTexture=gasTexture;
   gasMaterial.emissiveColor=Color3.White(); gasMaterial.disableLighting=true; gasMaterial.useAlphaFromDiffuseTexture=true;
   for (let i=0;i<10;i++) {
     const root = new TransformNode(`gas crystal ${i}`,scene); root.parent = gasRack;
-    const crystal=MeshBuilder.CreatePlane(`gas socket ${i}`,{width:1.08,height:1.08},scene);
+    const crystal=MeshBuilder.CreateDisc(`gas socket ${i}`,{radius:.54,tessellation:32},scene);
     crystal.parent=root;crystal.material=gasMaterial;crystal.metadata={kind:'gas',uid:'gas-counter',owner:0};
-    const slot=Math.floor(i/2),x=1185+slot*65+(i%2===0?-16:16);
-    root.position.set(x/50,-777/50,-.2);root.scaling.setAll(.62);
+    root.position.set((-.386+i*.0858)*430/50,-.03,-.2);root.scaling.setAll(.435);
     gasCells.push({mesh:crystal,target:0});
   }
   function gasFill(state:GameState){
     const me=state.players[0];
-    gasRack.position.copyFrom(point(0,0));
-    gasCells.forEach((cell,i)=>{const slot=Math.floor(i/2),x=(portrait?638:1185)+slot*(portrait?83:65)+(i%2===0?-16:16);(cell.mesh.parent as TransformNode).position.set(x/50,-(portrait?908:777)/50,-.2);cell.target=i<me.gas?1:i<me.maxGas?.22:.075;if(!gasInitialized||options.reducedMotion)cell.mesh.visibility=cell.target;});
+    const width=portrait?590:430;
+    gasRack.position.copyFrom(point(portrait?802:1320,portrait?918:777));gasPlate.scaling.setAll(width/430);
+    const centers=[127,212.25,297.25,382.5,468,552.75,638.25,724,809,894.5];
+    gasCells.forEach((cell,i)=>{const root=cell.mesh.parent as TransformNode;root.position.set(((centers[i]-8)/1010-.5)*width/50,-(width/430*2.33)/50,-.2);root.scaling.setAll(portrait?.60:.435);cell.target=i<me.gas?1:i<me.maxGas?.18:0;if(!gasInitialized||options.reducedMotion)cell.mesh.visibility=cell.target;});
     gasInitialized=true;
   }
 
@@ -208,14 +230,13 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       const w = entry.width, h = entry.height;
       // The painted socket is the frame; one real relief coin sits inside it.
       // Avoid two conflicting frames and the incomplete inner geometry of the Tripo ring.
-      void attach(`hero-${face.heroId}` as ModelId, {width:w*.68,height:h*.62,depth:.20,stretch:true},new Vector3(0,h*.075,-.65)).then(handle=>{
+      void attach(`hero-${face.heroId}` as ModelId, {width:w*.68,height:h*.62,depth:.20,stretch:true},new Vector3(0,0,-.65)).then(handle=>{
         if(handle&&!entry.root.isDisposed()&&entry.modelKey===key){entry.modelReady=true;entry.backing.setEnabled(false);entry.face.position.z=-.84;paint(entry,entry.painted);request();}
       });
     } else {
-      const id: ModelId = face.heroId === 'degen' ? 'dice' : face.heroId === 'validator' ? 'scales' : face.heroId === 'whale' ? 'treasury' : 'bust';
-      void attach(id, { width: entry.width*.67, height: entry.height*.65 }, new Vector3(0,.13,-.28)).then(handle => {
-      if (handle && !entry.root.isDisposed() && entry.modelKey === key) { entry.modelReady = true; entry.face.position.z = -.85; paint(entry,entry.painted); request(); }
-      });
+      // A painted relief has the same light and circular profile as its socket.
+      // The Tripo bust/treasury silhouettes were floating above a generic sphere.
+      entry.backing.setEnabled(false);
     }
   }
 
@@ -230,7 +251,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       : MeshBuilder.CreateBox(`${keyId}-thickness`, { width: width * .95, height: height * .93, depth: .13 }, scene);
     if (oval) { backing.scaling.set(width * .85, height * .8, .17); backing.position.y = height * .055; }
     backing.parent = root; backing.position.z = .09; backing.material = bronze; backing.isPickable = false;
-    if (['command','gas','block','deck','scroll'].includes(face.kind)) backing.setEnabled(false);
+    if (['hero','power','command','gas','block','deck','scroll'].includes(face.kind)) backing.setEnabled(false);
     const faceMesh = MeshBuilder.CreatePlane(`${keyId}-face`, { width, height, sideOrientation: Mesh.DOUBLESIDE }, scene);
     const texture = textures.make(`${keyId}-ink`, face);
     const mat = new StandardMaterial(`${keyId}-material`, scene); mat.diffuseTexture = texture.texture; mat.emissiveTexture = texture.texture; mat.emissiveColor = Color3.White(); mat.diffuseColor = Color3.Black(); mat.disableLighting = true; mat.specularColor = Color3.Black(); mat.useAlphaFromDiffuseTexture = true;
@@ -297,13 +318,13 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const native = (id:string,kind:ArenaTarget['kind'],face:Face,w:number,h:number,x:number,y:number)=>keep(id,{kind,uid:id,owner:0},face,w,h,x,y,-.5);
     const me=state.players[0];
     native('turn-command','command',{kind:'command',state:activeBatch?'busy':state.winner!==null?'over':state.turn===0?'own':'enemy',engraved:true},195,74,portrait?1138:1443,portrait?631:464);
-    native('hero-power','power',{kind:'power',heroId:me.heroId,cost:effectivePowerCost(state,0),available:state.turn===0&&legalActions(state).some(a=>a.type==='hero-power')},107,107,portrait?950:975,portrait?810:705);
+    native('hero-power','power',{kind:'power',heroId:me.heroId,cost:effectivePowerCost(state,0),available:state.turn===0&&legalActions(state).some(a=>a.type==='hero-power')},101,101,portrait?951:981,portrait?799:711);
     native('gas-counter','gas',{kind:'gas',gas:me.gas,max:me.maxGas,engraved:true},135,90,portrait?1130:1320,portrait?908:868);
-    native('block-counter','block',{kind:'block',block:state.block},80,106,portrait?441:223,portrait?143:277);
-    const deck=native('own-deck','deck',{kind:'deck',count:me.deck.length},80,112,portrait?1160:1430,portrait?190:255);deck.modelReady=true;paint(deck,deck.painted);
+    native('block-counter','block',{kind:'block',block:state.block},68,90,portrait?458:223,portrait?108:257);
+    const deck=native('own-deck','deck',{kind:'deck',count:me.deck.length},80,112,portrait?1169:1378,portrait?195:245);deck.modelReady=true;paint(deck,deck.painted);
     const scroll=native('battle-scroll','scroll',{kind:'scroll'},65,86,portrait?430:155,portrait?430:480);scroll.face.setEnabled(!assets.loaded.has('mempool-scroll'));
-    hourglass.position.copyFrom(point(portrait?1177:1425,portrait?511:355,.1));clock.position.copyFrom(point(portrait?441:223,portrait?63:210,.1));history.position.copyFrom(point(portrait?430:155,portrait?430:480,.1));
-    deckStack.position.copyFrom(point(portrait?1156:1410,portrait?95:185,-.2));deckStack.scaling.setAll(portrait?1.5:1);
+    hourglass.position.copyFrom(point(portrait?1173:1430,portrait?518:327,.1));clock.position.copyFrom(point(portrait?458:223,portrait?77:220,.1));history.position.copyFrom(point(portrait?430:155,portrait?430:480,.1));
+    deckStack.position.copyFrom(point(portrait?1169:1378,portrait?122:184,-.2));deckStack.scaling.setAll(portrait?1.08:1);
     gasFill(state);
     entities.forEach((entry,id)=>{if(!used.has(id)){destroy(entry);entities.delete(id);}});highlights();
   }
@@ -390,6 +411,9 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     boardMaterial.diffuseTexture=portrait?portraitPainting!:painting;boardMaterial.emissiveTexture=boardMaterial.diffuseTexture;
     const height=portrait?Math.max(12.6,9/aspect):Math.max(10.2,16.3/aspect);
     camera.orthoTop=height;camera.orthoBottom=-height;camera.orthoLeft=-height*aspect;camera.orthoRight=height*aspect;
+    const menu=point(portrait?1175:1515,portrait?1070:915);
+    canvas.parentElement?.style.setProperty('--arena-menu-x',`${(menu.x/(height*aspect)+1)*canvas.clientWidth/2}px`);
+    canvas.parentElement?.style.setProperty('--arena-menu-y',`${(1-menu.y/height)*canvas.clientHeight/2}px`);
     propAnchors.forEach(root=>root.setEnabled(!portrait));
     if(shown&&!activeBatch)sync(shown);request();
   }
@@ -405,6 +429,13 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   }
   function render() {
     if (disposed || document.hidden) return;
+    if(!readyReported){
+      const portraitsReady=shown?.players.every(p=>assets.loaded.has(`hero-${p.heroId}` as ModelId)||assets.failed.has(`hero-${p.heroId}` as ModelId));
+      const visibleReady=scene.meshes.every(mesh=>!mesh.isEnabled()||!mesh.isVisible||mesh.visibility<=0||mesh.isReady(true));
+      if(portraitsReady&&painting.isReady()&&(!portrait||portraitPainting?.isReady())&&visibleReady){
+        readyReported=true;options.onReady?.();
+      }
+    }
     const time = performance.now(), rawDelta=Math.max(0,time-last), delta=rawDelta; last = time;
     scheduler.tick(delta);
     videoEffects.tick(delta);
@@ -491,11 +522,11 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     // Victory belongs inside the result dialog; ordinary accents belong on battle pieces.
     const cues=videoCues(batch).filter(cue=>cue.id!=='06-victory');
     if(!options.reducedMotion)videoEffects.prepare(cues);
-    const cuePositions=new Map(cues.map(cue=>[cue.anchor,cue.anchor==='arena-center'?Vector3.Zero():cue.anchor==='row-0'?point(800,rowY(0)):cue.anchor==='row-1'?point(800,rowY(1)):cue.anchor==='gas-counter'?point(portrait?802:1320,portrait?908:777):entities.get(cue.anchor)?.base.clone()]));
+    const cuePositions=new Map(cues.map(cue=>[cue.anchor,cue.anchor==='arena-center'?Vector3.Zero():cue.anchor==='row-0'?point(800,rowY(0)):cue.anchor==='row-1'?point(800,rowY(1)):cue.anchor==='gas-counter'?gasRack.position.clone():entities.get(cue.anchor)?.base.clone()]));
     const locate=(uid:string)=>{
       if(uid==='arena-center')return Vector3.Zero();
       if(uid==='row-0'||uid==='row-1')return point(800,rowY(uid==='row-0'?0:1));
-      if(uid==='gas-counter')return point(portrait?802:1320,portrait?908:777);
+      if(uid==='gas-counter')return gasRack.position.clone();
       const existing=entities.get(uid);if(existing)return existing.base.clone();
       for(const owner of [0,1]){const row=batch.after.players[owner].board,index=row.findIndex(m=>m.uid===uid);if(index>=0){const spacing=Math.min(portrait?124:150,(portrait?700:980)/row.length);return point(800+(index-(row.length-1)/2)*spacing,rowY(owner));}}
     };

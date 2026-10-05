@@ -132,9 +132,9 @@ export default function ArenaLab({ heroId, opening, debug }: { heroId: string; o
           locale: locale.locale, reducedMotion: reduced, measure: debug,
           onPick: target => callbacks.current.pick(target), onHover: () => {},
           onPlay: uid => callbacks.current.play(uid), onAttack: (uid, target) => callbacks.current.attack(uid, target),
-          onMetrics: setMetrics, onFailure: setFailure,
+          onMetrics: setMetrics, onFailure: setFailure,onReady:()=>{if(!cancelled)setReady(true);},
         });
-        renderer.current = arena; arena.sync(session.snapshot().shown); setReady(true);
+        renderer.current = arena; arena.sync(session.snapshot().shown);
       } catch { setFailure('webgl'); }
     }).catch(() => { if (!cancelled) setFailure('load'); });
     return () => { cancelled = true; renderer.current?.dispose(); renderer.current = null; };

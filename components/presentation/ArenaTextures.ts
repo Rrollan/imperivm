@@ -184,13 +184,14 @@ export class ArenaTextures {
 
   private drawHero(ctx: CanvasRenderingContext2D, id: string, treasury: number, model = false) {
     if (!model) {
-    ctx.save(); rounded(ctx, 47, 23, 290, 396, 120); ctx.fillStyle = '#594124'; ctx.fill();
-    ctx.lineWidth = 19; ctx.strokeStyle = '#e1bd77'; ctx.stroke(); ctx.clip();
-    const art = this.image(`/heroes/${id}.webp`); if (art) cover(ctx, art, 50, 25, 284, 390);
-    const gradient = ctx.createLinearGradient(0, 280, 0, 418); gradient.addColorStop(0, '#26160b00'); gradient.addColorStop(1, '#26160bee');
-    ctx.fillStyle = gradient; ctx.fillRect(48, 272, 290, 150); ctx.restore();
+    // The loading portrait occupies exactly the coin's circular recess.
+    // Texture pixels and the mesh use different aspect ratios, hence the ellipse.
+    ctx.save();ctx.beginPath();ctx.ellipse(192,256,132,160,0,0,Math.PI*2);ctx.clip();
+    ctx.fillStyle='#594124';ctx.fillRect(60,96,264,320);
+    const art=this.image(`/heroes/${id}.webp`);if(art)cover(ctx,art,60,96,264,320);
+    ctx.restore();
     }
-    this.badge(ctx, `${treasury}`, model ? 315 : 286, model ? 355 : 418, '#a8322f', 59);
+    this.badge(ctx, `${treasury}`, 315, 355, '#a8322f', 59);
   }
 
   private drawPower(ctx: CanvasRenderingContext2D, face: Extract<Face, { kind: 'power' }>) {
@@ -222,7 +223,7 @@ export class ArenaTextures {
     }
     ctx.restore();
     const label = state === 'own' ? (this.locale === 'ru' ? 'Конец хода' : 'End turn') : state === 'enemy' ? (this.locale === 'ru' ? 'Ход ИИ' : 'Opponent') : state === 'busy' ? (this.locale === 'ru' ? 'Бой…' : 'Resolving…') : (this.locale === 'ru' ? 'Бой окончен' : 'Battle over');
-    ctx.font = `800 85px ${this.font}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = `800 108px ${this.font}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.strokeStyle = '#1d100b'; ctx.lineWidth = 9; ctx.strokeText(label, 384, 145);
     ctx.fillStyle = state === 'own' ? '#fff0c7' : '#c2b39a'; ctx.fillText(label, 384, 145);
   }
@@ -247,6 +248,8 @@ export class ArenaTextures {
   }
 
   private drawBack(ctx: CanvasRenderingContext2D) {
+    const art=this.image('/ui/arena-lab/native/card-back-native.webp');
+    if(art){contain(ctx,art,0,0,384,512);return;}
     rounded(ctx, 17, 13, 350, 486, 22); ctx.fillStyle = '#3b2725'; ctx.fill();
     ctx.strokeStyle = '#d7ae63'; ctx.lineWidth = 17; ctx.stroke();
     rounded(ctx, 40, 39, 304, 435, 12); ctx.strokeStyle = '#9c7445'; ctx.lineWidth = 5; ctx.stroke();

@@ -15,7 +15,7 @@ const sharp=createRequire(new URL('../tripo/package.json',import.meta.url))('sha
 const probe=JSON.parse(execFileSync('ffprobe',['-v','error','-show_entries','format=duration:stream=width,height,codec_type','-of','json',source],{encoding:'utf8'}));
 const video=probe.streams.find(s=>s.codec_type==='video');
 if(!video||Math.abs(video.width/video.height-16/9)>.03||start+duration>Number(probe.format.duration))throw new Error('Expected a valid 16:9 source and an existing source range.');
-execFileSync('ffmpeg',['-hide_banner','-loglevel','error','-y','-ss',String(start),'-t',String(frameCount/fps),'-i',source,'-an','-vf',`fps=${fps},scale=192:108:flags=lanczos,eq=saturation=0.55,fade=t=out:st=${Math.max(0,duration-.15)}:d=0.12,tile=${columns}x${rows}`,'-frames:v','1','-c:v','png',png],{stdio:'inherit'});
+execFileSync('ffmpeg',['-hide_banner','-loglevel','error','-y','-ss',String(start),'-t',String(frameCount/fps),'-i',source,'-an','-vf',`fps=${fps},scale=192:108:flags=lanczos,eq=saturation=0.82,fade=t=out:st=${Math.max(0,duration-.15)}:d=0.12,tile=${columns}x${rows}`,'-frames:v','1','-c:v','png',png],{stdio:'inherit'});
 await sharp(png).webp({quality:82}).toFile(temp);await unlink(png);
 const size=(await stat(temp)).size;if(size>300000)throw new Error('Atlas exceeds its 300 KB budget.');
 await rename(temp,target);

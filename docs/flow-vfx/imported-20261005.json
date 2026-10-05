@@ -1,0 +1,161 @@
+{
+  "archive": "Download (5).zip",
+  "format": "1280x720, 24 fps, 4.01 seconds each",
+  "clips": [
+    {
+      "id": "01-impact",
+      "sourceIndex": 3,
+      "sourceName": "Creating_tactical_card-game_VFX_…_20261005202335.mp4",
+      "sha256": "0086486e91fc4c73cfc740e79539cd196cd8992220e1f991183eee5610fd3c79",
+      "sourceRange": [
+        0,
+        0.65
+      ],
+      "playbackSeconds": 0.4,
+      "preprocess": [
+        "setpts=0.6153846153846154*PTS",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Reduced oversized strike and removed long spark tail"
+    },
+    {
+      "id": "02-builder-heal",
+      "sourceIndex": 5,
+      "sourceName": "Create_Roman_tactical_card-game_VFX_20261005202335_2.mp4",
+      "sha256": "0c2893ff2cf44ac141dd977eb4f24dc75847460d58090df6f9037bfdadba4703",
+      "sourceRange": [
+        0,
+        0.9
+      ],
+      "playbackSeconds": 0.6666666666666666,
+      "preprocess": [
+        "crop=288:240:496:236,drawbox=x=0:y=0:w=12:h=ih:color=black:t=fill,drawbox=x=iw-12:y=0:w=12:h=ih:color=black:t=fill,pad=1280:720:(ow-iw)/2:(oh-ih)/2",
+        "setpts=0.7407407407407407*PTS",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Kept the central laurel; excluded an invented second outer wreath"
+    },
+    {
+      "id": "03-whale-impact",
+      "sourceIndex": 7,
+      "sourceName": "Create_Roman_tactical_card-game_VFX_20261005202336.mp4",
+      "sha256": "aa2bd1812a9481fbfc96b7f9c4bde0df832d125da62dadc969ee61c6ca373ebd",
+      "sourceRange": [
+        0,
+        0.8
+      ],
+      "playbackSeconds": 0.5,
+      "preprocess": [
+        "setpts=0.625*PTS",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Removed residual sparks before final black frame"
+    },
+    {
+      "id": "04-degen-draw",
+      "sourceIndex": 6,
+      "sourceName": "Roman_gaming_die_dissolves_black_20261005202336.mp4",
+      "sha256": "fe641f4a358859ac1cb54c1609a03a37b23382355920949b50a71878c7dcd7f7",
+      "sourceRange": [
+        0,
+        0.5
+      ],
+      "playbackSeconds": 0.5,
+      "preprocess": [
+        "setpts=1.0*PTS",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Preserved the die silhouette and its short dissolve"
+    },
+    {
+      "id": "05-validator-gas",
+      "sourceIndex": 1,
+      "sourceName": "Create_Roman_tactical_card-game_VFX_20261005202335.mp4",
+      "sha256": "f0e10382ea4672f8bac08fe7caee275d3488885fbe4ed9f92aab870c5ca5dc86",
+      "sourceRange": [
+        0,
+        0.75
+      ],
+      "playbackSeconds": 0.6666666666666666,
+      "preprocess": [
+        "setpts=0.8888888888888888*PTS",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Preserved the seal and teal confirmation arc"
+    },
+    {
+      "id": "06-victory",
+      "sourceIndex": 4,
+      "sourceName": "Create_Roman_tactical_game_VFX_20261005202335.mp4",
+      "sha256": "4052330489c32392b5994681fb89696ed10609560fdb19e2b572593e47814152",
+      "sourceRange": [
+        0,
+        1.8
+      ],
+      "playbackSeconds": 1.8,
+      "preprocess": [
+        "setpts=1.0*PTS",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Kept laurel in the result dialog only"
+    },
+    {
+      "id": "07-spell-impact",
+      "sourceIndex": 9,
+      "sourceName": "Create_tactical_card-game_VFX_clip_20261005202336.mp4",
+      "sha256": "35c4042f5333057ce13ab5e1737d32e452f2edf25d89bc4a4aa89d6d89082cae",
+      "sourceRange": [
+        0,
+        0.8
+      ],
+      "playbackSeconds": 0.5,
+      "preprocess": [
+        "setpts=0.625*PTS",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Removed residual sparks before final black frame"
+    },
+    {
+      "id": "08-spell-buff",
+      "sourceIndex": 8,
+      "sourceName": "Creating_tactical_card-game_VFX_…_20261005202336.mp4",
+      "sha256": "f086dc7530b5d75461ec466f581d2af45650f124882ea3c3a72d4f18406942ac",
+      "sourceRange": [
+        0,
+        1.6
+      ],
+      "playbackSeconds": 0.7,
+      "preprocess": [
+        "scale=640:360,pad=1280:720:(ow-iw)/2:(oh-ih)/2",
+        "setpts=0.43749999999999994*PTS",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Restored the compact scale of the reference laurel"
+    },
+    {
+      "id": "09-spell-counter",
+      "sourceIndex": 2,
+      "sourceName": "Create_Roman_tactical_VFX_clip_20261005202335.mp4",
+      "sha256": "f276a807ecf0bbf4d0613300a311bfa289b3238dabffa9d231292a1ab52d892f",
+      "sourceRange": [
+        0,
+        0.55
+      ],
+      "playbackSeconds": 0.5333333333333333,
+      "preprocess": [
+        "setpts=0.9696969696969696*PTS",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Preserved one crossed seal and its fade"
+    }
+  ]
+}

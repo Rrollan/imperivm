@@ -1,0 +1,26 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-10-05",
+  "assets": [
+    {
+      "id": "card-back-native",
+      "prompt": "Use case: stylized-concept. Asset type: one production-ready 2.5D painted card back for the browser game IMPERIVM, Roman fantasy, to place on a warm marble and carved bronze game table. A SINGLE face-down rectangular playing card, portrait aspect 3:4, straight vertical with absolutely symmetrical geometry and squared alignment, orthographic overhead view, no perspective tilt. Rich worn oxblood red leather center, carved aged bronze narrow border with small subtle laurel ornaments in the four corners, one compact bronze imperial eagle relief at the center with a laurel circle, lightly worn ivory parchment edges. Painterly tactile hand-painted fantasy game style, warm upper-left daylight, soft dark lower-right bevel, same reddish antique bronze as a Roman table and muted cream marble. The entire rounded-rectangle card fits the frame with only a tiny transparent margin; crisp silhouette; real transparent background. No words, letters, numbers, logos, UI, multiple cards, scene, sparkles, glow, cast shadow outside the card, white backdrop or checkerboard. Keep texture painterly and integrated, not a flat vector or a clean modern gold outline.",
+      "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-4813f4ee-6dd0-4fa3-98ed-f2a124fdd0cf.png"
+    },
+    {
+      "id": "hourglass-native",
+      "prompt": "Use case: stylized-concept. Asset type: one transparent hand-painted 2.5D hourglass game prop for IMPERIVM, antique Roman tabletop. A SINGLE small elegant hourglass in warm aged reddish bronze, two slender bronze posts, clear delicately teal-tinted glass, readable light ivory sand in both bulbs. Strong perfectly upright vertical symmetry, narrow base elliptical in perspective, top and bottom level, warm upper-left sunlight and subtle lower-right shadow painted into the object. Elevated orthographic three-quarter tabletop view: camera looks down about 25 degrees; see the upper surface of the two small bronze bases, matching a painted Roman board with carved bronze sockets. Tactile stylized fantasy game painting with restrained material highlights, warm ochre and oxblood reflected light, not photorealistic black industrial metal. Isolated whole hourglass, portrait 3:4 composition, object occupies 85 percent height, transparent background. No plinth, tabletop, socket, decorative frame around it, text, numbers, letters, fire, aura, bloom, duplicate objects or checkerboard. Keep sand and clear glass legible at a 40-pixel game size.",
+      "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-5d9a99c3-b6a3-46bd-ba9f-6377dd499073.png"
+    },
+    {
+      "id": "water-clock-native",
+      "prompt": "Use case: stylized-concept. Asset type: one transparent hand-painted 2.5D Roman clepsydra water clock for a fantasy Roman tabletop game IMPERIVM. A SINGLE perfectly upright compact antique bronze water clock, two warm reddish bronze side pillars and a wide low oval foot, a central clear teal-tinted vessel with a visible water line and a tiny bronze spout. A quiet Roman object, elegant warm upper-left daylight, shadows only on the object, painterly muted bronze, warm ivory stone and turquoise water. Elevated orthographic camera viewing downward about 25 degrees, visible top of the oval base, matching an illustrated marble board with reddish bronze inset sockets. Compact straight symmetrical silhouette with level top and base, easily legible at only 40 pixels in game. Portrait 3:4 composition, entire object occupies 85 percent height; true transparent background. No surrounding scene, board, circular socket, UI plaque, digits, letters, decorative outer frame, dark black steel, flashy lighting, sparks, bloom or checkerboard.",
+      "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-46311a47-8b06-4c7f-98b9-a76f49f18baa.png"
+    },
+    {
+      "id": "gas-rack-native",
+      "prompt": "Use case: stylized-concept. Asset type: transparent game UI prop, a single hand-painted Roman gas resource rack for IMPERIVM. Wide horizontal elongated bronze tray, roughly 5:1 aspect ratio, perfectly horizontal and centered, containing EXACTLY TEN empty small round dark teal gemstone sockets arranged in ONE STRAIGHT evenly spaced row. Ten sockets, count them carefully. Low bevel, carved warm aged reddish bronze perimeter, small tasteful laurel flourishes only at the extreme left and right ends, green-black veined marble interior. Upper-left warm daylight with subtle lower-right painted shadow; tactile hand-painted fantasy card game art in antique bronze and ivory marble palette. Slight elevated orthographic tabletop view, not side view. Entire rack fits the canvas with transparent margin. True transparent background. Empty sockets only, no gemstones, no text or digits or labels, no extra slots, no second row, no board or backdrop, no strong glow, no sparkles, no modern clean vector outline or checkerboard. Must feel carved into a Roman arena table.",
+      "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-7f17b14b-0cf2-4443-8f47-a0334b337ad7.png"
+    }
+  ]
+}

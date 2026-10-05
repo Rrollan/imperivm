@@ -9,10 +9,110 @@
       "rows": 3,
       "frameCount": 12,
       "fps": 30,
-      "bytes": 10440,
+      "bytes": 3128,
       "sourceRange": [
         0,
-        0.4
+        0.399
+      ]
+    },
+    "02-builder-heal": {
+      "src": "/ui/arena-lab/fx/02-builder-heal.atlas.webp",
+      "maxMs": 667,
+      "columns": 4,
+      "rows": 5,
+      "frameCount": 20,
+      "fps": 30,
+      "bytes": 7022,
+      "sourceRange": [
+        0,
+        0.6656666666666666
+      ]
+    },
+    "03-whale-impact": {
+      "src": "/ui/arena-lab/fx/03-whale-impact.atlas.webp",
+      "maxMs": 500,
+      "columns": 4,
+      "rows": 4,
+      "frameCount": 15,
+      "fps": 30,
+      "bytes": 3246,
+      "sourceRange": [
+        0,
+        0.499
+      ]
+    },
+    "04-degen-draw": {
+      "src": "/ui/arena-lab/fx/04-degen-draw.atlas.webp",
+      "maxMs": 500,
+      "columns": 4,
+      "rows": 4,
+      "frameCount": 15,
+      "fps": 30,
+      "bytes": 5558,
+      "sourceRange": [
+        0,
+        0.499
+      ]
+    },
+    "05-validator-gas": {
+      "src": "/ui/arena-lab/fx/05-validator-gas.atlas.webp",
+      "maxMs": 667,
+      "columns": 4,
+      "rows": 5,
+      "frameCount": 20,
+      "fps": 30,
+      "bytes": 6260,
+      "sourceRange": [
+        0,
+        0.6656666666666666
+      ]
+    },
+    "06-victory": {
+      "src": "/ui/arena-lab/fx/06-victory.mp4",
+      "maxMs": 1800,
+      "bytes": 65978,
+      "sourceRange": [
+        0,
+        1.7990000000000002
+      ]
+    },
+    "07-spell-impact": {
+      "src": "/ui/arena-lab/fx/07-spell-impact.atlas.webp",
+      "maxMs": 500,
+      "columns": 4,
+      "rows": 4,
+      "frameCount": 15,
+      "fps": 30,
+      "bytes": 6038,
+      "sourceRange": [
+        0,
+        0.499
+      ]
+    },
+    "08-spell-buff": {
+      "src": "/ui/arena-lab/fx/08-spell-buff.atlas.webp",
+      "maxMs": 700,
+      "columns": 4,
+      "rows": 6,
+      "frameCount": 21,
+      "fps": 30,
+      "bytes": 7686,
+      "sourceRange": [
+        0,
+        0.699
+      ]
+    },
+    "09-spell-counter": {
+      "src": "/ui/arena-lab/fx/09-spell-counter.atlas.webp",
+      "maxMs": 533,
+      "columns": 4,
+      "rows": 4,
+      "frameCount": 16,
+      "fps": 30,
+      "bytes": 5006,
+      "sourceRange": [
+        0,
+        0.5323333333333333
       ]
     }
   }
