@@ -1,7 +1,7 @@
 /**
  * IMPERIVM — card content v1.
  *
- * 40 cards, 10 per faction (DeFi / NFT / DePIN / Meme).
+ * Four factions (DeFi / NFT / DePIN / Meme), plus shared edict expansions.
  * Vanilla minion curve: cost N ≈ N+1 total stats; cards with effects sit below it.
  * All rules text is in English with imperial-crypto flavor.
  * Effect kinds used are exactly those from lib/engine/types.ts.
@@ -9,6 +9,14 @@
 import type { CardDef } from './engine/types';
 
 export const CARDS: Record<string, CardDef> = {
+  'senate-censure': {
+    id:'senate-censure',name:'Senate Censure',faction:'DeFi',rarity:'rare',cost:2,type:'spell',
+    spell:{kind:'weaken-random-enemy',amount:1},text:'Reduce a random enemy fighter’s attack by 1, to a minimum of 0.',
+  },
+  'restoration-rite': {
+    id:'restoration-rite',name:'Restoration Rite',faction:'NFT',rarity:'rare',cost:2,type:'spell',
+    spell:{kind:'heal-own-minions',amount:2},text:'Restore 2 health to every friendly fighter, up to their maximum health.',
+  },
   // ---------------------------------------------------------------- DeFi
   'lending-legionnaire': {
     id: 'lending-legionnaire',

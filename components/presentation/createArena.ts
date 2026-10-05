@@ -29,10 +29,10 @@ import { videoCues, VIDEO_IDS } from './videoCue';
 import type { PresentationBatch } from './GameSession';
 import {MOTION, smooth, settle, attackTravel} from './motionSpec';
 import {ArenaAbilityEffects} from './ArenaAbilityEffects';
+import {ArenaDeploymentEffects} from './ArenaDeploymentEffects';
 import {pixelRatio, type RenderQuality} from './renderQuality';
-import nativeUV from '../../public/ui/arena-lab/native/uv.json';
 
-export type ArenaTarget = { kind: 'hand' | 'minion' | 'hero' | 'power' | 'command' | 'gas' | 'block' | 'deck' | 'scroll'; uid: string; owner: 0 | 1; cardId?: string };
+export type ArenaTarget = { kind: 'hand' | 'minion' | 'hero' | 'power' | 'command' | 'gas' | 'block' | 'deck' | 'scroll' | 'queue'; uid: string; owner: 0 | 1; cardId?: string };
 export interface ArenaMetrics { meshes: number; triangles: number; drawCalls: number; renderScale: number; renderWidth: number; renderHeight: number; models: number; failedModels: number; frames: number; frameMedianMs: number; frameP95Ms: number; renderP95Ms: number; gpu: string; pending: string[] }
 export interface ArenaOptions {
   locale: Locale;
@@ -101,16 +101,20 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   const scheduler = new PresentationScheduler();
   let disposed = false, running = false, dirty = 3, last = 0, portrait = false, readyReported=false;
   let shown: GameState | null = null, selected: string | null = null;
-  let hovered: string | null = null, reportedHover: string | null = null;
+  let hovered: string | null = null, reportedHover: string | null = null, overlayOpen=false;
   let activeBatch: PresentationBatch | null = null;
   const rowY=(owner:number)=>owner===0?535:portrait?260:335;
-  const heroY=(owner:number)=>owner===0?(portrait?779:705):(portrait?26:153);
-  const queueX=()=>portrait?470:385;
+  // Measured recess centers in the delivered artwork. Portrait pixels map to
+  // x=350+.9*px, y=-130+.9*py; landscape uses its 1600×1000 pixels directly.
+  const heroX=()=>portrait?793:800;
+  const heroY=(owner:number)=>owner===0?(portrait?774:686):(portrait?20:148);
+  const queueX=()=>portrait?443:230;
+  const queueY=(owner:number)=>owner===0?525:339;
   const handY=()=>portrait?1020:865;
   const entities = new Map<string, Entity>();
   let heldArrival: Entity | null = null;
   let drawFlights:{entry:Entity;start:Vector3;target:Vector3;face:Face;delay:number;revealed:boolean;temporary:boolean}[]=[];
-  let layoutMoves:{entry:Entity;start:Vector3;target:Vector3;elapsed:number}[]=[];
+  let layoutMoves:{entry:Entity;start:Vector3;target:Vector3;elapsed:number;startScale?:Vector3;startRotation?:number}[]=[];
   const materials = new Map<string, StandardMaterial>();
   const request = () => {
     if (disposed) return;
@@ -120,6 +124,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   const textures = new ArenaTextures(scene, options.locale, request);
   const effects = new ArenaEffects(scene,request);
   const abilities = new ArenaAbilityEffects(scene,request);
+  const deployments=new ArenaDeploymentEffects(scene,request);
   const videoEffects = new ArenaSpriteEffects(scene,request);
   // Warm every small combat atlas during loading, before its first contact.
   if(!options.reducedMotion)videoEffects.prepare(VIDEO_IDS.filter(id=>id!=='06-victory').map(id=>({id,anchor:'arena-center',width:4})));
@@ -134,78 +139,28 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   const board = MeshBuilder.CreatePlane('painted Roman arena', { width: 32, height: 20 }, scene);
   board.position.z = 1.7; board.isPickable = false; board.receiveShadows = true;
   const boardMaterial = material('painted arena surface', '#ffffff', 0);
-  const painting = new Texture('/ui/arena-lab/roman-board.webp', scene, false, true, Texture.TRILINEAR_SAMPLINGMODE, request, request);
+  const painting = new Texture('/ui/arena-lab/roman-board-integrated.webp', scene, false, true, Texture.TRILINEAR_SAMPLINGMODE, request, request);
   painting.wrapU = Texture.CLAMP_ADDRESSMODE; painting.wrapV = Texture.CLAMP_ADDRESSMODE;
   boardMaterial.diffuseTexture = painting; boardMaterial.emissiveTexture = painting; boardMaterial.emissiveColor = new Color3(.32,.32,.32); board.material = boardMaterial;
   let portraitPainting:Texture|undefined;
-  const propAnchors: TransformNode[] = [];
-  function prop(id: ModelId, x: number, y: number, width: number, height: number, target?: ArenaTarget, decorative = false, fit: ModelFit = {}) {
-    const root = new TransformNode(`socket:${id}`, scene); root.position.copyFrom(point(x, y, .1));
-    if(target){const hit=MeshBuilder.CreatePlane(`${id}:hit`,{width:width/50,height:height/50},scene);hit.parent=root;hit.position.z=-1;hit.visibility=0;hit.isPickable=true;hit.metadata=target;}
-    if (decorative) propAnchors.push(root);
-    void assets.attach(id, root, { width: width/50, height: height/50, ...fit }, target).then(request);
-    return root;
+  // The clocks and deck are painted into the same board, light and perspective.
+  // Only these invisible hit surfaces and state overlays remain dynamic.
+  function inset(name:string,w:number,h:number,target:ArenaTarget){
+    const root=new TransformNode(name,scene);
+    const hit=MeshBuilder.CreatePlane(`${name}:hit`,{width:w/50,height:h/50},scene);
+    hit.parent=root;hit.visibility=0;hit.isPickable=true;hit.metadata=target;return root;
   }
-  function paintedProp(id:keyof typeof nativeUV,width:number,height:number,target:ArenaTarget){
-    const root=new TransformNode(`painted:${id}`,scene);
-    const texture=new Texture(`/ui/arena-lab/native/${id}.webp`,scene,false,true,Texture.TRILINEAR_SAMPLINGMODE,request,request);
-    const uv=nativeUV[id];texture.uOffset=uv.left;texture.vOffset=uv.bottom;texture.uScale=uv.width;texture.vScale=uv.height;
-    texture.hasAlpha=true;texture.wrapU=Texture.CLAMP_ADDRESSMODE;texture.wrapV=Texture.CLAMP_ADDRESSMODE;
-    const ink=material(`painted:${id}`,'#000000',0);ink.diffuseTexture=texture;ink.emissiveTexture=texture;
-    ink.emissiveColor=Color3.Black();ink.useEmissiveAsIllumination=true;ink.disableLighting=true;ink.useAlphaFromDiffuseTexture=true;
-    const face=MeshBuilder.CreatePlane(`painted:${id}:face`,{width:width/50,height:height/50},scene);
-    face.parent=root;face.material=ink;face.metadata=target;face.isPickable=true;
-    return root;
-  }
-  const hourglass=paintedProp('hourglass-native',54,102,{kind:'command',uid:'turn-command',owner:0});
-  const clock=paintedProp('water-clock-native',74,106,{kind:'block',uid:'block-counter',owner:0});
-  // The pivot is the foot on the painted plinth, so a small tilt cannot slide it.
-  (hourglass.getChildMeshes()[0] as Mesh).position.y=102*.38/50;
-  (clock.getChildMeshes()[0] as Mesh).position.y=106*.38/50;
-  const deckStack = new TransformNode('imperial deck',scene);deckStack.position.copyFrom(point(1378,184,-.2));deckStack.rotation.z=-.09;
-  const deckInk=textures.make('imperial deck backs',{kind:'back'});
-  const deckMaterial=material('imperial card backs','#000000',0);deckMaterial.diffuseTexture=deckInk.texture;deckMaterial.emissiveTexture=deckInk.texture;deckMaterial.emissiveColor=Color3.White();deckMaterial.disableLighting=true;deckMaterial.useAlphaFromDiffuseTexture=true;
-  for(let i=0;i<5;i++){
-    const leaf=MeshBuilder.CreatePlane(`deck leaf ${i}`,{width:1.8,height:2.4},scene);leaf.parent=deckStack;
-    leaf.position.set(i*.025,i*.018,-i*.025);leaf.material=deckMaterial;leaf.metadata={kind:'deck',uid:'own-deck',owner:0};
-  }
-  const sandMaterial=material('hourglass sand','#c69c60',0);sandMaterial.emissiveColor=Color3.FromHexString('#725635');
-  const sandTop=MeshBuilder.CreateCylinder('upper sand',{diameterTop:.35,diameterBottom:.03,height:.31,tessellation:10},scene);
-  const sandBottom=MeshBuilder.CreateCylinder('lower sand',{diameterTop:.03,diameterBottom:.35,height:.28,tessellation:10},scene);
-  const sandStream=MeshBuilder.CreateCylinder('falling sand',{diameter:.018,height:.32,tessellation:6},scene);
-  for(const sand of [sandTop,sandBottom,sandStream]){sand.parent=hourglass;sand.material=sandMaterial;sand.isPickable=false;sand.position.z=-.82;}
-  sandTop.position.y=.21;sandBottom.position.y=-.22;sandBottom.scaling.y=.3;sandStream.position.y=.75;sandStream.setEnabled(false);
-  // The illustration owns the two sand heaps; only a thin falling stream moves.
-  sandTop.setEnabled(false);sandBottom.setEnabled(false);
-  const history = prop('mempool-scroll', 155, 480, 110, 80, {kind:'scroll',uid:'battle-scroll',owner:0}, false, {pitch:Math.PI/2,yaw:Math.PI/2});
-  prop('brazier', 1220, 150, 80, 110, undefined, true);
-  const queueTray = new TransformNode('mempool tray', scene); queueTray.position.copyFrom(point(385,445,.4)); queueTray.setEnabled(false);
-  void assets.attach('mempool-scroll',queueTray,{width:5.2,height:2,pitch:Math.PI/2,yaw:Math.PI/2}).then(request);
-  const gasRack = new TransformNode('gas rack', scene);
-  const gasPlate=paintedProp('gas-rack-native',430,75,{kind:'gas',uid:'gas-counter',owner:0});gasPlate.parent=gasRack;gasPlate.position.z=.05;
-  const gasCells: {mesh:Mesh;target:number}[]=[];
-  let gasInitialized=false;
-  const gasTexture = new Texture('/ui/arena-lab/gas-socket.webp',scene,false,true,Texture.TRILINEAR_SAMPLINGMODE,request,request);
-  gasTexture.hasAlpha=true; gasTexture.wrapU=Texture.CLAMP_ADDRESSMODE; gasTexture.wrapV=Texture.CLAMP_ADDRESSMODE;
-  // The new rack supplies the bronze rim; sample only the stone inside the old art.
-  gasTexture.uOffset=.15;gasTexture.vOffset=.15;gasTexture.uScale=.70;gasTexture.vScale=.70;
-  const gasMaterial=material('painted gas sockets','#000000',0);
-  gasMaterial.diffuseTexture=gasTexture; gasMaterial.emissiveTexture=gasTexture;
-  gasMaterial.emissiveColor=Color3.White(); gasMaterial.disableLighting=true; gasMaterial.useAlphaFromDiffuseTexture=true;
-  for (let i=0;i<10;i++) {
-    const root = new TransformNode(`gas crystal ${i}`,scene); root.parent = gasRack;
-    const crystal=MeshBuilder.CreateDisc(`gas socket ${i}`,{radius:.54,tessellation:32},scene);
-    crystal.parent=root;crystal.material=gasMaterial;crystal.metadata={kind:'gas',uid:'gas-counter',owner:0};
-    root.position.set((-.386+i*.0858)*430/50,-.03,-.2);root.scaling.setAll(.435);
-    gasCells.push({mesh:crystal,target:0});
-  }
+  const hourglass=inset('embedded hourglass',75,110,{kind:'command',uid:'turn-command',owner:0});
+  const clock=inset('embedded water clock',85,120,{kind:'block',uid:'block-counter',owner:0});
+  const deckStack=inset('embedded deck',110,150,{kind:'deck',uid:'own-deck',owner:0});
+  const sandMaterial=material('falling ivory sand','#eed6a4',0);
+  const sandStream=MeshBuilder.CreateCylinder('falling sand',{diameter:.026,height:.35,tessellation:6},scene);
+  sandStream.parent=hourglass;sandStream.material=sandMaterial;sandStream.isPickable=false;sandStream.position.set(0,-.13,-.6);sandStream.setEnabled(false);
+  const gasRack=new TransformNode('orders anchor',scene);
   function gasFill(state:GameState){
-    const me=state.players[0];
-    const width=portrait?590:430;
-    gasRack.position.copyFrom(point(portrait?802:1320,portrait?918:777));gasPlate.scaling.setAll(width/430);
-    const centers=[127,212.25,297.25,382.5,468,552.75,638.25,724,809,894.5];
-    gasCells.forEach((cell,i)=>{const root=cell.mesh.parent as TransformNode;root.position.set(((centers[i]-8)/1010-.5)*width/50,-(width/430*2.33)/50,-.2);root.scaling.setAll(portrait?.60:.435);cell.target=i<me.gas?1:i<me.maxGas?.18:0;if(!gasInitialized||options.reducedMotion)cell.mesh.visibility=cell.target;});
-    gasInitialized=true;
+    gasRack.position.copyFrom(point(portrait?811:1347,portrait?905:760));
+    const counter=entities.get('gas-counter');
+    if(counter)paint(counter,{kind:'orders',gas:state.players[0].gas,max:state.players[0].maxGas});
   }
 
   function paint(entry: Entity, face: Face) {
@@ -227,10 +182,12 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       handle.root.position.copyFrom(position); entry.modelHandles.push(handle); return handle;
     };
     if (face.kind === 'hero') {
-      const w = entry.width, h = entry.height;
+      // The Whale bas-relief's fine silhouette is clearer in its existing,
+      // well-lit model poster at this small size, with no extra GLB or shader.
+      if(face.heroId==='whale'){entry.backing.setEnabled(false);return;}
       // The painted socket is the frame; one real relief coin sits inside it.
       // Avoid two conflicting frames and the incomplete inner geometry of the Tripo ring.
-      void attach(`hero-${face.heroId}` as ModelId, {width:w*.68,height:h*.62,depth:.20,stretch:true},new Vector3(0,0,-.65)).then(handle=>{
+      void attach(`hero-${face.heroId}` as ModelId, {width:(portrait?125:144)/50,height:(portrait?116:128)/50,depth:.20,stretch:true},new Vector3(0,0,-.65)).then(handle=>{
         if(handle&&!entry.root.isDisposed()&&entry.modelKey===key){entry.modelReady=true;entry.backing.setEnabled(false);entry.face.position.z=-.84;paint(entry,entry.painted);request();}
       });
     } else {
@@ -251,15 +208,15 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       : MeshBuilder.CreateBox(`${keyId}-thickness`, { width: width * .95, height: height * .93, depth: .13 }, scene);
     if (oval) { backing.scaling.set(width * .85, height * .8, .17); backing.position.y = height * .055; }
     backing.parent = root; backing.position.z = .09; backing.material = bronze; backing.isPickable = false;
-    if (['hero','power','command','gas','block','deck','scroll'].includes(face.kind)) backing.setEnabled(false);
+    if (['hero','power','command','gas','orders','block','deck','scroll','queueTitle'].includes(face.kind)) backing.setEnabled(false);
     const faceMesh = MeshBuilder.CreatePlane(`${keyId}-face`, { width, height, sideOrientation: Mesh.DOUBLESIDE }, scene);
     const texture = textures.make(`${keyId}-ink`, face);
     const mat = new StandardMaterial(`${keyId}-material`, scene); mat.diffuseTexture = texture.texture; mat.emissiveTexture = texture.texture; mat.emissiveColor = Color3.White(); mat.diffuseColor = Color3.Black(); mat.disableLighting = true; mat.specularColor = Color3.Black(); mat.useAlphaFromDiffuseTexture = true;
     faceMesh.parent = root; faceMesh.position.z = -.01; faceMesh.material = mat; faceMesh.metadata = data;
-    const halo = oval ? MeshBuilder.CreateTorus(`${keyId}-halo`, { diameter: 1, thickness: .028, tessellation: 48 }, scene) : MeshBuilder.CreatePlane(`${keyId}-halo`, { width: width * 1.06, height: height * 1.04 }, scene);
+    const halo = oval ? MeshBuilder.CreateTorus(`${keyId}-halo`, { diameter: 1, thickness: .045, tessellation: 48 }, scene) : MeshBuilder.CreatePlane(`${keyId}-halo`, { width: width * 1.06, height: height * 1.04 }, scene);
     if (oval) { halo.rotation.x = Math.PI / 2; halo.scaling.set(width * .89, 1, height * .81); halo.position.y = height * .055; }
     const haloMat = new StandardMaterial(`${keyId}-halo-material`, scene); haloMat.diffuseColor = Color3.Black(); haloMat.emissiveColor = Color3.FromHexString('#427650'); haloMat.alpha = oval ? .9 : .22; haloMat.disableLighting = true;
-    halo.parent = root; halo.position.z = .035; halo.material = haloMat; halo.isPickable = false; halo.setEnabled(false);
+    halo.parent = root; halo.position.z = -.03; halo.material = haloMat; halo.isPickable = false; halo.setEnabled(false);
     const entry: Entity = { root, face: faceMesh, halo, material: mat, haloMaterial: haloMat, texture, data, base: Vector3.Zero(), signature: '', width, height, backing, modelKey: '', modelReady: false, modelHandles: [], painted: face,hoverLift:0,hoverTarget:0,fanAngle:0 };
     entities.set(keyId, entry); return entry;
   }
@@ -275,10 +232,10 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       const target = entry.data.owner === 1 && targets.includes(entry.data.kind === 'hero' ? 'hero' : entry.data.uid);
       const active = selected === entry.data.uid;
       entry.halo.setEnabled(!activeBatch && (ready || powerReady || target || active));
-      const color = target ? '#f27445' : active ? '#ffe0a0' : '#c29c59';
+      const color = target ? '#ff8750' : active ? '#fff0bc' : '#c29c59';
       entry.haloMaterial.emissiveColor = Color3.FromHexString(color);
       entry.haloMaterial.alpha = target || active ? 1 : .5;
-      entry.hoverTarget=!activeBatch&&entry.data.kind==='hand'&&entry.data.owner===0&&hovered===entry.data.uid?1:0;
+      entry.hoverTarget=!overlayOpen&&!activeBatch&&entry.data.kind==='hand'&&entry.data.owner===0&&hovered===entry.data.uid?1:0;
     });
     updateAim();
     request();
@@ -291,7 +248,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const used = new Set<string>();
     const keep = (id: string, data: ArenaTarget, face: Face, w: number, h: number, x: number, y: number, z = 0) => {
       used.add(id);const old=entities.get(id),previous=old?.root.position.clone(); const entry = entity(id,data,face,w/50,h/50);
-      entry.root.setEnabled(true);
+      entry.data=data;entry.face.metadata=data;entry.root.setEnabled(true);
       paint(entry,face); modelPortrait(entry,face);
       entry.base.copyFrom(point(x,y,z)); entry.root.position.copyFrom(entry.base); entry.root.scaling.setAll(1);
       if(changed&&previous&&old===entry&&(data.kind==='minion'||data.kind==='hand'&&data.owner===0)&&Vector3.DistanceSquared(previous,entry.base)>.001&&!options.reducedMotion){
@@ -303,7 +260,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     };
     state.players.forEach((player,index)=>{
       const owner = index as 0|1;
-      keep(`hero-${owner}`,{kind:'hero',uid:`hero-${owner}`,owner},{kind:'hero',heroId:player.heroId,treasury:player.treasury},portrait?190:205,portrait?205:220,800,heroY(owner),-1.6);
+      keep(`hero-${owner}`,{kind:'hero',uid:`hero-${owner}`,owner},{kind:'hero',heroId:player.heroId,treasury:player.treasury},portrait?190:205,portrait?205:220,heroX(),heroY(owner),-1.6);
       const spacing = Math.min(portrait?124:150,(portrait?700:980)/Math.max(1,player.board.length));
       player.board.forEach((m,i)=>keep(m.uid,{kind:'minion',uid:m.uid,owner,cardId:m.cardId},{kind:'minion',minion:m,ready:readyAttackers.has(m.uid)},portrait?120:145,portrait?162:196,800+(i-(player.board.length-1)/2)*spacing,rowY(owner),-.15));
     });
@@ -312,19 +269,25 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     hand.forEach((c,i)=>{const x=800+(i-(hand.length-1)/2)*spacing;keep(c.uid,{kind:'hand',uid:c.uid,owner:0,cardId:c.cardId},{kind:'card',cardId:c.cardId},portrait?150:168,portrait?208:234,x,handY()+Math.abs(x-800)*.024,-1-i*.015);});
     const backs = Math.min(8,state.players[1].hand.length);
     for(let i=0;i<backs;i++){const e=keep(`back-${i}`,{kind:'hand',uid:`back-${i}`,owner:1},{kind:'back'},50,70,800+(i-(backs-1)/2)*40,portrait?-93:35,.5);e.face.isPickable=false;}
-    const hasQueue = mempoolOf(state,0).length+mempoolOf(state,1).length>0;
-    queueTray.setEnabled(hasQueue); queueTray.position.copyFrom(point(queueX(),445,.4));queueTray.scaling.setAll(portrait?.65:1);
-    for(const owner of [0,1] as const){const spells=mempoolOf(state,owner);spells.slice(0,6).forEach((spell,i)=>{const id=`queued-${spell.uid}`;const e=keep(id,{kind:'hand',uid:id,owner,cardId:spell.cardId},{kind:'card',cardId:spell.cardId},45,62,queueX()+(i-(Math.min(6,spells.length)-1)/2)*(portrait?26:40),owner===0?458:420,-.1);e.face.metadata={...e.data,kind:'minion'};});}
+    for(const owner of [0,1] as const){
+      const spells=mempoolOf(state,owner);
+      spells.slice(0,3).forEach((spell,i)=>{
+        const id=`queued-${spell.uid}`;
+        const e=keep(id,{kind:'queue',uid:id,owner,cardId:spell.cardId},{kind:'queued',cardId:spell.cardId,owner,count:spells.length,ordinal:i+1},130,174,queueX()+i*7,queueY(owner)-i*7,-1+i*.03);
+        e.face.metadata=e.data;
+      });
+    }
     const native = (id:string,kind:ArenaTarget['kind'],face:Face,w:number,h:number,x:number,y:number)=>keep(id,{kind,uid:id,owner:0},face,w,h,x,y,-.5);
     const me=state.players[0];
-    native('turn-command','command',{kind:'command',state:activeBatch?'busy':state.winner!==null?'over':state.turn===0?'own':'enemy',engraved:true},195,74,portrait?1138:1443,portrait?631:464);
-    native('hero-power','power',{kind:'power',heroId:me.heroId,cost:effectivePowerCost(state,0),available:state.turn===0&&legalActions(state).some(a=>a.type==='hero-power')},101,101,portrait?951:981,portrait?799:711);
-    native('gas-counter','gas',{kind:'gas',gas:me.gas,max:me.maxGas,engraved:true},135,90,portrait?1130:1320,portrait?908:868);
-    native('block-counter','block',{kind:'block',block:state.block},68,90,portrait?458:223,portrait?108:257);
-    const deck=native('own-deck','deck',{kind:'deck',count:me.deck.length},80,112,portrait?1169:1378,portrait?195:245);deck.modelReady=true;paint(deck,deck.painted);
-    const scroll=native('battle-scroll','scroll',{kind:'scroll'},65,86,portrait?430:155,portrait?430:480);scroll.face.setEnabled(!assets.loaded.has('mempool-scroll'));
-    hourglass.position.copyFrom(point(portrait?1173:1430,portrait?518:327,.1));clock.position.copyFrom(point(portrait?458:223,portrait?77:220,.1));history.position.copyFrom(point(portrait?430:155,portrait?430:480,.1));
-    deckStack.position.copyFrom(point(portrait?1169:1378,portrait?122:184,-.2));deckStack.scaling.setAll(portrait?1.08:1);
+    native('turn-command','command',{kind:'command',state:activeBatch?'busy':state.winner!==null?'over':state.turn===0?'own':'enemy',engraved:true},190,72,portrait?1165:1452,portrait?621:465);
+    native('hero-power','power',{kind:'power',heroId:me.heroId,cost:effectivePowerCost(state,0),available:state.turn===0&&legalActions(state).some(a=>a.type==='hero-power')},101,101,portrait?960:975,portrait?792:703);
+    native('gas-counter','gas',{kind:'orders',gas:me.gas,max:me.maxGas},portrait?650:488,portrait?68:54,portrait?876:1391,portrait?905:760);
+    native('block-counter','block',{kind:'block',block:state.block},60,78,portrait?446:234,portrait?70:220);
+    const deck=native('own-deck','deck',{kind:'deck',count:me.deck.length},80,112,portrait?1163:1390,portrait?202:238);deck.modelReady=true;paint(deck,deck.painted);
+    native('battle-scroll','scroll',{kind:'queueTitle',own:mempoolOf(state,0).length,enemy:mempoolOf(state,1).length},180,110,queueX(),190);
+    hourglass.position.copyFrom(point(portrait?1178:1442,portrait?514:352,-.5));
+    clock.position.copyFrom(point(portrait?446:234,portrait?57:218,-.5));
+    deckStack.position.copyFrom(point(portrait?1163:1390,portrait?99:175,-.5));
     gasFill(state);
     entities.forEach((entry,id)=>{if(!used.has(id)){destroy(entry);entities.delete(id);}});highlights();
   }
@@ -351,12 +314,23 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     if(to)effects.aim(source.base,to,valid);else effects.hideAim();
     canvas.style.cursor=valid?'crosshair':'pointer';
   }
-  function clearPress() {
-    if (press) { press.entity.root.position.copyFrom(press.entity.base); press.entity.root.scaling.setAll(1); }
+  function clearPress(animateReturn=false) {
+    if (press) {
+      const entry=press.entity;
+      if(animateReturn&&press.dragged&&!options.reducedMotion){
+        layoutMoves=layoutMoves.filter(move=>move.entry!==entry);
+        layoutMoves.push({entry,start:entry.root.position.clone(),target:entry.base.clone(),elapsed:0,startScale:entry.root.scaling.clone(),startRotation:entry.root.rotation.z});
+        entry.hoverLift=0;entry.hoverTarget=0;
+        hovered=null;reportedHover=null;
+      }else {entry.root.position.copyFrom(entry.base);entry.root.scaling.setAll(1);}
+    }
     press = null; highlights();
   }
   scene.onPointerObservable.add(info => {
     if (activeBatch || !shown) return;
+    // Babylon listens for release on the window. A DOM inspector/menu button
+    // must never also activate the board beneath its last canvas coordinates.
+    if (info.event.target !== canvas && !press) return;
     if (info.type === PointerEventTypes.POINTERDOWN) {
       const target = hitTarget(); if (!target || target.owner !== 0) return;
       const entry = entities.get(target.uid); if (!entry) return;
@@ -385,7 +359,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         const data = current.entity.data;
         // Save the actual release pose before highlights restore the hand layout.
         released = { uid:data.uid, position:current.entity.root.position.clone(), scaling:current.entity.root.scaling.clone(), rotation:current.entity.root.rotation.z };
-        clearPress();
+        clearPress(true);
         if (data.kind === 'hand' && at && Math.abs(at.x) < 11.5 && at.y > -3 && at.y < 5) options.onPlay(data.uid);
         if (data.kind === 'minion' && target?.owner === 1 && (target.kind === 'minion' || target.kind === 'hero')) options.onAttack(data.uid, target.kind === 'hero' ? 'hero' : target.uid);
         released = null;
@@ -397,7 +371,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       if (typeof event.pointerId === 'number' && canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     }
   });
-  const cancelPointer = () => { clearPress(); options.onHover(null); };
+  const cancelPointer = () => { clearPress(true); options.onHover(null); };
   const leavePointer = () => { if (!press) { hovered = null; reportedHover = null; options.onHover(null); highlights(); } };
   canvas.addEventListener('pointercancel', cancelPointer);
   canvas.addEventListener('pointerleave', leavePointer);
@@ -406,7 +380,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     engine.setHardwareScalingLevel(1/pixelRatio(canvas.clientWidth,canvas.clientHeight,window.devicePixelRatio,options.quality??'auto'));
     engine.resize(); const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight);
     portrait=aspect<1.1;
-    if(portrait&&!portraitPainting){portraitPainting=new Texture('/ui/arena-lab/roman-board-portrait.webp',scene,false,true,Texture.TRILINEAR_SAMPLINGMODE,request,request);portraitPainting.wrapU=Texture.CLAMP_ADDRESSMODE;portraitPainting.wrapV=Texture.CLAMP_ADDRESSMODE;}
+    if(portrait&&!portraitPainting){portraitPainting=new Texture('/ui/arena-lab/roman-board-integrated-portrait.webp',scene,false,true,Texture.TRILINEAR_SAMPLINGMODE,request,request);portraitPainting.wrapU=Texture.CLAMP_ADDRESSMODE;portraitPainting.wrapV=Texture.CLAMP_ADDRESSMODE;}
     board.scaling.set(portrait?18/32:1,portrait?25.2/20:1,1);
     boardMaterial.diffuseTexture=portrait?portraitPainting!:painting;boardMaterial.emissiveTexture=boardMaterial.diffuseTexture;
     const height=portrait?Math.max(12.6,9/aspect):Math.max(10.2,16.3/aspect);
@@ -414,7 +388,6 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const menu=point(portrait?1175:1515,portrait?1070:915);
     canvas.parentElement?.style.setProperty('--arena-menu-x',`${(menu.x/(height*aspect)+1)*canvas.clientWidth/2}px`);
     canvas.parentElement?.style.setProperty('--arena-menu-y',`${(1-menu.y/height)*canvas.clientHeight/2}px`);
-    propAnchors.forEach(root=>root.setEnabled(!portrait));
     if(shown&&!activeBatch)sync(shown);request();
   }
   const resizeObserver = new ResizeObserver(resize); resizeObserver.observe(canvas);
@@ -430,9 +403,9 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   function render() {
     if (disposed || document.hidden) return;
     if(!readyReported){
-      const portraitsReady=shown?.players.every(p=>assets.loaded.has(`hero-${p.heroId}` as ModelId)||assets.failed.has(`hero-${p.heroId}` as ModelId));
+      const portraitsReady=shown?.players.every(p=>p.heroId==='whale'||assets.loaded.has(`hero-${p.heroId}` as ModelId)||assets.failed.has(`hero-${p.heroId}` as ModelId));
       const visibleReady=scene.meshes.every(mesh=>!mesh.isEnabled()||!mesh.isVisible||mesh.visibility<=0||mesh.isReady(true));
-      if(portraitsReady&&painting.isReady()&&(!portrait||portraitPainting?.isReady())&&visibleReady){
+      if(portraitsReady&&textures.isReady()&&painting.isReady()&&(!portrait||portraitPainting?.isReady())&&visibleReady){
         readyReported=true;options.onReady?.();
       }
     }
@@ -441,23 +414,29 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     videoEffects.tick(delta);
     layoutMoves=layoutMoves.filter(move=>{
       if(move.entry.root.isDisposed()||move.entry.root===press?.entity.root)return false;
-      move.elapsed+=delta;move.entry.root.position.copyFrom(Vector3.Lerp(move.start,move.target,smooth(move.elapsed/160)));return move.elapsed<160;
+      move.elapsed+=delta;
+      const progress=smooth(move.elapsed/160);
+      move.entry.root.position.copyFrom(Vector3.Lerp(move.start,move.target,progress));
+      if(move.startScale){move.entry.root.scaling.copyFrom(Vector3.Lerp(move.startScale,Vector3.One(),progress));move.entry.root.rotation.z=(move.startRotation??0)*(1-progress)+move.entry.fanAngle*progress;}
+      return move.elapsed<160;
     });
     let settling=layoutMoves.length>0;
-    gasCells.forEach(cell=>{cell.mesh.visibility=options.reducedMotion?cell.target:settle(cell.mesh.visibility,cell.target,delta,MOTION.gasMs);settling ||= cell.mesh.visibility!==cell.target;});
     if(!activeBatch)entities.forEach(entry=>{
       if(entry.data.kind!=='hand'||entry.data.owner!==0||entry.root===press?.entity.root)return;
+      if(layoutMoves.some(move=>move.entry===entry&&move.startScale))return;
       entry.hoverLift=options.reducedMotion?entry.hoverTarget:settle(entry.hoverLift,entry.hoverTarget,delta,MOTION.hoverMs);
       const lift=entry.hoverLift;
       if(!layoutMoves.some(m=>m.entry===entry))entry.root.position.copyFrom(entry.base);
-      entry.root.position.y+=2.1*lift;entry.root.position.z-=6*lift;
-      entry.root.scaling.setAll(1+.55*lift);entry.root.rotation.z=entry.fanAngle*(1-lift);
+      const hoverLimit=portrait?5.7:12;
+      entry.root.position.x+=(Math.max(-hoverLimit,Math.min(hoverLimit,entry.base.x))-entry.base.x)*lift;
+      entry.root.position.y+=3.5*lift;entry.root.position.z-=6*lift;
+      entry.root.scaling.setAll(1+1.1*lift);entry.root.rotation.z=entry.fanAngle*(1-lift);
       entry.root.getChildMeshes().forEach(mesh=>mesh.renderingGroupId=lift>.02?2:0);
       settling ||= entry.hoverLift!==entry.hoverTarget;
     });
     effects.flush();
     scene.render();
-    if(options.measure&&frameSamples.length<300){frameSamples.push(rawDelta);renderSamples.push(performance.now()-time);}
+    if(options.measure){frameSamples.push(rawDelta);renderSamples.push(performance.now()-time);if(frameSamples.length>300){frameSamples.shift();renderSamples.shift();}}
     if(options.measure&&time>=nextMetricAt){nextMetricAt=time+1000;reportMetrics();}
     // Parallel shader compilation may outlive the first few requested frames.
     // Keep the clock alive until the newly introduced materials can draw.
@@ -474,11 +453,10 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
 
   function releaseArrival(){if(heldArrival){destroy(heldArrival);heldArrival=null;}}
   function releaseDraws(){drawFlights.forEach(f=>{if(f.temporary){entities.delete(f.entry.data.uid);destroy(f.entry);}else if(!f.entry.root.isDisposed()){f.entry.root.rotation.y=0;paint(f.entry,f.face);}});drawFlights=[];}
-  function resetClock(){hourglass.rotation.z=0;sandTop.scaling.y=1;sandBottom.scaling.y=.3;sandStream.setEnabled(false);}
-  function cancel() { scheduler.cancel(); releaseArrival(); releaseDraws();layoutMoves=[];effects.clear();abilities.clear(); videoEffects.cancel(); activeBatch = null; released=null; entities.forEach(entry=>{entry.material.alpha=1;entry.backing.visibility=1;entry.hoverLift=0;}); resetClock(); queueTray.position.y=1.07; clearPress(); if (shown) sync(shown); }
+  function resetClock(){sandStream.setEnabled(false);}
+  function cancel() { scheduler.cancel(); releaseArrival(); releaseDraws();layoutMoves=[];effects.clear();abilities.clear();deployments.clear(); videoEffects.cancel(); activeBatch = null; released=null; entities.forEach(entry=>{entry.material.alpha=1;entry.backing.visibility=1;entry.hoverLift=0;}); resetClock(); clearPress(); if (shown) sync(shown); }
 
   async function present(batch: PresentationBatch, impact: () => void) {
-    frameSamples=[];renderSamples=[];
     scheduler.cancel(); releaseArrival();releaseDraws();layoutMoves=[]; activeBatch = batch; options.onHover(null); hovered = null; selected = null; highlights();
     const command = entities.get('turn-command'); if (command) paint(command, { kind: 'command', state: 'busy', engraved: true });
     const attack = batch.action.type === 'attack' ? batch.action : null;
@@ -503,9 +481,9 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const addedIndex = added ? batch.after.players[owner].board.findIndex(m=>m.uid===added.uid) : 0;
     const pending = mempoolOf(batch.after, owner), pendingIndex = Math.min(5,pending.length-1);
     const target = defender?.root.position.clone() ?? (batch.action.type === 'cast-spell'
-      ? point(queueX()+(pendingIndex-(Math.min(6,pending.length)-1)/2)*(portrait?26:40),owner===0?458:420,-.1)
+      ? point(queueX()+Math.min(2,pendingIndex)*7,queueY(owner)-Math.min(2,pendingIndex)*7,-1)
       : point(800+(addedIndex-(boardSize-1)/2)*boardSpacing,rowY(owner),-.15));
-    const landingScale = moving ? new Vector3((batch.action.type==='cast-spell'?45:portrait?120:145)/(moving.width*50),(batch.action.type==='cast-spell'?62:portrait?162:196)/(moving.height*50),1) : Vector3.One();
+    const landingScale = moving ? new Vector3((batch.action.type==='cast-spell'?130:portrait?120:145)/(moving.width*50),(batch.action.type==='cast-spell'?174:portrait?162:196)/(moving.height*50),1) : Vector3.One();
     const settling = handUid ? batch.after.players[owner].board.flatMap((m,index)=>{
       const entry=entities.get(m.uid); return entry ? [{entry,start:entry.root.position.clone(),target:point(800+(index-(boardSize-1)/2)*boardSpacing,rowY(owner),-.15)}] : [];
     }) : [];
@@ -560,17 +538,18 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       });
       resolving.forEach(({entry,start,delay})=>{if(entry.root.isDisposed()||progress>=impactAt)return;const t=smooth((progress*duration/1000-delay)/Math.max(.12,contactMs/1000-delay));entry.root.position.copyFrom(start);entry.root.position.y+=.8*t;entry.root.scaling.setAll(1+.55*t);entry.material.alpha=1-.65*t;});
       effects.tick(progress,impactAt,options.reducedMotion);
+      deployments.tick(progress,impactAt,options.reducedMotion);
       abilities.tick(progress,impactAt,options.reducedMotion);
       if (progress > .55) deadObjects.forEach(entry => { if (!entry.root.isDisposed()) entry.root.scaling.setAll(Math.max(.02, 1 - (progress - .55) / .45)); });
       if (!options.reducedMotion) {
-        if (batch.action.type === 'end-turn'){hourglass.rotation.z = Math.sin(progress*Math.PI)*.12;sandTop.scaling.y=1-.75*smooth(progress);sandBottom.scaling.y=.3+.7*smooth(progress);sandStream.setEnabled(progress>.15&&progress<.8);clock.rotation.z=Math.sin(progress*Math.PI)*.025;}
+        if (batch.action.type === 'end-turn'){sandStream.setEnabled(progress>.15&&progress<.8);}
         if (batch.action.type === 'hero-power') entities.get('hero-power')?.root.scaling.setAll(1+Math.sin(progress*Math.PI)*.04);
-        if (batch.action.type === 'cast-spell') queueTray.position.y = 1.07+Math.sin(progress*Math.PI)*.15;
         if (defender && defenderStart && progress>impactAt && !defender.root.isDisposed()) defender.root.position.x = defenderStart.x+Math.sin((progress-impactAt)*Math.PI*10)*.09*(1-progress);
       }
     }, () => {
       if (activeBatch?.id !== batch.id) return;
       videoEffects.trigger(cues,uid=>cuePositions.get(uid),options.reducedMotion);
+      if(batch.events?.play)deployments.begin(batch.events.play.cardId,target);
       if(handUid){
         // Replace the arriving card with its battlefield/queue form at the same position,
         // at contact rather than after a return to the hand or a blank frame.
@@ -603,7 +582,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         if (hero) paint(hero,{ kind: 'hero', heroId: player.heroId, treasury: player.treasury });
         player.board.forEach(minion => { const entry = entities.get(minion.uid); if (entry) paint(entry, { kind: 'minion', minion }); });
       });
-      const gas = entities.get('gas-counter'); if (gas) paint(gas, { kind: 'gas', gas: batch.after.players[0].gas, max: batch.after.players[0].maxGas, engraved: true });
+      const gas = entities.get('gas-counter'); if (gas) paint(gas, { kind: 'orders', gas: batch.after.players[0].gas, max: batch.after.players[0].maxGas });
       gasFill(batch.after);
       const clock = entities.get('block-counter'); if (clock) paint(clock, { kind: 'block', block: batch.after.block });
       if (defender && !defender.root.isDisposed()) defender.haloMaterial.emissiveColor = Color3.FromHexString('#ec9a58');
@@ -613,8 +592,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       releaseArrival();releaseDraws();if(landed&&!landed.root.isDisposed()){landed.material.alpha=1;landed.backing.visibility=1;}
       entities.forEach(entry=>{entry.material.alpha=1;entry.face.isPickable=entry.data.owner===0||entry.data.kind!=='hand';entry.root.rotation.y=0;});
       activeBatch = null; sync(batch.after);
-      effects.clear();abilities.clear();
-      resetClock();clock.rotation.z=0; queueTray.position.y = 1.07;
+      effects.clear();abilities.clear();deployments.clear();
+      resetClock();
     });
     request();
   }
@@ -622,6 +601,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   return {
     sync: (state: GameState) => { if (!activeBatch) sync(state); },
     select: (uid: string | null) => { selected = uid; highlights(); },
+    setOverlayOpen: (open:boolean) => {overlayOpen=open;if(open){hovered=null;reportedHover=null;}highlights();},
     setLocale: (locale: Locale) => textures.setLocale(locale),
     setQuality: (quality: RenderQuality) => {options.quality=quality;resize();},
     setReducedMotion: (reduced: boolean) => { options.reducedMotion = reduced; if(reduced)videoEffects.cancel(); },
@@ -630,7 +610,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     dispose: () => {
       disposed = true; scheduler.cancel(); releaseArrival();releaseDraws(); resizeObserver.disconnect(); document.removeEventListener('visibilitychange', visibility); canvas.removeEventListener('pointercancel', cancelPointer);
       canvas.removeEventListener('pointerleave', leavePointer);
-      engine.stopRenderLoop(render); videoEffects.dispose(); effects.dispose();abilities.dispose(); assets.dispose(); textures.dispose(); instrument.dispose(); scene.dispose(); engine.dispose(); entities.clear();
+      engine.stopRenderLoop(render); videoEffects.dispose(); effects.dispose();abilities.dispose();deployments.dispose(); assets.dispose(); textures.dispose(); instrument.dispose(); scene.dispose(); engine.dispose(); entities.clear();
     },
   };
 }

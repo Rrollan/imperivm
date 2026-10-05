@@ -3,7 +3,7 @@ import { readFile, writeFile, mkdir, stat, rename } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ids=['01-impact','02-builder-heal','03-whale-impact','04-degen-draw','05-validator-gas','06-victory','07-spell-impact','08-spell-buff','09-spell-counter'];
+const ids=['01-impact','02-builder-heal','03-whale-impact','04-degen-draw','05-validator-gas','06-victory','07-spell-impact','08-spell-buff','09-spell-counter','10-deploy-legionary','11-deploy-guard','12-deploy-commander','13-deploy-minister','14-deploy-priest','15-deploy-engineer','16-edict-weaken','17-edict-heal'];
 const [id,sourceArg,startArg='0',endArg]=process.argv.slice(2);
 if(!ids.includes(id)||!sourceArg||!endArg)throw new Error('Usage: node scripts/vfx/import.mjs <id> <original.mp4> <startSeconds> <endSeconds>');
 const source=resolve(sourceArg),start=Number(startArg),end=Number(endArg),duration=end-start;

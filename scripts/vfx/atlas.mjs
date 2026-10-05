@@ -5,7 +5,7 @@ import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const [id,sourceArg,startArg='0',durationArg='.4']=process.argv.slice(2);
-const ids=['01-impact','02-builder-heal','03-whale-impact','04-degen-draw','05-validator-gas','07-spell-impact','08-spell-buff','09-spell-counter'];
+const ids=['01-impact','02-builder-heal','03-whale-impact','04-degen-draw','05-validator-gas','07-spell-impact','08-spell-buff','09-spell-counter','10-deploy-legionary','11-deploy-guard','12-deploy-commander','13-deploy-minister','14-deploy-priest','15-deploy-engineer','16-edict-weaken','17-edict-heal'];
 const start=Number(startArg),duration=Number(durationArg),fps=30,columns=4,frameCount=Math.round(duration*fps),rows=Math.ceil(frameCount/columns);
 if(!ids.includes(id)||!sourceArg||!Number.isFinite(start)||start<0||!Number.isFinite(duration)||duration<.2||duration>1)throw new Error('Usage: atlas.mjs <combat-id> <original.mp4> <startSeconds> <durationSeconds 0.2–1>');
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..'),out=resolve(root,'public/ui/arena-lab/fx');

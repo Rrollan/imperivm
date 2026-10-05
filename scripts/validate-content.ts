@@ -9,6 +9,8 @@ const EFFECT_KINDS: EffectKind[] = [
   'damage-random-enemy',
   'damage-enemy-treasury',
   'heal-treasury',
+  'heal-own-minions',
+  'weaken-random-enemy',
   'draw',
   'buff-own',
   'gain-gas',

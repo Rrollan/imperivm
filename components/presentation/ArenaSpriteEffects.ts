@@ -19,7 +19,7 @@ export class ArenaSpriteEffects {
   private clips=new Map<VideoId,Clip[]>();
   private live:Live[]=[];
   private disposed=false;
-  private sources:Partial<Record<Exclude<VideoId,'06-victory'>,Source>>=registry.clips;
+  private sources:Partial<Record<Exclude<VideoId,'06-victory'>,Source>>=registry.clips as Partial<Record<Exclude<VideoId,'06-victory'>,Source>>;
   constructor(private scene:Scene,private invalidate:()=>void){}
   get active(){return this.live.length>0;}
   prepare(cues:VideoCue[]){cues.forEach(c=>this.load(c.id));}

@@ -24,6 +24,7 @@ import type {
   Minion,
   PlayerId,
   PlayerState,
+  SpellEffectResult,
 } from './types';
 
 /* ------------------------------------------------------------------ */
@@ -46,12 +47,22 @@ interface EngineGame extends GameState {
   enableMulligan: boolean;
   mulliganCount: [number, number]; // P0, P1
   mulliganPhase: [boolean, boolean]; // true while that player may still mulligan
+  /** Per-action ledger for targeted delayed effects. */
+  spellEffects?: SpellEffectResult[];
 }
 
 /** Read a player's mempool (cast spells waiting to resolve next turn). */
 export function mempoolOf(state: GameState, pid: PlayerId): MempoolEntry[] {
   const p = state.players[pid] as EnginePlayer | undefined;
   return p !== undefined && Array.isArray(p.mempool) ? p.mempool : [];
+}
+
+/** Read the exact targeted-effect ledger produced by the latest action. */
+export function spellEffectsOf(state: GameState): SpellEffectResult[] {
+  const ledger = (state as EngineGame).spellEffects;
+  return Array.isArray(ledger)
+    ? ledger.map(effect => ({ ...effect, targets: effect.targets.map(target => ({ ...target })) }))
+    : [];
 }
 
 /* ------------------------------------------------------------------ */
@@ -224,13 +235,15 @@ function counterMempool(s: EngineGame, pid: PlayerId): void {
   pushLog(s, `P${pid} counters ${removed.name}`);
 }
 
-function applyEffect(s: EngineGame, caster: PlayerId, eff: EffectDef): void {
+function applyEffect(s: EngineGame, caster: PlayerId, eff: EffectDef): string[] | undefined {
   const me = s.players[caster];
   const foe = s.players[other(caster)];
+  let targets:string[]|undefined;
   switch (eff.kind) {
     case 'damage-all-enemy-minions': {
       const amt = eff.amount ?? 0;
       pushLog(s, `${amt} damage to all enemy minions`);
+      targets=foe.board.map(minion=>minion.uid);
       for (const m of [...foe.board]) damageMinion(s, foe.id, m.uid, amt);
       break;
     }
@@ -239,8 +252,10 @@ function applyEffect(s: EngineGame, caster: PlayerId, eff: EffectDef): void {
       if (foe.board.length > 0) {
         const t = foe.board[Math.floor(rand(s) * foe.board.length)] as Minion;
         pushLog(s, `${amt} damage to random enemy ${t.name}`);
+        targets=[t.uid];
         damageMinion(s, foe.id, t.uid, amt);
       } else {
+        targets=[`hero-${foe.id}`];
         foe.treasury -= amt;
         pushLog(s, `${amt} damage to enemy treasury`);
       }
@@ -248,14 +263,40 @@ function applyEffect(s: EngineGame, caster: PlayerId, eff: EffectDef): void {
     }
     case 'damage-enemy-treasury': {
       const amt = eff.amount ?? 0;
+      targets=[`hero-${foe.id}`];
       foe.treasury -= amt;
       pushLog(s, `${amt} damage to enemy treasury`);
       break;
     }
     case 'heal-treasury': {
       const amt = eff.amount ?? 0;
+      const before=me.treasury;
       me.treasury = Math.min(30, me.treasury + amt);
+      targets=me.treasury>before?[`hero-${me.id}`]:[];
       pushLog(s, `P${caster} restores ${amt} treasury`);
+      break;
+    }
+    case 'heal-own-minions': {
+      const amount=eff.amount??0;
+      const healed:string[]=[];
+      for(const minion of me.board){
+        const before=minion.health;
+        minion.health=Math.min(minion.maxHealth,minion.health+amount);
+        if(minion.health>before)healed.push(minion.uid);
+      }
+      pushLog(s,`P${caster} restores ${amount} to own minions`);
+      targets=healed;break;
+    }
+    case 'weaken-random-enemy': {
+      if(foe.board.length){
+        const target=foe.board[Math.floor(rand(s)*foe.board.length)];
+        target.attack=Math.max(0,target.attack-(eff.amount??1));
+        pushLog(s,`P${caster} weakens ${target.name} to ${target.attack} attack`);
+        targets=[target.uid];
+      }else{
+        pushLog(s,`P${caster} weakening fizzles (no enemy minions)`);
+        targets=[];
+      }
       break;
     }
     case 'draw': {
@@ -272,6 +313,7 @@ function applyEffect(s: EngineGame, caster: PlayerId, eff: EffectDef): void {
         m.maxHealth += h;
       }
       pushLog(s, `P${caster} minions +${a}/+${h}`);
+      targets=a!==0||h!==0?me.board.map(minion=>minion.uid):[];
       break;
     }
     case 'gain-gas': {
@@ -310,6 +352,7 @@ function applyEffect(s: EngineGame, caster: PlayerId, eff: EffectDef): void {
     }
   }
   checkWinner(s);
+  return targets;
 }
 
 /**
@@ -356,6 +399,7 @@ function completeTurnStart(s: EngineGame): void {
   pushLog(s, `Block ${s.block} — P${s.turn} turn`);
 
   // 1. Resolve the new active player's mempool entries in cast order.
+  let queuedOrders = 0;
   const entries = me.mempool;
   me.mempool = [];
   for (const e of entries) {
@@ -365,7 +409,44 @@ function completeTurnStart(s: EngineGame): void {
       continue;
     }
     pushLog(s, `${e.name} resolves`);
-    applyEffect(s, s.turn, def.spell);
+    const effectKind = def.spell.kind;
+    const shouldTrack = effectKind.startsWith('damage-') || effectKind === 'heal-treasury' || effectKind === 'heal-own-minions' || effectKind === 'weaken-random-enemy' || effectKind === 'buff-own';
+    const beforeByUid = shouldTrack
+      ? new Map(s.players.flatMap(player => player.board).map(minion => [minion.uid, {
+          attack: minion.attack,
+          health: minion.health,
+          maxHealth:minion.maxHealth,
+        }] as const))
+      : undefined;
+    if(beforeByUid)for(const player of s.players)beforeByUid.set(`hero-${player.id}`,{attack:0,health:player.treasury,maxHealth:30});
+    const ordersBefore = me.gas;
+    const targetUids = applyEffect(s, s.turn, def.spell);
+    // Delayed order rewards belong to this new turn. Preserve them when the
+    // base stock refills below; do not change the established resolve order.
+    if (effectKind === 'gain-gas') queuedOrders += me.gas - ordersBefore;
+    if (shouldTrack) {
+      const targets = (targetUids ?? []).flatMap(uid => {
+        const before = beforeByUid?.get(uid);
+        const after = s.players.flatMap(player => player.board).find(minion => minion.uid === uid);
+        if (!before) return [];
+        const ruler=uid==='hero-0'?s.players[0]:uid==='hero-1'?s.players[1]:undefined;
+        return [{
+          uid,
+          attackBefore: before.attack,
+          attackAfter: after?.attack??before.attack,
+          healthBefore: before.health,
+          healthAfter:Math.max(0,ruler?.treasury??after?.health??0),
+          maxHealth:after?.maxHealth??before.maxHealth,
+        }];
+      });
+      (s.spellEffects ??= []).push({
+        owner: s.turn,
+        cardId: e.cardId,
+        mempoolUid: e.uid,
+        kind: effectKind,
+        targets,
+      });
+    }
     if (s.winner !== null) return;
   }
 
@@ -384,7 +465,7 @@ function completeTurnStart(s: EngineGame): void {
 
   // 3. Gas refill: maxGas grows, staked minions add +1 gas each.
   me.maxGas = Math.min(10, me.maxGas + 1);
-  me.gas = me.maxGas + me.board.filter(m => m.staked).length;
+  me.gas = me.maxGas + me.board.filter(m => m.staked).length + queuedOrders;
   me.heroPowerUsed = false;
 
   // 3b. Pavilion reset for the new active player; additive stats above persist.
@@ -649,6 +730,7 @@ export function applyAction(state: GameState, action: Action): GameState {
   }
 
   const s = structuredClone(state) as EngineGame;
+  s.spellEffects = [];
   for (const p of s.players) {
     if (!Array.isArray(p.mempool)) p.mempool = [];
     if (!p.factionPlaysThisTurn) p.factionPlaysThisTurn = {};

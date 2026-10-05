@@ -73,7 +73,8 @@ export class ArenaAssets {
       const root = new TransformNode(`${parent.name}:${id}`, this.scene);
       const orientation = new TransformNode(`${id}:orientation`, this.scene);
       orientation.parent = root;
-      const front = id === 'hero-whale' || id === 'end-turn-hourglass' ? Math.PI / 2 : ['hero-builder','hero-degen','hero-validator','hero-frame', 'bust', 'chest', 'water-clock'].includes(id) ? Math.PI : 0;
+      // Whale's relief lies in YZ; the other hero reliefs lie in XY.
+      const front = id === 'hero-whale' ? -Math.PI / 2 : id === 'end-turn-hourglass' ? Math.PI / 2 : ['hero-builder','hero-degen','hero-validator','hero-frame', 'bust', 'chest', 'water-clock'].includes(id) ? Math.PI : 0;
       orientation.rotation.set(fit.pitch ?? 0, fit.yaw ?? front, 0);
       entries.rootNodes.forEach(node => { node.parent = orientation; node.setEnabled(true); });
       orientation.computeWorldMatrix(true);

@@ -18,7 +18,7 @@ export class ArenaAbilityEffects {
   private pool:Piece[]=[];
   private live:Live[]=[];
   constructor(private scene:Scene,private invalidate:()=>void){
-    for(const kind of ['steel','heal','gas','dice','seal','buff','counter'] as const)this.glyphs.set(kind,this.glyph(kind));
+    for(const kind of ['steel','heal','gas','dice','seal','buff','counter','weaken'] as const)this.glyphs.set(kind,this.glyph(kind));
     for(let i=0;i<18;i++){
       const mesh=MeshBuilder.CreatePlane(`ability ${i}`,{width:1,height:1},scene);
       const material=new StandardMaterial(`ability ${i}`,scene);
@@ -31,10 +31,11 @@ export class ArenaAbilityEffects {
   private glyph(kind:AccentKind){
     const texture=new DynamicTexture(`ability glyph ${kind}`,128,this.scene,false);texture.hasAlpha=true;
     const c=texture.getContext() as unknown as CanvasRenderingContext2D;
-    c.clearRect(0,0,128,128);c.strokeStyle=kind==='gas'?'#96cbd0':kind==='heal'?'#e1d4ac':kind==='steel'?'#c2a18a':'#d4b780';
+    c.clearRect(0,0,128,128);c.strokeStyle=kind==='weaken'?'#d77969':kind==='gas'?'#77d8de':kind==='heal'?'#b1ecd7':kind==='steel'?'#ecd3a1':'#e5bd73';
     c.fillStyle=c.strokeStyle;c.lineWidth=4;c.lineCap='round';c.lineJoin='round';
     if(kind==='steel'){c.beginPath();c.moveTo(33,89);c.lineTo(89,33);c.stroke();c.lineWidth=2;c.moveTo(48,74);c.lineTo(40,41);c.moveTo(68,59);c.lineTo(93,68);c.stroke();}
     else if(kind==='gas'){c.beginPath();c.moveTo(64,25);c.lineTo(82,46);c.lineTo(64,96);c.lineTo(46,46);c.closePath();c.stroke();c.moveTo(46,46);c.lineTo(82,46);c.stroke();}
+    else if(kind==='weaken'){c.beginPath();c.moveTo(45,91);c.lineTo(82,32);c.stroke();c.strokeStyle='#e5afa0';c.lineWidth=6;c.beginPath();c.moveTo(33,40);c.lineTo(93,93);c.stroke();}
     else if(kind==='dice'){c.strokeRect(36,36,56,56);for(const [x,y] of [[49,49],[79,49],[64,64],[49,79],[79,79]]){c.beginPath();c.arc(x,y,3,0,Math.PI*2);c.fill();}}
     else if(kind==='seal'||kind==='counter'){c.beginPath();c.arc(64,64,34,.2,Math.PI*1.9);c.stroke();c.beginPath();c.moveTo(64,40);c.lineTo(64,86);c.moveTo(44,51);c.lineTo(84,51);c.moveTo(40,71);c.lineTo(50,71);c.moveTo(78,71);c.lineTo(88,71);c.stroke();if(kind==='counter'){c.strokeStyle='#b67c65';c.moveTo(39,89);c.lineTo(89,39);c.stroke();}}
     else{for(const side of [-1,1]){c.beginPath();c.moveTo(64,99);c.quadraticCurveTo(64+side*35,73,64+side*22,32);c.stroke();for(let i=0;i<4;i++){c.beginPath();c.ellipse(64+side*(19+i),82-i*12,7,3,side*.65,0,Math.PI*2);c.fill();}}}

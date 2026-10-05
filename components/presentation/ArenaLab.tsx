@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { CARDS } from '../../lib/cards';
 import { chooseAiAction } from '../../lib/ai';
-import { legalActions } from '../../lib/engine/engine';
+import { legalActions,mempoolOf } from '../../lib/engine/engine';
 import { unlockAudio, isMuted, setMuted, onMuteChange } from '../../lib/audio/manager';
 import { emitSfxFromEvents } from '../../lib/audio/events';
 import type { Action } from '../../lib/engine/types';
@@ -16,6 +16,9 @@ import styles from './ArenaLab.module.css';
 import { cardRules, powerRules } from './rulesText';
 import fxRegistry from '../../public/ui/arena-lab/fx/manifest.json';
 import type {RenderQuality} from './renderQuality';
+import {roleName,rankName,cardIdentity} from './cardIdentity';
+import {ordersView} from './ordersView';
+import {cardArtPath} from '../../lib/cardArt';
 
 function usePanelFocus(open: boolean, panel: React.RefObject<HTMLElement>, modal = false) {
   useEffect(() => {
@@ -35,10 +38,10 @@ function usePanelFocus(open: boolean, panel: React.RefObject<HTMLElement>, modal
   }, [open, panel, modal]);
 }
 
-export default function ArenaLab({ heroId, opening, debug }: { heroId: string; opening: boolean; debug: boolean }) {
+export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId: string; opening: boolean; debug: boolean; seed?:number }) {
   const locale = useLocale(), reduced = useReducedMotion();
   const sessionRef = useRef<GameSession>();
-  if (!sessionRef.current) sessionRef.current = new GameSession(createLabGame(heroId, opening));
+  if (!sessionRef.current) sessionRef.current = new GameSession(createLabGame(heroId, opening,seed));
   const session = sessionRef.current;
   const [view, setView] = useState<SessionSnapshot>(() => session.snapshot());
   const [selected, setSelected] = useState<string | null>(null);
@@ -50,6 +53,7 @@ export default function ArenaLab({ heroId, opening, debug }: { heroId: string; o
   const [help, setHelp] = useState(false);
   const [keyboard, setKeyboard] = useState(false);
   const [metrics, setMetrics] = useState<ArenaMetrics | null>(null);
+  const [lastAction,setLastAction] = useState<{type:string;owner:number;revision:number}|null>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const renderer = useRef<ArenaRenderer | null>(null);
   const helpPanel = useRef<HTMLElement>(null), actionPanel = useRef<HTMLElement>(null), resultPanel = useRef<HTMLElement>(null);
@@ -71,15 +75,16 @@ export default function ArenaLab({ heroId, opening, debug }: { heroId: string; o
     void unlockAudio();
     try {
       const batch = session.dispatch(action); if (!batch) return;
-      select(null); setInspect(null); setFailure('');
-      const impact = () => { session.impact(batch.id); if (batch.events) emitSfxFromEvents(batch.events); };
+      if(debug)setLastAction({type:action.type,owner:batch.before.turn,revision:batch.revision});
+      select(null); setInspect(null); setKeyboard(false); setFailure('');
+      const impact = () => { session.impact(batch.id); emitSfxFromEvents(batch.events ?? {}, batch); };
       const arena = renderer.current;
       if (arena) void arena.present(batch, impact).then(() => session.complete(batch.id)).catch(() => { session.complete(batch.id); setFailure('presentation'); });
       else { impact(); session.complete(batch.id); }
     } catch (error) {
       setFailure(error instanceof Error ? locale.errorText(error.message) : locale.t('Действие недоступно.', 'Action unavailable.'));
     }
-  }, [locale.locale, select, session]);
+  }, [locale.locale, select, session, debug]);
 
   const play = (uid: string) => {
     const current = session.snapshot(); if (current.state.turn !== 0 || current.busy) return;
@@ -144,6 +149,7 @@ export default function ArenaLab({ heroId, opening, debug }: { heroId: string; o
   useEffect(() => { renderer.current?.sync(view.shown); }, [view.shown]);
   useEffect(() => { renderer.current?.setLocale(locale.locale); }, [locale.locale]);
   useEffect(() => { renderer.current?.setReducedMotion(reduced); }, [reduced]);
+  useEffect(() => {renderer.current?.setOverlayOpen(help||keyboard||inspect!==null);},[help,keyboard,inspect,ready]);
   useEffect(() => {
     try {const saved=localStorage.getItem('imperivm-arena-quality');if(saved==='auto'||saved==='sharp'||saved==='fast')setQuality(saved);} catch {}
   }, []);
@@ -161,7 +167,7 @@ export default function ArenaLab({ heroId, opening, debug }: { heroId: string; o
 
   function restart(nextHero = me.heroId, fromOpening = opening) {
     renderer.current?.cancel(); select(null); setInspect(null);
-    session.restart(createLabGame(nextHero, fromOpening));
+    session.restart(createLabGame(nextHero, fromOpening,seed));
   }
 
   const card = inspect?.cardId ? CARDS[inspect.cardId] : null;
@@ -199,26 +205,28 @@ export default function ArenaLab({ heroId, opening, debug }: { heroId: string; o
 
     {inspect && card && <section className={styles.inspection} role="dialog" aria-label={locale.cardName(card.id)}>
       <button className={styles.close} onClick={() => { setInspect(null); select(null); }} aria-label={locale.t('Закрыть просмотр', 'Close inspection')}>×</button>
-      <img src={`/cards/${card.id}.webp`} alt={locale.cardName(card.id)} />
-      <div><h2>{locale.cardName(card.id)}</h2><p>{cardRules(card.id, locale.locale)}</p>{inspectedMinion?.staked && <p>{locale.t("Стейкинг: +1 газ в начале хода. Не атакует.", "Staking: +1 gas at turn start. Cannot attack.")}</p>}
+      <img src={cardArtPath(card.id)} alt={locale.cardName(card.id)} />
+      <div><h2>{locale.cardName(card.id)}</h2><p className={styles.cardIdentity} style={{borderColor:cardIdentity(card.id).color}}>{roleName(card.id,locale.locale)} · {rankName(card.id,locale.locale)}</p><p>{cardRules(card.id, locale.locale)}</p>{card.type==='spell'&&<p className={styles.targetHint}>{locale.t('Указ: ждёт в очереди слева и срабатывает в начале следующего хода владельца.','Edict: waits in the left queue and resolves at the start of its owner’s next turn.')}</p>}{inspectedMinion?.staked && <p>{locale.t("Гарнизон: +1 приказ в начале хода. Не атакует.", "Garrison: +1 order at turn start. Cannot attack.")}</p>}
         <dl><div><dt>{locale.t('Стоимость', 'Cost')}</dt><dd>{card.cost}</dd></div>{card.type === 'minion' && <><div><dt>{locale.t('Атака', 'Attack')}</dt><dd>{inspectedMinion?.attack ?? card.attack}</dd></div><div><dt>{locale.t('Здоровье', 'Health')}</dt><dd>{inspectedMinion?.health ?? card.health}</dd></div></>}</dl>
         {selected === inspect.uid && <p className={styles.targetHint}>{locale.t('Теперь нажмите на подсвеченную цель на поле.', 'Now click a highlighted target on the board.')}</p>}
-        {inspect.owner === 0 && inspect.kind === 'hand' && <button className={styles.primary} disabled={!playAction} onClick={() => { if (playAction) dispatch(playAction); }}>{playAction ? locale.t('Разыграть', 'Play') : locale.t('Недоступно в этом ходу', 'Unavailable this turn')}</button>}
-        {inspect.owner === 0 && stakeAction && <button onClick={() => dispatch(stakeAction)}>{stakeAction.type === 'stake' ? locale.t('Стейкинг · +1 газ', 'Stake · +1 gas') : locale.t('Снять стейкинг', 'Unstake minion')}</button>}
       </div>
+      {(inspect.owner===0&&(inspect.kind==='hand'||stakeAction))&&<div className={styles.inspectionActions}>
+        {inspect.owner === 0 && inspect.kind === 'hand' && <button className={styles.primary} aria-label={playAction?locale.t('Разыграть','Play'):undefined} disabled={!playAction} onClick={() => { if (playAction) dispatch(playAction); }}>{playAction ? <><span className={styles.costChip}>{card.cost}</span>{locale.t('Разыграть', 'Play')}</> : locale.t('Недоступно в этом ходу', 'Unavailable this turn')}</button>}
+        {inspect.owner === 0 && stakeAction && <button onClick={() => dispatch(stakeAction)}>{stakeAction.type === 'stake' ? locale.t('Гарнизон · +1 приказ', 'Garrison · +1 order') : locale.t('Вернуть в бой', 'Return to battle')}</button>}
+      </div>}
     </section>}
 
     {inspect?.kind === 'hero' && <section className={styles.inspection} role="dialog" aria-label={locale.heroName(shown.players[inspect.owner].heroId)}>
       <button className={styles.close} onClick={() => setInspect(null)} aria-label={locale.t('Закрыть просмотр', 'Close inspection')}>×</button>
-      <img src={`/heroes/${shown.players[inspect.owner].heroId}.webp`} alt="" />
+      <img src={shown.players[inspect.owner].heroId==='whale'?'/models/hero-whale.webp':`/heroes/${shown.players[inspect.owner].heroId}.webp`} alt="" />
       <div><h2>{locale.heroName(shown.players[inspect.owner].heroId)}</h2><h3>{locale.powerName(shown.players[inspect.owner].heroId)}</h3><p>{powerRules(shown.players[inspect.owner].heroId,locale.locale)}</p><strong>{locale.t('Казна', 'Treasury')}: {shown.players[inspect.owner].treasury}</strong></div>
     </section>}
 
     {inspect && ['gas','block','deck','scroll'].includes(inspect.kind) && <section className={styles.inspection} role="dialog" aria-label={locale.t('Предмет арены','Arena object')}><button className={styles.close} onClick={()=>setInspect(null)} aria-label={locale.t('Закрыть просмотр','Close inspection')}>×</button><div>
-      {inspect.kind==='gas' && <><h2>{locale.t('Газ','Gas')} {me.gas} / {me.maxGas}</h2><p>{locale.t('Расходуется на карты и силу героя. Кристаллы восстанавливаются в начале вашего хода. Тёмные ячейки уже потрачены.','Spend gas on cards and your hero power. Crystals refill at the start of your turn. Dark sockets have been spent.')}</p></>}
-      {inspect.kind==='block' && <><h2>{locale.t('Блок','Block')} {shown.block}</h2><p>{locale.t('Новый ход открывает следующий блок. В начале вашего хода разрешаются заклинания со свитка и восстанавливается газ.','Each turn opens the next block. Your pending spells resolve and gas refills at the start of your turn.')}</p></>}
+      {inspect.kind==='gas' && <><h2>{locale.t('Приказы','Orders')} {me.gas}</h2><p>{locale.t('Основной запас: ','Base capacity: ')}{me.maxGas}. {locale.t('Бонус: ','Bonus: ')}+{ordersView(me.gas,me.maxGas).bonus}.</p><p>{locale.t('Каждый светящийся камень — один доступный приказ. Золотистые камни — бонусные. При запасе больше 10 остаток указан числом. Приказы расходуются на карты и силу правителя; запас пополняется в начале вашего хода.','Each lit stone is one available order. Gold stones are bonuses. Beyond ten sockets, extra orders are counted numerically. Spend orders on cards and the ruler’s power; refill at the start of your turn.')}</p></>}
+      {inspect.kind==='block' && <><h2>{locale.t('Ход','Turn')} {shown.block}</h2><p>{locale.t('В начале вашего хода срабатывают ваши указы и восстанавливается запас приказов.','Your edicts resolve and orders refill at the start of your turn.')}</p></>}
       {inspect.kind==='deck' && <><h2>{locale.t('Колода','Deck')}</h2><p>{me.deck.length} {locale.t('карт осталось. В начале хода вы берёте следующую карту. Пустая колода наносит урон казне.','cards remain. Draw a card at the start of your turn. An empty deck damages your treasury.')}</p></>}
-      {inspect.kind==='scroll' && <><h2>{locale.t('Хроника боя','Battle chronicle')}</h2>{shown.log.slice(-4).map((line,index)=><p key={index}>{locale.logLine(line)}</p>)}</>}
+      {inspect.kind==='scroll' && <><h2>{locale.t('Очередь указов','Edict queue')}</h2><p>{locale.t('Указы срабатывают в начале следующего хода владельца, по порядку разыгрывания.','Edicts resolve at the start of their owner’s next turn, in cast order.')}</p>{([0,1] as const).map(owner=><div key={owner}><h3>{owner===0?locale.t('Ваши указы','Your edicts'):locale.t('Указы соперника','Enemy edicts')}</h3>{mempoolOf(shown,owner).length?mempoolOf(shown,owner).map((entry,index)=><button key={entry.uid} onClick={()=>setInspect({kind:'queue',uid:`queued-${entry.uid}`,owner,cardId:entry.cardId})}>{index+1}. {locale.cardName(entry.cardId)}</button>):<p>{locale.t('Очередь пуста.','No pending edicts.')}</p>}</div>)}</>}
     </div></section>}
 
     {keyboard && <section ref={actionPanel} className={styles.actionsPanel} role="dialog" aria-label={locale.t('Доступные действия', 'Available actions')}><button className={styles.close} onClick={() => setKeyboard(false)} aria-label={locale.t('Закрыть действия', 'Close actions')}>×</button><h2>{locale.t('Доступные действия', 'Available actions')}</h2><p>{locale.t('Управление с клавиатуры: Tab, Enter. Esc закрывает окно.', 'Keyboard controls: Tab, Enter. Esc closes the panel.')}</p>{view.state.turn === 0 && !view.busy ? legal.map((action, index) => <button key={index} onClick={() => dispatch(action)}>{actionLabel(action)}</button>) : <p>{locale.t('Ожидаем завершения действия соперника.', 'Waiting for the opponent.')}</p>}</section>}
@@ -233,11 +241,12 @@ export default function ArenaLab({ heroId, opening, debug }: { heroId: string; o
         <button onClick={() => {const next=quality==='auto'?'sharp':quality==='sharp'?'fast':'auto';setQuality(next);try{localStorage.setItem('imperivm-arena-quality',next);}catch{}}}>{locale.t('Изображение: ', 'Image: ')}{quality==='auto'?locale.t('авто','auto'):quality==='sharp'?locale.t('чётче','sharper'):locale.t('быстрее','faster')}</button>
         <button onClick={() => { restart(); setHelp(false); }}>{locale.t('Начать заново', 'New battle')}</button>
       </div>
-      <details><summary>{locale.t('Управление', 'Controls')}</summary><p>{locale.t('Перетащите карту на поле. Скрещённые мечи — боец готов атаковать: выберите его и цель. Заклинания ждут следующего блока на свитке слева.', 'Drag a card to the court. Crossed swords mean a fighter can attack: select it and a target. Spells wait for the next block on the left scroll.')}</p><button onClick={() => {setHelp(false);setKeyboard(true);}}>{locale.t('Действия с клавиатуры', 'Keyboard actions')}</button></details>
+      <details><summary>{locale.t('Управление', 'Controls')}</summary><p>{locale.t('Перетащите карту на поле. Скрещённые мечи — боец готов атаковать: выберите его и цель. Указы ждут начала следующего хода в очереди слева.', 'Drag a card to the court. Crossed swords mean a fighter can attack: select it and a target. Edicts wait in the left queue until the owner’s next turn.')}</p><button onClick={() => {setHelp(false);setKeyboard(true);}}>{locale.t('Действия с клавиатуры', 'Keyboard actions')}</button></details>
       <Link className={styles.leaveArena} href="/arena">{locale.t('Покинуть арену', 'Leave arena')}</Link>
     </section></div>}
 
     {shown.winner !== null && <div className={styles.modalBackdrop}><section ref={resultPanel} className={`${styles.result} ${victorySrc?styles.resultWithFx:''}`} role="dialog" aria-modal="true"><span className={styles.eyebrow}>IMPERIVM</span><div className={victorySrc?styles.victoryBanner:undefined}>{victorySrc&&<video key={view.revision} src={victorySrc} autoPlay muted playsInline aria-hidden="true"/>}<h2>{shown.winner === 0 ? locale.t('Ваша империя устояла', 'Your empire stands') : shown.winner === 'draw' ? locale.t('Империи пали вместе', 'Both empires fell') : locale.t('Казна опустела', 'The treasury is empty')}</h2></div><p>{locale.t('Каждая потеря — урок для следующего блока.', 'Every loss is a lesson for the next block.')}</p><button className={styles.primary} onClick={() => restart()}>{locale.t('Ещё один бой', 'Another battle')}</button></section></div>}
+    {debug && <output hidden data-action={JSON.stringify({last:lastAction,turn:shown.turn,block:shown.block,busy:view.busy,orders:me.gas,capacity:me.maxGas,queued:mempoolOf(shown,0).map(entry=>entry.cardId)})}/>}
     {debug && metrics && <output className={styles.metrics} hidden data-perf={JSON.stringify(metrics)}>{metrics.drawCalls} draws · {Math.round(metrics.triangles).toLocaleString()} triangles · {metrics.meshes} meshes · {metrics.models} models · {metrics.failedModels} failed · {metrics.frameMedianMs}/{metrics.frameP95Ms} ms median/p95 · 1 canvas</output>}
   </main>;
 }

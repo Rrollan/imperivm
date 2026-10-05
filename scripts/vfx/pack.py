@@ -4,25 +4,29 @@ import json
 import shutil
 import struct
 import zipfile
+import sys
 
 root = Path(__file__).resolve().parents[2]
 source = root / 'docs/flow-vfx'
-frames = sorted(json.loads((source / 'frames.json').read_text()), key=lambda frame: frame['id'])
+phase2 = '--phase2' in sys.argv[1:]
+frames = sorted(json.loads((source / ('frames-phase2.json' if phase2 else 'frames.json')).read_text()), key=lambda frame: frame['id'])
 public = root / 'public/ui/arena-lab'
 files = public / 'flow-kit'
 files.mkdir(parents=True, exist_ok=True)
-output = public / 'imperivm-flow-vfx-pairs.zip'
+output = public / ('imperivm-flow-vfx-phase2.zip' if phase2 else 'imperivm-flow-vfx-pairs.zip')
 with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as archive:
-    archive.write(source / 'START-HERE.txt', '00-START-HERE.txt')
-    for index, frame in enumerate(frames, 1):
+    archive.write(source / ('PHASE2-START-HERE.txt' if phase2 else 'START-HERE.txt'), '00-START-HERE.txt')
+    for index, frame in enumerate(frames, 10 if phase2 else 1):
         number = frame['id'].split('-')[0]
         assert number == f'{index:02}', 'Video numbers must match their folder and filenames'
-        prompt = (source / f"prompts/{frame['id']}-v2.txt").read_text()
+        version = 'v3' if phase2 else 'v2'
+        prompt_path = source / f"prompts/{frame['id']}-{version}.txt"
+        prompt = prompt_path.read_text()
         assert prompt.strip() == frame['videoPrompt'].strip()
         exported = {
             f'{number}-START.png': source / frame['firstFrame'],
             f'{number}-END.png': source / frame['lastFrame'],
-            f'{number}-PROMPT.txt': source / f"prompts/{frame['id']}-v2.txt",
+            f'{number}-PROMPT.txt': prompt_path,
         }
         for name, original in exported.items():
             if original.suffix == '.png':

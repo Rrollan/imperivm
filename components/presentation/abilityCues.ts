@@ -3,11 +3,11 @@ import {HEROES} from '../../lib/heroes';
 import type {EffectKind} from '../../lib/engine/types';
 import type {PresentationBatch} from './GameSession';
 
-export type AccentKind='steel'|'heal'|'gas'|'dice'|'seal'|'buff'|'counter';
+export type AccentKind='steel'|'heal'|'gas'|'dice'|'seal'|'buff'|'counter'|'weaken';
 export type AbilityCue={kind:AccentKind;from:string;to:string;phase:'contact'|'after';delay:number};
 const glyph:Record<EffectKind,AccentKind>={
   'damage-all-enemy-minions':'steel','damage-random-enemy':'steel','damage-enemy-treasury':'steel',
-  'heal-treasury':'heal',draw:'dice','buff-own':'buff','gain-gas':'gas','counter-mempool':'counter',rugpull:'counter',summon:'buff',
+  'heal-own-minions':'heal','weaken-random-enemy':'weaken','heal-treasury':'heal',draw:'dice','buff-own':'buff','gain-gas':'gas','counter-mempool':'counter',rugpull:'counter',summon:'buff',
 };
 
 /** Presentation follows public rule fields and exact UID diffs; it never changes rules. */
@@ -21,13 +21,25 @@ export function abilityCues(batch:PresentationBatch):AbilityCue[]{
   const add=(kind:AccentKind,from:string,to:string,phase:AbilityCue['phase']='contact',delay=0)=>cues.push({kind,from,to,phase,delay});
   if(batch.action.type==='hero-power'){
     switch(HEROES[batch.before.players[owner].heroId].power){
-      case 'heal-treasury':add('heal',owner===0?'hero-power':hero,hero);break;
+      case 'heal-treasury':if(batch.after.players[owner].treasury>batch.before.players[owner].treasury)add('heal',owner===0?'hero-power':hero,hero);break;
       case 'gain-gas':add('seal',owner===0?'hero-power':hero,gas(owner));break;
       case 'draw-burn':add('dice',owner===0?'hero-power':hero,hero);break;
       case 'damage-random-enemy':add('steel',hero,enemy(owner));break;
     }
   }
   const effect=(kind:EffectKind,p:number,from:string,multiple=false,delay=0)=>{
+    if((kind.startsWith('damage-')||kind==='heal-treasury')&&from.startsWith('queued-')){
+      const result=batch.events?.effectResults?.find(r=>`queued-${r.mempoolUid}`===from&&r.owner===p&&r.kind===kind);
+      result?.targets.forEach((target,i)=>{if(target.healthAfter!==target.healthBefore)add(glyph[kind],from,target.uid,'contact',delay+i*.025);});return;
+    }
+    if(kind==='buff-own'&&from.startsWith('queued-')){
+      const result=batch.events?.effectResults?.find(r=>`queued-${r.mempoolUid}`===from&&r.owner===p&&r.kind===kind);
+      result?.targets.forEach((target,i)=>{if(target.attackAfter!==target.attackBefore||target.healthAfter!==target.healthBefore)add('buff',from,target.uid,'contact',delay+i*.025);});return;
+    }
+    if(kind==='heal-own-minions'||kind==='weaken-random-enemy'){
+      const result=batch.events?.effectResults?.find(r=>`queued-${r.mempoolUid}`===from&&r.owner===p&&r.kind===kind);
+      result?.targets.forEach((target,i)=>{if(kind==='heal-own-minions'&&target.healthAfter>target.healthBefore)add('heal',from,target.uid,'contact',delay+i*.025);if(kind==='weaken-random-enemy'&&target.attackAfter<target.attackBefore)add('weaken',from,target.uid,'contact',delay);});return;
+    }
     const destination=kind==='gain-gas'?gas(p):kind==='damage-all-enemy-minions'?`row-${1-p}`:
       kind==='damage-enemy-treasury'?`hero-${1-p}`:kind==='damage-random-enemy'?(multiple?`row-${1-p}`:enemy(p)):
       kind==='buff-own'||kind==='summon'?`row-${p}`:kind==='rugpull'?'arena-center':kind==='counter-mempool'?(batch.events?.spellCountered?`queued-${batch.events.spellCountered.mempoolUid}`:`row-${1-p}`):`hero-${p}`;
@@ -39,7 +51,8 @@ export function abilityCues(batch:PresentationBatch):AbilityCue[]{
     if(s.fizzled)add('counter',`queued-${s.mempoolUid}`,`queued-${s.mempoolUid}`,'after',i*.06);
     else if(spell)effect(spell.kind,s.owner,`queued-${s.mempoolUid}`,resolved.length>1,i*.04);
   });
-  if(batch.events?.spellCountered){const uid=`queued-${batch.events.spellCountered.mempoolUid}`;add('counter',uid,uid,'after');}
+  const counters=batch.events?.spellCounters??(batch.events?.spellCountered?[batch.events.spellCountered]:[]);
+  counters.forEach((counter,index)=>{const uid=`queued-${counter.mempoolUid}`;add('counter',uid,uid,'after',index*.06);});
   batch.events?.halvings?.forEach(h=>add('buff',h.uid,h.uid,'after'));
   batch.after.players.forEach((p,i)=>{
     const prev=batch.before.players[i];
@@ -51,5 +64,7 @@ export function abilityCues(batch:PresentationBatch):AbilityCue[]{
     // Healing is observed, including actual lifesteal capped by treasury health.
     if(batch.after.players[owner].treasury>batch.before.players[owner].treasury)add('heal',batch.action.attackerUid,hero,'after');
   }
-  return cues.slice(0,18);
+  // A turn can resolve multiple copies. Show each resulting target once rather
+  // than replaying the same aggregate health/stat delta for every queued copy.
+  return cues.filter((cue,index,all)=>all.findIndex(other=>other.kind===cue.kind&&other.to===cue.to&&other.phase===cue.phase)===index).slice(0,18);
 }

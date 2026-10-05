@@ -14,12 +14,31 @@ export type EffectKind =
   | 'damage-random-enemy' // random enemy minion; if none, enemy treasury
   | 'damage-enemy-treasury'
   | 'heal-treasury'
+  | 'heal-own-minions'
+  | 'weaken-random-enemy'
   | 'draw'
   | 'buff-own' // all own minions
   | 'gain-gas'
   | 'counter-mempool' // remove highest-cost enemy mempool spell
   | 'rugpull' // destroy ALL minions on both boards
   | 'summon'; // summon minion by cardId (owner's board)
+
+/** Exact per-card deltas for delayed damage, healing, buff and weakening effects. */
+export interface SpellEffectResult {
+  owner: PlayerId;
+  cardId: string;
+  mempoolUid: string;
+  kind: EffectKind;
+  targets: Array<{
+    /** Fighter UID, or hero-0 / hero-1 for a treasury target. */
+    uid: string;
+    attackBefore: number;
+    attackAfter: number;
+    healthBefore: number;
+    healthAfter: number;
+    maxHealth: number;
+  }>;
+}
 
 export interface EffectDef {
   kind: EffectKind;

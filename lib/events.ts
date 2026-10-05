@@ -12,7 +12,8 @@
  *        - queued: a new uid appears
  *        - resolved: a uid disappears AND a resolve/fizzle line for the
  *          same owner exists in the same start-of-turn batch
- *        - countered: a uid disappears without a resolve/fizzle line
+ *        - countered: a uid disappears without a resolve/fizzle line, unless
+ *          the game ended before the engine could process the rest of queue
  *      Multiple resolutions per start-of-turn are first-class: emitted
  *      as `spellResolved[]` instead of a singleton.
  *   4. RUG PULL detection scans ONLY the new lines for the exact string
@@ -45,8 +46,10 @@ import type {
   GameState,
   Minion,
   PlayerId,
+  SpellEffectResult,
 } from './engine/types';
-import { mempoolOf } from './engine/engine';
+import { mempoolOf, spellEffectsOf } from './engine/engine';
+import { CARDS } from './cards';
 
 export interface DeadMinion {
   uid: string;
@@ -69,6 +72,13 @@ export interface DamageInstance {
   died: boolean;
 }
 
+export interface CounteredSpell {
+  owner: PlayerId;
+  cardId: string;
+  name: string;
+  mempoolUid: string;
+}
+
 export interface BattleEvents {
   /** New card played onto our board. */
   play?: { cardId: string; name: string; fromHandUid: string };
@@ -82,8 +92,12 @@ export interface BattleEvents {
     mempoolUid: string;
     fizzled: boolean;
   }>;
+  /** Exact targets/deltas from newly resolved healing and weakening spells. */
+  effectResults?: SpellEffectResult[];
   /** An enemy mempool spell was removed without resolving (priority). */
-  spellCountered?: { owner: PlayerId; cardId: string; name: string; mempoolUid: string };
+  spellCountered?: CounteredSpell;
+  /** All countered entries in engine order; singular field stays compatible. */
+  spellCounters?: CounteredSpell[];
   /** Minion-to-minion or minion-to-treasury attack we should lunge for. */
   attack?: {
     attackerUid: string;
@@ -99,6 +113,8 @@ export interface BattleEvents {
   };
   /** Damage floats to render on minions. */
   damages?: DamageInstance[];
+  /** Exact stat targets, including debuffs that do not remove health. */
+  statChanges?: Array<{uid:string;owner:PlayerId;attackBefore:number;attackAfter:number}>;
   /** Death fade targets. */
   deaths?: DeadMinion[];
   /** Halving pulses to render (+1/+1). One per matching log line. */
@@ -202,7 +218,8 @@ function hpDelta(prev: GameState, next: GameState, owner: PlayerId, uid: string)
  *     live array reference, so iteration order matches engine).
  *   - Parse the new log lines after the most recent start-turn marker.
  *     `P<owner> X resolves` → consumed in order. Same for `fizzles`.
- *   - Pair by order. Leftover disappears → countered.
+ *   - Pair by order. Unmatched disappears are countered only while the game
+ *     remains active; a terminal game state consumes no further queue entries.
  *
  * The `P0 counters X` line tells us a counter happened; we surface it
  * via `spellCountered` keyed to the disappeared enemy uid.
@@ -214,6 +231,7 @@ function diffMempool(
   startTurnBoundary: number,
   into: BattleEvents,
 ): void {
+  const gameEnded = prev.winner === null && next.winner !== null;
   const prevByUid = new Map<string, { owner: PlayerId; cardId: string; name: string }>();
   const nextByUid = new Map<string, { owner: PlayerId; cardId: string; name: string }>();
   for (const owner of [0, 1] as const) {
@@ -230,6 +248,7 @@ function diffMempool(
 
   // 2. Disappeared entries — resolved or counter-cancelled.
   const resolved: NonNullable<BattleEvents['spellResolved']> = [];
+  const counterCandidates: CounteredSpell[] = [];
   for (const owner of [0, 1] as const) {
     const prevArr = mempoolOf(prev, owner);
     const nextUids = new Set(mempoolOf(next, owner).map(e => e.uid));
@@ -248,7 +267,7 @@ function diffMempool(
     }
     const batchLines = ownerStartIdx >= 0
       ? newLog.slice(ownerStartIdx + 1)
-      : newLog.slice(startTurnBoundary + 1);
+      : [];
     const ownerResolves: { name: string; fizzled: boolean }[] = [];
     for (const line of batchLines) {
       // Stop at any subsequent start-turn (a different owner's turn).
@@ -273,50 +292,51 @@ function diffMempool(
             fizzled: r.fizzled,
           });
         } else {
-          // Engine logged fewer resolves than we have disappears —
-          // surface the surplus as counter (defensive).
-          into.spellCountered = {
-            owner: e.owner,
-            cardId: e.cardId,
-            name: e.name,
-            mempoolUid: e.uid,
-          };
+          // The engine removes the entire queue before resolving it. If an
+          // earlier spell ends the game, later entries disappear without
+          // resolving and are not priority-countered.
+          if (!gameEnded) {
+            counterCandidates.push({
+              owner: e.owner,
+              cardId: e.cardId,
+              name: e.name,
+              mempoolUid: e.uid,
+            });
+          }
         }
       }
-    } else {
-      // No resolve lines at all — every disappearance is a counter.
-      into.spellCountered = {
-        owner: disappeared[0].owner,
-        cardId: disappeared[0].cardId,
-        name: disappeared[0].name,
-        mempoolUid: disappeared[0].uid,
-      };
+    } else if (!gameEnded) {
+      // No resolve lines at all — absent a terminal winner, this is a counter.
+      counterCandidates.push(...disappeared.map(entry => ({
+        owner: entry.owner, cardId: entry.cardId, name: entry.name, mempoolUid: entry.uid,
+      })));
     }
   }
   if (resolved.length > 0) into.spellResolved = resolved;
 
-  // 3. `P0 counters X` line — caller asked for the *target* uid. Walk
-  //    next mempool for the named entry; if absent it was already
-  //    counter-cancelled (which is what the line tells us). Prefer the
-  //    PREV-side (defender's) mempool to find the cancelled uid.
-  if (!into.spellCountered) {
-    for (const line of newLog) {
-      const m = /^P(\d+) counters (.+)$/.exec(line);
-      if (!m) continue;
-      const counterOwner = Number(m[1]) as PlayerId;
-      const victim = counterOwner === 0 ? 1 : 0;
-      const victimName = m[2];
-      const victimEntry = mempoolOf(prev, victim).find(e => e.name === victimName);
-      if (victimEntry) {
-        into.spellCountered = {
-          owner: victim,
-          cardId: victimEntry.cardId,
-          name: victimEntry.name,
-          mempoolUid: victimEntry.uid,
-        };
-        break;
-      }
+  // 3. Match each counter log to a disappeared defender UID. Duplicate
+  //    copies with the same name are claimed once each, in engine order.
+  const counters: CounteredSpell[] = [];
+  for (const line of newLog) {
+    const m = /^P(\d+) counters (.+)$/.exec(line);
+    if (!m) continue;
+    const counterOwner = Number(m[1]) as PlayerId;
+    const victim = counterOwner === 0 ? 1 : 0;
+    const victimName = m[2];
+    const victimEntry = mempoolOf(prev, victim).find(e => e.name === victimName && !nextByUid.has(e.uid) && !counters.some(c => c.mempoolUid === e.uid));
+    if (victimEntry) {
+      counters.push({
+        owner: victim,
+        cardId: victimEntry.cardId,
+        name: victimEntry.name,
+        mempoolUid: victimEntry.uid,
+      });
     }
+  }
+  for (const entry of counterCandidates) if (!counters.some(c => c.mempoolUid === entry.mempoolUid)) counters.push(entry);
+  if (counters.length) {
+    into.spellCountered = counters[0];
+    into.spellCounters = counters;
   }
 }
 
@@ -345,6 +365,7 @@ function diffBoards(
     nextByUid.forEach((m, uid) => {
       const p = prevByUid.get(uid);
       if (!p) return; // new summon — handled by `play`
+      if(m.attack!==p.attack)(into.statChanges??=[]).push({uid,owner,attackBefore:p.attack,attackAfter:m.attack});
       if (m.health !== p.health) {
         damages.push({
           uid,
@@ -388,21 +409,15 @@ export function diffAction(
   const rugPullActive = newLog.includes(RUG_PULL_LINE);
   if (rugPullActive) ev.rugPull = true;
 
-  // ── 2. Halving ticks (one event per matching NEW line, matched to a
-  //        specific uid by stat delta + name). Names are not unique
-  //        across boards (and same-name twins can halve in the same
-  //        batch), so we disambiguate by finding every uid whose
-  //        attack AND health both went up by exactly 1 since `prev`,
-  //        then pair them in order with the fresh 'Halving:' lines.
-  //        This way a player with two copies of the same minion sees
-  //        two distinct halving pops. ──
+  // ── 2. Match fresh halving lines in engine board order. Healing, buffs
+  //        or weakening can alter the same stats earlier in this action,
+  //        so its aggregate delta cannot identify the halving target.
+  //        A summoned fighter can also halve on its arrival block. ──
   const halvingBuffs: Array<{ uid: string; name: string; owner: PlayerId }> = [];
   for (const owner of [0, 1] as const) {
-    const prevByUid = new Map(prev.players[owner].board.map(m => [m.uid, m] as const));
     for (const n of next.players[owner].board) {
-      const p = prevByUid.get(n.uid);
-      if (!p) continue;
-      if (n.attack === p.attack + 1 && n.health === p.health + 1 && n.maxHealth === p.maxHealth + 1) {
+      const period=CARDS[n.cardId]?.halvingPeriod??0;
+      if (next.block>prev.block && period>0 && next.block%period===0) {
         halvingBuffs.push({ uid: n.uid, name: n.name, owner });
       }
     }
@@ -439,6 +454,8 @@ export function diffAction(
 
   // ── 4. Mempool deltas (public API only). ──
   diffMempool(prev, next, newLog, startTurnIdx, ev);
+  const effectResults = spellEffectsOf(next);
+  if (effectResults.length > 0) ev.effectResults = effectResults;
 
   // ── 5. Board deltas. ──
   diffBoards(prev, next, rugPullActive, ev);
@@ -448,7 +465,7 @@ export function diffAction(
 
   // ── 7. Suppress empty envelopes. ──
   if (
-    !ev.play && !ev.spellQueued && !ev.spellResolved && !ev.spellCountered &&
+    !ev.play && !ev.spellQueued && !ev.spellResolved && !ev.effectResults && !ev.spellCountered &&
     !ev.attack && !ev.damages && !ev.deaths && !ev.halvings &&
     !ev.rugPull && !ev.gameOver
   ) {

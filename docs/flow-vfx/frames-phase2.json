@@ -1,0 +1,98 @@
+[
+  {
+    "id": "10-deploy-legionary",
+    "title": "Легионер · выход",
+    "role": "legionary",
+    "duration": 4,
+    "activeSeconds": 0.42,
+    "imagePrompt": "Use case: stylized-concept. Asset type: START frame for an isolated IMPERIVM Roman fantasy card-game overlay. Subject: A compact low horizontal bronze dust arc and six small warm copper flecks around an empty black landing footprint. No emblem. Strict landscape 16:9, pure uniform black RGB 0,0,0, locked frontal orthographic view. Hand-painted tactile VFX in the bronze and ivory Roman arena palette; restrained rich accent colors, visible crisp sparse edges. The ENTIRE effect stays in the central 30 percent width and 40 percent height, leaving generous pure black margins. No card, person, board, text, letters, digits, runes, screen-wide glow, haze, bloom, fireball or explosions. Single frame, no contact sheet.",
+    "videoPrompt": "Create one 4-second isolated IMPERIVM Roman game VFX clip. Set First and last frames, 16:9, 720p. The supplied 10-START.png is the EXACT FIRST frame; the supplied 10-END.png is the EXACT LAST frame. Completely locked frontal orthographic camera; uniform pure black RGB 0,0,0 background throughout. Preserve the exact starting footprint, palette, silhouette and empty black center. From 0.00 to 0.12 seconds, the existing contours give ONE brief restrained glint. From 0.12 to 0.42 seconds, only the small existing particles drift a short distance and all contours smoothly fade to black. By 0.42 seconds ALL light has vanished; hold pure black for the remainder. Do not add another ring, wreath, seal, object or strike. No expanding effect, scenery, body, card, table, interface, letters, numbers, smoke, white disk, cuts or camera movement. A single short dry sound is acceptable, no music or speech.",
+    "firstFrame": "frames/10-deploy-legionary-start-v3.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-33ab8ffb-027d-4784-8a9b-5bccb7a44e16.png"
+  },
+  {
+    "id": "11-deploy-guard",
+    "title": "Страж · выход",
+    "role": "guard",
+    "duration": 4,
+    "activeSeconds": 0.5,
+    "imagePrompt": "Use case: stylized-concept. Asset type: START frame for an isolated IMPERIVM Roman fantasy card-game overlay. Subject: Two small pale steel-blue shield-shaped contour segments framing an empty black oval, with a short ivory glint along their lower edges. Strict landscape 16:9, pure uniform black RGB 0,0,0, locked frontal orthographic view. Hand-painted tactile VFX in the bronze and ivory Roman arena palette; restrained rich accent colors, visible crisp sparse edges. The ENTIRE effect stays in the central 30 percent width and 40 percent height, leaving generous pure black margins. No card, person, board, text, letters, digits, runes, screen-wide glow, haze, bloom, fireball or explosions. Single frame, no contact sheet.",
+    "videoPrompt": "Create one 4-second isolated IMPERIVM Roman game VFX clip. Set First and last frames, 16:9, 720p. The supplied 11-START.png is the EXACT FIRST frame; the supplied 11-END.png is the EXACT LAST frame. Completely locked frontal orthographic camera; uniform pure black RGB 0,0,0 background throughout. Preserve the exact starting footprint, palette, silhouette and empty black center. From 0.00 to 0.12 seconds, the existing contours give ONE brief restrained glint. From 0.12 to 0.50 seconds, only the small existing particles drift a short distance and all contours smoothly fade to black. By 0.50 seconds ALL light has vanished; hold pure black for the remainder. Do not add another ring, wreath, seal, object or strike. No expanding effect, scenery, body, card, table, interface, letters, numbers, smoke, white disk, cuts or camera movement. A single short dry sound is acceptable, no music or speech.",
+    "firstFrame": "frames/11-deploy-guard-start-v3.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-ce093791-59d4-4922-bcff-ebf7d6b454fc.png"
+  },
+  {
+    "id": "12-deploy-commander",
+    "title": "Предводитель · выход",
+    "role": "commander",
+    "duration": 4,
+    "activeSeconds": 0.65,
+    "imagePrompt": "Use case: stylized-concept. Asset type: START frame for an isolated IMPERIVM Roman fantasy card-game overlay. Subject: Two red-gold laurel branches opening around an empty black center, and eight tiny vermilion and gold embers at the foot. An imperial arrival, bright but compact. Strict landscape 16:9, pure uniform black RGB 0,0,0, locked frontal orthographic view. Hand-painted tactile VFX in the bronze and ivory Roman arena palette; restrained rich accent colors, visible crisp sparse edges. The ENTIRE effect stays in the central 30 percent width and 40 percent height, leaving generous pure black margins. No card, person, board, text, letters, digits, runes, screen-wide glow, haze, bloom, fireball or explosions. Single frame, no contact sheet.",
+    "videoPrompt": "Create one 4-second isolated IMPERIVM Roman game VFX clip. Set First and last frames, 16:9, 720p. The supplied 12-START.png is the EXACT FIRST frame; the supplied 12-END.png is the EXACT LAST frame. Completely locked frontal orthographic camera; uniform pure black RGB 0,0,0 background throughout. Preserve the exact starting footprint, palette, silhouette and empty black center. From 0.00 to 0.12 seconds, the existing contours give ONE brief restrained glint. From 0.12 to 0.65 seconds, only the small existing particles drift a short distance and all contours smoothly fade to black. By 0.65 seconds ALL light has vanished; hold pure black for the remainder. Do not add another ring, wreath, seal, object or strike. No expanding effect, scenery, body, card, table, interface, letters, numbers, smoke, white disk, cuts or camera movement. A single short dry sound is acceptable, no music or speech.",
+    "firstFrame": "frames/12-deploy-commander-start-v3.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-6ce49348-60da-4625-b195-37341d1959de.png"
+  },
+  {
+    "id": "13-deploy-minister",
+    "title": "Военный министр · выход",
+    "role": "minister",
+    "duration": 4,
+    "activeSeconds": 0.58,
+    "imagePrompt": "Use case: stylized-concept. Asset type: START frame for an isolated IMPERIVM Roman fantasy card-game overlay. Subject: A small open lavender-silver wax-seal contour, with two symmetrical warm gold command strokes spreading only a short distance left and right. Keep the center empty black. Strict landscape 16:9, pure uniform black RGB 0,0,0, locked frontal orthographic view. Hand-painted tactile VFX in the bronze and ivory Roman arena palette; restrained rich accent colors, visible crisp sparse edges. The ENTIRE effect stays in the central 30 percent width and 40 percent height, leaving generous pure black margins. No card, person, board, text, letters, digits, runes, screen-wide glow, haze, bloom, fireball or explosions. Single frame, no contact sheet.",
+    "videoPrompt": "Create one 4-second isolated IMPERIVM Roman game VFX clip. Set First and last frames, 16:9, 720p. The supplied 13-START.png is the EXACT FIRST frame; the supplied 13-END.png is the EXACT LAST frame. Completely locked frontal orthographic camera; uniform pure black RGB 0,0,0 background throughout. Preserve the exact starting footprint, palette, silhouette and empty black center. From 0.00 to 0.12 seconds, the existing contours give ONE brief restrained glint. From 0.12 to 0.58 seconds, only the small existing particles drift a short distance and all contours smoothly fade to black. By 0.58 seconds ALL light has vanished; hold pure black for the remainder. Do not add another ring, wreath, seal, object or strike. No expanding effect, scenery, body, card, table, interface, letters, numbers, smoke, white disk, cuts or camera movement. A single short dry sound is acceptable, no music or speech.",
+    "firstFrame": "frames/13-deploy-minister-start-v3.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-b1fb72d1-323c-45c8-9f20-8c0149a0e97c.png"
+  },
+  {
+    "id": "14-deploy-priest",
+    "title": "Жрец · выход",
+    "role": "priest",
+    "duration": 4,
+    "activeSeconds": 0.58,
+    "imagePrompt": "Use case: stylized-concept. Asset type: START frame for an isolated IMPERIVM Roman fantasy card-game overlay. Subject: Two slender jade and ivory olive branches with five turquoise motes rising a short distance through their empty black center, a quiet sacred arrival. Strict landscape 16:9, pure uniform black RGB 0,0,0, locked frontal orthographic view. Hand-painted tactile VFX in the bronze and ivory Roman arena palette; restrained rich accent colors, visible crisp sparse edges. The ENTIRE effect stays in the central 30 percent width and 40 percent height, leaving generous pure black margins. No card, person, board, text, letters, digits, runes, screen-wide glow, haze, bloom, fireball or explosions. Single frame, no contact sheet.",
+    "videoPrompt": "Create one 4-second isolated IMPERIVM Roman game VFX clip. Set First and last frames, 16:9, 720p. The supplied 14-START.png is the EXACT FIRST frame; the supplied 14-END.png is the EXACT LAST frame. Completely locked frontal orthographic camera; uniform pure black RGB 0,0,0 background throughout. Preserve the exact starting footprint, palette, silhouette and empty black center. From 0.00 to 0.12 seconds, the existing contours give ONE brief restrained glint. From 0.12 to 0.58 seconds, only the small existing particles drift a short distance and all contours smoothly fade to black. By 0.58 seconds ALL light has vanished; hold pure black for the remainder. Do not add another ring, wreath, seal, object or strike. No expanding effect, scenery, body, card, table, interface, letters, numbers, smoke, white disk, cuts or camera movement. A single short dry sound is acceptable, no music or speech.",
+    "firstFrame": "frames/14-deploy-priest-start-v3.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-b947a3bd-1874-41ef-a746-8dedc846e664.png"
+  },
+  {
+    "id": "15-deploy-engineer",
+    "title": "Инженер · выход",
+    "role": "engineer",
+    "duration": 4,
+    "activeSeconds": 0.5,
+    "imagePrompt": "Use case: stylized-concept. Asset type: START frame for an isolated IMPERIVM Roman fantasy card-game overlay. Subject: A small cyan-bronze open hexagonal schematic ring made of thin six line segments, three small amber sparks at its foot. Empty black center. Strict landscape 16:9, pure uniform black RGB 0,0,0, locked frontal orthographic view. Hand-painted tactile VFX in the bronze and ivory Roman arena palette; restrained rich accent colors, visible crisp sparse edges. The ENTIRE effect stays in the central 30 percent width and 40 percent height, leaving generous pure black margins. No card, person, board, text, letters, digits, runes, screen-wide glow, haze, bloom, fireball or explosions. Single frame, no contact sheet.",
+    "videoPrompt": "Create one 4-second isolated IMPERIVM Roman game VFX clip. Set First and last frames, 16:9, 720p. The supplied 15-START.png is the EXACT FIRST frame; the supplied 15-END.png is the EXACT LAST frame. Completely locked frontal orthographic camera; uniform pure black RGB 0,0,0 background throughout. Preserve the exact starting footprint, palette, silhouette and empty black center. From 0.00 to 0.12 seconds, the existing contours give ONE brief restrained glint. From 0.12 to 0.50 seconds, only the small existing particles drift a short distance and all contours smoothly fade to black. By 0.50 seconds ALL light has vanished; hold pure black for the remainder. Do not add another ring, wreath, seal, object or strike. No expanding effect, scenery, body, card, table, interface, letters, numbers, smoke, white disk, cuts or camera movement. A single short dry sound is acceptable, no music or speech.",
+    "firstFrame": "frames/15-deploy-engineer-start-v3.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-8935c9ef-a591-483f-b9f0-c72b9e99a11f.png"
+  },
+  {
+    "id": "16-edict-weaken",
+    "title": "Сенатское порицание · ослабление",
+    "role": "weaken",
+    "duration": 4,
+    "activeSeconds": 0.55,
+    "imagePrompt": "Use case: stylized-concept. Asset type: START frame for an isolated IMPERIVM Roman fantasy card-game overlay. Subject: One small split vermilion wax-seal rim and a broken pale steel spear contour, three muted burgundy fragments moving downward. Empty black center. Strict landscape 16:9, pure uniform black RGB 0,0,0, locked frontal orthographic view. Hand-painted tactile VFX in the bronze and ivory Roman arena palette; restrained rich accent colors, visible crisp sparse edges. The ENTIRE effect stays in the central 30 percent width and 40 percent height, leaving generous pure black margins. No card, person, board, text, letters, digits, runes, screen-wide glow, haze, bloom, fireball or explosions. Single frame, no contact sheet.",
+    "videoPrompt": "Create one 4-second isolated IMPERIVM Roman game VFX clip. Set First and last frames, 16:9, 720p. The supplied 16-START.png is the EXACT FIRST frame; the supplied 16-END.png is the EXACT LAST frame. Completely locked frontal orthographic camera; uniform pure black RGB 0,0,0 background throughout. Preserve the exact starting footprint, palette, silhouette and empty black center. From 0.00 to 0.12 seconds, the existing contours give ONE brief restrained glint. From 0.12 to 0.55 seconds, only the small existing particles drift a short distance and all contours smoothly fade to black. By 0.55 seconds ALL light has vanished; hold pure black for the remainder. Do not add another ring, wreath, seal, object or strike. No expanding effect, scenery, body, card, table, interface, letters, numbers, smoke, white disk, cuts or camera movement. A single short dry sound is acceptable, no music or speech.",
+    "firstFrame": "frames/16-edict-weaken-start-v3.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-4d340c0a-d6fc-44c2-8601-86285d63f68d.png"
+  },
+  {
+    "id": "17-edict-heal",
+    "title": "Обряд восстановления · лечение бойцов",
+    "role": "heal",
+    "duration": 4,
+    "activeSeconds": 0.6,
+    "imagePrompt": "Use case: stylized-concept. Asset type: START frame for an isolated IMPERIVM Roman fantasy card-game overlay. Subject: A small open turquoise and warm ivory restorative halo, six tiny jade motes around an empty black oval. Light outlines, no opaque central symbol. Strict landscape 16:9, pure uniform black RGB 0,0,0, locked frontal orthographic view. Hand-painted tactile VFX in the bronze and ivory Roman arena palette; restrained rich accent colors, visible crisp sparse edges. The ENTIRE effect stays in the central 30 percent width and 40 percent height, leaving generous pure black margins. No card, person, board, text, letters, digits, runes, screen-wide glow, haze, bloom, fireball or explosions. Single frame, no contact sheet.",
+    "videoPrompt": "Create one 4-second isolated IMPERIVM Roman game VFX clip. Set First and last frames, 16:9, 720p. The supplied 17-START.png is the EXACT FIRST frame; the supplied 17-END.png is the EXACT LAST frame. Completely locked frontal orthographic camera; uniform pure black RGB 0,0,0 background throughout. Preserve the exact starting footprint, palette, silhouette and empty black center. From 0.00 to 0.12 seconds, the existing contours give ONE brief restrained glint. From 0.12 to 0.60 seconds, only the small existing particles drift a short distance and all contours smoothly fade to black. By 0.60 seconds ALL light has vanished; hold pure black for the remainder. Do not add another ring, wreath, seal, object or strike. No expanding effect, scenery, body, card, table, interface, letters, numbers, smoke, white disk, cuts or camera movement. A single short dry sound is acceptable, no music or speech.",
+    "firstFrame": "frames/17-edict-heal-start-v3.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-87b457b2-8a18-478a-89c1-920e98bb89ec.png"
+  }
+]

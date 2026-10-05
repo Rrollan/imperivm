@@ -4,6 +4,9 @@ import type { Scene } from '@babylonjs/core/scene';
 import { CARDS } from '../../lib/cards';
 import { cardName, type Locale } from '../../lib/locale';
 import type { Minion } from '../../lib/engine/types';
+import {cardIdentity} from './cardIdentity';
+import {cardArtPath} from '../../lib/cardArt';
+import {ordersView} from './ordersView';
 
 export type Face =
   | { kind: 'card'; cardId: string }
@@ -12,6 +15,9 @@ export type Face =
   | { kind: 'power'; heroId: string; cost: number; available: boolean; model?: boolean }
   | { kind: 'command'; state: 'own' | 'enemy' | 'busy' | 'over'; engraved?: boolean }
   | { kind: 'gas'; gas: number; max: number; engraved?: boolean }
+  | { kind: 'orders'; gas: number; max: number }
+  | { kind: 'queued'; cardId:string; owner:0|1; count:number; ordinal:number }
+  | { kind: 'queueTitle'; own:number; enemy:number }
   | { kind: 'block'; block: number }
   | { kind: 'deck'; count: number; model?: boolean }
   | { kind: 'scroll' }
@@ -82,7 +88,7 @@ export class ArenaTextures {
   }
 
   make(name: string, initial: Face) {
-    const size = initial.kind === 'command' ? { width: 768, height: 288 } : initial.kind === 'power' ? { width: 384, height: 384 } : initial.kind === 'gas' ? { width: 384, height: 256 } : { width: 384, height: 512 };
+    const size = initial.kind==='orders'?{width:1248,height:160}:initial.kind==='queueTitle'?{width:512,height:312}:initial.kind === 'command' ? { width: 768, height: 288 } : initial.kind === 'power' ? { width: 384, height: 384 } : initial.kind === 'gas' ? { width: 384, height: 256 } : { width: 384, height: 512 };
     const texture = new DynamicTexture(name, size, this.scene, true, Texture.TRILINEAR_SAMPLINGMODE);
     texture.hasAlpha = true;
     const ctx = texture.getContext() as unknown as CanvasRenderingContext2D;
@@ -97,6 +103,14 @@ export class ArenaTextures {
       else if (face.kind === 'power') this.drawPower(ctx, face);
       else if (face.kind === 'command') this.drawCommand(ctx, face.state, face.engraved);
       else if (face.kind === 'gas') this.drawGas(ctx, face.gas, face.max, face.engraved);
+      else if(face.kind==='orders')this.drawOrders(ctx,face.gas,face.max);
+      else if(face.kind==='queued')this.drawQueued(ctx,face);
+      else if(face.kind==='queueTitle'){
+        ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`800 95px ${this.font}`;
+        ctx.strokeStyle='#1e110b';ctx.lineWidth=9;ctx.strokeText(this.locale==='ru'?'Указы':'Edicts',256,58);ctx.fillStyle='#f5dbac';ctx.fillText(this.locale==='ru'?'Указы':'Edicts',256,58);
+        ctx.font=`750 75px ${this.font}`;
+        for(const [label,y,color] of [[this.locale==='ru'?`Ваши ${face.own}`:`Yours ${face.own}`,151,'#b8e1d4'],[this.locale==='ru'?`Враг ${face.enemy}`:`Foe ${face.enemy}`,246,'#f2b7a6']] as const){ctx.strokeText(label,256,y);ctx.fillStyle=color;ctx.fillText(label,256,y);}
+      }
       else if (face.kind === 'block') this.drawBlock(ctx, face.block);
       else if (face.kind === 'deck') { if (!face.model) this.drawBack(ctx); this.badge(ctx, String(face.count), 192, 350, '#544026', 70); }
       else this.drawScroll(ctx);
@@ -113,7 +127,8 @@ export class ArenaTextures {
   }
 
   setLocale(locale: Locale) { this.locale = locale; this.redraws.forEach(draw => draw()); }
-  preloadCards(ids:string[]){ids.forEach(id=>this.image(`/cards/${id}.webp`));}
+  isReady() { return Array.from(this.images.values()).every(image => image.complete); }
+  preloadCards(ids:string[]){ids.forEach(id=>this.image(cardArtPath(id)));}
 
   private badge(ctx: CanvasRenderingContext2D, value: string, x: number, y: number, color: string, radius = 43) {
     ctx.save();
@@ -133,24 +148,68 @@ export class ArenaTextures {
 
   private drawCard(ctx: CanvasRenderingContext2D, id: string) {
     const def = CARDS[id];
-    const frame = ctx.createLinearGradient(0, 0, 384, 512);
-    frame.addColorStop(0, '#d6ad58'); frame.addColorStop(.25, '#624123'); frame.addColorStop(.7, '#bd914b'); frame.addColorStop(1, '#392518');
-    rounded(ctx, 9, 9, 366, 494, 24); ctx.fillStyle = frame; ctx.fill();
-    rounded(ctx, 22, 22, 340, 468, 15); ctx.fillStyle = '#ecdfbb'; ctx.fill();
-    ctx.save(); rounded(ctx, 29, 25, 326, 330, 9); ctx.clip();
-    const art = this.image(`/cards/${id}.webp`);
-    ctx.fillStyle = '#30241b'; ctx.fillRect(29, 25, 326, 330);
-    if (art) contain(ctx, art, 29, 25, 326, 330);
+    rounded(ctx, 9, 9, 366, 494, 20); ctx.fillStyle = '#8c693c'; ctx.fill();
+    rounded(ctx, 17, 17, 350, 478, 14); ctx.fillStyle = '#ead7ab'; ctx.fill();
+    ctx.save(); rounded(ctx, 23, 23, 338, 339, 9); ctx.clip();
+    const art = this.image(cardArtPath(id));
+    ctx.fillStyle = '#3b3026'; ctx.fillRect(23, 23, 338, 339);
+    if (art) contain(ctx, art, 23, 23, 338, 339);
     ctx.restore();
-    ctx.fillStyle = '#3d291c'; rounded(ctx, 18, 358, 348, 79, 10); ctx.fill();
-    ctx.strokeStyle = '#cfad6c'; ctx.lineWidth = 4; ctx.stroke();
-    ctx.fillStyle = '#fff1cf'; ctx.font = `700 32px ${this.font}`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = '#4d3423'; rounded(ctx, 18, 365, 348, 72, 8); ctx.fill();
+    ctx.fillStyle = '#fff1cf'; ctx.font = `750 32px ${this.font}`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
     words(ctx, cardName(id, this.locale), 192, 390, 321, 34);
     this.badge(ctx, `${def.cost}`, 56, 61, '#246784', 45);
     if (def.type === 'minion') {
       this.badge(ctx, `${def.attack}`, 55, 469, '#aa7626', 31);
       this.badge(ctx, `${def.health}`, 329, 469, '#a83f31', 31);
     }
+    const identity=cardIdentity(id);
+    // Keep the compact hand face free of tiny rules text. Full role/rank labels
+    // are in inspection; this engraved emblem marks the role on the card.
+    ctx.save();ctx.translate(192,466);ctx.strokeStyle='#493422';ctx.fillStyle=identity.color;ctx.lineWidth=3;ctx.lineCap='round';
+    ctx.beginPath();ctx.arc(0,0,24,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.beginPath();
+    if(identity.role==='guard'){ctx.moveTo(-12,-12);ctx.lineTo(12,-12);ctx.lineTo(10,6);ctx.lineTo(0,16);ctx.lineTo(-10,6);ctx.closePath();}
+    else if(identity.role==='engineer'){for(let i=0;i<7;i++){const a=i*Math.PI/3;ctx.lineTo(Math.cos(a)*15,Math.sin(a)*15);}}
+    else if(identity.role==='commander'||identity.role==='priest'){ctx.arc(0,0,14,.2,Math.PI-.2);for(const side of [-1,1])for(let i=0;i<3;i++){ctx.moveTo(side*(8+i*2),8-i*7);ctx.lineTo(side*(16+i*2),4-i*7);}}
+    else if(identity.role==='minister'||identity.role==='edict'){ctx.arc(0,-3,10,0,Math.PI*2);ctx.moveTo(-5,7);ctx.lineTo(-8,17);ctx.lineTo(0,12);ctx.lineTo(8,17);ctx.lineTo(5,7);}
+    else{ctx.moveTo(0,17);ctx.lineTo(0,-15);ctx.moveTo(-6,-5);ctx.lineTo(0,-17);ctx.lineTo(6,-5);ctx.moveTo(-6,8);ctx.lineTo(6,8);}
+    ctx.stroke();ctx.restore();
+    ctx.strokeStyle=identity.color;ctx.lineWidth=7;
+    for(let i=0;i<identity.rank;i++){ctx.beginPath();ctx.arc(328-i*18,33,4,0,Math.PI*2);ctx.stroke();}
+  }
+
+  private drawQueued(ctx:CanvasRenderingContext2D,face:Extract<Face,{kind:'queued'}>){
+    this.drawCard(ctx,face.cardId);
+    ctx.fillStyle=face.owner===0?'#1d4b4b':'#6b2d26';rounded(ctx,20,350,344,86,8);ctx.fill();
+    ctx.textAlign='center';ctx.font=`800 47px ${this.font}`;ctx.fillStyle='#fff0ce';
+    ctx.fillText(this.locale==='ru'?(face.owner===0?'Ваш ход':'Ход врага'):(face.owner===0?'Your turn':'Enemy turn'),192,405);
+    this.badge(ctx,String(face.ordinal),322,65,'#785435',44);
+    if(face.count>3){ctx.font=`800 40px ${this.font}`;ctx.fillText(`+${face.count-3}`,192,487);}
+  }
+
+  private drawOrders(ctx:CanvasRenderingContext2D,gas:number,max:number){
+    const view=ordersView(gas,max),art=this.image('/ui/arena-lab/gas-socket.webp');
+    // Paint the sockets and counter from the same snapshot in one layer.
+    const centers=[57,159,260,364,465,567,668,770,872,973];
+    view.slots.forEach((status,index)=>{
+      if(status==='locked')return;
+      const x=centers[index];ctx.save();ctx.beginPath();ctx.arc(x,72,42,0,Math.PI*2);ctx.clip();
+      ctx.globalAlpha=status==='spent'?.18:1;
+      if(art)ctx.drawImage(art,art.naturalWidth*.2,art.naturalHeight*.2,art.naturalWidth*.6,art.naturalHeight*.6,x-43,29,86,86);
+      else{const g=ctx.createRadialGradient(x-10,60,2,x,72,43);g.addColorStop(0,'#98ecf0');g.addColorStop(.5,'#298c98');g.addColorStop(1,'#154447');ctx.fillStyle=g;ctx.fillRect(x-43,29,86,86);}
+      if(status==='bonus'){
+        ctx.globalAlpha=.8;ctx.fillStyle='#dfa743';ctx.fillRect(x-43,29,86,86);
+        ctx.globalAlpha=1;ctx.strokeStyle='#ffe2a0';ctx.lineWidth=6;ctx.beginPath();ctx.arc(x,72,36,0,Math.PI*2);ctx.stroke();
+        ctx.fillStyle='#fff1c5';ctx.fillRect(x-2,53,4,38);ctx.fillRect(x-19,70,38,4);
+      }
+      ctx.restore();
+    });
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff1d3';ctx.strokeStyle='#21140d';ctx.lineWidth=7;
+    ctx.font=`750 44px ${this.font}`;ctx.strokeText(this.locale==='ru'?'Приказы':'Orders',1136,23);ctx.fillText(this.locale==='ru'?'Приказы':'Orders',1136,23);
+    ctx.font=`800 103px ${this.font}`;ctx.strokeText(String(gas),1097,89);ctx.fillText(String(gas),1097,89);
+    ctx.font=`750 54px ${this.font}`;ctx.strokeText(`/ ${max}`,1190,98);ctx.fillText(`/ ${max}`,1190,98);
+    if(view.bonus){ctx.font=`750 38px ${this.font}`;const label=`+${view.bonus} ${this.locale==='ru'?'бонус':'bonus'}`;ctx.fillStyle='#f3c67c';ctx.strokeText(label,1136,146);ctx.fillText(label,1136,146);}
   }
 
   private drawMinion(ctx: CanvasRenderingContext2D, minion: Minion, ready=false) {
@@ -158,7 +217,7 @@ export class ArenaTextures {
     ctx.beginPath(); ctx.ellipse(192, 225, 159, 197, 0, 0, Math.PI * 2);
     ctx.fillStyle = '#593c24'; ctx.fill(); ctx.lineWidth = minion.taunt ? 24 : 17; ctx.strokeStyle = minion.taunt ? '#ddd1af' : '#d5aa63'; ctx.stroke();
     ctx.clip();
-    const art = this.image(`/cards/${minion.cardId}.webp`);
+    const art = this.image(cardArtPath(minion.cardId));
     // Battlefield pieces use an edge-to-edge portrait. Inspection shows the full illustration.
     if (art) cover(ctx, art, 32, 27, 320, 400);
     ctx.restore();
@@ -186,9 +245,10 @@ export class ArenaTextures {
     if (!model) {
     // The loading portrait occupies exactly the coin's circular recess.
     // Texture pixels and the mesh use different aspect ratios, hence the ellipse.
-    ctx.save();ctx.beginPath();ctx.ellipse(192,256,132,160,0,0,Math.PI*2);ctx.clip();
+    ctx.save();ctx.beginPath();ctx.ellipse(192,256,126,145,0,0,Math.PI*2);ctx.clip();
     ctx.fillStyle='#594124';ctx.fillRect(60,96,264,320);
-    const art=this.image(`/heroes/${id}.webp`);if(art)cover(ctx,art,60,96,264,320);
+    const art=this.image(id==='whale'?'/models/hero-whale.webp':`/heroes/${id}.webp`);
+    if(art){if(id==='whale')ctx.drawImage(art,35,35,530,530,66,111,252,290);else cover(ctx,art,66,111,252,290);}
     ctx.restore();
     }
     this.badge(ctx, `${treasury}`, 315, 355, '#a8322f', 59);
@@ -205,7 +265,9 @@ export class ArenaTextures {
       // Measured alpha bounds; generated atlas spacing is not assumed to be exact.
       const regions = [[.049924,.003361,.43646,.484874],[.515885,.005042,.434191,.482353],[.044629,.481092,.440242,.489076],[.515129,.481513,.440242,.489076]];
       const [x,y,w,h] = regions[Math.max(0,index)];
-      ctx.drawImage(atlas, x*atlas.naturalWidth, y*atlas.naturalHeight, w*atlas.naturalWidth, h*atlas.naturalHeight, 0, 0, 384, 384);
+      // Use just the relief, leaving the board's own painted ring visible.
+      ctx.beginPath();ctx.arc(192,192,161,0,Math.PI*2);ctx.clip();
+      ctx.drawImage(atlas, (x+w*.1)*atlas.naturalWidth, (y+h*.1)*atlas.naturalHeight, w*.8*atlas.naturalWidth, h*.8*atlas.naturalHeight, 27, 27, 330, 330);
     } else {
       this.badge(ctx, '', 192, 190, '#785b36', 140);
       ctx.strokeStyle = '#e5c08b'; ctx.lineWidth = 18;

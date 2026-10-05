@@ -42,3 +42,8 @@
 .shell .header{inset:auto;left:var(--arena-menu-x,calc(100% - 46px));top:var(--arena-menu-y,calc(100% - 46px));transform:translate(-50%,-50%);}
 .shell .settingsButton{border:0;padding:0;background:transparent url('/ui/arena-lab/native/settings-medallion.webp') center/contain no-repeat !important;box-shadow:none;}
 .settingsButton svg{display:none;}
+
+.inspection .cardIdentity{font-size:16px;font-weight:700;border-bottom:3px solid;padding-bottom:8px;text-align:center;color:#493224;}
+.inspection .inspectionActions{position:sticky;bottom:-10px;margin:0 -5px -5px;padding:8px;background:#eeddb5;border-top:1px solid #b89b6b;}
+.inspection .inspectionActions button{margin:0;}
+.costChip{display:inline-grid;place-items:center;width:29px;height:29px;margin-right:9px;border:2px solid #d9bd80;border-radius:50%;background:#245f74;color:#fff1d1;font-weight:800;vertical-align:middle;}

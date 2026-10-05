@@ -14,7 +14,12 @@
  * would fire victory for both sides.
  */
 import { play } from './sfx';
+import type { SfxName } from './sfx';
 import type { BattleEvents } from '../events';
+import type { Action, GameState } from '../engine/types';
+import { CARDS } from '../cards';
+
+type SoundContext = { action: Action; before: GameState; after: GameState };
 
 const LS_AMB = 'imperivm.audio.ambient';
 let ambientStarted = false;
@@ -42,40 +47,67 @@ export function isAmbientStarted(): boolean {
   return ambientStarted;
 }
 
-/** Map a single BattleEvents payload to SFX. Best-effort, dedupe-safe. */
-export function emitSfxFromEvents(events: BattleEvents): void {
+/** One cue of each kind per contact, even when an edict hits seven fighters. */
+export function soundsForEvents(events: BattleEvents, context?: SoundContext): SfxName[] {
+  const sounds = new Set<SfxName>();
+  const add = (name: SfxName) => sounds.add(name);
+  if (context) {
+    if (context.action.type === 'end-turn') add('end-turn');
+    if (context.action.type === 'stake') add('stake');
+    if (context.action.type === 'unstake') add('unstake');
+    if (context.action.type === 'hero-power') add('ui-click');
+    for (const owner of [0, 1] as const) {
+      const before = context.before.players[owner].treasury;
+      const after = context.after.players[owner].treasury;
+      if (after > before) add('heal');
+      if (after < before) add('damage');
+    }
+  }
   // Plays (cards entering our board)
-  if (events.play) play('play');
+  if (events.play) add('play');
 
   // Mempool lifecycle
-  if (events.spellQueued) play('mempool-queue');
+  if (events.spellQueued) add('mempool-queue');
   if (events.spellResolved && events.spellResolved.length > 0) {
-    play('mempool-resolve');
+    add('mempool-resolve');
     // Each spell has a distinct sound; for the cast spells we have
     // today, fall back to one cue per resolution (avoid stacking).
   }
-  if (events.spellCountered) play('priority');
+  if (events.spellCountered) add('priority');
 
   // Halving pulse + rug pull
-  if (events.halvings && events.halvings.length > 0) play('halving');
-  if (events.rugPull) play('rug-pull');
+  if (events.halvings && events.halvings.length > 0) add('halving');
+  if (events.rugPull) add('rug-pull');
 
   // Combat: attack lunge + per-minion damage/heal floats
-  if (events.attack) play('attack');
-  if (events.damages) {
-    for (const d of events.damages) {
-      if (events.halvings?.some(h => h.uid === d.uid)) continue;
-      if (d.health > d.prevHealth) play('heal');
-      else play('damage');
+  if (events.attack) add('attack');
+  const covered = new Set<string>();
+  for (const result of events.effectResults ?? []) {
+    for (const target of result.targets) {
+      covered.add(target.uid);
+      if ((result.kind === 'heal-own-minions' || result.kind === 'heal-treasury') && target.healthAfter > target.healthBefore) add('heal');
+      if (result.kind.startsWith('damage-') && target.healthAfter < target.healthBefore) add('damage');
     }
   }
-  if (events.deaths && events.deaths.length > 0) play('death');
+  if (events.damages) {
+    for (const d of events.damages) {
+      if (covered.has(d.uid) || events.halvings?.some(h => h.uid === d.uid)) continue;
+      if (d.health > d.prevHealth && CARDS[events.play?.cardId ?? '']?.battlecry?.kind !== 'buff-own') add('heal');
+      else if (d.health < d.prevHealth) add('damage');
+    }
+  }
+  if (events.deaths && events.deaths.length > 0) add('death');
 
   // End-game: perspective-aware. 'me' = triumph, 'foe' = defeat,
   // 'draw' = stalemate.
   if (events.gameOver) {
-    if (events.gameOver.perspective === 'me') play('victory');
-    else if (events.gameOver.perspective === 'foe') play('rugged');
-    else play('rugged'); // draw reuses rugged cue for the cliff-drop tone
+    if (events.gameOver.perspective === 'me') add('victory');
+    else add('rugged'); // draw reuses the defeat cue
   }
+  return Array.from(sounds);
+}
+
+/** Called once at the visual contact point of the action. */
+export function emitSfxFromEvents(events: BattleEvents, context?: SoundContext): void {
+  soundsForEvents(events, context).forEach(name => play(name));
 }

@@ -16,9 +16,10 @@ export default function FlowKit({ items }: { items: FlowVideo[] }) {
   return <main className={styles.page}>
     <header><Link href="/arena-lab">← Арена</Link><span>IMPERIVM / GOOGLE FLOW</span></header>
     <section className={styles.intro}>
-      <p>9 видео · Готовые пары кадров</p><h1>Start. End. Промпт.</h1>
+      <p>{items.length} новых видео · Эффекты 10–17</p><h1>Start. End. Промпт.</h1>
       <p>Для каждого видео — отдельная папка с двумя картинками и готовым текстом. Номер папки, картинок и промпта совпадает.</p>
-      <a className={styles.download} href="/ui/arena-lab/imperivm-flow-vfx-pairs.zip" download>Скачать все 9 папок · ZIP</a>
+      <p>Видео 01–09 уже подключены. Здесь только новые эффекты выхода бойцов, ослабления и лечения.</p>
+      <a className={styles.download} href="/ui/arena-lab/imperivm-flow-vfx-phase2.zip" download>Скачать {items.length} новых папок · ZIP</a>
     </section>
     <aside>
       <strong>16:9 · 720p · 4 секунды · First and last</strong>

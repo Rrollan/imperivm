@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import frames from '../../../docs/flow-vfx/frames.json';
+import frames from '../../../docs/flow-vfx/frames-phase2.json';
 import FlowKit from '../../../components/presentation/FlowKit';
 
 export const metadata:Metadata={title:'Эффекты для Flow — IMPERIVM'};
