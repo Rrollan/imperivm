@@ -47,3 +47,17 @@
 .inspection .inspectionActions{position:sticky;bottom:-10px;margin:0 -5px -5px;padding:8px;background:#eeddb5;border-top:1px solid #b89b6b;}
 .inspection .inspectionActions button{margin:0;}
 .costChip{display:inline-grid;place-items:center;width:29px;height:29px;margin-right:9px;border:2px solid #d9bd80;border-radius:50%;background:#245f74;color:#fff1d1;font-weight:800;vertical-align:middle;}
+.mulligan{width:min(800px,100%);max-height:96%;overflow:auto;border:6px ridge #876037;border-radius:24px;padding:22px;background:#dfc795 url('/ui/arena-lab/playing-surface.webp') center/cover;color:#412918;text-align:center;box-shadow:0 20px 65px #0009;}
+.mulligan h2{font-size:30px;line-height:1.15;margin:0 0 12px;}.mulligan p{margin:0 0 18px;font-size:16px;line-height:1.4;}
+.openingCards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px;}
+.shell .openingCard{position:relative;min-width:0;padding:5px;border:2px solid #8b6a3c;border-radius:12px;background:#e8d2a0 !important;color:#3f2b1b;box-shadow:0 4px 8px #35200b44;}
+.shell .openingCard:hover{background:#f1ddb1 !important;border-color:#e8c37c;}
+.shell .openingCardSelected{border:3px solid #aa4838;background:#e7bca0 !important;box-shadow:0 0 0 2px #e5be78,0 4px 8px #35200b44;}
+.openingCard img{display:block;width:100%;aspect-ratio:2/3;object-fit:contain;border-radius:7px;background:#463322;}
+.openingCard strong{display:block;min-height:46px;margin:7px 0 4px;font-size:16px;line-height:1.15;}
+.openingCost{position:absolute;left:-5px;top:-7px;width:34px;height:34px;display:grid;place-items:center;border:2px solid #e2c184;border-radius:50%;background:#245f74;color:#fff1d1;font-size:23px;font-weight:800;box-shadow:0 2px 4px #24150877;}
+.openingStats{display:flex;justify-content:space-between;align-items:center;min-height:30px;padding:0 2px;font-size:17px;font-weight:800;}
+.openingStats>span:first-child:not(:only-child),.openingStats>span:last-child:not(:only-child){display:grid;place-items:center;width:29px;height:29px;border:1px solid #b88c4d;border-radius:50%;background:#9a722d;color:#fff1d1;}.openingStats>span:last-child:not(:only-child){background:#963d2d;}
+.openingDecision{display:block;margin:5px 0;font-size:15px;font-weight:750;line-height:1.2;}
+.mulligan>.primary{min-width:200px;min-height:50px;font-size:18px;}
+@media(max-width:520px){.mulligan{padding:19px 12px;}.openingCards{gap:8px;}.openingCard strong{min-height:56px;font-size:15px;}}

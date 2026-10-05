@@ -25,7 +25,9 @@ export interface SessionSnapshot {
 export function createLabGame(heroId = 'builder', opening = false, seed = 2718): GameState {
   const hero = HEROES[heroId] ? heroId : 'builder';
   const foe = hero === 'degen' ? 'whale' : 'degen';
-  let state = createGame(hero, DECKS[hero], foe, DECKS[foe], seed);
+  let state = opening
+    ? createGame(hero, DECKS[hero], foe, DECKS[foe], {enableMulligan:true}, seed)
+    : createGame(hero, DECKS[hero], foe, DECKS[foe], seed);
   if (!opening) {
     for (let step = 0; step < 180 && state.block < 9 && state.winner === null; step++) {
       state = applyAction(state, chooseAiAction(state));

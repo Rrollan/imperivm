@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { CARDS } from '../../lib/cards';
 import { chooseAiAction } from '../../lib/ai';
-import { legalActions,mempoolOf } from '../../lib/engine/engine';
+import { legalActions,mempoolOf,mulliganAvailable } from '../../lib/engine/engine';
 import { unlockAudio, isMuted, setMuted, onMuteChange } from '../../lib/audio/manager';
 import { emitSfxFromEvents } from '../../lib/audio/events';
 import type { Action } from '../../lib/engine/types';
@@ -19,6 +19,7 @@ import type {RenderQuality} from './renderQuality';
 import {roleName,rankName,cardIdentity} from './cardIdentity';
 import {ordersView} from './ordersView';
 import {cardArtPath} from '../../lib/cardArt';
+import {OpeningHand} from './OpeningHand';
 
 function usePanelFocus(open: boolean, panel: React.RefObject<HTMLElement>, modal = false) {
   useEffect(() => {
@@ -51,15 +52,20 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
   const [muted, updateMuted] = useState(true);
   const [quality,setQuality] = useState<RenderQuality>('auto');
   const [help, setHelp] = useState(false);
+  const helpOpen=useRef(help);helpOpen.current=help;
   const [keyboard, setKeyboard] = useState(false);
   const [metrics, setMetrics] = useState<ArenaMetrics | null>(null);
   const [lastAction,setLastAction] = useState<{type:string;owner:number;revision:number}|null>(null);
+  const [mulliganUids,setMulliganUids] = useState<string[]>([]);
+  const [pageVisible,setPageVisible] = useState(true);
   const canvas = useRef<HTMLCanvasElement>(null);
   const renderer = useRef<ArenaRenderer | null>(null);
-  const helpPanel = useRef<HTMLElement>(null), actionPanel = useRef<HTMLElement>(null), resultPanel = useRef<HTMLElement>(null);
+  const helpPanel = useRef<HTMLElement>(null), actionPanel = useRef<HTMLElement>(null), resultPanel = useRef<HTMLElement>(null), mulliganPanel=useRef<HTMLElement>(null);
+  const showMulligan=ready&&!view.busy&&view.state.turn===0&&mulliganAvailable(view.state);
   usePanelFocus(help, helpPanel, true);
   usePanelFocus(keyboard, actionPanel);
   usePanelFocus(view.shown.winner !== null, resultPanel, true);
+  usePanelFocus(showMulligan,mulliganPanel,true);
   const selectedRef = useRef<string | null>(null);
   const callbacks = useRef({ pick: (_target: ArenaTarget) => {}, play: (_uid: string) => {}, attack: (_uid: string, _target: string) => {} });
   const shown = view.shown, me = shown.players[0], foe = shown.players[1];
@@ -76,7 +82,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
     try {
       const batch = session.dispatch(action); if (!batch) return;
       if(debug)setLastAction({type:action.type,owner:batch.before.turn,revision:batch.revision});
-      select(null); setInspect(null); setKeyboard(false); setFailure('');
+      select(null); setInspect(null); setKeyboard(false); setMulliganUids([]); setFailure('');
       const impact = () => { session.impact(batch.id); emitSfxFromEvents(batch.events ?? {}, batch); };
       const arena = renderer.current;
       if (arena) void arena.present(batch, impact).then(() => session.complete(batch.id)).catch(() => { session.complete(batch.id); setFailure('presentation'); });
@@ -149,24 +155,31 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
   useEffect(() => { renderer.current?.sync(view.shown); }, [view.shown]);
   useEffect(() => { renderer.current?.setLocale(locale.locale); }, [locale.locale]);
   useEffect(() => { renderer.current?.setReducedMotion(reduced); }, [reduced]);
-  useEffect(() => {renderer.current?.setOverlayOpen(help||keyboard||inspect!==null);},[help,keyboard,inspect,ready]);
+  useEffect(()=>{renderer.current?.setPaused(help);},[help,ready]);
+  useEffect(()=>{const visibility=()=>setPageVisible(!document.hidden);visibility();document.addEventListener('visibilitychange',visibility);return()=>document.removeEventListener('visibilitychange',visibility);},[]);
+  useEffect(() => {renderer.current?.setOverlayOpen(help||keyboard||inspect!==null||showMulligan||shown.winner!==null);},[help,keyboard,inspect,ready,showMulligan,shown.winner]);
   useEffect(() => {
     try {const saved=localStorage.getItem('imperivm-arena-quality');if(saved==='auto'||saved==='sharp'||saved==='fast')setQuality(saved);} catch {}
   }, []);
   useEffect(() => {renderer.current?.setQuality(quality);}, [quality,ready]);
   useEffect(() => { updateMuted(isMuted()); return onMuteChange(updateMuted); }, []);
   useEffect(() => {
-    if (!ready || help || view.busy || view.state.winner !== null || view.state.turn !== 1) return;
-    const timer = window.setTimeout(() => dispatch(chooseAiAction(session.snapshot().state)), reduced ? 180 : 450);
+    if (!ready || !pageVisible || help || view.busy || view.state.winner !== null || view.state.turn !== 1) return;
+    const timer = window.setTimeout(() => {
+      const current=session.snapshot();
+      if(document.hidden||helpOpen.current||current.busy||current.state.winner!==null||current.state.turn!==1)return;
+      dispatch(chooseAiAction(current.state));
+    }, reduced ? 180 : 450);
     return () => window.clearTimeout(timer);
-  }, [view.revision, view.busy, view.state, ready, help, reduced, dispatch, session]);
+  }, [view.revision, view.busy, view.state, ready, pageVisible, help, reduced, dispatch, session]);
   useEffect(() => {
-    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { select(null); setInspect(null); setHelp(false); setKeyboard(false); } };
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { select(null); setInspect(null); setHelp(false); setKeyboard(false); setMulliganUids([]); } };
     window.addEventListener('keydown', escape); return () => window.removeEventListener('keydown', escape);
   }, [select]);
 
-  function restart(nextHero = me.heroId, fromOpening = opening) {
+  function restart(nextHero = me.heroId, fromOpening = true) {
     renderer.current?.cancel(); select(null); setInspect(null);
+    setHelp(false);setKeyboard(false);setMulliganUids([]);setLastAction(null);setFailure('');
     session.restart(createLabGame(nextHero, fromOpening,seed));
   }
 
@@ -189,7 +202,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
     }
     if (action.type === 'stake' || action.type === 'unstake') {
       const minion = view.state.players[0].board.find(m => m.uid === action.uid);
-      return `${locale.t(action.type === 'stake' ? 'Стейкинг' : 'Снять стейкинг', action.type === 'stake' ? 'Stake' : 'Unstake')} ${minion ? locale.cardName(minion.cardId) : ''}`;
+      return `${locale.t(action.type === 'stake' ? 'Гарнизон' : 'Вернуть в бой', action.type === 'stake' ? 'Garrison' : 'Return to battle')} ${minion ? locale.cardName(minion.cardId) : ''}`;
     }
     return locale.t('Оставить руку', 'Keep hand');
   };
@@ -201,6 +214,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
 
 
     {!ready && !failure && <div className={styles.loading} role="status"><div>IV</div><p>{locale.t('Открываем врата арены…', 'Opening the arena gates…')}</p></div>}
+    {showMulligan&&<div className={styles.modalBackdrop}><section ref={mulliganPanel} className={styles.mulligan} role="dialog" aria-modal="true" aria-labelledby="opening-hand-title"><OpeningHand hand={view.state.players[0].hand} selected={mulliganUids} locale={locale.locale} onToggle={uid=>setMulliganUids(previous=>previous.includes(uid)?previous.filter(value=>value!==uid):[...previous,uid])} onConfirm={()=>dispatch({type:'mulligan',uids:mulliganUids})}/></section></div>}
     {failure && <div className={styles.error} role="alert">{failure === 'webgl' || failure === 'load' ? <><strong>{locale.t('Не удалось открыть новую арену', 'Could not open the new arena')}</strong><span>{locale.t('Проверьте поддержку WebGL и обновите страницу.', 'Check WebGL support and reload the page.')}</span><Link href="/game">{locale.t('Открыть текущую игру', 'Open current game')}</Link></> : failure === 'context-lost' ? locale.t('Восстанавливаем графику. Матч сохранён.', 'Restoring graphics. Match preserved.') : failure === 'presentation' ? locale.t('Действие выполнено. Обновите страницу для восстановления графики.', 'Action completed. Reload to restore graphics.') : failure}<button onClick={() => setFailure('')} aria-label={locale.t('Закрыть сообщение', 'Dismiss message')}>×</button></div>}
 
     {inspect && card && <section className={styles.inspection} role="dialog" aria-label={locale.cardName(card.id)}>
@@ -219,7 +233,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
     {inspect?.kind === 'hero' && <section className={styles.inspection} role="dialog" aria-label={locale.heroName(shown.players[inspect.owner].heroId)}>
       <button className={styles.close} onClick={() => setInspect(null)} aria-label={locale.t('Закрыть просмотр', 'Close inspection')}>×</button>
       <img src={shown.players[inspect.owner].heroId==='whale'?'/models/hero-whale.webp':`/heroes/${shown.players[inspect.owner].heroId}.webp`} alt="" />
-      <div><h2>{locale.heroName(shown.players[inspect.owner].heroId)}</h2><h3>{locale.powerName(shown.players[inspect.owner].heroId)}</h3><p>{powerRules(shown.players[inspect.owner].heroId,locale.locale)}</p><strong>{locale.t('Казна', 'Treasury')}: {shown.players[inspect.owner].treasury}</strong></div>
+      <div><h2>{locale.heroName(shown.players[inspect.owner].heroId)}</h2><h3>{locale.powerName(shown.players[inspect.owner].heroId)}</h3><p>{powerRules(shown.players[inspect.owner].heroId,locale.locale)}</p><strong>{locale.t('Казна', 'Treasury')}: {Math.max(0,shown.players[inspect.owner].treasury)}</strong></div>
     </section>}
 
     {inspect && ['gas','block','deck','scroll'].includes(inspect.kind) && <section className={styles.inspection} role="dialog" aria-label={locale.t('Предмет арены','Arena object')}><button className={styles.close} onClick={()=>setInspect(null)} aria-label={locale.t('Закрыть просмотр','Close inspection')}>×</button><div>
@@ -245,7 +259,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
       <Link className={styles.leaveArena} href="/arena">{locale.t('Покинуть арену', 'Leave arena')}</Link>
     </section></div>}
 
-    {shown.winner !== null && <div className={styles.modalBackdrop}><section ref={resultPanel} className={`${styles.result} ${victorySrc?styles.resultWithFx:''}`} role="dialog" aria-modal="true"><span className={styles.eyebrow}>IMPERIVM</span><div className={victorySrc?styles.victoryBanner:undefined}>{victorySrc&&<video key={view.revision} src={victorySrc} autoPlay muted playsInline aria-hidden="true"/>}<h2>{shown.winner === 0 ? locale.t('Ваша империя устояла', 'Your empire stands') : shown.winner === 'draw' ? locale.t('Империи пали вместе', 'Both empires fell') : locale.t('Казна опустела', 'The treasury is empty')}</h2></div><p>{locale.t('Каждая потеря — урок для следующего блока.', 'Every loss is a lesson for the next block.')}</p><button className={styles.primary} onClick={() => restart()}>{locale.t('Ещё один бой', 'Another battle')}</button></section></div>}
+    {shown.winner !== null && <div className={styles.modalBackdrop}><section ref={resultPanel} className={`${styles.result} ${victorySrc?styles.resultWithFx:''}`} role="dialog" aria-modal="true" aria-label={locale.t('Результат боя','Battle result')}><span className={styles.eyebrow}>IMPERIVM</span><div className={victorySrc?styles.victoryBanner:undefined}>{victorySrc&&<video key={view.revision} src={victorySrc} autoPlay muted playsInline aria-hidden="true"/>}<h2>{shown.winner === 0 ? locale.t('Ваша империя устояла', 'Your empire stands') : shown.winner === 'draw' ? locale.t('Империи пали вместе', 'Both empires fell') : locale.t('Казна опустела', 'The treasury is empty')}</h2></div><p>{locale.t('Каждая потеря — урок для следующего блока.', 'Every loss is a lesson for the next block.')}</p><button className={styles.primary} onClick={() => restart()}>{locale.t('Ещё один бой', 'Another battle')}</button></section></div>}
     {debug && <output hidden data-action={JSON.stringify({last:lastAction,turn:shown.turn,block:shown.block,busy:view.busy,orders:me.gas,capacity:me.maxGas,queued:mempoolOf(shown,0).map(entry=>entry.cardId)})}/>}
     {debug && metrics && <output className={styles.metrics} hidden data-perf={JSON.stringify(metrics)}>{metrics.drawCalls} draws · {Math.round(metrics.triangles).toLocaleString()} triangles · {metrics.meshes} meshes · {metrics.models} models · {metrics.failedModels} failed · {metrics.frameMedianMs}/{metrics.frameP95Ms} ms median/p95 · 1 canvas</output>}
   </main>;

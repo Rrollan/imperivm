@@ -9,7 +9,7 @@ import {cardArtPath} from '../../lib/cardArt';
 import {ordersView} from './ordersView';
 
 export type Face =
-  | { kind: 'card'; cardId: string }
+  | { kind: 'card'; cardId: string; playable?:boolean }
   | { kind: 'minion'; minion: Minion; ready?: boolean }
   | { kind: 'hero'; heroId: string; treasury: number; model?: boolean }
   | { kind: 'power'; heroId: string; cost: number; available: boolean; model?: boolean }
@@ -97,7 +97,7 @@ export class ArenaTextures {
       this.painting=draw;
       ctx.clearRect(0, 0, size.width, size.height);
       if (face.kind === 'back') this.drawBack(ctx);
-      else if (face.kind === 'card') this.drawCard(ctx, face.cardId);
+      else if (face.kind === 'card') this.drawCard(ctx, face.cardId,face.playable);
       else if (face.kind === 'minion') this.drawMinion(ctx, face.minion, face.ready);
       else if (face.kind === 'hero') this.drawHero(ctx, face.heroId, face.treasury, face.model);
       else if (face.kind === 'power') this.drawPower(ctx, face);
@@ -146,10 +146,11 @@ export class ArenaTextures {
     ctx.fillStyle = '#fff4d4'; ctx.fillText(value, x, y + 1); ctx.restore();
   }
 
-  private drawCard(ctx: CanvasRenderingContext2D, id: string) {
+  private drawCard(ctx: CanvasRenderingContext2D, id: string,playable?:boolean) {
     const def = CARDS[id];
     rounded(ctx, 9, 9, 366, 494, 20); ctx.fillStyle = '#8c693c'; ctx.fill();
     rounded(ctx, 17, 17, 350, 478, 14); ctx.fillStyle = '#ead7ab'; ctx.fill();
+    if(playable){ctx.strokeStyle='#fff0bc';ctx.lineWidth=7;rounded(ctx,14,14,356,484,16);ctx.stroke();}
     ctx.save(); rounded(ctx, 23, 23, 338, 339, 9); ctx.clip();
     const art = this.image(cardArtPath(id));
     ctx.fillStyle = '#3b3026'; ctx.fillRect(23, 23, 338, 339);
@@ -158,7 +159,7 @@ export class ArenaTextures {
     ctx.fillStyle = '#4d3423'; rounded(ctx, 18, 365, 348, 72, 8); ctx.fill();
     ctx.fillStyle = '#fff1cf'; ctx.font = `750 32px ${this.font}`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
     words(ctx, cardName(id, this.locale), 192, 390, 321, 34);
-    this.badge(ctx, `${def.cost}`, 56, 61, '#246784', 45);
+    this.badge(ctx, `${def.cost}`, 56, 61, playable===false?'#4a5352':'#246784', 45);
     if (def.type === 'minion') {
       this.badge(ctx, `${def.attack}`, 55, 469, '#aa7626', 31);
       this.badge(ctx, `${def.health}`, 329, 469, '#a83f31', 31);
@@ -251,7 +252,7 @@ export class ArenaTextures {
     if(art){if(id==='whale')ctx.drawImage(art,35,35,530,530,66,111,252,290);else cover(ctx,art,66,111,252,290);}
     ctx.restore();
     }
-    this.badge(ctx, `${treasury}`, 315, 355, '#a8322f', 59);
+    this.badge(ctx, `${Math.max(0,treasury)}`, 315, 355, '#a8322f', 59);
   }
 
   private drawPower(ctx: CanvasRenderingContext2D, face: Extract<Face, { kind: 'power' }>) {

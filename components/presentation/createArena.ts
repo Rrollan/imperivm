@@ -99,7 +99,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   let nextMetricAt=0;
   const percentile=(samples:number[],fraction:number)=>samples.length?Math.round([...samples].sort((a,b)=>a-b)[Math.floor((samples.length-1)*fraction)]*10)/10:0;
   const scheduler = new PresentationScheduler();
-  let disposed = false, running = false, dirty = 3, last = 0, portrait = false, readyReported=false;
+  let disposed = false, running = false, dirty = 3, last = 0, portrait = false, readyReported=false, paused=false;
   let shown: GameState | null = null, selected: string | null = null;
   let hovered: string | null = null, reportedHover: string | null = null, overlayOpen=false;
   let activeBatch: PresentationBatch | null = null;
@@ -119,7 +119,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   const request = () => {
     if (disposed) return;
     dirty = 3;
-    if (!running && !document.hidden) { running = true; last = performance.now(); engine.runRenderLoop(render); }
+    if (!running && !document.hidden && !paused) { running = true; last = performance.now(); engine.runRenderLoop(render); }
   };
   const textures = new ArenaTextures(scene, options.locale, request);
   const effects = new ArenaEffects(scene,request);
@@ -245,6 +245,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const changed=shown!==null&&shown!==state;
     shown = state;
     const readyAttackers=new Set(!activeBatch&&state.turn===0?legalActions(state).flatMap(action=>action.type==='attack'?[action.attackerUid]:[]):[]);
+    const playableCards=new Set(!activeBatch&&state.turn===0?legalActions(state).flatMap(action=>action.type==='play-minion'||action.type==='cast-spell'?[action.uid]:[]):[]);
     const used = new Set<string>();
     const keep = (id: string, data: ArenaTarget, face: Face, w: number, h: number, x: number, y: number, z = 0) => {
       used.add(id);const old=entities.get(id),previous=old?.root.position.clone(); const entry = entity(id,data,face,w/50,h/50);
@@ -266,7 +267,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     });
     const hand = state.players[0].hand;
     const spacing = Math.min(portrait?136:155,(portrait?670:900)/Math.max(1,hand.length-1));
-    hand.forEach((c,i)=>{const x=800+(i-(hand.length-1)/2)*spacing;keep(c.uid,{kind:'hand',uid:c.uid,owner:0,cardId:c.cardId},{kind:'card',cardId:c.cardId},portrait?150:168,portrait?208:234,x,handY()+Math.abs(x-800)*.024,-1-i*.015);});
+    hand.forEach((c,i)=>{const x=800+(i-(hand.length-1)/2)*spacing;keep(c.uid,{kind:'hand',uid:c.uid,owner:0,cardId:c.cardId},{kind:'card',cardId:c.cardId,playable:playableCards.has(c.uid)},portrait?150:168,portrait?208:234,x,handY()+Math.abs(x-800)*.024,-1-i*.015);});
     const backs = Math.min(8,state.players[1].hand.length);
     for(let i=0;i<backs;i++){const e=keep(`back-${i}`,{kind:'hand',uid:`back-${i}`,owner:1},{kind:'back'},50,70,800+(i-(backs-1)/2)*40,portrait?-93:35,.5);e.face.isPickable=false;}
     for(const owner of [0,1] as const){
@@ -401,7 +402,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     options.onMetrics({meshes:meshes.length,triangles:meshes.reduce((n,mesh)=>n+mesh.getTotalIndices()/3,0),drawCalls:instrument.drawCallsCounter.current,renderScale:engine.getHardwareScalingLevel(),renderWidth:engine.getRenderWidth(),renderHeight:engine.getRenderHeight(),models:assets.loaded.size,failedModels:assets.failed.size,frames:frameSamples.length,frameMedianMs:percentile(frameSamples,.5),frameP95Ms:percentile(frameSamples,.95),renderP95Ms:percentile(renderSamples,.95),gpu:engine.getGlInfo().renderer,pending:meshes.filter(mesh=>mesh.isVisible&&mesh.visibility>0&&!mesh.isReady(true)).slice(0,6).map(mesh=>mesh.name)});
   }
   function render() {
-    if (disposed || document.hidden) return;
+    if (disposed || document.hidden || paused) return;
     if(!readyReported){
       const portraitsReady=shown?.players.every(p=>p.heroId==='whale'||assets.loaded.has(`hero-${p.heroId}` as ModelId)||assets.failed.has(`hero-${p.heroId}` as ModelId));
       const visibleReady=scene.meshes.every(mesh=>!mesh.isEnabled()||!mesh.isVisible||mesh.visibility<=0||mesh.isReady(true));
@@ -463,6 +464,13 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const attacker = attack ? entities.get(attack.attackerUid) : null;
     const defender = attack ? entities.get(attack.target === 'hero' ? `hero-${batch.before.turn === 0 ? 1 : 0}` : attack.target) : null;
     const handUid = batch.action.type === 'play-minion' || batch.action.type === 'cast-spell' ? batch.action.uid : null;
+    const rejected=batch.action.type==='mulligan'?batch.action.uids.flatMap(uid=>{
+      const index=batch.before.players[batch.before.turn].hand.findIndex(card=>card.uid===uid);
+      const entry=entities.get(batch.before.turn===0?uid:`back-${index}`);
+      if(!entry)return [];
+      entry.root.getChildMeshes().forEach(mesh=>mesh.renderingGroupId=2);
+      return [{entry,start:entry.root.position.clone(),scale:entry.root.scaling.clone(),rotation:entry.root.rotation.z,flipped:false}];
+    }):[];
     let moving = attacker ?? (handUid ? entities.get(handUid) : null);
     if(handUid&&!moving){
       const card=batch.before.players[batch.before.turn].hand.find(c=>c.uid===handUid);
@@ -512,6 +520,13 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     abilities.begin(batch,locate);
     const resolving=(batch.events?.spellResolved??[]).flatMap((s,i)=>{const entry=entities.get(`queued-${s.mempoolUid}`);return entry?[{entry,start:entry.base.clone(),delay:i*.075}]:[];});
     await scheduler.play(duration, impactAt, progress => {
+      rejected.forEach(item=>{
+        if(item.entry.root.isDisposed()||progress>=impactAt)return;
+        const t=smooth(progress/impactAt),destination=batch.before.turn===0?deckStack.position:point(portrait?1156:1370,portrait?95:90,-4);
+        item.entry.root.position.copyFrom(Vector3.Lerp(item.start,destination,t));item.entry.root.position.z=-5;
+        item.entry.root.scaling.copyFrom(Vector3.Lerp(item.scale,new Vector3(.45,.45,.45),t));item.entry.root.rotation.z=item.rotation*(1-t);
+        if(batch.before.turn===0&&!item.flipped&&t>.45){paint(item.entry,{kind:'back'});item.flipped=true;}
+      });
       if (moving && start && !moving.root.isDisposed()) {
         // Attacks lunge and return. A played card travels once and stays at its destination.
         const eased = handUid?smooth(progress/impactAt):attackTravel(progress);
@@ -602,6 +617,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     sync: (state: GameState) => { if (!activeBatch) sync(state); },
     select: (uid: string | null) => { selected = uid; highlights(); },
     setOverlayOpen: (open:boolean) => {overlayOpen=open;if(open){hovered=null;reportedHover=null;}highlights();},
+    setPaused: (value:boolean) => {if(paused===value)return;paused=value;scheduler.setPaused(value);if(value){engine.stopRenderLoop(render);running=false;}else request();},
     setLocale: (locale: Locale) => textures.setLocale(locale),
     setQuality: (quality: RenderQuality) => {options.quality=quality;resize();},
     setReducedMotion: (reduced: boolean) => { options.reducedMotion = reduced; if(reduced)videoEffects.cancel(); },

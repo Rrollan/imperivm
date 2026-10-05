@@ -1,5 +1,6 @@
 /** One clock for movement, impact, death and audio. No delayed React callbacks. */
 export class PresentationScheduler {
+  private suspended = false;
   private current: {
     elapsed: number;
     duration: number;
@@ -12,6 +13,8 @@ export class PresentationScheduler {
   } | null = null;
 
   get active() { return this.current !== null; }
+  get paused() { return this.suspended; }
+  setPaused(paused: boolean) { this.suspended = paused; }
 
   play(duration: number, impactAt: number, update: (progress: number) => void, impact: () => void, finish: () => void) {
     this.cancel();
@@ -22,6 +25,7 @@ export class PresentationScheduler {
   }
 
   tick(deltaMs: number) {
+    if (this.suspended) return;
     const item = this.current;
     if (!item) return;
     item.elapsed += Math.max(0, deltaMs);

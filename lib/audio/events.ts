@@ -56,6 +56,7 @@ export function soundsForEvents(events: BattleEvents, context?: SoundContext): S
     if (context.action.type === 'stake') add('stake');
     if (context.action.type === 'unstake') add('unstake');
     if (context.action.type === 'hero-power') add('ui-click');
+    if (context.action.type === 'mulligan') add(context.action.uids.length?'card-reveal':'ui-click');
     for (const owner of [0, 1] as const) {
       const before = context.before.players[owner].treasury;
       const after = context.after.players[owner].treasury;
