@@ -29,16 +29,17 @@ export default function ArenaGates() {
         <h1>{t('Арена', 'Arena')}</h1>
         <span>{t('Выберите императора. Возглавьте легион.', 'Choose your Imperator. Lead your legion.')}</span>
       </header>
-      <Link href={`/game?hero=${hero}`} className={styles.portal} aria-label={t('В бой — тренировка против ИИ', 'To battle — training against AI')}>
+      <Link href={`/arena-lab?hero=${hero}&opening=1`} className={styles.portal} aria-label={t('В бой — новая арена против ИИ', 'To battle — new arena against AI')}>
         <span className={styles.keystone} aria-hidden="true">⚔</span>
         <div className={styles.interior} aria-hidden="true" style={{ backgroundImage: "url('/ui/portals/training.webp')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
         </div>
         <div className={styles.portalCopy}>
           <h2>{t('Тренировка', 'Training')}</h2>
-          <p>{t('Против ИИ · бесплатно', 'Against AI · free')}</p>
+          <p>{t('Новая арена · против ИИ', 'New arena · against AI')}</p>
           <span className={styles.action}>{t('В бой', 'To battle')} <span aria-hidden="true">→</span></span>
         </div>
       </Link>
+      <div className={styles.labLinks}><Link href={`/game?hero=${hero}`}>{t('Текущая версия игры', 'Current game version')}</Link><Link href="/arena-lab/typeface">{t('Наш шрифт', 'Our typeface')}</Link></div>
       <section className={styles.heroes} aria-label={t('Выбор императора', 'Choose your Imperator')}>
         <h2>{t('Ваш император', 'Your Imperator')}</h2>
         <div className={styles.heroOptions}>{Object.values(HEROES).map(h => <button key={h.id} className={`${styles.hero} hero-choice`} aria-pressed={h.id === hero} aria-label={heroName(h.id)} title={heroTitle(h.id)} onClick={() => setHero(h.id)}>

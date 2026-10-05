@@ -1,0 +1,107 @@
+[
+  {
+    "id": "01-impact",
+    "title": "Обычный удар",
+    "duration": 4,
+    "activeSeconds": 0.4,
+    "videoPrompt": "Create a 4-second isolated IMPERIVM Roman tactical card-game VFX clip. One continuous shot, completely locked frontal orthographic camera, landscape 16:9. Use the supplied pure-black image as the exact LAST frame. The background remains uniform pure black RGB 0,0,0 throughout.\nUse the supplied fine steel streak as the exact first frame. At 0.00–0.08 seconds the tiny contact point glints once. At 0.08–0.20 seconds exactly three short copper sparks drift a few pixels. All streaks taper and fade completely by 0.35 seconds. No crescent sweep or explosion.\nHold pure black for the remainder of the 4-second source. Preserve the first-frame compact silhouette, low saturation, sparse aged-bronze/steel/ivory palette and large black margins. The effect never grows beyond its starting footprint. No scenery, cards, UI, lettering, numbers, creatures, camera movement, cuts, haze, bloom, extra repeated actions or invented symbols. One short restrained dry sound is acceptable; no music or speech.",
+    "firstFrame": "frames/01-impact-start-v2.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-bc544de6-b312-4a24-97e7-fcc9e5627262.png",
+    "imagePrompt": "Use case: stylized-concept. Asset type: start frame for an isolated browser card game combat VFX, IMPERIVM Roman setting. Landscape 16:9. Perfectly uniform pure black RGB 0,0,0 background. Locked frontal orthographic view. A very short diagonal brushed-steel contact streak from lower left to upper right, soft ivory at its tiny central contact point, with exactly three short dull copper sparks. Delicate asymmetrical silhouette. No crescent ribbon, no starburst, no ring, no fire, no magical halo. Restrained hand-painted tactical game effect: aged bronze, brushed steel, warm ivory. Low saturation and compact scale: entire effect within central 25% width and 35% height; large completely black margins. Fine crisp edges and only a tiny local highlight, no blown out white center, no broad fog or glow. No scenery, cards, UI, lettering, numbers, logos, objects unrelated to the effect. Single frame, no contact sheet."
+  },
+  {
+    "id": "02-builder-heal",
+    "title": "Строитель · восстановление",
+    "duration": 4,
+    "activeSeconds": 0.65,
+    "videoPrompt": "Create a 4-second isolated IMPERIVM Roman tactical card-game VFX clip. One continuous shot, completely locked frontal orthographic camera, landscape 16:9. Use the supplied pure-black image as the exact LAST frame. The background remains uniform pure black RGB 0,0,0 throughout.\nUse the supplied bronze laurel sprigs as the exact first frame. A small warm ivory highlight travels once up their edges in 0.00–0.18 seconds. Leaves stay the same shape and size. Between 0.18–0.60 seconds they gently dissolve into three tiny motes and pure black. No circle pulse, pearl, shield or new leaves.\nHold pure black for the remainder of the 4-second source. Preserve the first-frame compact silhouette, low saturation, sparse aged-bronze/steel/ivory palette and large black margins. The effect never grows beyond its starting footprint. No scenery, cards, UI, lettering, numbers, creatures, camera movement, cuts, haze, bloom, extra repeated actions or invented symbols. One short restrained dry sound is acceptable; no music or speech.",
+    "firstFrame": "frames/02-builder-heal-start-v2.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-955d183a-a93b-4ba4-a4df-a2e794d700e0.png",
+    "imagePrompt": "Use case: stylized-concept. Asset type: start frame for an isolated browser card game combat VFX, IMPERIVM Roman setting. Landscape 16:9. Perfectly uniform pure black RGB 0,0,0 background. Locked frontal orthographic view. Two small slender laurel sprigs made from softly illuminated aged bronze linework, opening upward around a completely black central opening. Five simple broad leaves on each sprig, three tiny pale ivory flecks near their tips. Quiet restoration. No pearl, no circle, no light beam, no sparkling gold explosion. Restrained hand-painted tactical game effect: aged bronze, brushed steel, warm ivory. Low saturation and compact scale: entire effect within central 25% width and 35% height; large completely black margins. Fine crisp edges and only a tiny local highlight, no blown out white center, no broad fog or glow. No scenery, cards, UI, lettering, numbers, logos, objects unrelated to the effect. Single frame, no contact sheet."
+  },
+  {
+    "id": "03-whale-impact",
+    "title": "Кит · обвал рынка",
+    "duration": 4,
+    "activeSeconds": 0.5,
+    "videoPrompt": "Create a 4-second isolated IMPERIVM Roman tactical card-game VFX clip. One continuous shot, completely locked frontal orthographic camera, landscape 16:9. Use the supplied pure-black image as the exact LAST frame. The background remains uniform pure black RGB 0,0,0 throughout.\nUse the supplied three fine steel-teal scratches as the exact first frame. They give one compact decisive downward flick of at most 12 pixels in 0.00–0.12 seconds, with a tiny ivory contact fleck. Three short dull copper flecks settle and fade. All light is gone by 0.45 seconds. No physical blades, water, whale animal, waves or explosion.\nHold pure black for the remainder of the 4-second source. Preserve the first-frame compact silhouette, low saturation, sparse aged-bronze/steel/ivory palette and large black margins. The effect never grows beyond its starting footprint. No scenery, cards, UI, lettering, numbers, creatures, camera movement, cuts, haze, bloom, extra repeated actions or invented symbols. One short restrained dry sound is acceptable; no music or speech.",
+    "firstFrame": "frames/03-whale-impact-start-v2.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-ea103df5-65d5-41f1-a67c-1af8931d017a.png",
+    "imagePrompt": "Use case: precise-object-edit. Edit target: supplied isolated game effect image. Preserve the exact pure black background, centered placement, small diagonal composition and muted steel/teal palette. Replace ALL opaque jagged metal shards and blade-like objects with exactly THREE thin, clean, luminous diagonal scratches, each only 2-4 pixels thick, softly tapered at both ends. They are short light trails, never physical swords, weapons or torn fabric. A tiny restrained ivory contact fleck at exact center, with only 3 small dull copper sparks. No broad filled shapes, no starburst, no magical aura, no crescent, no smoke or ground. Keep the whole effect within central 25% of this 16:9 canvas. Rest of image remains uniform RGB 0,0,0. Clean premium tactical Roman card game VFX, low saturation, fine crisp edges.",
+    "editReference": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-74d627dc-4b64-45e4-acad-59f1aca000fd.png"
+  },
+  {
+    "id": "04-degen-draw",
+    "title": "Деген · риск и добор",
+    "duration": 4,
+    "activeSeconds": 0.6,
+    "videoPrompt": "Create a 4-second isolated IMPERIVM Roman tactical card-game VFX clip. One continuous shot, completely locked frontal orthographic camera, landscape 16:9. Use the supplied pure-black image as the exact LAST frame. The background remains uniform pure black RGB 0,0,0 throughout.\nUse the supplied small ivory Roman gaming die as the exact first frame. It tilts only 12 degrees, gives one restrained warm edge glint at 0.10 seconds, then dissolves smoothly into pure black by 0.55 seconds. It never rolls across the frame. No violet vortex, coins, money, fragments, extra dice or explosion.\nHold pure black for the remainder of the 4-second source. Preserve the first-frame compact silhouette, low saturation, sparse aged-bronze/steel/ivory palette and large black margins. The effect never grows beyond its starting footprint. No scenery, cards, UI, lettering, numbers, creatures, camera movement, cuts, haze, bloom, extra repeated actions or invented symbols. One short restrained dry sound is acceptable; no music or speech.",
+    "firstFrame": "frames/04-degen-draw-start-v2.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-5fc75334-9bc5-4276-bd61-a7b7a5149350.png",
+    "imagePrompt": "Use case: stylized-concept. Asset type: first frame for isolated card-game ability VFX for IMPERIVM Roman setting. Landscape 16:9 canvas, pure black RGB 0,0,0 background, completely locked frontal orthographic view. One small translucent ivory-outline Roman gaming die in a front three-quarter view, with simple circular pips and exactly two small muted copper flecks. Clear black gaps, delicate light-line edges, a tactile ivory glint. No violet spiral, no magical halo, no gold shower, no floor. Entire effect within central 25% width and 35% height, large uniform black margins. Restrained hand-painted tactical game art, low saturation, fine clean edges, brushed steel, aged bronze, warm ivory. No blown out center, no bloom or haze across frame. No text, numbers, cards, UI, characters or scenery. Single frame, no collage."
+  },
+  {
+    "id": "05-validator-gas",
+    "title": "Валидатор · подтверждение и газ",
+    "duration": 4,
+    "activeSeconds": 0.65,
+    "videoPrompt": "Create a 4-second isolated IMPERIVM Roman tactical card-game VFX clip. One continuous shot, completely locked frontal orthographic camera, landscape 16:9. Use the supplied pure-black image as the exact LAST frame. The background remains uniform pure black RGB 0,0,0 throughout.\nUse the supplied thin bronze scales seal as the exact first frame. In 0.00–0.20 seconds a pale teal highlight travels once around its thin rim, as if approval has been stamped. The seal stays centered and upright. All lines fade to pure black by 0.60 seconds. No ray, impact, explosion, spinning or expanding circle.\nHold pure black for the remainder of the 4-second source. Preserve the first-frame compact silhouette, low saturation, sparse aged-bronze/steel/ivory palette and large black margins. The effect never grows beyond its starting footprint. No scenery, cards, UI, lettering, numbers, creatures, camera movement, cuts, haze, bloom, extra repeated actions or invented symbols. One short restrained dry sound is acceptable; no music or speech.",
+    "firstFrame": "frames/05-validator-gas-start-v2.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-72f5b645-f91a-4b7a-8933-38b28f06a44e.png",
+    "imagePrompt": "Use case: stylized-concept. Asset type: start frame for an isolated browser card game combat VFX, IMPERIVM Roman setting. Landscape 16:9. Perfectly uniform pure black RGB 0,0,0 background. Locked frontal orthographic view. One small circular judicial seal with sparse thin muted bronze light lines and a simple balanced scale mark in the middle. One short faint coral contact glint at its bottom. Thin open linework, black visible through its interior, readable at tiny size. No opaque coin, no runes, no beam, no radial explosion. Restrained hand-painted tactical game effect: aged bronze, brushed steel, warm ivory. Low saturation and compact scale: entire effect within central 25% width and 35% height; large completely black margins. Fine crisp edges and only a tiny local highlight, no blown out white center, no broad fog or glow. No scenery, cards, UI, lettering, numbers, logos, objects unrelated to the effect. Single frame, no contact sheet.",
+    "referenceFrom": "05-validator-strike"
+  },
+  {
+    "id": "07-spell-impact",
+    "title": "Заклинание · урон",
+    "duration": 4,
+    "activeSeconds": 0.5,
+    "videoPrompt": "Create a 4-second isolated IMPERIVM Roman tactical card-game VFX clip. One continuous shot, completely locked frontal orthographic camera, landscape 16:9. Use the supplied pure-black image as the exact LAST frame. The background remains uniform pure black RGB 0,0,0 throughout.\nUse the supplied fine steel streak as the exact first frame. One short copper-ivory contact scratch brightens locally in 0.00–0.10 seconds. Two tiny dull embers drift a short distance; the complete effect dissolves to black by 0.45 seconds. No meteor, fireball, smoke, ground crack or radial blast.\nHold pure black for the remainder of the 4-second source. Preserve the first-frame compact silhouette, low saturation, sparse aged-bronze/steel/ivory palette and large black margins. The effect never grows beyond its starting footprint. No scenery, cards, UI, lettering, numbers, creatures, camera movement, cuts, haze, bloom, extra repeated actions or invented symbols. One short restrained dry sound is acceptable; no music or speech.",
+    "firstFrame": "frames/07-spell-impact-start-v2.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-bc544de6-b312-4a24-97e7-fcc9e5627262.png",
+    "imagePrompt": "Use case: stylized-concept. Asset type: start frame for an isolated browser card game combat VFX, IMPERIVM Roman setting. Landscape 16:9. Perfectly uniform pure black RGB 0,0,0 background. Locked frontal orthographic view. A very short diagonal brushed-steel contact streak from lower left to upper right, soft ivory at its tiny central contact point, with exactly three short dull copper sparks. Delicate asymmetrical silhouette. No crescent ribbon, no starburst, no ring, no fire, no magical halo. Restrained hand-painted tactical game effect: aged bronze, brushed steel, warm ivory. Low saturation and compact scale: entire effect within central 25% width and 35% height; large completely black margins. Fine crisp edges and only a tiny local highlight, no blown out white center, no broad fog or glow. No scenery, cards, UI, lettering, numbers, logos, objects unrelated to the effect. Single frame, no contact sheet.",
+    "referenceFrom": "01-impact"
+  },
+  {
+    "id": "08-spell-buff",
+    "title": "Заклинание · усиление и призыв",
+    "duration": 4,
+    "activeSeconds": 0.7,
+    "videoPrompt": "Create a 4-second isolated IMPERIVM Roman tactical card-game VFX clip. One continuous shot, completely locked frontal orthographic camera, landscape 16:9. Use the supplied pure-black image as the exact LAST frame. The background remains uniform pure black RGB 0,0,0 throughout.\nUse the supplied bronze laurel sprigs as the exact first frame. A single soft ivory edge highlight rises from the base in 0.00–0.25 seconds. Both sprigs remain still; they fade entirely by 0.65 seconds. No expanding wreath, beam, pearl, shield, flowers or new objects.\nHold pure black for the remainder of the 4-second source. Preserve the first-frame compact silhouette, low saturation, sparse aged-bronze/steel/ivory palette and large black margins. The effect never grows beyond its starting footprint. No scenery, cards, UI, lettering, numbers, creatures, camera movement, cuts, haze, bloom, extra repeated actions or invented symbols. One short restrained dry sound is acceptable; no music or speech.",
+    "firstFrame": "frames/08-spell-buff-start-v2.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-955d183a-a93b-4ba4-a4df-a2e794d700e0.png",
+    "imagePrompt": "Use case: stylized-concept. Asset type: start frame for an isolated browser card game combat VFX, IMPERIVM Roman setting. Landscape 16:9. Perfectly uniform pure black RGB 0,0,0 background. Locked frontal orthographic view. Two small slender laurel sprigs made from softly illuminated aged bronze linework, opening upward around a completely black central opening. Five simple broad leaves on each sprig, three tiny pale ivory flecks near their tips. Quiet restoration. No pearl, no circle, no light beam, no sparkling gold explosion. Restrained hand-painted tactical game effect: aged bronze, brushed steel, warm ivory. Low saturation and compact scale: entire effect within central 25% width and 35% height; large completely black margins. Fine crisp edges and only a tiny local highlight, no blown out white center, no broad fog or glow. No scenery, cards, UI, lettering, numbers, logos, objects unrelated to the effect. Single frame, no contact sheet.",
+    "referenceFrom": "02-builder-heal"
+  },
+  {
+    "id": "09-spell-counter",
+    "title": "Заклинание · отмена и уничтожение",
+    "duration": 4,
+    "activeSeconds": 0.45,
+    "videoPrompt": "Create a 4-second isolated IMPERIVM Roman tactical card-game VFX clip. One continuous shot, completely locked frontal orthographic camera, landscape 16:9. Use the supplied pure-black image as the exact LAST frame. The background remains uniform pure black RGB 0,0,0 throughout.\nUse the supplied thin bronze scales seal as the exact first frame. A very small dull coral glint crosses its center in 0.00–0.10 seconds. Its thin lines gently fragment into exactly four faint strokes and disappear by 0.40 seconds. No shattering opaque coin, vortex, flames, lightning or full-frame explosion.\nHold pure black for the remainder of the 4-second source. Preserve the first-frame compact silhouette, low saturation, sparse aged-bronze/steel/ivory palette and large black margins. The effect never grows beyond its starting footprint. No scenery, cards, UI, lettering, numbers, creatures, camera movement, cuts, haze, bloom, extra repeated actions or invented symbols. One short restrained dry sound is acceptable; no music or speech.",
+    "firstFrame": "frames/09-spell-counter-start-v2.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-72f5b645-f91a-4b7a-8933-38b28f06a44e.png",
+    "imagePrompt": "Use case: stylized-concept. Asset type: start frame for an isolated browser card game combat VFX, IMPERIVM Roman setting. Landscape 16:9. Perfectly uniform pure black RGB 0,0,0 background. Locked frontal orthographic view. One small circular judicial seal with sparse thin muted bronze light lines and a simple balanced scale mark in the middle. One short faint coral contact glint at its bottom. Thin open linework, black visible through its interior, readable at tiny size. No opaque coin, no runes, no beam, no radial explosion. Restrained hand-painted tactical game effect: aged bronze, brushed steel, warm ivory. Low saturation and compact scale: entire effect within central 25% width and 35% height; large completely black margins. Fine crisp edges and only a tiny local highlight, no blown out white center, no broad fog or glow. No scenery, cards, UI, lettering, numbers, logos, objects unrelated to the effect. Single frame, no contact sheet.",
+    "referenceFrom": "05-validator-strike"
+  },
+  {
+    "id": "06-victory",
+    "title": "Победа · лавр",
+    "duration": 4,
+    "activeSeconds": 1.8,
+    "videoPrompt": "Create a 4-second isolated IMPERIVM Roman tactical card-game VFX clip. One continuous shot, completely locked frontal orthographic camera, landscape 16:9. Use the supplied pure-black image as the exact LAST frame. The background remains uniform pure black RGB 0,0,0 throughout.\nUse the supplied bronze laurel sprigs as the exact first frame. One subtle ivory highlight moves up both branches during 0.00–0.40 seconds. Hold still until 1.0 seconds, with the black central opening completely empty for live text. Fade the two sprigs naturally to pure black by 1.8 seconds. No sunburst, confetti, crown, banner, fireworks, shimmer shower or expanding ring.\nHold pure black for the remainder of the 4-second source. Preserve the first-frame compact silhouette, low saturation, sparse aged-bronze/steel/ivory palette and large black margins. The effect never grows beyond its starting footprint. No scenery, cards, UI, lettering, numbers, creatures, camera movement, cuts, haze, bloom, extra repeated actions or invented symbols. One short restrained dry sound is acceptable; no music or speech.",
+    "firstFrame": "frames/06-victory-start-v2.png",
+    "lastFrame": "frames/black-end.png",
+    "source": "/Users/a11111/.codex/generated_images/01a10813-1873-74c2-a5e1-250044ecd604/exec-955d183a-a93b-4ba4-a4df-a2e794d700e0.png",
+    "imagePrompt": "Use case: stylized-concept. Asset type: start frame for an isolated browser card game combat VFX, IMPERIVM Roman setting. Landscape 16:9. Perfectly uniform pure black RGB 0,0,0 background. Locked frontal orthographic view. Two small slender laurel sprigs made from softly illuminated aged bronze linework, opening upward around a completely black central opening. Five simple broad leaves on each sprig, three tiny pale ivory flecks near their tips. Quiet restoration. No pearl, no circle, no light beam, no sparkling gold explosion. Restrained hand-painted tactical game effect: aged bronze, brushed steel, warm ivory. Low saturation and compact scale: entire effect within central 25% width and 35% height; large completely black margins. Fine crisp edges and only a tiny local highlight, no blown out white center, no broad fog or glow. No scenery, cards, UI, lettering, numbers, logos, objects unrelated to the effect. Single frame, no contact sheet.",
+    "referenceFrom": "02-builder-heal"
+  }
+]

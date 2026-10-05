@@ -1,0 +1,1313 @@
+{
+  "version": 1,
+  "sourceArchive": "imperivm-models-full-21.zip",
+  "tools": {
+    "gltfTransform": "4.5.1",
+    "meshoptimizer": "0.25.0",
+    "sharp": "0.35.5"
+  },
+  "models": [
+    {
+      "id": "aquila",
+      "file": "/arena-assets/models/aquila.glb",
+      "sourceBytes": 2620632,
+      "bytes": 266584,
+      "sourceTriangles": 137904,
+      "triangles": 8000,
+      "targetTriangles": 8000,
+      "textureSize": 512,
+      "error": 0.009,
+      "sourceSha256": "280503c15ee1d2588ba443990648cecb94d0780e2b2a542d9abf76502bf52c3f",
+      "sha256": "dc143ab4cc2ed3f8bbe199c57b88b0e75f7ea65b851f2336bea0500779b6ba97",
+      "sourceBounds": {
+        "min": [
+          -0.3161717842491588,
+          0.00006103515625,
+          -0.11985948803434512
+        ],
+        "max": [
+          0.3161107490929088,
+          0.980377197265625,
+          0.11972215893278262
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.31605990297011627,
+          0.00047987140715122223,
+          -0.11971252676031872
+        ],
+        "max": [
+          0.3157595328133513,
+          0.9800780285149813,
+          0.11801947633186137
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "brazier",
+      "file": "/arena-assets/models/brazier.glb",
+      "sourceBytes": 2173012,
+      "bytes": 236072,
+      "sourceTriangles": 138766,
+      "triangles": 8000,
+      "targetTriangles": 8000,
+      "textureSize": 512,
+      "error": 0.009,
+      "sourceSha256": "a120e6aab8be870e5eddc32a95e0421532008dbecb94add30e77bac300584ff1",
+      "sha256": "e73ed36f9a48130f30d328d2b5a55bf96b1dae3a0b0a08ce6e89c4de508ba0a9",
+      "sourceBounds": {
+        "min": [
+          -0.4889875656408732,
+          0.000030517578125,
+          -0.32565707772143443
+        ],
+        "max": [
+          0.4889265304846232,
+          0.9798583984375,
+          0.32568759529955943
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.4887186924423636,
+          0.00009032152593135834,
+          -0.32550776679079946
+        ],
+        "max": [
+          0.48829880439812906,
+          0.9797387905418873,
+          0.3253588725255054
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "bust",
+      "file": "/arena-assets/models/bust.glb",
+      "sourceBytes": 764400,
+      "bytes": 198060,
+      "sourceTriangles": 76504,
+      "triangles": 8000,
+      "targetTriangles": 8000,
+      "textureSize": 512,
+      "error": 0.009,
+      "sourceSha256": "562519c3f9d8f594f832260aac1ee86fe53a5a0b97f48c8f63da6c9b100402a7",
+      "sha256": "4408b7a1cb18b42de3035fd0d836c14781a79fc8eaaae0b8e7de3addafb89490",
+      "sourceBounds": {
+        "min": [
+          -0.3733262192956674,
+          0.000030517578125,
+          -0.21706038213763562
+        ],
+        "max": [
+          0.3732651841394174,
+          0.98065185546875,
+          0.21715193487201062
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.37333388813533985,
+          0.00021007470786571503,
+          -0.21703842992285724
+        ],
+        "max": [
+          0.37201589462131834,
+          0.9795146310889322,
+          0.21623218239613204
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "chest",
+      "file": "/arena-assets/models/chest.glb",
+      "sourceBytes": 875128,
+      "bytes": 239632,
+      "sourceTriangles": 76226,
+      "triangles": 8000,
+      "targetTriangles": 8000,
+      "textureSize": 512,
+      "error": 0.009,
+      "sourceSha256": "18b0684627ec437a47f477cf8ed57bcc8d113dda86b8499d1721d49cb912fc68",
+      "sha256": "e9e1dd452e3dec580a5cfeadb58521c5571883029a5dbb1d6dedb358607e4f10",
+      "sourceBounds": {
+        "min": [
+          -0.490020751953125,
+          0.00015160019289245374,
+          -0.4439288067232683
+        ],
+        "max": [
+          0.489990234375,
+          0.8227243763696075,
+          0.44420334571710374
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.4899011217057705,
+          0.0011621141839497362,
+          -0.44395462294509996
+        ],
+        "max": [
+          0.4889135329422061,
+          0.8227307486876669,
+          0.44369079661923677
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "column",
+      "file": "/arena-assets/models/column.glb",
+      "sourceBytes": 1130148,
+      "bytes": 643916,
+      "sourceTriangles": 77042,
+      "triangles": 34056,
+      "targetTriangles": 8000,
+      "textureSize": 512,
+      "error": 0.009,
+      "sourceSha256": "92eacb1a0284dc2c90a71e0c1b601befba59465f0985d205d941b7e3d9cd26d5",
+      "sha256": "105762642d47f731fc292621fabc12c7ffdf3c9675311b98fdb51342fb2f7b12",
+      "sourceBounds": {
+        "min": [
+          -0.4893798828125,
+          -0.000006398381350747329,
+          -0.21763041784384465
+        ],
+        "max": [
+          0.4896240234375,
+          0.9783999530688507,
+          0.21753886510946965
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.48582619064831634,
+          -0.000006407499313354492,
+          -0.21547875375226302
+        ],
+        "max": [
+          0.48929714542459224,
+          0.977623135477188,
+          0.21024822609733254
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "dice",
+      "file": "/arena-assets/models/dice.glb",
+      "sourceBytes": 2054148,
+      "bytes": 181120,
+      "sourceTriangles": 138792,
+      "triangles": 8000,
+      "targetTriangles": 8000,
+      "textureSize": 512,
+      "error": 0.009,
+      "sourceSha256": "2ac9e9a60568c64ee7d1ab280fe1e37b496f7369569eca4e2ac19e7cddcafc27",
+      "sha256": "a63e3bb40b37b282d6685f0099d8334e0319c1eb63a8801ea6143eafa6ebb0fb",
+      "sourceBounds": {
+        "min": [
+          -0.4897614121437073,
+          -0.000008450578256408159,
+          -0.39819230371593034
+        ],
+        "max": [
+          0.4898224472999573,
+          0.3782585428462465,
+          0.39819230371593034
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.4893428887662594,
+          0.00004039135114919379,
+          -0.39700422823122433
+        ],
+        "max": [
+          0.48952350203035166,
+          0.37803033375507755,
+          0.39760214796430954
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "end-turn-hourglass",
+      "file": "/arena-assets/models/end-turn-hourglass.glb",
+      "sourceBytes": 2255296,
+      "bytes": 175416,
+      "sourceTriangles": 233741,
+      "triangles": 7999,
+      "targetTriangles": 8000,
+      "textureSize": 512,
+      "error": 0.012,
+      "sourceSha256": "aaadb2da27d84a8a2bb7b28fac79ba2efae7befd7b52c6339d37752586aa851a",
+      "sha256": "9d9fa57b208c411bc6b1d8681d01c8944043c1d083e178610351c428c7fc46c7",
+      "sourceBounds": {
+        "min": [
+          -0.3479264572767094,
+          0,
+          -0.3445878224016768
+        ],
+        "max": [
+          0.3479874924329594,
+          0.998992919921875,
+          0.3451066212298018
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.34790521966838084,
+          0.00006097368896007538,
+          -0.34295098114475364
+        ],
+        "max": [
+          0.34796625482463084,
+          0.998992919921875,
+          0.34511609934710974
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "gas-crystal-small",
+      "file": "/arena-assets/models/gas-crystal-small.glb",
+      "sourceBytes": 3391412,
+      "bytes": 55124,
+      "sourceTriangles": 343056,
+      "triangles": 1800,
+      "targetTriangles": 1800,
+      "textureSize": 256,
+      "error": 0.025,
+      "sourceSha256": "b9b0ded9be40acfcadba5f2dbd1495968595f844c6689d722cf9e55fefd98617",
+      "sha256": "e0eb808b55f1ce39fccfe7863f9f3f31c52693ecf572c3960ce3f1fc04566e89",
+      "sourceBounds": {
+        "min": [
+          -0.3502366925179404,
+          0,
+          -0.35430923756686655
+        ],
+        "max": [
+          0.3486802960335654,
+          0.99945068359375,
+          0.35058609303561655
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.3420546413697862,
+          0.0010980591014231322,
+          -0.3543195491670194
+        ],
+        "max": [
+          0.33732604105246494,
+          0.99945068359375,
+          0.34797324524651047
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            256,
+            256
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            256,
+            256
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            256,
+            256
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "gas-crystal",
+      "file": "/arena-assets/models/gas-crystal.glb",
+      "sourceBytes": 1930312,
+      "bytes": 102568,
+      "sourceTriangles": 138478,
+      "triangles": 4000,
+      "targetTriangles": 4000,
+      "textureSize": 384,
+      "error": 0.015,
+      "sourceSha256": "3a206c681666a82ec754471f56d2377f348588ff5a1e1eeca104013824d5933f",
+      "sha256": "da3d3f2a450abdb5e42d0bbe46c3dc50de1b5e16aa5aa2ee711cc30c3dfc59fd",
+      "sourceBounds": {
+        "min": [
+          -0.25713292903436213,
+          0,
+          -0.2152654077549291
+        ],
+        "max": [
+          0.25722448176873713,
+          0.979766845703125,
+          0.2152196313877416
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.2571553179356623,
+          0.0005382312019719393,
+          -0.2148950349042515
+        ],
+        "max": [
+          0.2570076697799731,
+          0.9797070454806089,
+          0.21461005764699975
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            384,
+            384
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            384,
+            384
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            384,
+            384
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "hero-builder",
+      "file": "/arena-assets/models/hero-builder.glb",
+      "sourceBytes": 831808,
+      "bytes": 402056,
+      "sourceTriangles": 68330,
+      "triangles": 17998,
+      "targetTriangles": 18000,
+      "textureSize": 768,
+      "error": 0.004,
+      "sourceSha256": "a71b4f65461d827ff80aae9ddca15bbe157feedcd56b266fe577a65884476e52",
+      "sha256": "9e8b46a3ba57a06a29e4f443ecfa192f978efade01fad6145db5b68dbc864027",
+      "sourceBounds": {
+        "min": [
+          -0.4997711181640625,
+          0.0002592503979029215,
+          -0.16506798071562506
+        ],
+        "max": [
+          0.4995880126953125,
+          0.9991303980395971,
+          0.16496116919218756
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.4997711181640625,
+          0.00025922061377098293,
+          -0.1644379327731221
+        ],
+        "max": [
+          0.49946602061390877,
+          0.9990084357423252,
+          0.1643311212496846
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "hero-degen",
+      "file": "/arena-assets/models/hero-degen.glb",
+      "sourceBytes": 983364,
+      "bytes": 469908,
+      "sourceTriangles": 78642,
+      "triangles": 17992,
+      "targetTriangles": 18000,
+      "textureSize": 768,
+      "error": 0.004,
+      "sourceSha256": "6679696a3b06811f4b0cde8e9889417036e290b5aa46a08189aaeb657ca27236",
+      "sha256": "406d97f0c9606d610dcedea190597d6224fd1078846c4012e98f958f86b38263",
+      "sourceBounds": {
+        "min": [
+          -0.4998321793981404,
+          0.00006103515625,
+          -0.21679633388507064
+        ],
+        "max": [
+          0.4996795915075154,
+          0.99981689453125,
+          0.21673529872882064
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.49916093238294956,
+          0.00006103515625,
+          -0.21594201865562437
+        ],
+        "max": [
+          0.49876426347196934,
+          0.99981689453125,
+          0.21551486196884154
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "hero-frame",
+      "file": "/arena-assets/models/hero-frame.glb",
+      "sourceBytes": 3651580,
+      "bytes": 198188,
+      "sourceTriangles": 370694,
+      "triangles": 12000,
+      "targetTriangles": 12000,
+      "textureSize": 512,
+      "error": 0.006,
+      "sourceSha256": "feef772d8b3c04ad87d4fa654833b88c482575ab953ade7438089d42cc9c027c",
+      "sha256": "9f745a4cc6e8062aaae5e0632d8c6883ef65a085206967f8b25bcb78c786b512",
+      "sourceBounds": {
+        "min": [
+          -0.4999695420265198,
+          -5.960464477539063e-8,
+          -0.13326630926673005
+        ],
+        "max": [
+          0.4999695420265198,
+          0.9999390244483948,
+          0.12639986908976625
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.49984747915004846,
+          0.0007933081150164889,
+          -0.13312048255454811
+        ],
+        "max": [
+          0.4999085105882841,
+          0.9998170323498328,
+          0.12637610525405563
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "hero-validator",
+      "file": "/arena-assets/models/hero-validator.glb",
+      "sourceBytes": 955592,
+      "bytes": 455492,
+      "sourceTriangles": 76116,
+      "triangles": 18000,
+      "targetTriangles": 18000,
+      "textureSize": 768,
+      "error": 0.004,
+      "sourceSha256": "23ee927b55f730818c937d86a733871e897d7b1e3f4fbda53fbedf27b5d71d43",
+      "sha256": "ab0af76031955d8c1252900603ff9498d4cd6b3fef6e13e144aebbb1919169ae",
+      "sourceBounds": {
+        "min": [
+          -0.48816344900047115,
+          0.00006103515625,
+          -0.23185627834548134
+        ],
+        "max": [
+          0.48813293142234615,
+          0.999664306640625,
+          0.23187153713454384
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.48813440889397186,
+          0.00006103515625,
+          -0.2313704260971672
+        ],
+        "max": [
+          0.48743274116485424,
+          0.9995422847568989,
+          0.2315687177118189
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "hero-whale",
+      "file": "/arena-assets/models/hero-whale.glb",
+      "sourceBytes": 2832516,
+      "bytes": 571340,
+      "sourceTriangles": 118534,
+      "triangles": 17998,
+      "targetTriangles": 18000,
+      "textureSize": 768,
+      "error": 0.004,
+      "sourceSha256": "215cfab4e3bacce711762656fd431211715994c5104bb217fd663b28b76eba80",
+      "sha256": "9247387942c5bafb7fe4b08debcab4fa759f890ecb39b2c327593b7feb823ba0",
+      "sourceBounds": {
+        "min": [
+          -0.0972929243878893,
+          -0.49847713867098087,
+          -0.497955322265625
+        ],
+        "max": [
+          0.0974149947003893,
+          0.49658504882723087,
+          0.499542236328125
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.09610971925618012,
+          -0.49799146362637214,
+          -0.4972855859250558
+        ],
+        "max": [
+          0.09653620909735489,
+          0.4959776089439266,
+          0.4989942648262513
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "laurel-wreath",
+      "file": "/arena-assets/models/laurel-wreath.glb",
+      "sourceBytes": 2313520,
+      "bytes": 218512,
+      "sourceTriangles": 137150,
+      "triangles": 8000,
+      "targetTriangles": 8000,
+      "textureSize": 512,
+      "error": 0.009,
+      "sourceSha256": "9d889e829f768a8337ed1d15fab4d69fedb60e1a1cea9a2dfeecb19cdba3bd60",
+      "sha256": "08f6d6b0ff41ec1648b861ca839d758a17d56919467f22d10da03c54144941c3",
+      "sourceBounds": {
+        "min": [
+          -0.490325927734375,
+          0.000013593999155014913,
+          -0.05640803050794051
+        ],
+        "max": [
+          0.490325927734375,
+          0.969651933344595,
+          0.05648050975598738
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.4897273561164184,
+          0.0009046577376948806,
+          -0.05586100761999326
+        ],
+        "max": [
+          0.4897273561164184,
+          0.969239732745561,
+          0.0556940626047129
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "mempool-scroll",
+      "file": "/arena-assets/models/mempool-scroll.glb",
+      "sourceBytes": 1974008,
+      "bytes": 160816,
+      "sourceTriangles": 193144,
+      "triangles": 5998,
+      "targetTriangles": 6000,
+      "textureSize": 512,
+      "error": 0.012,
+      "sourceSha256": "603fd212b6c16577fdfdb88a17c42a1de4d7c440c0f83bcdf6c8e6b7cfb05e24",
+      "sha256": "ae58f03251c6abe7f9d4607c306cc42c493df2b5e07d66f8e397b86c6dc2dc73",
+      "sourceBounds": {
+        "min": [
+          -0.378917554974425,
+          -0.000008942010066737005,
+          -0.49951182305812836
+        ],
+        "max": [
+          0.3658254841564776,
+          0.163621307732723,
+          0.4985656887292862
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.378917554974425,
+          0.00029565636983241994,
+          -0.49951182305812836
+        ],
+        "max": [
+          0.3658254841564776,
+          0.163560388056607,
+          0.4985656887292862
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "roman-table",
+      "file": "/arena-assets/models/roman-table.glb",
+      "sourceBytes": 1518712,
+      "bytes": 350080,
+      "sourceTriangles": 139632,
+      "triangles": 24000,
+      "targetTriangles": 24000,
+      "textureSize": 768,
+      "error": 0.006,
+      "sourceSha256": "6749ce48aa9128e8e1faf878cc2928609ca572985d763277416d8e187afce980",
+      "sha256": "a97bd47176749b2fbe85ea123a7871d056a08c5657991a997fd70aa32d842406",
+      "sourceBounds": {
+        "min": [
+          -0.4891916813967404,
+          0.00002819627125960622,
+          -0.4896546006202698
+        ],
+        "max": [
+          0.4891306462404904,
+          0.4576744404474904,
+          0.4896240830421448
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.4891916777485317,
+          0.00002819627125960622,
+          -0.4896546006202698
+        ],
+        "max": [
+          0.48889156088240315,
+          0.4576744404474904,
+          0.4896240830421448
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            768,
+            768
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "scales",
+      "file": "/arena-assets/models/scales.glb",
+      "sourceBytes": 2423796,
+      "bytes": 238392,
+      "sourceTriangles": 138919,
+      "triangles": 7995,
+      "targetTriangles": 8000,
+      "textureSize": 512,
+      "error": 0.009,
+      "sourceSha256": "27c88fe321ae1c92e410ed67fd825cdb9ffc9a95ce8f0b3bd9add73a329eb282",
+      "sha256": "04260e26408ecc24b0db8e0760cfaf41c4b13dfcbea67bebe936322e027f6e72",
+      "sourceBounds": {
+        "min": [
+          -0.42439055855369445,
+          0,
+          -0.1700914395566018
+        ],
+        "max": [
+          0.42436004097556945,
+          0.929046630859375,
+          0.1700609219784768
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.42285100741665727,
+          0,
+          -0.16995188053360794
+        ],
+        "max": [
+          0.4243515668835337,
+          0.9285929671214035,
+          0.16924088119239927
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "treasury",
+      "file": "/arena-assets/models/treasury.glb",
+      "sourceBytes": 2011924,
+      "bytes": 257292,
+      "sourceTriangles": 133891,
+      "triangles": 8000,
+      "targetTriangles": 8000,
+      "textureSize": 512,
+      "error": 0.009,
+      "sourceSha256": "535c41b1285a371ff9019d37368104b4dd26616bd849851ce3249a425583b141",
+      "sha256": "a8238dd110da66b190732499de9dc155438b70d9ec8c2e45a65233d8b020874d",
+      "sourceBounds": {
+        "min": [
+          -0.34919047567388684,
+          0,
+          -0.33708045161537686
+        ],
+        "max": [
+          0.34931254598638684,
+          0.97869873046875,
+          0.33704993403725186
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.34910086948293495,
+          0,
+          -0.33708045161537686
+        ],
+        "max": [
+          0.3491632047654991,
+          0.97869873046875,
+          0.33704993403725186
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "trophy",
+      "file": "/arena-assets/models/trophy.glb",
+      "sourceBytes": 819260,
+      "bytes": 218068,
+      "sourceTriangles": 75303,
+      "triangles": 8000,
+      "targetTriangles": 8000,
+      "textureSize": 512,
+      "error": 0.009,
+      "sourceSha256": "cadfd51daecb1d3e16cd566973f72858fc3b4aa356eed74d4fb8ab067222d048",
+      "sha256": "04c41ef6079cc4ed97970f1d55931fcc2bf7fe85818e4562bda2ee9ec241f64c",
+      "sourceBounds": {
+        "min": [
+          -0.48980712890625,
+          -0.000006486394019955544,
+          -0.05169812285489375
+        ],
+        "max": [
+          0.489776611328125,
+          0.9188297285815199,
+          0.05174008452481563
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.4883721333990252,
+          -0.00003315850323426517,
+          -0.051182857814626045
+        ],
+        "max": [
+          0.48935808800160885,
+          0.9180193248438315,
+          0.05086607425697552
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    },
+    {
+      "id": "water-clock",
+      "file": "/arena-assets/models/water-clock.glb",
+      "sourceBytes": 1986988,
+      "bytes": 251280,
+      "sourceTriangles": 133786,
+      "triangles": 7990,
+      "targetTriangles": 8000,
+      "textureSize": 512,
+      "error": 0.009,
+      "sourceSha256": "4b85aab7e4a4c76fdd214176f282b2a4a8f7024a8b19ccce4f546bc51fa7ba61",
+      "sha256": "7511c5d171cd6c033d39038c860d4ab37d9048cd524a5e2673d830f1f44f4e99",
+      "sourceBounds": {
+        "min": [
+          -0.27914629556780046,
+          0.000091552734375,
+          -0.22904646922340943
+        ],
+        "max": [
+          0.27917681314592546,
+          0.978515625,
+          0.22927535105934693
+        ]
+      },
+      "bounds": {
+        "min": [
+          -0.2786352247973467,
+          0.0004498623311519623,
+          -0.22632381237646648
+        ],
+        "max": [
+          0.2772324456697446,
+          0.9783364702016115,
+          0.2279262580723468
+        ]
+      },
+      "animations": 0,
+      "skins": 0,
+      "textures": [
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ]
+    }
+  ]
+}

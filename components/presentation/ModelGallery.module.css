@@ -1,0 +1,15 @@
+.page { min-height:100dvh; display:grid; grid-template-columns:320px 1fr; background:#101613; color:#eee3c9; }
+.page aside { padding:32px; background:#24251d; border-right:1px solid #796242; }
+.page h1 { font:700 30px/1.15 var(--font-roman); margin:35px 0 18px; }
+.page p { font:500 15px/1.6 var(--font-sans); color:#c7bea8; }
+.page a { color:#ebcf9c; text-decoration:underline; }
+.page label { display:grid; gap:10px; font-size:16px; margin-top:30px; }
+.page select { width:100%; padding:12px; background:#342c20; color:#fff1d3; border:1px solid #ad8c56; border-radius:6px; font:inherit; }
+.angles { display:flex; gap:8px; margin-top:16px; }
+.angles button { padding:10px; min-height:44px; color:#f4dfb5; background:#3c3020; border:1px solid #ad8c56; }
+.angles button[aria-pressed=true] { background:#a07a41; }
+.page dl { font-size:15px; margin:30px 0; }
+.page dt { color:#c2b392; margin-top:16px; }.page dd { margin:4px 0; font-size:18px; }
+.page section { position:relative; min-height:70dvh; }.page canvas { width:100%; height:100%; display:block; touch-action:none; }
+.page section p { position:absolute; bottom:20px; left:20px; }
+@media(max-width:700px) { .page { grid-template-columns:1fr; }.page aside { padding:20px; }.page h1 { margin:20px 0 10px; }.page section { height:65dvh; }.page canvas { position:absolute; } }

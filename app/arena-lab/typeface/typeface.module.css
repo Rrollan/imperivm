@@ -1,0 +1,15 @@
+@font-face { font-family: 'IMPERIVM Inscription'; src: url('/fonts/imperivm/imperivm-inscription.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+.page { position: relative; z-index: 40; min-height: 100vh; padding: 28px max(24px,calc((100vw - 1080px)/2)); background: #17211e; color: #e7dcc5; font: 16px/1.6 var(--font-sans); }
+.page nav { display: flex; justify-content: space-between; gap: 20px; padding-bottom: 25px; border-bottom: 1px solid #9f7d494d; }
+.page nav span, .page header > p:first-child { color: #baac8c; font-size: 13px; }
+.page a { color: #f0d397; text-decoration: underline; text-underline-offset: 5px; }
+.page header { margin: 60px 0; }
+.page h1 { margin: 15px 0; font: 400 clamp(38px,6vw,70px)/1.25 'IMPERIVM Inscription',serif; letter-spacing: .03em; color: #f0d397; }
+.page h2 { font: 400 26px/1.4 'IMPERIVM Inscription',serif; color: #dcbf84; }
+.page section { margin: 45px 0; padding-top: 25px; border-top: 1px solid #9f7d494d; }
+.page section > p { color: #bfb7a4; }
+.sample { width: 100%; min-height: 210px; resize: vertical; padding: 24px; background: #232923; border: 1px solid #9e855a; border-radius: 5px; color: #f5dfb2; font: 400 clamp(22px,3.8vw,39px)/1.6 'IMPERIVM Inscription',serif; }
+.sample:focus { outline: 2px solid #e5c383; outline-offset: 3px; }
+.alphabet p { margin: 20px 0; overflow-wrap: anywhere; color: #f5dfb2 !important; font: 400 clamp(21px,3vw,32px)/1.8 'IMPERIVM Inscription',serif; }
+.downloads { display: flex; flex-wrap: wrap; gap: 24px; margin: 20px 0; }
+.page pre { padding: 24px; overflow: auto; background: #0e1815; font: 13px/1.7 var(--font-mono); color: #d2c6ab; }

@@ -1,0 +1,39 @@
+@font-face { font-family:'IMPERIVM Inscription';src:url('/fonts/imperivm/imperivm-inscription.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap; }
+.shell { --display-font:'IMPERIVM Inscription',serif;position:fixed;z-index:40;inset:0;overflow:hidden;background:#141a17;color:#f4e6cb;font:500 16px/1.5 var(--font-sans);isolation:isolate; }
+.shell * { box-sizing:border-box; }
+.shell button,.shell a { font:inherit;letter-spacing:normal;color:inherit; }
+.shell button { min-width:44px;min-height:44px;padding:8px 14px;border:1px solid #947752;border-radius:6px;background:#29251dee !important;background-image:none !important;box-shadow:inset 0 1px #e8d3a51c,0 3px 8px #0004;cursor:pointer;text-shadow:none; }
+.shell button:hover { background:#493724 !important;border-color:#e3c28a; }
+.shell button:disabled { opacity:.5;cursor:default;filter:saturate(.4); }
+.shell button:focus-visible,.shell a:focus-visible,.shell summary:focus-visible { outline:3px solid #f0d594;outline-offset:3px; }
+.shell h2,.shell h3 { font-family:var(--font-roman),serif; }
+.canvas { display:block;width:100%;height:100%;touch-action:none;outline:none; }
+.header { position:absolute;inset:auto 20px 20px auto;pointer-events:none; }
+.header > * { pointer-events:auto; }
+.shell .settingsButton { display:grid;place-items:center;width:52px;height:52px;min-height:52px;border:2px solid #d7ae69;padding:11px;border-radius:50%;background:radial-gradient(circle at 35% 28%,#96784b,#4b3420 72%) !important;box-shadow:inset 0 0 0 3px #543a22,inset 0 0 0 4px #aa8350,0 3px 5px #130c08aa; }
+.settingsButton svg { display:block;width:26px;height:26px;fill:#e7c68b; }.settingsButton svg circle { fill:#594023; }.shell .settingsButton:hover { filter:brightness(1.13); }
+.loading { position:absolute;inset:0;background:#172019;display:grid;place-content:center;text-align:center; }
+.loading > div { margin:auto;width:96px;height:96px;border:2px solid #bda16a;border-radius:50%;font:700 44px/92px var(--font-roman);color:#ddc38f; }.loading p { margin-top:25px;color:#d1c6af; }
+.error { position:absolute;z-index:12;top:90px;left:50%;transform:translateX(-50%);max-width:min(520px,95%);background:#352019f5;border:1px solid #b9785e;border-radius:8px;padding:15px 55px 15px 18px;color:#f1d9c9; }.error span,.error strong,.error a { display:block; }.error button { position:absolute;top:5px;right:5px;padding:5px;border:0; }
+.shell .close { position:absolute;right:10px;top:9px;min-width:36px;min-height:36px;width:36px;height:36px;padding:3px;border:0;border-radius:50%;background:#50361edb !important;box-shadow:none;font-size:27px;line-height:1;color:#fff0cd; }
+.inspection { position:absolute;z-index:5;top:50%;left:16px;transform:translateY(-50%);width:246px;max-height:calc(100% - 32px);overflow:auto;padding:10px;border:5px ridge #96703b;border-radius:28px 28px 18px 18px;background:#eeddb5;color:#322418;box-shadow:0 15px 45px #0009; }
+.inspection > img { display:block;width:100%;height:250px;object-fit:contain;background:#372819;border-radius:12px 12px 4px 4px; }.inspection > div { padding:5px 8px; }
+.inspection h2 { font:700 23px/1.1 var(--font-roman);color:#3f2b1b;margin:8px 0 12px;text-align:center; }.inspection h3 { color:#594021;font-size:19px; }.inspection p { color:#33291b;font-size:16px;line-height:1.45; }
+.inspection dl { display:flex;justify-content:space-between;margin:9px 0;gap:10px; }.inspection dl div { display:grid; }.inspection dt { color:#685337;font-size:12px; }.inspection dd { margin:0;color:#3c2817;font-size:27px;font-weight:700; }
+.inspection .targetHint { color:#355e35;font-size:15px;font-weight:700; }
+.inspection button:not(.close) { display:block;width:100%;min-height:48px;margin-top:12px;color:#fff0d0 !important;background:linear-gradient(#80603a,#453020) !important;border:2px solid #a58049;font-size:17px;font-weight:750;line-height:1.25;padding:11px 8px;text-shadow:0 1px 2px #1a0d06; }
+.inspection button:disabled { opacity:1;color:#e6d5b8 !important;background:#655744 !important;filter:none; }
+.actionsPanel { position:absolute;z-index:8;top:80px;right:22px;width:min(420px,calc(100% - 44px));max-height:calc(100% - 110px);overflow:auto;padding:24px;border:1px solid #ac8b58;border-radius:10px;background:#22271ff5; }.actionsPanel h2 { font-size:25px;margin:4px 35px 12px 0; }.actionsPanel > button:not(.close) { display:block;text-align:left;margin:8px 0;width:100%; }
+.modalBackdrop { position:absolute;z-index:10;inset:0;display:grid;place-items:center;padding:20px;background:#100b08b8; }
+.help,.result { position:relative;width:min(430px,100%);max-height:94%;overflow:auto;padding:35px 30px 25px;border:12px ridge #876037;border-radius:28px;background:#dfc795 url('/ui/arena-lab/playing-surface.webp') center/cover;color:#412918;box-shadow:0 20px 65px #0009,inset 0 0 30px #69442733;text-align:center; }
+.help h2,.result h2 { font-family:var(--display-font);font-size:38px;color:#4a2b17;font-weight:400;font-synthesis:none;line-height:1.15;margin:5px 0 25px; }.help p,.result p { color:#3d2b1e;line-height:1.5; }
+.menuActions { display:flex;flex-direction:column;gap:9px;margin:0; }
+.help .menuActions button { width:min(290px,100%);height:68px;padding:12px 25px;border:0;background:transparent url('/ui/arena-lab/turn-command.webp') center/100% 100% no-repeat !important;box-shadow:none;border-radius:0;font-size:18px;font-weight:700;color:#fff0d1;text-shadow:0 2px 2px #140a05; }.help .menuActions button:hover { filter:brightness(1.15); }
+.help details { color:#4c3321;margin:22px 0 15px; }.help summary { cursor:pointer; }.help details p { text-align:left; }
+.leaveArena { display:inline-block;color:#573a22 !important;text-decoration:underline;text-underline-offset:3px;margin-top:8px; }
+.shell .primary { background:linear-gradient(#a9864e,#705730) !important;border-color:#d6b374;color:#fff2d3;font-weight:700; }
+.eyebrow { font:700 12px var(--font-sans);letter-spacing:.12em;color:#735536; }
+.metrics[hidden] { display:none; }
+.resultWithFx { background:radial-gradient(#3f2816,#171714);color:#f3dfb6; }.resultWithFx p { color:#e7d6b4; }.resultWithFx .eyebrow { color:#cdb07a; }.victoryBanner { position:relative;height:270px;overflow:hidden;display:grid;place-items:center; }.victoryBanner video { position:absolute;width:670px;max-width:none;height:auto;left:50%;top:50%;transform:translate(-50%,-50%);mix-blend-mode:screen;pointer-events:none; }.victoryBanner h2 { position:relative;z-index:1;max-width:200px;margin:0;color:#f8e5ba;font-size:30px;text-shadow:0 2px 6px #100a06; }
+@media (max-width:800px) { .inspection { width:230px; }.inspection > img { height:220px; }.header { inset:auto 14px 14px auto; }.help,.result { padding:25px; }.help h2,.result h2 { font-size:30px; } }
+@media (max-aspect-ratio:1/1) { .inspection { left:10px;width:min(246px,calc(100% - 20px));max-height:75%; }.inspection > img { height:180px; } }

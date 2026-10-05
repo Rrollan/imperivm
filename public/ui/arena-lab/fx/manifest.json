@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "composite": "sprite-additive-black",
+  "clips": {
+    "01-impact": {
+      "src": "/ui/arena-lab/fx/01-impact.atlas.webp",
+      "maxMs": 400,
+      "columns": 4,
+      "rows": 3,
+      "frameCount": 12,
+      "fps": 30,
+      "bytes": 10440,
+      "sourceRange": [
+        0,
+        0.4
+      ]
+    }
+  }
+}

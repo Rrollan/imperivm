@@ -10,6 +10,8 @@
   max-width: 1140px; margin: auto; padding: 32px 40px 56px;
 }
 .heading { grid-column: 1 / -1; text-align: center; color: #fff0ce; }
+.labLinks { grid-column: 1; grid-row: 4; display: flex; justify-content: space-between; gap: 16px; font-size: 14px; color: #e8d0a1; }
+.labLinks a { text-decoration: underline; text-underline-offset: 4px; }
 .heading p { margin: 0 0 4px; color: #e3bd78; font-size: 13px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
 .heading h1 { margin: 0; font: 700 clamp(42px, 5vw, 64px)/1.1 var(--font-display); text-shadow: 0 3px 10px #0009; }
 .heading > span { display: block; margin-top: 12px; color: #eee1c9; font-size: 16px; line-height: 1.5; }
@@ -63,6 +65,7 @@
   .portalCopy { padding: 24px 12px; } .portalCopy h2 { font-size: 32px; } .portalCopy p { margin-bottom: 18px; }
   .heroes { padding: 20px 16px; } .hero strong { font-size: 20px; } .heroBrief { min-height: 90px; }
   .futureModes { grid-column: 1; gap: 12px; }
+  .labLinks { grid-row: auto; }
 }
 @media (prefers-reduced-motion: reduce) { .portal, .hero { transition: none; } .dust { display: none; } }
 :global(html[data-imperivm-motion='off']) .dust { display: none; }
