@@ -27,8 +27,9 @@ import { ArenaEffects } from './ArenaEffects';
 import { ArenaSpriteEffects } from './ArenaSpriteEffects';
 import { videoCues, VIDEO_IDS } from './videoCue';
 import type { PresentationBatch } from './GameSession';
-import {MOTION, smooth, settle, attackTravel,deathProgress} from './motionSpec';
+import {MOTION, smooth, settle, attackTravel,deathProgress,publicPlayPhase} from './motionSpec';
 import {battleCommand,fighterReadiness} from './battleReadability';
+import {fighterRow} from './battleLayout';
 import {ArenaAbilityEffects} from './ArenaAbilityEffects';
 import {ArenaDeploymentEffects} from './ArenaDeploymentEffects';
 import {pixelRatio, type RenderQuality} from './renderQuality';
@@ -104,7 +105,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   let shown: GameState | null = null, selected: string | null = null;
   let hovered: string | null = null, reportedHover: string | null = null, overlayOpen=false;
   let activeBatch: PresentationBatch | null = null;
-  const rowY=(owner:number)=>owner===0?535:portrait?260:335;
+  const rowY=(owner:number)=>fighterRow(1,owner,portrait).y;
   // Measured recess centers in the delivered artwork. Portrait pixels map to
   // x=350+.9*px, y=-130+.9*py; landscape uses its 1600×1000 pixels directly.
   const heroX=()=>portrait?793:800;
@@ -264,8 +265,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     state.players.forEach((player,index)=>{
       const owner = index as 0|1;
       keep(`hero-${owner}`,{kind:'hero',uid:`hero-${owner}`,owner},{kind:'hero',heroId:player.heroId,treasury:player.treasury},portrait?190:205,portrait?205:220,heroX(),heroY(owner),-1.6);
-      const spacing = Math.min(portrait?124:150,(portrait?700:980)/Math.max(1,player.board.length));
-      player.board.forEach((m,i)=>keep(m.uid,{kind:'minion',uid:m.uid,owner,cardId:m.cardId},{kind:'minion',minion:m,ready:readyAttackers.has(m.uid),readiness:fighterReadiness(state,owner,m,stateActions)},portrait?120:145,portrait?162:196,800+(i-(player.board.length-1)/2)*spacing,rowY(owner),-.15));
+      const row=fighterRow(player.board.length,owner,portrait);
+      player.board.forEach((m,i)=>keep(m.uid,{kind:'minion',uid:m.uid,owner,cardId:m.cardId},{kind:'minion',minion:m,ready:readyAttackers.has(m.uid),readiness:fighterReadiness(state,owner,m,stateActions)},row.width,row.height,row.center+(i-(player.board.length-1)/2)*row.spacing,row.y,-.15));
     });
     const hand = state.players[0].hand;
     const spacing = Math.min(portrait?136:155,(portrait?670:900)/Math.max(1,hand.length-1));
@@ -487,20 +488,22 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const owner = batch.before.turn;
     const added = batch.after.players[owner].board.find(m => !batch.before.players[owner].board.some(old=>old.uid===m.uid));
     const boardSize = batch.after.players[owner].board.length;
-    const boardSpacing = Math.min(portrait?124:150,(portrait?700:980)/Math.max(1,boardSize));
+    const boardRow=fighterRow(boardSize,owner,portrait);
     const addedIndex = added ? batch.after.players[owner].board.findIndex(m=>m.uid===added.uid) : 0;
     const pending = mempoolOf(batch.after, owner), pendingIndex = Math.min(5,pending.length-1);
     const target = defender?.root.position.clone() ?? (batch.action.type === 'cast-spell'
       ? point(queueX()+Math.min(2,pendingIndex)*7,queueY(owner)-Math.min(2,pendingIndex)*7,-1)
-      : point(800+(addedIndex-(boardSize-1)/2)*boardSpacing,rowY(owner),-.15));
-    const landingScale = moving ? new Vector3((batch.action.type==='cast-spell'?130:portrait?120:145)/(moving.width*50),(batch.action.type==='cast-spell'?174:portrait?162:196)/(moving.height*50),1) : Vector3.One();
+      : point(boardRow.center+(addedIndex-(boardSize-1)/2)*boardRow.spacing,boardRow.y,-.15));
+    const landingScale = moving ? new Vector3((batch.action.type==='cast-spell'?130:boardRow.width)/(moving.width*50),(batch.action.type==='cast-spell'?174:boardRow.height)/(moving.height*50),1) : Vector3.One();
     const settling = handUid ? batch.after.players[owner].board.flatMap((m,index)=>{
-      const entry=entities.get(m.uid); return entry ? [{entry,start:entry.root.position.clone(),target:point(800+(index-(boardSize-1)/2)*boardSpacing,rowY(owner),-.15)}] : [];
+      const entry=entities.get(m.uid); return entry ? [{entry,start:entry.root.position.clone(),target:point(boardRow.center+(index-(boardSize-1)/2)*boardRow.spacing,boardRow.y,-.15)}] : [];
     }) : [];
     let landed: Entity | undefined;
     const deaths = new Set(batch.events?.deaths?.map(dead => dead.uid) ?? []);
     const deadObjects = Array.from(entities.values()).filter(entry => deaths.has(entry.data.uid));
-    const spec=attack?MOTION.attack:handUid?MOTION.play:batch.action.type==='hero-power'?MOTION.power:MOTION.turn;
+    const publicPlay=handUid!==null&&owner===1&&!options.reducedMotion;
+    const revealAt=point(portrait?1070:1205,325,-6),revealScale=new Vector3(portrait?1.85:1.65,portrait?1.85:1.65,1);
+    const spec=attack?MOTION.attack:handUid?(publicPlay?MOTION.enemyPlay:MOTION.play):batch.action.type==='hero-power'?MOTION.power:MOTION.turn;
     const drawn=batch.after.players.flatMap((p,owner)=>p.hand.filter(c=>!batch.before.players[owner].hand.some(old=>old.uid===c.uid)).map(c=>({...c,owner:owner as 0|1,index:p.hand.findIndex(h=>h.uid===c.uid)})));
     textures.preloadCards(drawn.filter(c=>c.owner===0).map(c=>c.cardId));
     const contactMs=options.reducedMotion?72:Math.max(spec.duration*spec.contact,(batch.events?.spellResolved?.length??0)*75+90);
@@ -510,15 +513,18 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     // Victory belongs inside the result dialog; ordinary accents belong on battle pieces.
     const cues=videoCues(batch).filter(cue=>cue.id!=='06-victory');
     if(!options.reducedMotion)videoEffects.prepare(cues);
-    const cuePositions=new Map(cues.map(cue=>[cue.anchor,cue.anchor==='arena-center'?Vector3.Zero():cue.anchor==='row-0'?point(800,rowY(0)):cue.anchor==='row-1'?point(800,rowY(1)):cue.anchor==='gas-counter'?gasRack.position.clone():entities.get(cue.anchor)?.base.clone()]));
     const locate=(uid:string)=>{
       if(uid==='arena-center')return Vector3.Zero();
-      if(uid==='row-0'||uid==='row-1')return point(800,rowY(uid==='row-0'?0:1));
+      if(uid==='row-0'||uid==='row-1')return point(fighterRow(1,0,portrait).center,rowY(uid==='row-0'?0:1));
       if(uid==='gas-counter')return gasRack.position.clone();
+      // Plays reflow the row: feedback belongs at the final socket, including
+      // the new fighter which has no entity until the contact callback.
+      for(const p of [0,1]){const board=batch.after.players[p].board,index=board.findIndex(m=>m.uid===uid);if(index>=0){const row=fighterRow(board.length,p,portrait);return point(row.center+(index-(board.length-1)/2)*row.spacing,row.y);}}
       const existing=entities.get(uid);if(existing)return existing.base.clone();
-      for(const owner of [0,1]){const row=batch.after.players[owner].board,index=row.findIndex(m=>m.uid===uid);if(index>=0){const spacing=Math.min(portrait?124:150,(portrait?700:980)/row.length);return point(800+(index-(row.length-1)/2)*spacing,rowY(owner));}}
+      for(const p of [0,1] as const){const queue=mempoolOf(batch.after,p),index=queue.findIndex(e=>`queued-${e.uid}`===uid);if(index>=0){const visible=Math.min(2,index);return point(queueX()+visible*7,queueY(p)-visible*7,-1);}}
     };
-    effects.begin(batch,locate,handUid?target:undefined);
+    const cuePositions=new Map(cues.map(cue=>[cue.anchor,locate(cue.anchor)]));
+    effects.begin(batch,locate);
     abilities.begin(batch,locate);
     const resolving=(batch.events?.spellResolved??[]).flatMap((s,i)=>{const entry=entities.get(`queued-${s.mempoolUid}`);return entry?[{entry,start:entry.base.clone(),delay:i*.075}]:[];});
     await scheduler.play(duration, impactAt, progress => {
@@ -532,11 +538,19 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       if (moving && start && !moving.root.isDisposed()) {
         // Attacks lunge and return. A played card travels once and stays at its destination.
         const eased = handUid?smooth(progress/impactAt):attackTravel(progress);
-        moving.root.position.copyFrom(Vector3.Lerp(start, target, handUid ? eased : options.reducedMotion ? 0 : eased * .84));
-        moving.root.position.z -= Math.sin(Math.max(0,eased) * Math.PI) * (options.reducedMotion ? 0 : .35);
-        if(heldArrival===moving)moving.root.position.z-=.65;
-        if(handUid){moving.root.scaling.copyFrom(Vector3.Lerp(startScale,landingScale,eased));moving.root.rotation.z=startRotation*(1-eased);}
-        else moving.root.scaling.setAll(1 + Math.sin(progress * Math.PI) * .04);
+        if(publicPlay&&progress<impactAt){
+          const phase=publicPlayPhase(progress/impactAt);
+          const approach=Vector3.Lerp(start,revealAt,phase.approach);
+          moving.root.position.copyFrom(Vector3.Lerp(approach,target,phase.landing));
+          moving.root.scaling.copyFrom(Vector3.Lerp(Vector3.Lerp(startScale,revealScale,phase.approach),landingScale,phase.landing));
+          moving.root.rotation.z=startRotation*(1-phase.approach);
+        }else{
+          moving.root.position.copyFrom(Vector3.Lerp(start, target, handUid ? eased : options.reducedMotion ? 0 : eased * .84));
+          moving.root.position.z -= Math.sin(Math.max(0,eased) * Math.PI) * (options.reducedMotion ? 0 : .35);
+          if(heldArrival===moving)moving.root.position.z-=.65;
+          if(handUid){moving.root.scaling.copyFrom(Vector3.Lerp(startScale,landingScale,eased));moving.root.rotation.z=startRotation*(1-eased);}
+          else moving.root.scaling.setAll(1 + Math.sin(progress * Math.PI) * .04);
+        }
       }
       if(handUid){const t=Math.min(1,progress/impactAt),ease=t*t*(3-2*t);settling.forEach(({entry,start,target})=>{if(!entry.root.isDisposed())entry.root.position.copyFrom(Vector3.Lerp(start,target,ease));});}
       if(landed&&!landed.root.isDisposed()){
@@ -572,7 +586,9 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         // Replace the arriving card with its battlefield/queue form at the same position,
         // at contact rather than after a return to the hand or a blank frame.
         if(moving){entities.delete(handUid);heldArrival=moving;moving.face.isPickable=false;moving.root.position.copyFrom(target);moving.root.position.z-=.65;}
+        deadObjects.forEach(entry=>entities.delete(entry.data.uid));
         sync(batch.after);
+        deadObjects.forEach(entry=>entities.set(entry.data.uid,entry));
         landed=added?entities.get(added.uid):pending.length?entities.get(`queued-${pending[pending.length-1].uid}`):undefined;
         if(landed&&!options.reducedMotion){landed.material.alpha=0;landed.backing.visibility=0;}else releaseArrival();
       }else if(drawn.length||resolving.length){

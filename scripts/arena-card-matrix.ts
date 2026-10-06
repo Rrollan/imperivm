@@ -293,7 +293,8 @@ minionCards.forEach((cardId,index)=>{
   const identity=cardIdentity(cardId);
   assert.equal((roles as Record<string,string>)[cardId],identity.role,`${cardId}: explicit role metadata must reach identity`);
   const deploy=videoCues(batch);
-  assert.equal(deploy.length,1,`${cardId}: played minion must get exactly one deployment clip`);
+  assert.ok(deploy.length>=1&&deploy.length<=2,`${cardId}: deployment and actual outcomes share at most two sprite layers`);
+  assert.equal(deploy.filter(c=>c.id.startsWith('10-deploy')||c.id.startsWith('11-deploy')||c.id.startsWith('12-deploy')||c.id.startsWith('13-deploy')||c.id.startsWith('14-deploy')||c.id.startsWith('15-deploy')).length,1,`${cardId}: played minion must get exactly one deployment clip`);
   assert.equal(deploy[0].anchor,played.uid,`${cardId}: deployment clip must follow the summoned fighter`);
   if(observedRoleAnimations.has(identity.role))assert.equal(observedRoleAnimations.get(identity.role),deploy[0].id,`${identity.role}: all cards in a role share its deployment cue`);
   else observedRoleAnimations.set(identity.role,deploy[0].id);
@@ -349,7 +350,9 @@ spellCards.forEach((cardId,index)=>{
   assert.deepEqual(play.events?.spellCounters?.map(counter=>counter.mempoolUid),removed.map(entry=>entry.uid),'Counter events must retain each exact removed mempool UID');
   assert.equal(play.events?.spellCountered?.mempoolUid,play.events?.spellCounters?.[0]?.mempoolUid,'Legacy singular counter must remain the first counter');
   const counterCues=abilityCues(play).filter(cue=>cue.kind==='counter'&&cue.phase==='after');
-  assert.deepEqual(counterCues.map(cue=>cue.from).sort(),removed.map(entry=>`queued-${entry.uid}`).sort(),'Each removed decree gets its own counter feedback');
+  const played=play.after.players[0].board.find(m=>m.cardId==='frontrun-bot'&&!play.before.players[0].board.some(old=>old.uid===m.uid));
+  assert.ok(played);
+  assert.ok(counterCues.every(cue=>cue.from===played.uid),'Each actual cancellation must originate at the played fighter');
   assert.deepEqual(counterCues.map(cue=>cue.to).sort(),removed.map(entry=>`queued-${entry.uid}`).sort(),'Counter feedback must target the exact removed UID');
 }
 

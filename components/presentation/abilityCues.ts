@@ -2,6 +2,7 @@ import {CARDS} from '../../lib/cards';
 import {HEROES} from '../../lib/heroes';
 import type {EffectKind} from '../../lib/engine/types';
 import type {PresentationBatch} from './GameSession';
+import {directEffect,playedFighter} from './directPlay';
 
 export type AccentKind='steel'|'heal'|'gas'|'dice'|'seal'|'buff'|'counter'|'weaken';
 export type AbilityCue={kind:AccentKind;from:string;to:string;phase:'contact'|'after';delay:number};
@@ -28,6 +29,7 @@ export function abilityCues(batch:PresentationBatch):AbilityCue[]{
     }
   }
   const effect=(kind:EffectKind,p:number,from:string,multiple=false,delay=0)=>{
+    if(kind==='counter-mempool')return; // Only the confirmed victims below represent success.
     if((kind.startsWith('damage-')||kind==='heal-treasury')&&from.startsWith('queued-')){
       const result=batch.events?.effectResults?.find(r=>`queued-${r.mempoolUid}`===from&&r.owner===p&&r.kind===kind);
       result?.targets.forEach((target,i)=>{if(target.healthAfter!==target.healthBefore)add(glyph[kind],from,target.uid,'contact',delay+i*.025);});return;
@@ -42,17 +44,28 @@ export function abilityCues(batch:PresentationBatch):AbilityCue[]{
     }
     const destination=kind==='gain-gas'?gas(p):kind==='damage-all-enemy-minions'?`row-${1-p}`:
       kind==='damage-enemy-treasury'?`hero-${1-p}`:kind==='damage-random-enemy'?(multiple?`row-${1-p}`:enemy(p)):
-      kind==='buff-own'||kind==='summon'?`row-${p}`:kind==='rugpull'?'arena-center':kind==='counter-mempool'?(batch.events?.spellCountered?`queued-${batch.events.spellCountered.mempoolUid}`:`row-${1-p}`):`hero-${p}`;
+      kind==='buff-own'||kind==='summon'?`row-${p}`:kind==='rugpull'?'arena-center':`hero-${p}`;
     add(glyph[kind],from,destination,'contact',delay);
   };
-  if(batch.events?.play){const card=CARDS[batch.events.play.cardId];if(card.battlecry)effect(card.battlecry.kind,owner,`hero-${owner}`);}
+  const played=playedFighter(batch),direct=directEffect(batch);
+  if(direct){
+    if(direct.targets.length)direct.targets.forEach((target,i)=>add(glyph[direct.kind],direct.source,target.uid,'after',i*.025));
+    else if(direct.kind==='gain-gas'&&direct.ordersGain)add('gas',direct.source,gas(owner),'after');
+    else if(direct.kind==='draw'&&batch.after.players[owner].deck.length<batch.before.players[owner].deck.length)add('dice',direct.source,direct.source,'after');
+    else if(direct.kind==='summon')batch.after.players[owner].board.filter(m=>m.uid!==direct.source&&!batch.before.players[owner].board.some(old=>old.uid===m.uid)).forEach((m,i)=>add('buff',direct.source,m.uid,'after',i*.025));
+  }
   const resolved=batch.events?.spellResolved??[];
   resolved.forEach((s,i)=>{const spell=CARDS[s.cardId]?.spell;
     if(s.fizzled)add('counter',`queued-${s.mempoolUid}`,`queued-${s.mempoolUid}`,'after',i*.06);
     else if(spell)effect(spell.kind,s.owner,`queued-${s.mempoolUid}`,resolved.length>1,i*.04);
   });
   const counters=batch.events?.spellCounters??(batch.events?.spellCountered?[batch.events.spellCountered]:[]);
-  counters.forEach((counter,index)=>{const uid=`queued-${counter.mempoolUid}`;add('counter',uid,uid,'after',index*.06);});
+  const castSource=batch.action.type==='cast-spell'&&batch.events?.spellQueued?`queued-${batch.events.spellQueued.mempoolUid}`:undefined;
+  const counterSources=resolved.filter(s=>!s.fizzled&&CARDS[s.cardId]?.spell?.kind==='counter-mempool');
+  // A direct card is an unambiguous source. With several delayed counters the
+  // ledger names victims, not source-victim pairs: keep those outcomes local.
+  const counterSource=played?.uid??castSource??(counterSources.length===1?`queued-${counterSources[0].mempoolUid}`:undefined);
+  counters.forEach((counter,index)=>{const uid=`queued-${counter.mempoolUid}`;add('counter',counterSource??uid,uid,'after',index*.06);});
   batch.events?.halvings?.forEach(h=>add('buff',h.uid,h.uid,'after'));
   batch.after.players.forEach((p,i)=>{
     const prev=batch.before.players[i];

@@ -2,6 +2,7 @@
 export const MOTION = {
   attack: { duration: 460, contact: .42 },
   play: { duration: 440, contact: .62 },
+  enemyPlay: { duration: 1050, contact: .78 },
   power: { duration: 500, contact: .36 },
   turn: { duration: 480, contact: .40 },
   hoverMs: 70,
@@ -10,6 +11,13 @@ export const MOTION = {
 } as const;
 
 export const smooth = (t: number) => { const x=Math.max(0,Math.min(1,t));return x*x*(3-2*x); };
+/** A public opponent play approaches, holds for recognition, then lands once. */
+export function publicPlayPhase(progress:number){
+  const t=Math.max(0,Math.min(1,progress));
+  if(t<.22)return {approach:smooth(t/.22),landing:0};
+  if(t<.77)return {approach:1,landing:0};
+  return {approach:1,landing:smooth((t-.77)/.23)};
+}
 /** Exponential settling is stable at different frame rates and after a slow frame. */
 export function settle(current: number, target: number, delta: number, timeConstant: number) {
   const next=target+(current-target)*Math.exp(-Math.max(0,delta)/timeConstant);

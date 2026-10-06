@@ -4,16 +4,23 @@ import { chooseAiAction } from '../lib/ai';
 import { GameSession, createLabGame } from '../components/presentation/GameSession';
 import { PresentationScheduler } from '../components/presentation/PresentationScheduler';
 import { videoCues } from '../components/presentation/videoCue';
-import {MOTION,settle,attackTravel,deathProgress,accentProgress} from '../components/presentation/motionSpec';
+import {MOTION,settle,attackTravel,deathProgress,accentProgress,publicPlayPhase} from '../components/presentation/motionSpec';
 import {HEROES} from '../lib/heroes';
 import {abilityCues} from '../components/presentation/abilityCues';
 import {pixelRatio} from '../components/presentation/renderQuality';
+import {fighterRow} from '../components/presentation/battleLayout';
 
 async function main() {
   assert.ok(pixelRatio(1280,800,2,'auto')>1.4,'Retina must improve image resolution above CSS pixels');
   assert.equal(pixelRatio(1280,800,2,'fast'),1,'Performance mode must retain the CSS pixel budget');
   assert.ok(3840*2160*pixelRatio(3840,2160,2,'auto')**2<=3840*2160,'Large windows must not render at four times their area');
   assert.ok(1920*1080*pixelRatio(1920,1080,2,'sharp')**2<=4_000_001,'Sharp mode must respect its pixel budget');
+  for(let count=1;count<=7;count++){
+    const row=fighterRow(count,0,true),left=row.center-(count-1)*row.spacing/2-row.width/2,right=row.center+(count-1)*row.spacing/2+row.width/2;
+    assert.ok(left>450&&right<1140,'A complete portrait row must clear both table edges and the hourglass socket');
+    assert.ok(row.y+row.height/2<621-72/2,'Fighter stats must finish above the turn button');
+    if(count>1)assert.ok(row.spacing>=row.width*(335/384),'Oval frames must not overlap in the complete row');
+  }
   const opening = createLabGame('builder', true, 2718);
   assert.ok(mulliganAvailable(opening), 'A new match must offer the real starting-hand choice');
   assert.ok(legalActions(opening).every(choice=>choice.type==='mulligan'), 'Cards cannot play before the opening choice');
@@ -115,6 +122,11 @@ async function main() {
   assert.equal(attackTravel(0),0);
   assert.equal(attackTravel(MOTION.attack.contact),1,'The card must contact its target with the damage/sound phase');
   assert.equal(attackTravel(1),0,'An attack must finish at its original position');
+  assert.deepEqual(publicPlayPhase(0),{approach:0,landing:0});
+  assert.deepEqual(publicPlayPhase(.3),publicPlayPhase(.7),'The public card must hold still for recognition');
+  assert.deepEqual(publicPlayPhase(1),{approach:1,landing:1});
+  let previous={approach:0,landing:0};
+  for(let i=0;i<=1000;i++){const phase=publicPlayPhase(i/1000);assert.ok(phase.approach>=previous.approach&&phase.landing>=previous.landing,'A public play must never return to the hand');previous=phase;}
   for(const contact of [.42,.62,.8]){
     assert.equal(deathProgress(contact-.01,contact),0,'A doomed fighter must remain intact until the actual contact, including long queues');
     assert.equal(deathProgress(contact,contact),0,'Contact applies the result before the death departure');

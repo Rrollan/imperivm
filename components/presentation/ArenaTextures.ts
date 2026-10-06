@@ -229,8 +229,8 @@ export class ArenaTextures {
     ctx.restore();
     // Board figures communicate art, attack and health. Full rules/names live in inspection.
     const definition=CARDS[minion.cardId];
-    this.badge(ctx, `${minion.attack}`, 67, 422, minion.attack>(definition.attack??0)?'#6b7c42':minion.attack<(definition.attack??0)?'#735140':'#a87924', 49);
-    this.badge(ctx, `${minion.health}`, 316, 422, minion.health<minion.maxHealth?'#963528':'#b04334', 49);
+    this.badge(ctx, `${minion.attack}`, 100, 388, minion.attack>(definition.attack??0)?'#6b7c42':minion.attack<(definition.attack??0)?'#735140':'#a87924', 66);
+    this.badge(ctx, `${minion.health}`, 284, 388, minion.health<minion.maxHealth?'#963528':'#b04334', 66);
     if(minion.lifesteal){
       ctx.save();ctx.translate(304,98);ctx.beginPath();ctx.arc(0,0,28,0,Math.PI*2);ctx.fillStyle='#632d29';ctx.fill();ctx.strokeStyle='#dcad78';ctx.lineWidth=4;ctx.stroke();
       ctx.beginPath();ctx.moveTo(0,-19);ctx.bezierCurveTo(7,-8,15,0,15,8);ctx.arc(0,8,15,0,Math.PI);ctx.bezierCurveTo(-15,0,-7,-8,0,-19);ctx.fillStyle='#f0c8a9';ctx.fill();ctx.restore();
