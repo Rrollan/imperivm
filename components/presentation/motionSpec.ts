@@ -22,3 +22,9 @@ export function attackTravel(progress: number) {
   if(progress<.48)return 1;
   return 1-smooth((progress-.48)/.52);
 }
+
+/** A long spell queue can move contact beyond halfway through the action. */
+export function deathProgress(progress:number,contact:number){
+  const after=(progress-contact)/Math.max(.001,1-contact);
+  return smooth((after-.12)/.88);
+}

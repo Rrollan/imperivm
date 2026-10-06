@@ -4,7 +4,7 @@ import { chooseAiAction } from '../lib/ai';
 import { GameSession, createLabGame } from '../components/presentation/GameSession';
 import { PresentationScheduler } from '../components/presentation/PresentationScheduler';
 import { videoCues } from '../components/presentation/videoCue';
-import {MOTION,settle,attackTravel} from '../components/presentation/motionSpec';
+import {MOTION,settle,attackTravel,deathProgress} from '../components/presentation/motionSpec';
 import {HEROES} from '../lib/heroes';
 import {abilityCues} from '../components/presentation/abilityCues';
 import {pixelRatio} from '../components/presentation/renderQuality';
@@ -115,6 +115,12 @@ async function main() {
   assert.equal(attackTravel(0),0);
   assert.equal(attackTravel(MOTION.attack.contact),1,'The card must contact its target with the damage/sound phase');
   assert.equal(attackTravel(1),0,'An attack must finish at its original position');
+  for(const contact of [.42,.62,.8]){
+    assert.equal(deathProgress(contact-.01,contact),0,'A doomed fighter must remain intact until the actual contact, including long queues');
+    assert.equal(deathProgress(contact,contact),0,'Contact applies the result before the death departure');
+    assert.ok(deathProgress((1+contact)/2,contact)>0,'Death departure must follow contact');
+    assert.equal(deathProgress(1,contact),1,'The death departure must finish with the batch');
+  }
   const runSettle=(step:number)=>{let value=0;for(let elapsed=0;elapsed<210;elapsed+=step)value=settle(value,1,Math.min(step,210-elapsed),MOTION.hoverMs);return value;};
   assert.ok(Math.abs(runSettle(7)-runSettle(30))<.00001,'Hover motion must be independent of frame rate');
   assert.equal(settle(0,1,1000,MOTION.hoverMs),1,'A stalled frame must catch up rather than stretch the animation');

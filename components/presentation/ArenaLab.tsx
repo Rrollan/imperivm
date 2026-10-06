@@ -13,7 +13,8 @@ import { useReducedMotion } from '../../lib/prefersReducedMotion';
 import { createLabGame, GameSession, type SessionSnapshot } from './GameSession';
 import type { ArenaRenderer, ArenaTarget, ArenaMetrics } from './createArena';
 import styles from './ArenaLab.module.css';
-import { cardRules, powerRules } from './rulesText';
+import { cardKeywords, cardRules, powerRules } from './rulesText';
+import { battleCommand, fighterReadiness, nextHalvingBlock, readinessText, unavailableCardText } from './battleReadability';
 import fxRegistry from '../../public/ui/arena-lab/fx/manifest.json';
 import type {RenderQuality} from './renderQuality';
 import {roleName,rankName,cardIdentity} from './cardIdentity';
@@ -187,6 +188,10 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
   const inspectedMinion = inspect?.kind === 'minion' ? shown.players[inspect.owner].board.find(m => m.uid === inspect.uid) : null;
   const playAction = inspect ? legal.find(a => (a.type === 'play-minion' || a.type === 'cast-spell') && a.uid === inspect.uid) : undefined;
   const stakeAction = inspect ? legal.find(a => (a.type === 'stake' || a.type === 'unstake') && a.uid === inspect.uid) : undefined;
+  const attackAction = inspect ? legal.find(a => a.type === 'attack' && a.attackerUid === inspect.uid) : undefined;
+  const inspectedReadiness = inspectedMinion && inspect ? fighterReadiness(shown,inspect.owner,inspectedMinion) : null;
+  const keywords = card ? cardKeywords(card.id,locale.locale) : [];
+  const rules = card ? cardRules(card.id,locale.locale,false) : '';
 
   const actionLabel = (action: Action) => {
     if (action.type === 'end-turn') return locale.t('Завершить ход', 'End turn');
@@ -220,12 +225,19 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
     {inspect && card && <section className={styles.inspection} role="dialog" aria-label={locale.cardName(card.id)}>
       <button className={styles.close} onClick={() => { setInspect(null); select(null); }} aria-label={locale.t('Закрыть просмотр', 'Close inspection')}>×</button>
       <img src={cardArtPath(card.id)} alt={locale.cardName(card.id)} />
-      <div><h2>{locale.cardName(card.id)}</h2><p className={styles.cardIdentity} style={{borderColor:cardIdentity(card.id).color}}>{roleName(card.id,locale.locale)} · {rankName(card.id,locale.locale)}</p><p>{cardRules(card.id, locale.locale)}</p>{card.type==='spell'&&<p className={styles.targetHint}>{locale.t('Указ: ждёт в очереди слева и срабатывает в начале следующего хода владельца.','Edict: waits in the left queue and resolves at the start of its owner’s next turn.')}</p>}{inspectedMinion?.staked && <p>{locale.t("Гарнизон: +1 приказ в начале хода. Не атакует.", "Garrison: +1 order at turn start. Cannot attack.")}</p>}
-        <dl><div><dt>{locale.t('Стоимость', 'Cost')}</dt><dd>{card.cost}</dd></div>{card.type === 'minion' && <><div><dt>{locale.t('Атака', 'Attack')}</dt><dd>{inspectedMinion?.attack ?? card.attack}</dd></div><div><dt>{locale.t('Здоровье', 'Health')}</dt><dd>{inspectedMinion?.health ?? card.health}</dd></div></>}</dl>
+      <div><h2>{locale.cardName(card.id)}</h2><p className={styles.cardIdentity} style={{borderColor:cardIdentity(card.id).color}}>{roleName(card.id,locale.locale)}<span>{rankName(card.id,locale.locale)}</span></p>
+        <dl><div><dt>{locale.t('Стоимость', 'Cost')}</dt><dd>{card.cost}</dd></div>{card.type === 'minion' && <><div><dt>{locale.t('Атака', 'Attack')}</dt><dd>{inspectedMinion?.attack ?? card.attack}</dd></div><div><dt>{locale.t('Здоровье', 'Health')}</dt><dd>{inspectedMinion?`${inspectedMinion.health}/${inspectedMinion.maxHealth}`:card.health}</dd></div></>}</dl>
+        {rules&&<p>{rules}</p>}
+        {keywords.length>0&&<div className={styles.keywords}>{keywords.map(keyword=><details key={keyword.name}><summary>{keyword.name}</summary><p>{keyword.description}</p></details>)}</div>}
+        {card.type==='spell'&&<p className={styles.targetHint}>{locale.t('Указ: ждёт в очереди слева и срабатывает в начале следующего хода владельца.','Edict: waits in the left queue and resolves at the start of its owner’s next turn.')}</p>}
+        {inspectedReadiness&&<p className={styles.fighterStatus}>{readinessText(inspectedReadiness,locale.locale)}</p>}
+        {inspectedMinion&&((inspectedMinion.attack!==card.attack)||(inspectedMinion.maxHealth!==card.health))&&<p className={styles.statChanges}>{locale.t('Базовые характеристики: ','Base stats: ')}{card.attack}/{card.health}. {locale.t('Сейчас: ','Now: ')}{inspectedMinion.attack}/{inspectedMinion.maxHealth}.</p>}
+        {inspectedMinion&&card.halvingPeriod&&<p className={styles.statChanges}>{locale.t('Следующее усиление: блок ','Next growth: block ')}{nextHalvingBlock(shown.block,card.halvingPeriod)}.</p>}
         {selected === inspect.uid && <p className={styles.targetHint}>{locale.t('Теперь нажмите на подсвеченную цель на поле.', 'Now click a highlighted target on the board.')}</p>}
       </div>
-      {(inspect.owner===0&&(inspect.kind==='hand'||stakeAction))&&<div className={styles.inspectionActions}>
-        {inspect.owner === 0 && inspect.kind === 'hand' && <button className={styles.primary} aria-label={playAction?locale.t('Разыграть','Play'):undefined} disabled={!playAction} onClick={() => { if (playAction) dispatch(playAction); }}>{playAction ? <><span className={styles.costChip}>{card.cost}</span>{locale.t('Разыграть', 'Play')}</> : locale.t('Недоступно в этом ходу', 'Unavailable this turn')}</button>}
+      {(inspect.owner===0&&(inspect.kind==='hand'||stakeAction||attackAction))&&<div className={styles.inspectionActions}>
+        {inspect.owner === 0 && inspect.kind === 'hand' && <button className={styles.primary} aria-label={playAction?locale.t('Разыграть','Play'):undefined} disabled={!playAction} onClick={() => { if (playAction) dispatch(playAction); }}>{playAction ? <><span className={styles.costChip}>{card.cost}</span>{locale.t('Разыграть', 'Play')}</> : unavailableCardText(view.state,card.id,locale.locale,view.busy)}</button>}
+        {attackAction&&<button className={styles.primary} onClick={()=>{select(inspect.uid);setInspect(null);}}>{locale.t('Атаковать','Attack')}</button>}
         {inspect.owner === 0 && stakeAction && <button onClick={() => dispatch(stakeAction)}>{stakeAction.type === 'stake' ? locale.t('Гарнизон · +1 приказ', 'Garrison · +1 order') : locale.t('Вернуть в бой', 'Return to battle')}</button>}
       </div>}
     </section>}
@@ -255,12 +267,12 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
         <button onClick={() => {const next=quality==='auto'?'sharp':quality==='sharp'?'fast':'auto';setQuality(next);try{localStorage.setItem('imperivm-arena-quality',next);}catch{}}}>{locale.t('Изображение: ', 'Image: ')}{quality==='auto'?locale.t('авто','auto'):quality==='sharp'?locale.t('чётче','sharper'):locale.t('быстрее','faster')}</button>
         <button onClick={() => { restart(); setHelp(false); }}>{locale.t('Начать заново', 'New battle')}</button>
       </div>
-      <details><summary>{locale.t('Управление', 'Controls')}</summary><p>{locale.t('Перетащите карту на поле. Скрещённые мечи — боец готов атаковать: выберите его и цель. Указы ждут начала следующего хода в очереди слева.', 'Drag a card to the court. Crossed swords mean a fighter can attack: select it and a target. Edicts wait in the left queue until the owner’s next turn.')}</p><button onClick={() => {setHelp(false);setKeyboard(true);}}>{locale.t('Действия с клавиатуры', 'Keyboard actions')}</button></details>
+      <details><summary>{locale.t('Управление', 'Controls')}</summary><p>{locale.t('Перетащите карту на поле. Скрещённые мечи — боец готов атаковать: выберите его и цель. Z — боец только вступил в строй. Перечёркнутый круг — действие потрачено. Тёплый свет на кнопке хода — доступных карт, атак и силы правителя больше нет; гарнизон остаётся по вашему выбору. Указы ждут начала следующего хода в очереди слева.', 'Drag a card to the court. Crossed swords mean a fighter can attack: select it and a target. Z marks a newly deployed fighter. A crossed circle means its action is spent. A warm turn button means no cards, attacks or ruler power remain; garrison is optional. Edicts wait in the left queue until the owner’s next turn.')}</p><button onClick={() => {setHelp(false);setKeyboard(true);}}>{locale.t('Действия с клавиатуры', 'Keyboard actions')}</button></details>
       <Link className={styles.leaveArena} href="/arena">{locale.t('Покинуть арену', 'Leave arena')}</Link>
     </section></div>}
 
     {shown.winner !== null && <div className={styles.modalBackdrop}><section ref={resultPanel} className={`${styles.result} ${victorySrc?styles.resultWithFx:''}`} role="dialog" aria-modal="true" aria-label={locale.t('Результат боя','Battle result')}><span className={styles.eyebrow}>IMPERIVM</span><div className={victorySrc?styles.victoryBanner:undefined}>{victorySrc&&<video key={view.revision} src={victorySrc} autoPlay muted playsInline aria-hidden="true"/>}<h2>{shown.winner === 0 ? locale.t('Ваша империя устояла', 'Your empire stands') : shown.winner === 'draw' ? locale.t('Империи пали вместе', 'Both empires fell') : locale.t('Казна опустела', 'The treasury is empty')}</h2></div><p>{locale.t('Каждая потеря — урок для следующего блока.', 'Every loss is a lesson for the next block.')}</p><button className={styles.primary} onClick={() => restart()}>{locale.t('Ещё один бой', 'Another battle')}</button></section></div>}
-    {debug && <output hidden data-action={JSON.stringify({last:lastAction,turn:shown.turn,block:shown.block,busy:view.busy,orders:me.gas,capacity:me.maxGas,queued:mempoolOf(shown,0).map(entry=>entry.cardId)})}/>}
+    {debug && <output hidden data-action={JSON.stringify({last:lastAction,turn:shown.turn,block:shown.block,busy:view.busy,command:view.busy?'busy':battleCommand(shown),orders:me.gas,capacity:me.maxGas,queued:mempoolOf(shown,0).map(entry=>entry.cardId)})}/>}
     {debug && metrics && <output className={styles.metrics} hidden data-perf={JSON.stringify(metrics)}>{metrics.drawCalls} draws · {Math.round(metrics.triangles).toLocaleString()} triangles · {metrics.meshes} meshes · {metrics.models} models · {metrics.failedModels} failed · {metrics.frameMedianMs}/{metrics.frameP95Ms} ms median/p95 · 1 canvas</output>}
   </main>;
 }

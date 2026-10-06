@@ -7,13 +7,14 @@ import type { Minion } from '../../lib/engine/types';
 import {cardIdentity} from './cardIdentity';
 import {cardArtPath} from '../../lib/cardArt';
 import {ordersView} from './ordersView';
+import type {BattleCommand,FighterReadiness} from './battleReadability';
 
 export type Face =
   | { kind: 'card'; cardId: string; playable?:boolean }
-  | { kind: 'minion'; minion: Minion; ready?: boolean }
+  | { kind: 'minion'; minion: Minion; ready?: boolean;readiness?:FighterReadiness }
   | { kind: 'hero'; heroId: string; treasury: number; model?: boolean }
   | { kind: 'power'; heroId: string; cost: number; available: boolean; model?: boolean }
-  | { kind: 'command'; state: 'own' | 'enemy' | 'busy' | 'over'; engraved?: boolean }
+  | { kind: 'command'; state: BattleCommand; engraved?: boolean }
   | { kind: 'gas'; gas: number; max: number; engraved?: boolean }
   | { kind: 'orders'; gas: number; max: number }
   | { kind: 'queued'; cardId:string; owner:0|1; count:number; ordinal:number }
@@ -98,7 +99,7 @@ export class ArenaTextures {
       ctx.clearRect(0, 0, size.width, size.height);
       if (face.kind === 'back') this.drawBack(ctx);
       else if (face.kind === 'card') this.drawCard(ctx, face.cardId,face.playable);
-      else if (face.kind === 'minion') this.drawMinion(ctx, face.minion, face.ready);
+      else if (face.kind === 'minion') this.drawMinion(ctx, face.minion, face.ready,face.readiness);
       else if (face.kind === 'hero') this.drawHero(ctx, face.heroId, face.treasury, face.model);
       else if (face.kind === 'power') this.drawPower(ctx, face);
       else if (face.kind === 'command') this.drawCommand(ctx, face.state, face.engraved);
@@ -213,7 +214,11 @@ export class ArenaTextures {
     if(view.bonus){ctx.font=`750 38px ${this.font}`;const label=`+${view.bonus} ${this.locale==='ru'?'бонус':'bonus'}`;ctx.fillStyle='#f3c67c';ctx.strokeText(label,1136,146);ctx.fillText(label,1136,146);}
   }
 
-  private drawMinion(ctx: CanvasRenderingContext2D, minion: Minion, ready=false) {
+  private drawMinion(ctx: CanvasRenderingContext2D, minion: Minion, ready=false,readiness?:FighterReadiness) {
+    if(minion.taunt){
+      ctx.save();ctx.beginPath();ctx.moveTo(21,100);ctx.quadraticCurveTo(192,-8,363,100);ctx.lineTo(351,322);ctx.quadraticCurveTo(326,404,192,470);ctx.quadraticCurveTo(58,404,33,322);ctx.closePath();
+      ctx.fillStyle='#726649';ctx.fill();ctx.strokeStyle='#ede0bc';ctx.lineWidth=13;ctx.stroke();ctx.restore();
+    }
     ctx.save();
     ctx.beginPath(); ctx.ellipse(192, 225, 159, 197, 0, 0, Math.PI * 2);
     ctx.fillStyle = '#593c24'; ctx.fill(); ctx.lineWidth = minion.taunt ? 24 : 17; ctx.strokeStyle = minion.taunt ? '#ddd1af' : '#d5aa63'; ctx.stroke();
@@ -223,13 +228,18 @@ export class ArenaTextures {
     if (art) cover(ctx, art, 32, 27, 320, 400);
     ctx.restore();
     // Board figures communicate art, attack and health. Full rules/names live in inspection.
-    this.badge(ctx, `${minion.attack}`, 67, 422, '#a87924', 49);
-    this.badge(ctx, `${minion.health}`, 316, 422, '#b04334', 49);
+    const definition=CARDS[minion.cardId];
+    this.badge(ctx, `${minion.attack}`, 67, 422, minion.attack>(definition.attack??0)?'#6b7c42':minion.attack<(definition.attack??0)?'#735140':'#a87924', 49);
+    this.badge(ctx, `${minion.health}`, 316, 422, minion.health<minion.maxHealth?'#963528':'#b04334', 49);
+    if(minion.lifesteal){
+      ctx.save();ctx.translate(304,98);ctx.beginPath();ctx.arc(0,0,28,0,Math.PI*2);ctx.fillStyle='#632d29';ctx.fill();ctx.strokeStyle='#dcad78';ctx.lineWidth=4;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(0,-19);ctx.bezierCurveTo(7,-8,15,0,15,8);ctx.arc(0,8,15,0,Math.PI);ctx.bezierCurveTo(-15,0,-7,-8,0,-19);ctx.fillStyle='#f0c8a9';ctx.fill();ctx.restore();
+    }
     if (minion.staked) {
       ctx.fillStyle = '#1b5557'; ctx.beginPath(); ctx.arc(192,456,39,0,Math.PI*2); ctx.fill();
       ctx.strokeStyle = '#d9e5c8'; ctx.lineWidth = 9; ctx.beginPath(); ctx.arc(192,443,15,Math.PI,0); ctx.stroke();
       ctx.fillStyle = '#d9e5c8'; rounded(ctx,171,442,42,35,5); ctx.fill();
-    } else if(ready){
+    } else if(ready||readiness==='ready'||readiness==='rush'){
       ctx.save();ctx.translate(192,452);
       ctx.fillStyle='#49301d';ctx.strokeStyle='#e6bc6b';ctx.lineWidth=5;
       ctx.beginPath();ctx.arc(0,0,36,0,Math.PI*2);ctx.fill();ctx.stroke();
@@ -239,6 +249,10 @@ export class ArenaTextures {
         ctx.fillStyle='#d1a253';ctx.fillRect(-12,12,24,5);ctx.fillRect(-3,17,6,12);ctx.restore();
       }
       ctx.restore();
+    }else if(readiness==='fresh'){
+      ctx.save();ctx.fillStyle='#d7cdb8';ctx.strokeStyle='#483728';ctx.lineWidth=6;ctx.font=`800 58px ${this.font}`;ctx.textAlign='center';ctx.strokeText('Z',192,470);ctx.fillText('Z',192,470);ctx.restore();
+    }else if(readiness==='exhausted'||readiness==='no-target'){
+      ctx.save();ctx.strokeStyle='#776e5b';ctx.lineWidth=7;ctx.beginPath();ctx.arc(192,452,24,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(179,465);ctx.lineTo(205,439);ctx.stroke();ctx.restore();
     }
   }
 
@@ -279,16 +293,21 @@ export class ArenaTextures {
 
   private drawCommand(ctx: CanvasRenderingContext2D, state: Extract<Face, { kind: 'command' }>['state'], engraved = false) {
     const image = this.image('/ui/arena-lab/turn-command.webp');
-    ctx.save(); ctx.globalAlpha = state === 'own' ? 1 : .65;
+    const available=state==='own'||state==='done';
+    ctx.save(); ctx.globalAlpha = available ? 1 : .65;
     if (!engraved) {
       if (image) ctx.drawImage(image, 0, 0, 768, 288);
       else { rounded(ctx, 10, 22, 748, 244, 30); ctx.fillStyle = '#553b24'; ctx.fill(); }
     }
     ctx.restore();
-    const label = state === 'own' ? (this.locale === 'ru' ? 'Конец хода' : 'End turn') : state === 'enemy' ? (this.locale === 'ru' ? 'Ход ИИ' : 'Opponent') : state === 'busy' ? (this.locale === 'ru' ? 'Бой…' : 'Resolving…') : (this.locale === 'ru' ? 'Бой окончен' : 'Battle over');
+    if(state==='done'){
+      const light=ctx.createRadialGradient(384,145,35,384,145,310);light.addColorStop(0,'#e9b95840');light.addColorStop(1,'#e9b95800');ctx.fillStyle=light;rounded(ctx,96,67,576,156,35);ctx.fill();
+    }
+    const label = available ? (this.locale === 'ru' ? 'Конец хода' : 'End turn') : state === 'enemy' ? (this.locale === 'ru' ? 'Ход соперника' : 'Opponent') : state === 'busy' ? (this.locale === 'ru' ? 'Бой…' : 'Resolving…') : (this.locale === 'ru' ? 'Бой окончен' : 'Battle over');
     ctx.font = `800 108px ${this.font}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const size=Math.min(108,108*590/Math.max(1,ctx.measureText(label).width));ctx.font=`800 ${size}px ${this.font}`;
     ctx.strokeStyle = '#1d100b'; ctx.lineWidth = 9; ctx.strokeText(label, 384, 145);
-    ctx.fillStyle = state === 'own' ? '#fff0c7' : '#c2b39a'; ctx.fillText(label, 384, 145);
+    ctx.fillStyle = state === 'done' ? '#fff5d0' : state==='own'?'#f2dfb4':'#c2b39a'; ctx.fillText(label, 384, 145);
   }
 
   private drawGas(ctx: CanvasRenderingContext2D, gas: number, max: number, engraved = false) {

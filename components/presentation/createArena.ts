@@ -27,7 +27,8 @@ import { ArenaEffects } from './ArenaEffects';
 import { ArenaSpriteEffects } from './ArenaSpriteEffects';
 import { videoCues, VIDEO_IDS } from './videoCue';
 import type { PresentationBatch } from './GameSession';
-import {MOTION, smooth, settle, attackTravel} from './motionSpec';
+import {MOTION, smooth, settle, attackTravel,deathProgress} from './motionSpec';
+import {battleCommand,fighterReadiness} from './battleReadability';
 import {ArenaAbilityEffects} from './ArenaAbilityEffects';
 import {ArenaDeploymentEffects} from './ArenaDeploymentEffects';
 import {pixelRatio, type RenderQuality} from './renderQuality';
@@ -244,8 +245,9 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   function sync(state: GameState) {
     const changed=shown!==null&&shown!==state;
     shown = state;
-    const readyAttackers=new Set(!activeBatch&&state.turn===0?legalActions(state).flatMap(action=>action.type==='attack'?[action.attackerUid]:[]):[]);
-    const playableCards=new Set(!activeBatch&&state.turn===0?legalActions(state).flatMap(action=>action.type==='play-minion'||action.type==='cast-spell'?[action.uid]:[]):[]);
+    const stateActions=legalActions(state);
+    const readyAttackers=new Set(!activeBatch&&state.turn===0?stateActions.flatMap(action=>action.type==='attack'?[action.attackerUid]:[]):[]);
+    const playableCards=new Set(!activeBatch&&state.turn===0?stateActions.flatMap(action=>action.type==='play-minion'||action.type==='cast-spell'?[action.uid]:[]):[]);
     const used = new Set<string>();
     const keep = (id: string, data: ArenaTarget, face: Face, w: number, h: number, x: number, y: number, z = 0) => {
       used.add(id);const old=entities.get(id),previous=old?.root.position.clone(); const entry = entity(id,data,face,w/50,h/50);
@@ -263,7 +265,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       const owner = index as 0|1;
       keep(`hero-${owner}`,{kind:'hero',uid:`hero-${owner}`,owner},{kind:'hero',heroId:player.heroId,treasury:player.treasury},portrait?190:205,portrait?205:220,heroX(),heroY(owner),-1.6);
       const spacing = Math.min(portrait?124:150,(portrait?700:980)/Math.max(1,player.board.length));
-      player.board.forEach((m,i)=>keep(m.uid,{kind:'minion',uid:m.uid,owner,cardId:m.cardId},{kind:'minion',minion:m,ready:readyAttackers.has(m.uid)},portrait?120:145,portrait?162:196,800+(i-(player.board.length-1)/2)*spacing,rowY(owner),-.15));
+      player.board.forEach((m,i)=>keep(m.uid,{kind:'minion',uid:m.uid,owner,cardId:m.cardId},{kind:'minion',minion:m,ready:readyAttackers.has(m.uid),readiness:fighterReadiness(state,owner,m,stateActions)},portrait?120:145,portrait?162:196,800+(i-(player.board.length-1)/2)*spacing,rowY(owner),-.15));
     });
     const hand = state.players[0].hand;
     const spacing = Math.min(portrait?136:155,(portrait?670:900)/Math.max(1,hand.length-1));
@@ -280,7 +282,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     }
     const native = (id:string,kind:ArenaTarget['kind'],face:Face,w:number,h:number,x:number,y:number)=>keep(id,{kind,uid:id,owner:0},face,w,h,x,y,-.5);
     const me=state.players[0];
-    native('turn-command','command',{kind:'command',state:activeBatch?'busy':state.winner!==null?'over':state.turn===0?'own':'enemy',engraved:true},190,72,portrait?1165:1452,portrait?621:465);
+    native('turn-command','command',{kind:'command',state:activeBatch?'busy':battleCommand(state,stateActions),engraved:true},190,72,portrait?1165:1452,portrait?621:465);
     native('hero-power','power',{kind:'power',heroId:me.heroId,cost:effectivePowerCost(state,0),available:state.turn===0&&legalActions(state).some(a=>a.type==='hero-power')},101,101,portrait?960:975,portrait?792:703);
     native('gas-counter','gas',{kind:'orders',gas:me.gas,max:me.maxGas},portrait?650:488,portrait?68:54,portrait?876:1391,portrait?905:760);
     native('block-counter','block',{kind:'block',block:state.block},60,78,portrait?446:234,portrait?70:220);
@@ -555,7 +557,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       effects.tick(progress,impactAt,options.reducedMotion);
       deployments.tick(progress,impactAt,options.reducedMotion);
       abilities.tick(progress,impactAt,options.reducedMotion);
-      if (progress > .55) deadObjects.forEach(entry => { if (!entry.root.isDisposed()) entry.root.scaling.setAll(Math.max(.02, 1 - (progress - .55) / .45)); });
+      const death=deathProgress(progress,impactAt);
+      if(death>0)deadObjects.forEach(entry=>{if(!entry.root.isDisposed())entry.root.scaling.setAll(Math.max(.02,1-death));});
       if (!options.reducedMotion) {
         if (batch.action.type === 'end-turn'){sandStream.setEnabled(progress>.15&&progress<.8);}
         if (batch.action.type === 'hero-power') entities.get('hero-power')?.root.scaling.setAll(1+Math.sin(progress*Math.PI)*.04);
@@ -595,7 +598,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       batch.after.players.forEach((player, owner) => {
         const hero = entities.get(`hero-${owner}`);
         if (hero) paint(hero,{ kind: 'hero', heroId: player.heroId, treasury: player.treasury });
-        player.board.forEach(minion => { const entry = entities.get(minion.uid); if (entry) paint(entry, { kind: 'minion', minion }); });
+        player.board.forEach(minion => { const entry = entities.get(minion.uid); if (entry) paint(entry, { kind: 'minion', minion,readiness:fighterReadiness(batch.after,owner as 0|1,minion) }); });
       });
       const gas = entities.get('gas-counter'); if (gas) paint(gas, { kind: 'orders', gas: batch.after.players[0].gas, max: batch.after.players[0].maxGas });
       gasFill(batch.after);

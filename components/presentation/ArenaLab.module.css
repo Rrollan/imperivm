@@ -15,11 +15,11 @@
 .loading { position:absolute;z-index:15;inset:0;background:#172019;display:grid;place-content:center;text-align:center; }
 .loading > div { margin:auto;width:96px;height:96px;border:2px solid #bda16a;border-radius:50%;font:700 44px/92px var(--font-roman);color:#ddc38f; }.loading p { margin-top:25px;color:#d1c6af; }
 .error { position:absolute;z-index:12;top:90px;left:50%;transform:translateX(-50%);max-width:min(520px,95%);background:#352019f5;border:1px solid #b9785e;border-radius:8px;padding:15px 55px 15px 18px;color:#f1d9c9; }.error span,.error strong,.error a { display:block; }.error button { position:absolute;top:5px;right:5px;padding:5px;border:0; }
-.shell .close { position:absolute;right:10px;top:9px;min-width:36px;min-height:36px;width:36px;height:36px;padding:3px;border:0;border-radius:50%;background:#50361edb !important;box-shadow:none;font-size:27px;line-height:1;color:#fff0cd; }
+.shell .close { position:absolute;right:10px;top:9px;min-width:44px;min-height:44px;width:44px;height:44px;padding:3px;border:0;border-radius:50%;background:#50361edb !important;box-shadow:none;font-size:27px;line-height:1;color:#fff0cd; }
 .inspection { position:absolute;z-index:5;top:50%;left:16px;transform:translateY(-50%);width:246px;max-height:calc(100% - 32px);overflow:auto;padding:10px;border:5px ridge #96703b;border-radius:28px 28px 18px 18px;background:#eeddb5;color:#322418;box-shadow:0 15px 45px #0009; }
 .inspection > img { display:block;width:100%;height:250px;object-fit:contain;background:#372819;border-radius:12px 12px 4px 4px; }.inspection > div { padding:5px 8px; }
 .inspection h2 { font:700 23px/1.1 var(--font-roman);color:#3f2b1b;margin:8px 0 12px;text-align:center; }.inspection h3 { color:#594021;font-size:19px; }.inspection p { color:#33291b;font-size:16px;line-height:1.45; }
-.inspection dl { display:flex;justify-content:space-between;margin:9px 0;gap:10px; }.inspection dl div { display:grid; }.inspection dt { color:#685337;font-size:12px; }.inspection dd { margin:0;color:#3c2817;font-size:27px;font-weight:700; }
+.inspection dl { display:flex;justify-content:space-between;margin:9px 0;gap:10px; }.inspection dl div { display:grid; }.inspection dt { color:#685337;font-size:14px; }.inspection dd { margin:0;color:#3c2817;font-size:27px;font-weight:700; }
 .inspection .targetHint { color:#355e35;font-size:15px;font-weight:700; }
 .inspection button:not(.close) { display:block;width:100%;min-height:48px;margin-top:12px;color:#fff0d0 !important;background:linear-gradient(#80603a,#453020) !important;border:2px solid #a58049;font-size:17px;font-weight:750;line-height:1.25;padding:11px 8px;text-shadow:0 1px 2px #1a0d06; }
 .inspection button:disabled { opacity:1;color:#e6d5b8 !important;background:#655744 !important;filter:none; }
@@ -44,8 +44,12 @@
 .settingsButton svg{display:none;}
 
 .inspection .cardIdentity{font-size:16px;font-weight:700;border-bottom:3px solid;padding-bottom:8px;text-align:center;color:#493224;}
+.cardIdentity span{display:block;margin-top:3px;font-size:15px;font-weight:500;}
 .inspection .inspectionActions{position:sticky;bottom:-10px;margin:0 -5px -5px;padding:8px;background:#eeddb5;border-top:1px solid #b89b6b;}
 .inspection .inspectionActions button{margin:0;}
+.inspection .inspectionActions button+button{margin-top:8px;}
+.keywords details{border-top:1px solid #b79b70;}.keywords summary{display:flex;align-items:center;min-height:44px;cursor:pointer;font-size:16px;font-weight:750;color:#54391f;}.keywords summary::before{content:'+';margin-right:8px;font-size:22px;}.keywords details[open] summary::before{content:'−';}.keywords p{margin:0 0 12px;}
+.inspection .fighterStatus{padding:9px 0;border-top:1px solid #b79b70;border-bottom:1px solid #b79b70;font-size:16px;font-weight:750;color:#54391f;}.inspection .statChanges{font-size:15px;color:#654624;}
 .costChip{display:inline-grid;place-items:center;width:29px;height:29px;margin-right:9px;border:2px solid #d9bd80;border-radius:50%;background:#245f74;color:#fff1d1;font-weight:800;vertical-align:middle;}
 .mulligan{width:min(800px,100%);max-height:96%;overflow:auto;border:6px ridge #876037;border-radius:24px;padding:22px;background:#dfc795 url('/ui/arena-lab/playing-surface.webp') center/cover;color:#412918;text-align:center;box-shadow:0 20px 65px #0009;}
 .mulligan h2{font-size:30px;line-height:1.15;margin:0 0 12px;}.mulligan p{margin:0 0 18px;font-size:16px;line-height:1.4;}

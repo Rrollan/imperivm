@@ -8,7 +8,7 @@ export function effectText(effect: EffectDef, locale: Locale): string {
   const ru = locale === 'ru', n = effect.amount ?? (effect.kind==='draw'||effect.kind==='gain-gas'?1:0);
   switch (effect.kind) {
     case 'damage-all-enemy-minions': return ru ? `${n} урона всем бойцам противника.` : `Deal ${n} damage to all enemy fighters.`;
-    case 'damage-random-enemy': return ru ? `${n} урона случайному противнику.` : `Deal ${n} damage to a random enemy.`;
+    case 'damage-random-enemy': return ru ? `${n} урона случайному бойцу противника. Если бойцов нет — казне.` : `Deal ${n} damage to a random enemy fighter, or the treasury if none remain.`;
     case 'damage-enemy-treasury': return ru ? `${n} урона казне противника.` : `Deal ${n} damage to the enemy treasury.`;
     case 'heal-own-minions': return ru ? `Восстанавливает ${n} здоровья всем своим бойцам до их максимума.` : `Restore ${n} health to all friendly fighters, up to their maximum.`;
     case 'weaken-random-enemy': return ru ? `Случайному бойцу врага −${n} атаки, минимум 0.` : `Reduce a random enemy fighter’s attack by ${n}, minimum 0.`;
@@ -22,16 +22,28 @@ export function effectText(effect: EffectDef, locale: Locale): string {
   }
 }
 
-export function cardRules(id: string, locale: Locale) {
+export function cardKeywords(id:string,locale:Locale){
+  const card=CARDS[id],ru=locale==='ru';
+  return [
+    card.taunt&&{name:ru?'Провокация':'Taunt',description:ru?'Противник сначала должен атаковать бойцов с Провокацией.':'Enemies must attack fighters with Taunt first.'},
+    card.rush&&{name:ru?'Натиск':'Rush',description:ru?'Атакует бойцов сразу после выхода. Правителя — со следующего хода владельца.':'Can attack fighters immediately. Can attack the ruler on the owner’s next turn.'},
+    card.lifesteal&&{name:ru?'Похищение жизни':'Lifesteal',description:ru?'Восстанавливает казну владельца на величину фактически нанесённого урона.':'Restore the owner’s treasury by the actual damage dealt.'},
+    card.priority&&{name:ru?'Приоритет':'Priority',description:ru?'При розыгрыше отменяет самый дорогой указ противника в очереди.':'On play, counter the most expensive queued enemy edict.'},
+  ].filter((value):value is {name:string;description:string}=>!!value);
+}
+
+export function cardRules(id: string, locale: Locale,includeKeywords=true) {
   const card = CARDS[id], ru = locale === 'ru', rules: string[] = [];
-  if (card.taunt) rules.push(ru ? 'Провокация.' : 'Taunt.');
-  if (card.rush) rules.push(ru ? 'Натиск: сразу атакует бойцов.' : 'Rush: can attack fighters immediately.');
-  if (card.lifesteal) rules.push(ru ? 'Похищение жизни.' : 'Lifesteal.');
-  if (card.priority) rules.push(ru ? 'Приоритет.' : 'Priority.');
+  if(includeKeywords){
+    if (card.taunt) rules.push(ru ? 'Провокация.' : 'Taunt.');
+    if (card.rush) rules.push(ru ? 'Натиск: сразу атакует бойцов.' : 'Rush: can attack fighters immediately.');
+    if (card.lifesteal) rules.push(ru ? 'Похищение жизни.' : 'Lifesteal.');
+    if (card.priority) rules.push(ru ? 'Приоритет.' : 'Priority.');
+  }
   if (card.battlecry) rules.push(`${ru ? 'При выходе:' : 'On arrival:'} ${effectText(card.battlecry, locale)}`);
   if (card.spell) rules.push(effectText(card.spell, locale));
   if (card.halvingPeriod) rules.push(ru ? `Каждые ${card.halvingPeriod} блока: +1/+1.` : `Every ${card.halvingPeriod} blocks: +1/+1.`);
-  return rules.join(' ') || (ru ? 'Боец без дополнительных способностей.' : 'A fighter with no additional abilities.');
+  return rules.join(' ') || (!includeKeywords&&cardKeywords(id,locale).length?'':ru ? 'Боец без дополнительных способностей.' : 'A fighter with no additional abilities.');
 }
 
 export function powerRules(id: string, locale: Locale) {

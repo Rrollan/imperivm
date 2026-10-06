@@ -7,7 +7,7 @@ import type { Scene } from '@babylonjs/core/scene';
 import type { Mesh } from '@babylonjs/core/Meshes/mesh';
 import type { PresentationBatch } from './GameSession';
 
-type Flash = { mesh: Mesh; texture: DynamicTexture; material: StandardMaterial; origin: Vector3; kind: 'damage' | 'heal' | 'gas' | 'arrival' | 'buff' };
+type Flash = { mesh: Mesh; texture: DynamicTexture; material: StandardMaterial; origin: Vector3; kind: 'damage' | 'heal' | 'gas' | 'arrival' | 'buff' | 'weaken' };
 
 /** Transient feedback uses the same battle clock and camera as the pieces. */
 export class ArenaEffects {
@@ -85,12 +85,16 @@ export class ArenaEffects {
       const {texture,mesh,material}=flash;
       const ctx=texture.getContext() as unknown as CanvasRenderingContext2D;
       ctx.clearRect(0,0,256,256);
-      const colour=kind==='heal'?'#bff0b0':kind==='gas'?'#ffcf71':kind==='damage'?'#ffd4ac':'#ffe6a6';
+      const colour=kind==='heal'?'#bff0b0':kind==='gas'?'#ffcf71':kind==='damage'?'#ffd4ac':kind==='weaken'?'#e6c795':'#ffe6a6';
       ctx.strokeStyle=colour;ctx.lineWidth=3;
       // Damage is a crisp readable number; the contact accent owns the small spark.
       if(kind!=='damage'&&!label){ctx.globalAlpha=.45;ctx.beginPath();ctx.arc(128,128,72,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}
       if(label){ctx.font=`800 ${label.length>3?48:72}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle='#3d2118';ctx.lineWidth=7;ctx.strokeText(label,128,130);ctx.fillStyle=colour;ctx.fillText(label,128,130);}
+      if(kind==='weaken'){
+        ctx.beginPath();ctx.moveTo(109,196);ctx.lineTo(147,165);ctx.moveTo(113,170);ctx.lineTo(140,198);ctx.strokeStyle='#3d2118';ctx.lineWidth=10;ctx.stroke();ctx.strokeStyle=colour;ctx.lineWidth=4;ctx.stroke();
+      }
       texture.update();mesh.position.copyFrom(position);mesh.position.y+=kind==='heal'?.65:kind==='buff'?-.65:0;mesh.position.z=-11;mesh.scaling.setAll(1);mesh.setEnabled(false);material.alpha=1;
+      if(kind==='weaken'){mesh.position.x-=.7;mesh.position.y-=.8;}
       flash.origin.copyFrom(mesh.position);flash.kind=kind;this.flashes.push(flash);
     };
     const healed=new Map<string,number>(),weakened=new Map<string,number>(),damaged=new Map<string,number>(),buffed=new Map<string,{attack:number;health:number}>();
@@ -103,12 +107,12 @@ export class ArenaEffects {
     batch.events?.damages?.forEach(d=>{const delta=d.health-d.prevHealth;if(delta&&!healed.has(d.uid)&&!damaged.has(d.uid)&&!buffed.has(d.uid)&&!batch.events?.halvings?.some(h=>h.uid===d.uid))add(locate(d.uid),`${delta>0?'+':'−'}${Math.abs(delta)}`,delta>0?'heal':'damage');});
     healed.forEach((amount,uid)=>add(locate(uid),`+${amount}`,'heal'));
     damaged.forEach((amount,uid)=>add(locate(uid),`−${amount}`,'damage'));
-    weakened.forEach((amount,uid)=>add(locate(uid),`−${amount}`,'damage'));
+    weakened.forEach((amount,uid)=>add(locate(uid),`−${amount}`,'weaken'));
     batch.after.players.forEach((player,owner)=>{
       const delta=player.treasury-batch.before.players[owner].treasury;
       if(delta&&!healed.has(`hero-${owner}`)&&!damaged.has(`hero-${owner}`))add(locate(`hero-${owner}`),`${delta>0?'+':'−'}${Math.abs(delta)}`,delta>0?'heal':'damage');
     });
-    batch.events?.statChanges?.filter(s=>s.attackAfter<s.attackBefore&&!weakened.has(s.uid)).forEach(s=>add(locate(s.uid),`−${s.attackBefore-s.attackAfter}`,'damage'));
+    batch.events?.statChanges?.filter(s=>s.attackAfter<s.attackBefore&&!weakened.has(s.uid)).forEach(s=>add(locate(s.uid),`−${s.attackBefore-s.attackAfter}`,'weaken'));
     batch.events?.halvings?.forEach(h=>{const value=buffed.get(h.uid)??{attack:0,health:0};value.attack++;value.health++;buffed.set(h.uid,value);});
     buffed.forEach((value,uid)=>{if(value.attack||value.health)add(locate(uid),`+${value.attack}/+${value.health}`,'buff');});
     if(batch.action.type==='hero-power'){
