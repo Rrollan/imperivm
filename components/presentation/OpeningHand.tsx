@@ -1,6 +1,6 @@
 import {CARDS} from '../../lib/cards';
 import {cardName,type Locale} from '../../lib/locale';
-import {cardArtPath} from '../../lib/cardArt';
+import {ArenaCardPreview} from './ArenaCardPreview';
 import type {HandCard} from '../../lib/engine/types';
 import styles from './ArenaLab.module.css';
 
@@ -16,10 +16,7 @@ export function OpeningHand({hand,selected,locale,onToggle,onConfirm}: {
       {hand.map(entry=>{
         const card=CARDS[entry.cardId],name=cardName(card.id,locale),marked=selected.includes(entry.uid);
         return <button key={entry.uid} className={`${styles.openingCard} ${marked?styles.openingCardSelected:''}`} aria-pressed={marked} aria-label={`${name}: ${marked?(ru?'оставить в руке':'keep in hand'):(ru?'выбрать для замены':'select to replace')}`} onClick={()=>onToggle(entry.uid)}>
-          <span className={styles.openingCost} title={ru?'Стоимость':'Cost'}>{card.cost}</span>
-          <img src={cardArtPath(card.id)} alt="" />
-          <strong>{name}</strong>
-          <span className={styles.openingStats}>{card.type==='minion'?<><span title={ru?'Атака':'Attack'}>{card.attack}</span><span title={ru?'Здоровье':'Health'}>{card.health}</span></>:<span>{ru?'Указ':'Edict'}</span>}</span>
+          <ArenaCardPreview id={card.id} locale={locale} label={`${name}. ${ru?'Приказы':'Orders'}: ${card.cost}${card.type==='minion'?`. ${ru?'Атака':'Attack'}: ${card.attack}. ${ru?'Здоровье':'Health'}: ${card.health}`:''}`}/>
           <span className={styles.openingDecision}>{marked?(ru?'На замену':'Replace'):(ru?'Оставляем':'Keep')}</span>
         </button>;
       })}

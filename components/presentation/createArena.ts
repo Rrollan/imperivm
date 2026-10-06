@@ -33,6 +33,10 @@ import {fighterRow} from './battleLayout';
 import {ArenaAbilityEffects} from './ArenaAbilityEffects';
 import {ArenaDeploymentEffects} from './ArenaDeploymentEffects';
 import {pixelRatio, type RenderQuality} from './renderQuality';
+import {effectTimeline,effectFrame,deathWindow} from './effectTimeline';
+import {queueSlot,queueAnchor} from './queueLayout';
+import {CARD_FACE} from './cardFace';
+import {ordersLayout} from './ordersView';
 
 export type ArenaTarget = { kind: 'hand' | 'minion' | 'hero' | 'power' | 'command' | 'gas' | 'block' | 'deck' | 'scroll' | 'queue'; uid: string; owner: 0 | 1; cardId?: string };
 export interface ArenaMetrics { meshes: number; triangles: number; drawCalls: number; renderScale: number; renderWidth: number; renderHeight: number; models: number; failedModels: number; frames: number; frameMedianMs: number; frameP95Ms: number; renderP95Ms: number; gpu: string; pending: string[] }
@@ -110,9 +114,10 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   // x=350+.9*px, y=-130+.9*py; landscape uses its 1600×1000 pixels directly.
   const heroX=()=>portrait?793:800;
   const heroY=(owner:number)=>owner===0?(portrait?774:686):(portrait?20:148);
-  const queueX=()=>portrait?443:230;
-  const queueY=(owner:number)=>owner===0?525:339;
-  const handY=()=>portrait?1020:865;
+  const queueX=()=>queueSlot(0,portrait).x;
+  const queueY=(owner:number)=>queueSlot(owner,portrait).y;
+  const handY=()=>portrait?1030:865;
+  const ordersFace=(state:GameState):Face=>({kind:'orders',gas:state.players[0].gas,max:state.players[0].maxGas,portrait});
   const entities = new Map<string, Entity>();
   let heldArrival: Entity | null = null;
   let drawFlights:{entry:Entity;start:Vector3;target:Vector3;face:Face;delay:number;revealed:boolean;temporary:boolean}[]=[];
@@ -141,7 +146,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   const board = MeshBuilder.CreatePlane('painted Roman arena', { width: 32, height: 20 }, scene);
   board.position.z = 1.7; board.isPickable = false; board.receiveShadows = true;
   const boardMaterial = material('painted arena surface', '#ffffff', 0);
-  const painting = new Texture('/ui/arena-lab/roman-board-integrated.webp', scene, false, true, Texture.TRILINEAR_SAMPLINGMODE, request, request);
+  const painting = new Texture('/ui/arena-lab/native/roman-board-ten-orders.webp', scene, false, true, Texture.TRILINEAR_SAMPLINGMODE, request, request);
   painting.wrapU = Texture.CLAMP_ADDRESSMODE; painting.wrapV = Texture.CLAMP_ADDRESSMODE;
   boardMaterial.diffuseTexture = painting; boardMaterial.emissiveTexture = painting; boardMaterial.emissiveColor = new Color3(.32,.32,.32); board.material = boardMaterial;
   let portraitPainting:Texture|undefined;
@@ -160,9 +165,10 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   sandStream.parent=hourglass;sandStream.material=sandMaterial;sandStream.isPickable=false;sandStream.position.set(0,-.13,-.6);sandStream.setEnabled(false);
   const gasRack=new TransformNode('orders anchor',scene);
   function gasFill(state:GameState){
-    gasRack.position.copyFrom(point(portrait?811:1347,portrait?905:760));
+    const layout=ordersLayout(portrait);
+    gasRack.position.copyFrom(point(layout.anchorX,layout.anchorY));
     const counter=entities.get('gas-counter');
-    if(counter)paint(counter,{kind:'orders',gas:state.players[0].gas,max:state.players[0].maxGas});
+    if(counter)paint(counter,ordersFace(state));
   }
 
   function paint(entry: Entity, face: Face) {
@@ -186,7 +192,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     if (face.kind === 'hero') {
       // The Whale bas-relief's fine silhouette is clearer in its existing,
       // well-lit model poster at this small size, with no extra GLB or shader.
-      if(face.heroId==='whale'){entry.backing.setEnabled(false);return;}
+      if(face.heroId==='whale'||face.heroId==='builder'){entry.backing.setEnabled(false);return;}
       // The painted socket is the frame; one real relief coin sits inside it.
       // Avoid two conflicting frames and the incomplete inner geometry of the Tripo ring.
       void attach(`hero-${face.heroId}` as ModelId, {width:(portrait?125:144)/50,height:(portrait?116:128)/50,depth:.20,stretch:true},new Vector3(0,0,-.65)).then(handle=>{
@@ -269,8 +275,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       player.board.forEach((m,i)=>keep(m.uid,{kind:'minion',uid:m.uid,owner,cardId:m.cardId},{kind:'minion',minion:m,ready:readyAttackers.has(m.uid),readiness:fighterReadiness(state,owner,m,stateActions)},row.width,row.height,row.center+(i-(player.board.length-1)/2)*row.spacing,row.y,-.15));
     });
     const hand = state.players[0].hand;
-    const spacing = Math.min(portrait?136:155,(portrait?670:900)/Math.max(1,hand.length-1));
-    hand.forEach((c,i)=>{const x=800+(i-(hand.length-1)/2)*spacing;keep(c.uid,{kind:'hand',uid:c.uid,owner:0,cardId:c.cardId},{kind:'card',cardId:c.cardId,playable:playableCards.has(c.uid)},portrait?150:168,portrait?208:234,x,handY()+Math.abs(x-800)*.024,-1-i*.015);});
+    const spacing = Math.min(portrait?116:130,(portrait?670:900)/Math.max(1,hand.length-1));
+    hand.forEach((c,i)=>{const x=800+(i-(hand.length-1)/2)*spacing,h=portrait?196:234;keep(c.uid,{kind:'hand',uid:c.uid,owner:0,cardId:c.cardId},{kind:'card',cardId:c.cardId,playable:playableCards.has(c.uid)},h*CARD_FACE.ratio,h,x,handY()+Math.abs(x-800)*.024,-1-i*.015);});
     const backs = Math.min(8,state.players[1].hand.length);
     for(let i=0;i<backs;i++){const e=keep(`back-${i}`,{kind:'hand',uid:`back-${i}`,owner:1},{kind:'back'},50,70,800+(i-(backs-1)/2)*40,portrait?-93:35,.5);e.face.isPickable=false;}
     for(const owner of [0,1] as const){
@@ -285,7 +291,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const me=state.players[0];
     native('turn-command','command',{kind:'command',state:activeBatch?'busy':battleCommand(state,stateActions),engraved:true},190,72,portrait?1165:1452,portrait?621:465);
     native('hero-power','power',{kind:'power',heroId:me.heroId,cost:effectivePowerCost(state,0),available:state.turn===0&&legalActions(state).some(a=>a.type==='hero-power')},101,101,portrait?960:975,portrait?792:703);
-    native('gas-counter','gas',{kind:'orders',gas:me.gas,max:me.maxGas},portrait?650:488,portrait?68:54,portrait?876:1391,portrait?905:760);
+    const orders=ordersLayout(portrait);
+    native('gas-counter','gas',ordersFace(state),orders.width,orders.height,orders.x,orders.y);
     native('block-counter','block',{kind:'block',block:state.block},60,78,portrait?446:234,portrait?70:220);
     const deck=native('own-deck','deck',{kind:'deck',count:me.deck.length},80,112,portrait?1163:1390,portrait?202:238);deck.modelReady=true;paint(deck,deck.painted);
     native('battle-scroll','scroll',{kind:'queueTitle',own:mempoolOf(state,0).length,enemy:mempoolOf(state,1).length},180,110,queueX(),190);
@@ -407,7 +414,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   function render() {
     if (disposed || document.hidden || paused) return;
     if(!readyReported){
-      const portraitsReady=shown?.players.every(p=>p.heroId==='whale'||assets.loaded.has(`hero-${p.heroId}` as ModelId)||assets.failed.has(`hero-${p.heroId}` as ModelId));
+      const portraitsReady=shown?.players.every(p=>(p.heroId==='whale'||p.heroId==='builder')||assets.loaded.has(`hero-${p.heroId}` as ModelId)||assets.failed.has(`hero-${p.heroId}` as ModelId));
       const visibleReady=scene.meshes.every(mesh=>!mesh.isEnabled()||!mesh.isVisible||mesh.visibility<=0||mesh.isReady(true));
       if(portraitsReady&&textures.isReady()&&painting.isReady()&&(!portrait||portraitPainting?.isReady())&&visibleReady){
         readyReported=true;options.onReady?.();
@@ -477,7 +484,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     let moving = attacker ?? (handUid ? entities.get(handUid) : null);
     if(handUid&&!moving){
       const card=batch.before.players[batch.before.turn].hand.find(c=>c.uid===handUid);
-      if(card){moving=entity(handUid,{kind:'hand',uid:handUid,owner:batch.before.turn,cardId:card.cardId},{kind:'card',cardId:card.cardId},168/50,234/50);moving.base.copyFrom(point(800,portrait?-93:35,-2));moving.root.position.copyFrom(moving.base);entities.get(`back-${Math.min(7,batch.before.players[1].hand.length-1)}`)?.root.setEnabled(false);}
+      if(card){moving=entity(handUid,{kind:'hand',uid:handUid,owner:batch.before.turn,cardId:card.cardId},{kind:'card',cardId:card.cardId},234*CARD_FACE.ratio/50,234/50);moving.base.copyFrom(point(800,portrait?-93:35,-2));moving.root.position.copyFrom(moving.base);entities.get(`back-${Math.min(7,batch.before.players[1].hand.length-1)}`)?.root.setEnabled(false);}
     }
     if(handUid&&moving)moving.root.getChildMeshes().forEach(mesh=>mesh.renderingGroupId=2);
     const release = released?.uid === moving?.data.uid ? released : null;
@@ -506,12 +513,23 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const spec=attack?MOTION.attack:handUid?(publicPlay?MOTION.enemyPlay:MOTION.play):batch.action.type==='hero-power'?MOTION.power:MOTION.turn;
     const drawn=batch.after.players.flatMap((p,owner)=>p.hand.filter(c=>!batch.before.players[owner].hand.some(old=>old.uid===c.uid)).map(c=>({...c,owner:owner as 0|1,index:p.hand.findIndex(h=>h.uid===c.uid)})));
     textures.preloadCards(drawn.filter(c=>c.owner===0).map(c=>c.cardId));
+    const timeline=effectTimeline(batch,options.reducedMotion);
+    let frameKey:string|null=null;
+    const paintFrame=(elapsedMs:number)=>{
+      if(!timeline)return;
+      const key=timeline.windows.filter(w=>elapsedMs>=w.contactMs).map(w=>w.key).join(':')+(elapsedMs>=timeline.tailMs?':final':'');
+      if(key===frameKey)return;frameKey=key;
+      const frame=effectFrame(batch,timeline,elapsedMs);
+      frame.fighters.forEach(minion=>{const entry=entities.get(minion.uid);if(entry&&!entry.root.isDisposed())paint(entry,{kind:'minion',minion,ready:false});});
+      batch.after.players.forEach((player,p)=>{const entry=entities.get(`hero-${p}`);if(entry)paint(entry,{kind:'hero',heroId:player.heroId,treasury:frame.treasuries[p]});});
+    };
     const contactMs=options.reducedMotion?72:Math.max(spec.duration*spec.contact,(batch.events?.spellResolved?.length??0)*75+90);
-    const duration=options.reducedMotion?180:Math.max(spec.duration,contactMs+(drawn.length?420+Math.max(0,drawn.length-1)*65:230));
+    const duration=options.reducedMotion?Math.max(180,contactMs+(timeline?.tailMs??0)):Math.max(spec.duration,contactMs+(timeline?.tailMs??230)+(drawn.length?420+Math.max(0,drawn.length-1)*65:0));
     const impactAt=contactMs/duration;
     if(batch.after.winner!==null)videoEffects.cancel();
     // Victory belongs inside the result dialog; ordinary accents belong on battle pieces.
     const cues=videoCues(batch).filter(cue=>cue.id!=='06-victory');
+    const spriteContacts=new Set<string>();
     if(!options.reducedMotion)videoEffects.prepare(cues);
     const locate=(uid:string)=>{
       if(uid==='arena-center')return Vector3.Zero();
@@ -521,11 +539,11 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       // the new fighter which has no entity until the contact callback.
       for(const p of [0,1]){const board=batch.after.players[p].board,index=board.findIndex(m=>m.uid===uid);if(index>=0){const row=fighterRow(board.length,p,portrait);return point(row.center+(index-(board.length-1)/2)*row.spacing,row.y);}}
       const existing=entities.get(uid);if(existing)return existing.base.clone();
-      for(const p of [0,1] as const){const queue=mempoolOf(batch.after,p),index=queue.findIndex(e=>`queued-${e.uid}`===uid);if(index>=0){const visible=Math.min(2,index);return point(queueX()+visible*7,queueY(p)-visible*7,-1);}}
+      const queued=queueAnchor(uid,[batch.after,batch.before],portrait);if(queued)return point(queued.x,queued.y,-1);
     };
     const cuePositions=new Map(cues.map(cue=>[cue.anchor,locate(cue.anchor)]));
-    effects.begin(batch,locate);
-    abilities.begin(batch,locate);
+    effects.begin(batch,locate,timeline);
+    abilities.begin(batch,locate,timeline);
     const resolving=(batch.events?.spellResolved??[]).flatMap((s,i)=>{const entry=entities.get(`queued-${s.mempoolUid}`);return entry?[{entry,start:entry.base.clone(),delay:i*.075}]:[];});
     await scheduler.play(duration, impactAt, progress => {
       rejected.forEach(item=>{
@@ -560,19 +578,39 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         landed.root.scaling.setAll(.98+.02*fade);
       }
       drawFlights.forEach(f=>{
-        const t=options.reducedMotion?1:Math.max(0,Math.min(1,((progress-impactAt)*duration-f.delay)/420));
+        const elapsed=(progress-impactAt)*duration-(timeline?.tailMs??0)-f.delay;
+        f.entry.root.setEnabled(options.reducedMotion||elapsed>=0);
+        const t=options.reducedMotion?1:Math.max(0,Math.min(1,elapsed/420));
         const ease=smooth(t);f.entry.root.position.copyFrom(Vector3.Lerp(f.start,f.target,ease));f.entry.root.position.z=-6+ease*4;
         if(!options.reducedMotion)f.entry.root.position.y+=Math.sin(t*Math.PI)*1.5;
         f.entry.root.scaling.setAll(.45+.55*ease);f.entry.root.rotation.z=f.entry.fanAngle*ease;
         if(f.entry.data.owner===0){f.entry.root.rotation.y=t<.45?t/.45*Math.PI/2:-(1-(t-.45)/.55)*Math.PI/2;if(t>=.45&&!f.revealed){paint(f.entry,f.face);f.revealed=true;}}
         f.entry.root.getChildMeshes().forEach(mesh=>mesh.renderingGroupId=2);
       });
-      resolving.forEach(({entry,start,delay})=>{if(entry.root.isDisposed()||progress>=impactAt)return;const t=smooth((progress*duration/1000-delay)/Math.max(.12,contactMs/1000-delay));entry.root.position.copyFrom(start);entry.root.position.y+=.8*t;entry.root.scaling.setAll(1+.55*t);entry.material.alpha=1-.65*t;});
-      effects.tick(progress,impactAt,options.reducedMotion);
+      resolving.forEach(({entry,start,delay})=>{
+        if(entry.root.isDisposed())return;
+        if(timeline){
+          const window=timeline.windows.find(w=>w.key===entry.data.uid);
+          const elapsed=(progress-impactAt)*duration;
+          if(window){const t=Math.max(0,Math.min(1,(elapsed-window.startMs)/(window.endMs-window.startMs)));entry.root.position.copyFrom(start);if(!options.reducedMotion){entry.root.position.y+=Math.sin(t*Math.PI)*.25;entry.root.scaling.setAll(1+Math.sin(t*Math.PI)*.1);}entry.material.alpha=elapsed<window.contactMs?1:Math.max(0,1-(elapsed-window.contactMs)/(window.endMs-window.contactMs));entry.root.setEnabled(elapsed<window.endMs);}
+          return;
+        }
+        if(progress>=impactAt)return;const t=smooth((progress*duration/1000-delay)/Math.max(.12,contactMs/1000-delay));entry.root.position.copyFrom(start);entry.root.position.y+=.8*t;entry.root.scaling.setAll(1+.55*t);entry.material.alpha=1-.65*t;
+      });
+      effects.tick(progress,impactAt,options.reducedMotion,duration);
       deployments.tick(progress,impactAt,options.reducedMotion);
-      abilities.tick(progress,impactAt,options.reducedMotion);
-      const death=deathProgress(progress,impactAt);
-      if(death>0)deadObjects.forEach(entry=>{if(!entry.root.isDisposed())entry.root.scaling.setAll(Math.max(.02,1-death));});
+      abilities.tick(progress,impactAt,options.reducedMotion,duration);
+      if(timeline)for(const window of timeline.windows){
+        if((progress-impactAt)*duration<window.contactMs||spriteContacts.has(window.key))continue;
+        spriteContacts.add(window.key);videoEffects.trigger(cues.filter(c=>c.wave===window.key),uid=>cuePositions.get(uid),options.reducedMotion,window.endMs-window.contactMs);
+      }
+      if(progress>impactAt)paintFrame((progress-impactAt)*duration);
+      deadObjects.forEach(entry=>{
+        if(entry.root.isDisposed())return;
+        const window=timeline?deathWindow(batch,timeline,entry.data.uid):undefined;
+        const death=window?smooth(((progress-impactAt)*duration-window.contactMs)/Math.max(1,window.endMs-window.contactMs)):deathProgress(progress,impactAt);
+        if(death>0){if(options.reducedMotion)entry.root.setEnabled(false);else entry.root.scaling.setAll(Math.max(.02,1-death));}
+      });
       if (!options.reducedMotion) {
         if (batch.action.type === 'end-turn'){sandStream.setEnabled(progress>.15&&progress<.8);}
         if (batch.action.type === 'hero-power') entities.get('hero-power')?.root.scaling.setAll(1+Math.sin(progress*Math.PI)*.04);
@@ -580,7 +618,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       }
     }, () => {
       if (activeBatch?.id !== batch.id) return;
-      videoEffects.trigger(cues,uid=>cuePositions.get(uid),options.reducedMotion);
+      videoEffects.trigger(timeline?cues.filter(c=>!c.wave):cues,uid=>cuePositions.get(uid),options.reducedMotion);
       if(batch.events?.play)deployments.begin(batch.events.play.cardId,target);
       if(handUid){
         // Replace the arriving card with its battlefield/queue form at the same position,
@@ -593,7 +631,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         if(landed&&!options.reducedMotion){landed.material.alpha=0;landed.backing.visibility=0;}else releaseArrival();
       }else if(drawn.length||resolving.length){
         // Retain doomed pieces until their death phase, while real hand/queue changes commit.
-        deadObjects.forEach(entry=>entities.delete(entry.data.uid));sync(batch.after);deadObjects.forEach(entry=>entities.set(entry.data.uid,entry));
+        const retained=[...deadObjects,...(timeline?resolving.map(r=>r.entry):[])];
+        retained.forEach(entry=>entities.delete(entry.data.uid));sync(batch.after);retained.forEach(entry=>entities.set(entry.data.uid,entry));
       }
       drawn.forEach((c,i)=>{
         let entry=c.owner===0?entities.get(c.uid):c.index<8?entities.get(`back-${c.index}`):undefined;
@@ -602,7 +641,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         const face:Face=c.owner===0?{kind:'card',cardId:c.cardId}:{kind:'back'};
         const target=entry.base.clone();if(temporary)target.copyFrom(point(800+120,c.owner===0?handY():portrait?-93:35,.5));
         const start=c.owner===0?deckStack.position.clone():point(portrait?1156:1370,portrait?95:90,-4);
-        paint(entry,{kind:'back'});entry.root.position.copyFrom(start);entry.root.scaling.setAll(.45);entry.face.isPickable=false;
+        paint(entry,{kind:'back'});entry.root.position.copyFrom(start);entry.root.scaling.setAll(.45);entry.face.isPickable=false;if(timeline)entry.root.setEnabled(false);
         drawFlights.push({entry,start,target,face,delay:i*65,revealed:false,temporary});
       });
       // Keep doomed figures for a short death phase; stats/HUD commit at contact.
@@ -616,9 +655,12 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         if (hero) paint(hero,{ kind: 'hero', heroId: player.heroId, treasury: player.treasury });
         player.board.forEach(minion => { const entry = entities.get(minion.uid); if (entry) paint(entry, { kind: 'minion', minion,readiness:fighterReadiness(batch.after,owner as 0|1,minion) }); });
       });
-      const gas = entities.get('gas-counter'); if (gas) paint(gas, { kind: 'orders', gas: batch.after.players[0].gas, max: batch.after.players[0].maxGas });
+      const gas = entities.get('gas-counter'); if (gas) paint(gas, ordersFace(batch.after));
       gasFill(batch.after);
       const clock = entities.get('block-counter'); if (clock) paint(clock, { kind: 'block', block: batch.after.block });
+      // Queue results are already computed by the rules, but the board reveals
+      // each public stat change only at that source's presentation contact.
+      paintFrame(-1);
       if (defender && !defender.root.isDisposed()) defender.haloMaterial.emissiveColor = Color3.FromHexString('#ec9a58');
       impact();
     }, () => {

@@ -2,11 +2,12 @@ import { DynamicTexture } from '@babylonjs/core/Materials/Textures/dynamicTextur
 import { Texture } from '@babylonjs/core/Materials/Textures/texture';
 import type { Scene } from '@babylonjs/core/scene';
 import { CARDS } from '../../lib/cards';
-import { cardName, type Locale } from '../../lib/locale';
+import { type Locale } from '../../lib/locale';
 import type { Minion } from '../../lib/engine/types';
-import {cardIdentity} from './cardIdentity';
+import {CARD_FACE,CARD_FRAME_PATH,paintCardFace} from './cardFace';
+import {heroPortraitPath} from './heroPortrait';
 import {cardArtPath} from '../../lib/cardArt';
-import {ordersView} from './ordersView';
+import {ordersLayout,ordersView} from './ordersView';
 import type {BattleCommand,FighterReadiness} from './battleReadability';
 
 export type Face =
@@ -16,7 +17,7 @@ export type Face =
   | { kind: 'power'; heroId: string; cost: number; available: boolean; model?: boolean }
   | { kind: 'command'; state: BattleCommand; engraved?: boolean }
   | { kind: 'gas'; gas: number; max: number; engraved?: boolean }
-  | { kind: 'orders'; gas: number; max: number }
+  | { kind: 'orders'; gas: number; max: number; portrait: boolean }
   | { kind: 'queued'; cardId:string; owner:0|1; count:number; ordinal:number }
   | { kind: 'queueTitle'; own:number; enemy:number }
   | { kind: 'block'; block: number }
@@ -42,22 +43,6 @@ function contain(ctx: CanvasRenderingContext2D, image: HTMLImageElement, x: numb
   const ratio = Math.min(w / image.naturalWidth, h / image.naturalHeight);
   const width = image.naturalWidth * ratio, height = image.naturalHeight * ratio;
   ctx.drawImage(image, x + (w - width) / 2, y + (h - height) / 2, width, height);
-}
-
-function words(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, width: number, line: number, limit = 2) {
-  const lines: string[] = []; let current = '';
-  for (const word of text.split(' ')) {
-    const next = current ? `${current} ${word}` : word;
-    if (current && ctx.measureText(next).width > width) { lines.push(current); current = word; }
-    else current = next;
-  }
-  if (current) lines.push(current);
-  lines.slice(0, limit).forEach((value, index) => {
-    let shown = value;
-    while (ctx.measureText(shown).width > width && shown.length > 2) shown = shown.slice(0, -1);
-    if (shown !== value || (index === limit - 1 && lines.length > limit)) shown = `${shown.slice(0, -1)}…`;
-    ctx.fillText(shown, x, y + index * line);
-  });
 }
 
 /** Small render textures; source art is fetched only for visible cards/heroes. */
@@ -89,7 +74,7 @@ export class ArenaTextures {
   }
 
   make(name: string, initial: Face) {
-    const size = initial.kind==='orders'?{width:1248,height:160}:initial.kind==='queueTitle'?{width:512,height:312}:initial.kind === 'command' ? { width: 768, height: 288 } : initial.kind === 'power' ? { width: 384, height: 384 } : initial.kind === 'gas' ? { width: 384, height: 256 } : { width: 384, height: 512 };
+    const size = initial.kind==='card'?{width:CARD_FACE.width,height:CARD_FACE.height}:initial.kind==='orders'?{width:1248,height:160}:initial.kind==='queueTitle'?{width:512,height:312}:initial.kind === 'command' ? { width: 768, height: 288 } : initial.kind === 'power' ? { width: 384, height: 384 } : initial.kind === 'gas' ? { width: 384, height: 256 } : { width: 384, height: 512 };
     const texture = new DynamicTexture(name, size, this.scene, true, Texture.TRILINEAR_SAMPLINGMODE);
     texture.hasAlpha = true;
     const ctx = texture.getContext() as unknown as CanvasRenderingContext2D;
@@ -97,20 +82,25 @@ export class ArenaTextures {
     const draw = () => {
       this.painting=draw;
       ctx.clearRect(0, 0, size.width, size.height);
-      if (face.kind === 'back') this.drawBack(ctx);
+      if (face.kind === 'back') this.drawBack(ctx,size.height);
       else if (face.kind === 'card') this.drawCard(ctx, face.cardId,face.playable);
       else if (face.kind === 'minion') this.drawMinion(ctx, face.minion, face.ready,face.readiness);
       else if (face.kind === 'hero') this.drawHero(ctx, face.heroId, face.treasury, face.model);
       else if (face.kind === 'power') this.drawPower(ctx, face);
       else if (face.kind === 'command') this.drawCommand(ctx, face.state, face.engraved);
       else if (face.kind === 'gas') this.drawGas(ctx, face.gas, face.max, face.engraved);
-      else if(face.kind==='orders')this.drawOrders(ctx,face.gas,face.max);
+      else if(face.kind==='orders')this.drawOrders(ctx,face);
       else if(face.kind==='queued')this.drawQueued(ctx,face);
       else if(face.kind==='queueTitle'){
-        ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`800 95px ${this.font}`;
-        ctx.strokeStyle='#1e110b';ctx.lineWidth=9;ctx.strokeText(this.locale==='ru'?'Указы':'Edicts',256,58);ctx.fillStyle='#f5dbac';ctx.fillText(this.locale==='ru'?'Указы':'Edicts',256,58);
-        ctx.font=`750 75px ${this.font}`;
-        for(const [label,y,color] of [[this.locale==='ru'?`Ваши ${face.own}`:`Yours ${face.own}`,151,'#b8e1d4'],[this.locale==='ru'?`Враг ${face.enemy}`:`Foe ${face.enemy}`,246,'#f2b7a6']] as const){ctx.strokeText(label,256,y);ctx.fillStyle=color;ctx.fillText(label,256,y);}
+        // A physical rolled edict is the entry point. Counts live on their own
+        // stacks; three permanent miniature HUD lines add no useful reading.
+        ctx.save();ctx.shadowColor='#281408';ctx.shadowBlur=12;ctx.shadowOffsetY=8;
+        const paper=ctx.createLinearGradient(0,65,0,226);paper.addColorStop(0,'#a98348');paper.addColorStop(.2,'#e5cb91');paper.addColorStop(.8,'#cbae72');paper.addColorStop(1,'#856338');
+        ctx.fillStyle=paper;rounded(ctx,113,65,286,161,16);ctx.fill();ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+        ctx.strokeStyle='#714b29';ctx.lineWidth=5;ctx.stroke();
+        for(const x of [106,398]){ctx.fillStyle='#d5b67b';rounded(ctx,x-17,50,34,194,14);ctx.fill();ctx.stroke();}
+        ctx.strokeStyle='#79552f';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(164,111);ctx.lineTo(337,111);ctx.moveTo(164,139);ctx.lineTo(290,139);ctx.stroke();
+        this.badge(ctx,'IV',266,209,'#682d28',49);ctx.restore();
       }
       else if (face.kind === 'block') this.drawBlock(ctx, face.block);
       else if (face.kind === 'deck') { if (!face.model) this.drawBack(ctx); this.badge(ctx, String(face.count), 192, 350, '#544026', 70); }
@@ -147,64 +137,39 @@ export class ArenaTextures {
     ctx.fillStyle = '#fff4d4'; ctx.fillText(value, x, y + 1); ctx.restore();
   }
 
-  private drawCard(ctx: CanvasRenderingContext2D, id: string,playable?:boolean) {
-    const def = CARDS[id];
-    rounded(ctx, 9, 9, 366, 494, 20); ctx.fillStyle = '#8c693c'; ctx.fill();
-    rounded(ctx, 17, 17, 350, 478, 14); ctx.fillStyle = '#ead7ab'; ctx.fill();
-    if(playable){ctx.strokeStyle='#fff0bc';ctx.lineWidth=7;rounded(ctx,14,14,356,484,16);ctx.stroke();}
-    ctx.save(); rounded(ctx, 23, 23, 338, 339, 9); ctx.clip();
-    const art = this.image(cardArtPath(id));
-    ctx.fillStyle = '#3b3026'; ctx.fillRect(23, 23, 338, 339);
-    if (art) contain(ctx, art, 23, 23, 338, 339);
-    ctx.restore();
-    ctx.fillStyle = '#4d3423'; rounded(ctx, 18, 365, 348, 72, 8); ctx.fill();
-    ctx.fillStyle = '#fff1cf'; ctx.font = `750 32px ${this.font}`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-    words(ctx, cardName(id, this.locale), 192, 390, 321, 34);
-    this.badge(ctx, `${def.cost}`, 56, 61, playable===false?'#4a5352':'#246784', 45);
-    if (def.type === 'minion') {
-      this.badge(ctx, `${def.attack}`, 55, 469, '#aa7626', 31);
-      this.badge(ctx, `${def.health}`, 329, 469, '#a83f31', 31);
-    }
-    const identity=cardIdentity(id);
-    // Keep the compact hand face free of tiny rules text. Full role/rank labels
-    // are in inspection; this engraved emblem marks the role on the card.
-    ctx.save();ctx.translate(192,466);ctx.strokeStyle='#493422';ctx.fillStyle=identity.color;ctx.lineWidth=3;ctx.lineCap='round';
-    ctx.beginPath();ctx.arc(0,0,24,0,Math.PI*2);ctx.fill();ctx.stroke();
-    ctx.beginPath();
-    if(identity.role==='guard'){ctx.moveTo(-12,-12);ctx.lineTo(12,-12);ctx.lineTo(10,6);ctx.lineTo(0,16);ctx.lineTo(-10,6);ctx.closePath();}
-    else if(identity.role==='engineer'){for(let i=0;i<7;i++){const a=i*Math.PI/3;ctx.lineTo(Math.cos(a)*15,Math.sin(a)*15);}}
-    else if(identity.role==='commander'||identity.role==='priest'){ctx.arc(0,0,14,.2,Math.PI-.2);for(const side of [-1,1])for(let i=0;i<3;i++){ctx.moveTo(side*(8+i*2),8-i*7);ctx.lineTo(side*(16+i*2),4-i*7);}}
-    else if(identity.role==='minister'||identity.role==='edict'){ctx.arc(0,-3,10,0,Math.PI*2);ctx.moveTo(-5,7);ctx.lineTo(-8,17);ctx.lineTo(0,12);ctx.lineTo(8,17);ctx.lineTo(5,7);}
-    else{ctx.moveTo(0,17);ctx.lineTo(0,-15);ctx.moveTo(-6,-5);ctx.lineTo(0,-17);ctx.lineTo(6,-5);ctx.moveTo(-6,8);ctx.lineTo(6,8);}
-    ctx.stroke();ctx.restore();
-    ctx.strokeStyle=identity.color;ctx.lineWidth=7;
-    for(let i=0;i<identity.rank;i++){ctx.beginPath();ctx.arc(328-i*18,33,4,0,Math.PI*2);ctx.stroke();}
+  private drawCard(ctx:CanvasRenderingContext2D,id:string,playable?:boolean){
+    paintCardFace(ctx,id,this.locale,this.font,this.image(cardArtPath(id)),playable,undefined,this.image(CARD_FRAME_PATH));
   }
 
   private drawQueued(ctx:CanvasRenderingContext2D,face:Extract<Face,{kind:'queued'}>){
-    this.drawCard(ctx,face.cardId);
-    ctx.fillStyle=face.owner===0?'#1d4b4b':'#6b2d26';rounded(ctx,20,350,344,86,8);ctx.fill();
-    ctx.textAlign='center';ctx.font=`800 47px ${this.font}`;ctx.fillStyle='#fff0ce';
-    ctx.fillText(this.locale==='ru'?(face.owner===0?'Ваш ход':'Ход врага'):(face.owner===0?'Your turn':'Enemy turn'),192,405);
-    this.badge(ctx,String(face.ordinal),322,65,'#785435',44);
-    if(face.count>3){ctx.font=`800 40px ${this.font}`;ctx.fillText(`+${face.count-3}`,192,487);}
+    const paper=ctx.createLinearGradient(25,0,359,0);paper.addColorStop(0,'#aa824a');paper.addColorStop(.12,'#ebd5a0');paper.addColorStop(.88,'#d5ba7f');paper.addColorStop(1,'#96703d');
+    ctx.fillStyle=paper;rounded(ctx,12,18,360,476,17);ctx.fill();ctx.strokeStyle='#77502a';ctx.lineWidth=6;ctx.stroke();
+    ctx.save();rounded(ctx,84,39,216,324,8);ctx.clip();ctx.fillStyle='#d5ba7f';ctx.fillRect(84,39,216,324);
+    const art=this.image(cardArtPath(face.cardId));if(art)contain(ctx,art,84,39,216,324);ctx.restore();
+    ctx.strokeStyle='#a27e47';ctx.lineWidth=5;rounded(ctx,84,39,216,324,8);ctx.stroke();
+    // Owner-coloured wax and a readable queue ordinal replace tiny rules/ribbons.
+    ctx.fillStyle=face.owner===0?'#315e59':'#713b32';ctx.fillRect(175,372,34,100);
+    this.badge(ctx,String(face.ordinal),192,424,face.owner===0?'#315e59':'#713b32',59);
+    if(face.ordinal===1&&face.count>3)this.badge(ctx,`+${face.count-3}`,322,470,'#745631',51);
   }
 
-  private drawOrders(ctx:CanvasRenderingContext2D,gas:number,max:number){
+  private drawOrders(ctx:CanvasRenderingContext2D,face:Extract<Face,{kind:'orders'}>){
+    const {gas,max}=face,layout=ordersLayout(face.portrait);
     const view=ordersView(gas,max),art=this.image('/ui/arena-lab/gas-socket.webp');
     // Paint the sockets and counter from the same snapshot in one layer.
-    const centers=[57,159,260,364,465,567,668,770,872,973];
+    // The HUD plane is wider than its 1248×160 texture. Compensate in texture
+    // space so each gem remains round on the table, inset inside its painted rim.
+    const radius=34;
     view.slots.forEach((status,index)=>{
       if(status==='locked')return;
-      const x=centers[index];ctx.save();ctx.beginPath();ctx.arc(x,72,42,0,Math.PI*2);ctx.clip();
+      const x=layout.centers[index];ctx.save();ctx.translate(x,layout.centerY);ctx.scale(1,layout.verticalScale);
+      ctx.beginPath();ctx.arc(0,0,radius,0,Math.PI*2);ctx.clip();
       ctx.globalAlpha=status==='spent'?.18:1;
-      if(art)ctx.drawImage(art,art.naturalWidth*.2,art.naturalHeight*.2,art.naturalWidth*.6,art.naturalHeight*.6,x-43,29,86,86);
-      else{const g=ctx.createRadialGradient(x-10,60,2,x,72,43);g.addColorStop(0,'#98ecf0');g.addColorStop(.5,'#298c98');g.addColorStop(1,'#154447');ctx.fillStyle=g;ctx.fillRect(x-43,29,86,86);}
-      if(status==='bonus'){
-        ctx.globalAlpha=.8;ctx.fillStyle='#dfa743';ctx.fillRect(x-43,29,86,86);
-        ctx.globalAlpha=1;ctx.strokeStyle='#ffe2a0';ctx.lineWidth=6;ctx.beginPath();ctx.arc(x,72,36,0,Math.PI*2);ctx.stroke();
-        ctx.fillStyle='#fff1c5';ctx.fillRect(x-2,53,4,38);ctx.fillRect(x-19,70,38,4);
-      }
+      if(status==='bonus')ctx.filter='sepia(1) saturate(1.8)';
+      if(art)ctx.drawImage(art,art.naturalWidth*.145,art.naturalHeight*.145,art.naturalWidth*.71,art.naturalHeight*.71,-radius,-radius,radius*2,radius*2);
+      else{const g=ctx.createRadialGradient(-9,-12,2,0,0,radius);g.addColorStop(0,'#98ecf0');g.addColorStop(.5,'#298c98');g.addColorStop(1,'#154447');ctx.fillStyle=g;ctx.fillRect(-radius,-radius,radius*2,radius*2);}
+      ctx.filter='none';
+      const recess=ctx.createRadialGradient(0,0,radius*.72,0,0,radius);recess.addColorStop(0,'#12232100');recess.addColorStop(1,'#102019b0');ctx.fillStyle=recess;ctx.fillRect(-radius,-radius,radius*2,radius*2);
       ctx.restore();
     });
     ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff1d3';ctx.strokeStyle='#21140d';ctx.lineWidth=7;
@@ -262,8 +227,8 @@ export class ArenaTextures {
     // Texture pixels and the mesh use different aspect ratios, hence the ellipse.
     ctx.save();ctx.beginPath();ctx.ellipse(192,256,126,145,0,0,Math.PI*2);ctx.clip();
     ctx.fillStyle='#594124';ctx.fillRect(60,96,264,320);
-    const art=this.image(id==='whale'?'/models/hero-whale.webp':`/heroes/${id}.webp`);
-    if(art){if(id==='whale')ctx.drawImage(art,35,35,530,530,66,111,252,290);else cover(ctx,art,66,111,252,290);}
+    const art=this.image(heroPortraitPath(id));
+    if(art){if(id==='whale')ctx.drawImage(art,35,35,530,530,66,111,252,290);else if(id==='builder')ctx.drawImage(art,66,111,252,290);else cover(ctx,art,66,111,252,290);}
     ctx.restore();
     }
     this.badge(ctx, `${Math.max(0,treasury)}`, 315, 355, '#a8322f', 59);
@@ -329,15 +294,16 @@ export class ArenaTextures {
     for (const y of [175,215,255,295,335]) { ctx.beginPath(); ctx.moveTo(120,y); ctx.lineTo(263,y); ctx.stroke(); }
   }
 
-  private drawBack(ctx: CanvasRenderingContext2D) {
+  private drawBack(ctx: CanvasRenderingContext2D,height=512) {
     const art=this.image('/ui/arena-lab/native/card-back-native.webp');
-    if(art){contain(ctx,art,0,0,384,512);return;}
+    if(art){contain(ctx,art,0,0,384,height);return;}
+    ctx.save();ctx.scale(1,height/512);
     rounded(ctx, 17, 13, 350, 486, 22); ctx.fillStyle = '#3b2725'; ctx.fill();
     ctx.strokeStyle = '#d7ae63'; ctx.lineWidth = 17; ctx.stroke();
     rounded(ctx, 40, 39, 304, 435, 12); ctx.strokeStyle = '#9c7445'; ctx.lineWidth = 5; ctx.stroke();
     ctx.strokeStyle = '#c09752'; ctx.lineWidth = 12; ctx.beginPath(); ctx.arc(192, 255, 99, 0, Math.PI * 2); ctx.stroke();
     ctx.font = `700 68px ${this.font}`; ctx.fillStyle = '#e3c88b'; ctx.textAlign = 'center'; ctx.fillText('IV', 192, 278);
-    ctx.font = `700 24px ${this.font}`; ctx.fillText('IMPERIVM', 192, 432);
+    ctx.font = `700 24px ${this.font}`; ctx.fillText('IMPERIVM', 192, 432);ctx.restore();
   }
 
   dispose() { this.disposed = true; this.redraws.clear(); this.waiting.clear();this.painting=null;this.images.forEach(image => { image.onload = null; image.onerror = null; }); this.images.clear(); }

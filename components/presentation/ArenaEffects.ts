@@ -7,9 +7,10 @@ import type { Scene } from '@babylonjs/core/scene';
 import type { Mesh } from '@babylonjs/core/Meshes/mesh';
 import type { PresentationBatch } from './GameSession';
 import {battleFloats,type FloatKind} from './battleFloats';
+import {EFFECT_POOL_SIZE,type EffectTimeline} from './effectTimeline';
 
 type Flash = { mesh: Mesh; texture: DynamicTexture; material: StandardMaterial; origin: Vector3; kind: FloatKind };
-const MAX_FLASHES=18;
+const MAX_FLASHES=EFFECT_POOL_SIZE;
 
 /** Transient feedback uses the same battle clock and camera as the pieces. */
 export class ArenaEffects {
@@ -18,6 +19,9 @@ export class ArenaEffects {
   private aimMaterial: StandardMaterial;
   private flashes: Flash[] = [];
   private pool: Flash[]=[];
+  private timeline:EffectTimeline|null=null;
+  private locate:((uid:string)=>Vector3|undefined)|null=null;
+  private windowStart=-1;
   private pendingAim: {from:Vector3;to:Vector3;valid:boolean}|null=null;
   private aimKey='';
 
@@ -79,9 +83,12 @@ export class ArenaEffects {
 
   hideAim(){this.pendingAim=null;this.aimKey='';this.aimMesh.setEnabled(false);}
 
-  begin(batch:PresentationBatch,locate:(uid:string)=>Vector3|undefined) {
+  begin(batch:PresentationBatch,locate:(uid:string)=>Vector3|undefined,timeline:EffectTimeline|null=null) {
     this.clear();
-    const add=(position:Vector3|undefined,label:string,kind:Flash['kind'])=>{
+    this.timeline=timeline;this.locate=locate;
+    if(!timeline)battleFloats(batch).forEach(cue=>this.add(locate(cue.anchor),cue.label,cue.kind));
+  }
+  private add(position:Vector3|undefined,label:string,kind:Flash['kind']){
       if(!position||this.flashes.length>=MAX_FLASHES)return;
       const flash=this.pool[this.flashes.length];
       const {texture,mesh,material}=flash;
@@ -98,12 +105,16 @@ export class ArenaEffects {
       texture.update();mesh.position.copyFrom(position);mesh.position.y+=kind==='heal'||kind==='buff'?.8:0;mesh.position.z=-11;mesh.scaling.setAll(1);mesh.setEnabled(false);material.alpha=1;
       if(kind==='weaken'){mesh.position.x-=.65;mesh.position.y+=.6;}
       flash.origin.copyFrom(mesh.position);flash.kind=kind;this.flashes.push(flash);
-    };
-    battleFloats(batch).forEach(cue=>add(locate(cue.anchor),cue.label,cue.kind));
   }
 
-  tick(progress:number,impactAt:number,reduced:boolean) {
-    const t=(progress-impactAt)/(1-impactAt);
+  tick(progress:number,impactAt:number,reduced:boolean,durationMs:number) {
+    const elapsed=(progress-impactAt)*durationMs;
+    const window=this.timeline?.windows.find(w=>elapsed>=w.contactMs&&elapsed<w.endMs);
+    if(this.timeline&&(window?.startMs??-1)!==this.windowStart){
+      this.flashes.forEach(f=>f.mesh.setEnabled(false));this.flashes=[];this.windowStart=window?.startMs??-1;
+      if(window)this.timeline.floats.filter(c=>c.window===window).forEach(({cue})=>this.add(this.locate?.(cue.anchor),cue.label,cue.kind));
+    }
+    const t=this.timeline?(window?(elapsed-window.contactMs)/(window.endMs-window.contactMs):-1):(progress-impactAt)/(1-impactAt);
     this.flashes.forEach(({mesh,material,origin})=>{
       mesh.setEnabled(t>=0&&t<1);if(t<0)return;
       material.alpha=Math.max(0,1-t*t);
@@ -112,6 +123,6 @@ export class ArenaEffects {
     });
   }
 
-  clear(){this.hideAim();this.flashes.forEach(f=>f.mesh.setEnabled(false));this.flashes=[];}
+  clear(){this.hideAim();this.flashes.forEach(f=>f.mesh.setEnabled(false));this.flashes=[];this.timeline=null;this.locate=null;this.windowStart=-1;}
   dispose(){this.clear();this.pool.forEach(f=>{f.mesh.dispose();f.material.dispose();f.texture.dispose();});this.pool=[];this.aimMesh.dispose();this.aimTexture.dispose();this.aimMaterial.dispose();}
 }

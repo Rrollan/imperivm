@@ -8,6 +8,7 @@ import type {Scene} from '@babylonjs/core/scene';
 import {abilityCues,type AccentKind,type AbilityCue} from './abilityCues';
 import {smooth,accentProgress} from './motionSpec';
 import type {PresentationBatch} from './GameSession';
+import {EFFECT_POOL_SIZE,effectWindowAt,type EffectTimeline} from './effectTimeline';
 
 type Piece={mesh:Mesh;material:StandardMaterial};
 type Live={piece:Piece;cue:AbilityCue;from:Vector3;to:Vector3};
@@ -17,9 +18,12 @@ export class ArenaAbilityEffects {
   private glyphs=new Map<AccentKind,DynamicTexture>();
   private pool:Piece[]=[];
   private live:Live[]=[];
+  private timeline:EffectTimeline|null=null;
+  private locate:((uid:string)=>Vector3|undefined)|null=null;
+  private windowStart=-1;
   constructor(private scene:Scene,private invalidate:()=>void){
-    for(const kind of ['steel','heal','gas','dice','seal','buff','counter','weaken'] as const)this.glyphs.set(kind,this.glyph(kind));
-    for(let i=0;i<18;i++){
+    for(const kind of ['steel','heal','gas','dice','seal','buff','counter','weaken','destroy'] as const)this.glyphs.set(kind,this.glyph(kind));
+    for(let i=0;i<EFFECT_POOL_SIZE;i++){
       const mesh=MeshBuilder.CreatePlane(`ability ${i}`,{width:1,height:1},scene);
       const material=new StandardMaterial(`ability ${i}`,scene);
       material.diffuseColor=Color3.Black();material.emissiveColor=Color3.White();material.specularColor=Color3.Black();material.disableLighting=true;material.useAlphaFromDiffuseTexture=true;
@@ -31,9 +35,10 @@ export class ArenaAbilityEffects {
   private glyph(kind:AccentKind){
     const texture=new DynamicTexture(`ability glyph ${kind}`,128,this.scene,false);texture.hasAlpha=true;
     const c=texture.getContext() as unknown as CanvasRenderingContext2D;
-    c.clearRect(0,0,128,128);c.strokeStyle=kind==='weaken'?'#d77969':kind==='gas'?'#77d8de':kind==='heal'?'#b1ecd7':kind==='steel'?'#ecd3a1':'#e5bd73';
+    c.clearRect(0,0,128,128);c.strokeStyle=kind==='destroy'?'#c6aa88':kind==='weaken'?'#d77969':kind==='gas'?'#77d8de':kind==='heal'?'#b1ecd7':kind==='steel'?'#ecd3a1':'#e5bd73';
     c.fillStyle=c.strokeStyle;c.lineWidth=4;c.lineCap='round';c.lineJoin='round';
-    if(kind==='steel'){c.beginPath();c.moveTo(33,89);c.lineTo(89,33);c.stroke();c.lineWidth=2;c.moveTo(48,74);c.lineTo(40,41);c.moveTo(68,59);c.lineTo(93,68);c.stroke();}
+    if(kind==='destroy'){c.beginPath();c.moveTo(64,22);c.lineTo(53,49);c.lineTo(75,63);c.lineTo(54,91);c.lineTo(64,106);c.moveTo(53,49);c.lineTo(27,44);c.moveTo(75,63);c.lineTo(104,56);c.stroke();}
+    else if(kind==='steel'){c.beginPath();c.moveTo(33,89);c.lineTo(89,33);c.stroke();c.lineWidth=2;c.moveTo(48,74);c.lineTo(40,41);c.moveTo(68,59);c.lineTo(93,68);c.stroke();}
     else if(kind==='gas'){c.beginPath();c.moveTo(64,25);c.lineTo(82,46);c.lineTo(64,96);c.lineTo(46,46);c.closePath();c.stroke();c.moveTo(46,46);c.lineTo(82,46);c.stroke();}
     else if(kind==='weaken'){c.beginPath();c.moveTo(45,91);c.lineTo(82,32);c.stroke();c.strokeStyle='#e5afa0';c.lineWidth=6;c.beginPath();c.moveTo(33,40);c.lineTo(93,93);c.stroke();}
     else if(kind==='dice'){c.strokeRect(36,36,56,56);for(const [x,y] of [[49,49],[79,49],[64,64],[49,79],[79,79]]){c.beginPath();c.arc(x,y,3,0,Math.PI*2);c.fill();}}
@@ -41,19 +46,29 @@ export class ArenaAbilityEffects {
     else{for(const side of [-1,1]){c.beginPath();c.moveTo(64,99);c.quadraticCurveTo(64+side*35,73,64+side*22,32);c.stroke();for(let i=0;i<4;i++){c.beginPath();c.ellipse(64+side*(19+i),82-i*12,7,3,side*.65,0,Math.PI*2);c.fill();}}}
     texture.update();return texture;
   }
-  begin(batch:PresentationBatch,locate:(uid:string)=>Vector3|undefined){
-    this.clear();abilityCues(batch).forEach((cue,i)=>{
+  begin(batch:PresentationBatch,locate:(uid:string)=>Vector3|undefined,timeline:EffectTimeline|null=null){
+    this.clear();this.timeline=timeline;this.locate=locate;
+    if(!timeline)this.activate(abilityCues(batch),locate);
+  }
+  private activate(cues:AbilityCue[],locate:(uid:string)=>Vector3|undefined){
+    this.pool.forEach(piece=>piece.mesh.setEnabled(false));this.live=[];
+    cues.forEach((cue,i)=>{
       const from=locate(cue.from),to=locate(cue.to);if(!from||!to)return;
+      if(i>=this.pool.length)return;
       const piece=this.pool[i],texture=this.glyphs.get(cue.kind)!;
       piece.material.diffuseTexture=texture;piece.material.emissiveTexture=texture;
       this.live.push({piece,cue,from:from.clone(),to:to.clone()});
     });
   }
-  tick(progress:number,contact:number,reduced:boolean){
+  tick(progress:number,contact:number,reduced:boolean,durationMs:number){
+    const elapsed=(progress-contact)*durationMs,window=this.timeline?effectWindowAt(this.timeline,elapsed):undefined;
+    if(this.timeline&&(window?.startMs??-1)!==this.windowStart){
+      this.windowStart=window?.startMs??-1;this.activate(window?this.timeline.abilities.filter(c=>c.window===window).map(c=>c.cue):[],this.locate!);
+    }
     this.live.forEach(({piece:{mesh,material},cue,from,to})=>{
-      const t=accentProgress(progress,contact,cue.phase,cue.delay);
+      const t=this.timeline?(window?(elapsed-window.startMs)/(window.endMs-window.startMs):-1):accentProgress(progress,contact,cue.phase,cue.delay);
       mesh.setEnabled(t>=0&&t<1);if(t<0||t>=1)return;
-      const travel=reduced?1:smooth(t);
+      const travel=reduced?1:smooth(this.timeline?t*3:t);
       mesh.position.copyFrom(Vector3.Lerp(from,to,travel));mesh.position.z=-8;
       if(!reduced&&Vector3.DistanceSquared(from,to)>.2)mesh.position.y+=Math.sin(t*Math.PI)*.4;
       const local=Vector3.DistanceSquared(from,to)<.2;
@@ -62,6 +77,6 @@ export class ArenaAbilityEffects {
       material.alpha=reduced?.4:Math.sin(t*Math.PI)*.72;
     });
   }
-  clear(){this.pool.forEach(p=>p.mesh.setEnabled(false));this.live=[];}
+  clear(){this.pool.forEach(p=>p.mesh.setEnabled(false));this.live=[];this.timeline=null;this.locate=null;this.windowStart=-1;}
   dispose(){this.clear();this.pool.forEach(p=>{p.mesh.dispose();p.material.dispose();});this.glyphs.forEach(t=>t.dispose());this.pool=[];this.glyphs.clear();}
 }
