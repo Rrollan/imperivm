@@ -3,6 +3,8 @@ import {HEROES} from '../../lib/heroes';
 import type {EffectKind} from '../../lib/engine/types';
 import type {PresentationBatch} from './GameSession';
 import {directEffect,playedFighter} from './directPlay';
+import {rulesetOf} from '../../lib/engine/ruleset';
+import {validatorPayout} from './validatorInvestment';
 
 export type AccentKind='steel'|'heal'|'gas'|'dice'|'seal'|'buff'|'counter'|'weaken'|'destroy';
 export type AbilityCue={kind:AccentKind;from:string;to:string;phase:'contact'|'after';delay:number;wave?:string};
@@ -24,7 +26,7 @@ export function abilityCues(batch:PresentationBatch):AbilityCue[]{
   if(batch.action.type==='hero-power'){
     switch(HEROES[batch.before.players[owner].heroId].power){
       case 'heal-treasury':if(batch.after.players[owner].treasury>batch.before.players[owner].treasury)add('heal',owner===0?'hero-power':hero,hero);break;
-      case 'gain-gas':add('seal',owner===0?'hero-power':hero,gas(owner));break;
+      case 'gain-gas':add('seal',owner===0?'hero-power':hero,rulesetOf(batch.before)==='validator-investment-v1'?hero:gas(owner));break;
       case 'draw-burn':add('dice',owner===0?'hero-power':hero,hero);break;
       case 'damage-random-enemy':add('steel',hero,enemy(owner));break;
     }
@@ -78,6 +80,8 @@ export function abilityCues(batch:PresentationBatch):AbilityCue[]{
     if(batch.action.type==='end-turn'&&batch.after.turn===i)p.board.filter(m=>m.staked).forEach((m,index)=>add('gas',m.uid,gas(i),'after',index*.045));
   });
   if(batch.action.type==='stake'||batch.action.type==='unstake')add('seal',batch.action.uid,batch.action.uid,'after');
+  const investment=validatorPayout(batch);
+  if(investment)add('gas',`hero-${investment.owner}`,gas(investment.owner),'after',0,'aftermath');
   if(batch.action.type==='attack'){
     // Healing is observed, including actual lifesteal capped by treasury health.
     if(batch.after.players[owner].treasury>batch.before.players[owner].treasury)add('heal',batch.action.attackerUid,hero,'after');

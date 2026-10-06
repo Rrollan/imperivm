@@ -2,6 +2,7 @@ import { CARDS } from '../../lib/cards';
 import { HEROES } from '../../lib/heroes';
 import type { EffectDef } from '../../lib/engine/types';
 import type { Locale } from '../../lib/locale';
+import type {RulesetId} from '../../lib/engine/ruleset';
 
 /** UI rules come from the engine fields, keeping flavour text out of the action description. */
 export function effectText(effect: EffectDef, locale: Locale): string {
@@ -46,11 +47,11 @@ export function cardRules(id: string, locale: Locale,includeKeywords=true) {
   return rules.join(' ') || (!includeKeywords&&cardKeywords(id,locale).length?'':ru ? 'Боец без дополнительных способностей.' : 'A fighter with no additional abilities.');
 }
 
-export function powerRules(id: string, locale: Locale) {
+export function powerRules(id: string, locale: Locale,ruleset:RulesetId='classic-v1') {
   const ru = locale === 'ru';
   switch (HEROES[id].power) {
     case 'heal-treasury': return ru ? 'Восстанавливает 3 здоровья вашей казне.' : 'Restore 3 health to your treasury.';
-    case 'gain-gas': return ru ? 'Даёт 2 приказа в этом ходу.' : 'Gain 2 orders this turn.';
+    case 'gain-gas': return ruleset==='validator-investment-v1'?(ru?'Потратьте приказы сейчас. В начале следующего своего хода получите +2 приказа сверх запаса, после исполнения указов.':'Spend orders now. Gain +2 orders above capacity at the start of your next turn, after edicts resolve.'):(ru ? 'Даёт 2 приказа в этом ходу.' : 'Gain 2 orders this turn.');
     case 'draw-burn': return ru ? 'Добирает карту. Ваша казна получает 2 урона.' : 'Draw a card. Your treasury takes 2 damage.';
     case 'damage-random-enemy': return ru ? '2 урона случайному бойцу противника. Если бойцов нет — казне.' : 'Deal 2 damage to a random enemy fighter, or the treasury if none remain.';
   }

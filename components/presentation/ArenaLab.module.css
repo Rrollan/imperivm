@@ -103,3 +103,4 @@
 .shell .close,.shell .inspectionBack{display:grid;place-items:center;padding:0;border:2px solid #c69b58;border-radius:10px;background:linear-gradient(145deg,#947044,#4b301d 65%) !important;box-shadow:inset 0 0 0 2px #4c321e,inset 0 0 0 3px #af874d,0 2px 4px #1b10084d;color:#f7e5bc;}
 .close svg,.inspectionBack svg{width:24px;height:24px;display:block;}
 .shell .close:hover,.shell .inspectionBack:hover{filter:brightness(1.14);}
+.rulesetBadge{position:absolute;z-index:4;left:14px;top:12px;max-width:calc(100% - 76px);padding:6px 10px;border:1px solid #9c7b46;border-radius:4px;background:#2b211bd9;color:#edce8a;font:650 12px/1.3 var(--font-sans);pointer-events:none;}.investmentPending{padding:9px 12px;border-left:3px solid #bc995b;background:#bda26026;font-weight:700;}

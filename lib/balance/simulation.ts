@@ -2,6 +2,7 @@ import {chooseAiAction} from '../ai';
 import {CARDS} from '../cards';
 import {createGame,applyAction,legalActions,mempoolOf} from '../engine/engine';
 import type {Action,GameState,PlayerId} from '../engine/types';
+import {pendingValidatorOrders,type RulesetId} from '../engine/ruleset';
 
 export type ProbePolicy='greedy'|'pressure';
 export interface MatchProbe {
@@ -27,8 +28,8 @@ export function chooseProbeAction(state:GameState,policy:ProbePolicy):Action {
 }
 
 /** Real engine transitions, opening mulligans included, with bounded termination. */
-export function probeMatch(heroA:string,deckA:string[],heroB:string,deckB:string[],seed:number,policies:[ProbePolicy,ProbePolicy]=['greedy','greedy']):MatchProbe {
-  let state=createGame(heroA,deckA,heroB,deckB,{enableMulligan:true},seed);
+export function probeMatch(heroA:string,deckA:string[],heroB:string,deckB:string[],seed:number,policies:[ProbePolicy,ProbePolicy]=['greedy','greedy'],ruleset:RulesetId='classic-v1'):MatchProbe {
+  let state=createGame(heroA,deckA,heroB,deckB,{enableMulligan:true,ruleset},seed);
   const result:MatchProbe={winner:null,blocks:1,actions:0,casts:0,counters:0,powers:[0,0],neutralPowers:[0,0],stakes:0,factionRefunds:0};
   while(state.winner===null&&result.actions<2000){
     const owner=state.turn,enemy:PlayerId=owner===0?1:0;
@@ -43,7 +44,7 @@ export function probeMatch(heroA:string,deckA:string[],heroB:string,deckB:string
       result.powers[owner]++;
       const beforeMe=state.players[owner],afterMe=after.players[owner];
       const sameEnemy=JSON.stringify(state.players[enemy].board)===JSON.stringify(after.players[enemy].board)&&state.players[enemy].treasury===after.players[enemy].treasury;
-      if(sameEnemy&&beforeMe.treasury===afterMe.treasury&&beforeMe.hand.length===afterMe.hand.length&&beforeMe.gas===afterMe.gas)result.neutralPowers[owner]++;
+      if(sameEnemy&&beforeMe.treasury===afterMe.treasury&&beforeMe.hand.length===afterMe.hand.length&&beforeMe.gas===afterMe.gas&&pendingValidatorOrders(state,owner)===pendingValidatorOrders(after,owner))result.neutralPowers[owner]++;
     }
     if(action.type==='stake')result.stakes++;
     state=after;result.actions++;

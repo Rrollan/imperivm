@@ -1,5 +1,6 @@
 import type {PresentationBatch} from './GameSession';
 import {directEffect} from './directPlay';
+import {validatorPayout} from './validatorInvestment';
 
 export type FloatKind='damage'|'heal'|'gas'|'buff'|'weaken';
 export type FloatCue={anchor:string;label:string;kind:FloatKind;wave?:string};
@@ -49,5 +50,7 @@ export function battleFloats(batch:PresentationBatch):FloatCue[]{
     if(gained>0)add(owner===0?'gas-counter':`hero-${owner}`,signed(gained),'gas');
     add(owner===0?'hero-power':`hero-${owner}`,'','buff');
   }
+  const investment=validatorPayout(batch);
+  if(investment)cues.push({anchor:investment.owner===0?'gas-counter':`hero-${investment.owner}`,label:signed(investment.amount),kind:'gas',wave:'aftermath'});
   return cues;
 }

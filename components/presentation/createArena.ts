@@ -36,6 +36,7 @@ import {CARD_FACE} from './cardFace';
 import {ordersLayout} from './ordersView';
 import {rulerSocket,turnSocket,edictRegister} from './boardSockets';
 import {targetingEdge,targetingInsets} from './targetingGeometry';
+import {validatorPayout} from './validatorInvestment';
 
 export type ArenaTarget = { kind: 'hand' | 'minion' | 'hero' | 'power' | 'command' | 'gas' | 'block' | 'deck' | 'scroll' | 'queue'; uid: string; owner: 0 | 1; cardId?: string };
 export interface ArenaMetrics { meshes: number; triangles: number; drawCalls: number; renderScale: number; renderWidth: number; renderHeight: number; models: number; failedModels: number; frames: number; frameMedianMs: number; frameP95Ms: number; renderP95Ms: number; gpu: string; pending: string[] }
@@ -499,6 +500,12 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const drawn=batch.after.players.flatMap((p,owner)=>p.hand.filter(c=>!batch.before.players[owner].hand.some(old=>old.uid===c.uid)).map(c=>({...c,owner:owner as 0|1,index:p.hand.findIndex(h=>h.uid===c.uid)})));
     textures.preloadCards(drawn.filter(c=>c.owner===0).map(c=>c.cardId));
     const timeline=effectTimeline(batch,options.reducedMotion);
+    const investmentPayout=validatorPayout(batch);
+    const paintOrdersFrame=(paid:boolean)=>{
+      const ordersState:GameState=investmentPayout?.owner===0&&!paid?{...batch.after,players:[{...batch.after.players[0],gas:batch.after.players[0].gas-investmentPayout.amount},batch.after.players[1]]}:batch.after;
+      const counter=entities.get('gas-counter');if(counter)paint(counter,ordersFace(ordersState));
+      gasFill(ordersState);
+    };
     let frameKey:string|null=null;
     const paintFrame=(elapsedMs:number)=>{
       if(!timeline)return;
@@ -507,6 +514,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       const frame=effectFrame(batch,timeline,elapsedMs);
       frame.fighters.forEach(minion=>{const entry=entities.get(minion.uid);if(entry&&!entry.root.isDisposed())paint(entry,{kind:'minion',minion,ready:false});});
       batch.after.players.forEach((player,p)=>{const entry=entities.get(`hero-${p}`);if(entry)paint(entry,{kind:'hero',heroId:player.heroId,treasury:frame.treasuries[p],aspect:rulerSocket(p,portrait).width/rulerSocket(p,portrait).height});});
+      if(investmentPayout?.owner===0)paintOrdersFrame(elapsedMs>=timeline.tailMs||timeline.windows.some(w=>w.key==='aftermath'&&elapsedMs>=w.contactMs));
     };
     const contactMs=options.reducedMotion?72:Math.max(spec.duration*spec.contact,(batch.events?.spellResolved?.length??0)*75+90);
     const duration=options.reducedMotion?Math.max(180,contactMs+(timeline?.tailMs??0)):Math.max(spec.duration,contactMs+(timeline?.tailMs??230)+(drawn.length?420+Math.max(0,drawn.length-1)*65:0));
@@ -640,8 +648,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         if (hero) paint(hero,{ kind: 'hero', heroId: player.heroId, treasury: player.treasury,aspect:rulerSocket(owner,portrait).width/rulerSocket(owner,portrait).height });
         player.board.forEach(minion => { const entry = entities.get(minion.uid); if (entry) paint(entry, { kind: 'minion', minion,readiness:fighterReadiness(batch.after,owner as 0|1,minion) }); });
       });
-      const gas = entities.get('gas-counter'); if (gas) paint(gas, ordersFace(batch.after));
-      gasFill(batch.after);
+      paintOrdersFrame(!timeline||investmentPayout?.owner!==0);
       const clock = entities.get('block-counter'); if (clock) paint(clock, { kind: 'block', block: batch.after.block });
       // Queue results are already computed by the rules, but the board reveals
       // each public stat change only at that source's presentation contact.

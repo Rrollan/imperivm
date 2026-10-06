@@ -44,6 +44,7 @@
   "scripts": {
     "balance": "node --import tsx scripts/balance.ts",
     "balance:check": "node --import tsx scripts/balance-check.ts",
+    "balance:investment-check": "node --import tsx scripts/validator-investment-check.ts",
     "build": "next build",
     "dev": "next dev",
     "smoke": "node --import tsx scripts/smoke.ts",

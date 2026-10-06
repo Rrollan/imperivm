@@ -5,6 +5,7 @@ import { HEROES } from '../../lib/heroes';
 import { diffAction, type BattleEvents } from '../../lib/events';
 import type { Action, GameState } from '../../lib/engine/types';
 import {historyEntry,type HistoryEntry} from './battleHistory';
+import type {RulesetId} from '../../lib/engine/ruleset';
 
 export interface PresentationBatch {
   id: number;
@@ -24,12 +25,10 @@ export interface SessionSnapshot {
 }
 
 /** A real, seeded mid-match encounter, reached entirely through legal engine actions. */
-export function createLabGame(heroId = 'builder', opening = false, seed = 2718, opponent?:string): GameState {
+export function createLabGame(heroId = 'builder', opening = false, seed = 2718, opponent?:string,ruleset:RulesetId='classic-v1'): GameState {
   const hero = Object.hasOwn(HEROES,heroId) ? heroId : 'builder';
   const foe = opponent&&Object.hasOwn(HEROES,opponent)?opponent:hero === 'degen' ? 'whale' : 'degen';
-  let state = opening
-    ? createGame(hero, DECKS[hero], foe, DECKS[foe], {enableMulligan:true}, seed)
-    : createGame(hero, DECKS[hero], foe, DECKS[foe], seed);
+  let state = createGame(hero, DECKS[hero], foe, DECKS[foe], {enableMulligan:opening,ruleset}, seed);
   if (!opening) {
     for (let step = 0; step < 180 && state.block < 9 && state.winner === null; step++) {
       state = applyAction(state, chooseAiAction(state));

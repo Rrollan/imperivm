@@ -27,6 +27,7 @@ import {ArenaInspection} from './ArenaInspection';
 import {ArenaCardPreview} from './ArenaCardPreview';
 import {heroPortraitPath} from './heroPortrait';
 import {factionLink} from './factionLink';
+import {rulesetOf,pendingValidatorOrders,type RulesetId} from '../../lib/engine/ruleset';
 
 function usePanelFocus(open: boolean, panel: React.RefObject<HTMLElement>, modal = false) {
   useEffect(() => {
@@ -46,10 +47,10 @@ function usePanelFocus(open: boolean, panel: React.RefObject<HTMLElement>, modal
   }, [open, panel, modal]);
 }
 
-export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent }: { heroId: string; opening: boolean; debug: boolean; seed?:number;opponent?:string }) {
+export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ruleset='classic-v1' }: { heroId: string; opening: boolean; debug: boolean; seed?:number;opponent?:string;ruleset?:RulesetId }) {
   const locale = useLocale(), reduced = useReducedMotion();
   const sessionRef = useRef<GameSession>();
-  if (!sessionRef.current) sessionRef.current = new GameSession(createLabGame(heroId, opening,seed,opponent));
+  if (!sessionRef.current) sessionRef.current = new GameSession(createLabGame(heroId, opening,seed,opponent,ruleset));
   const session = sessionRef.current;
   const [view, setView] = useState<SessionSnapshot>(() => session.snapshot());
   const [selected, setSelected] = useState<string | null>(null);
@@ -189,7 +190,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent }:
   function restart(nextHero = me.heroId, fromOpening = true) {
     renderer.current?.cancel(); select(null); setInspect(null);
     setHelp(false);setHistoryOpen(false);setKeyboard(false);setMulliganUids([]);setLastAction(null);setFailure('');
-    session.restart(createLabGame(nextHero, fromOpening,seed,opponent));
+    session.restart(createLabGame(nextHero, fromOpening,seed,opponent,ruleset));
   }
 
   const card = inspect?.cardId ? CARDS[inspect.cardId] : null;
@@ -224,6 +225,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent }:
   };
 
   return <main className={styles.shell}>
+    {rulesetOf(shown)==='validator-investment-v1'&&<div className={styles.rulesetBadge}>{locale.t('Эксперимент · Инвестиция Валидатора','Experiment · Validator investment')}</div>}
     <canvas ref={canvas} className={styles.canvas} aria-label={locale.t('Объёмный игровой стол IMPERIVM. Клавиатурное управление: меню игры, затем «Доступные действия».', 'IMPERIVM game table. Keyboard controls: open the game menu, then Available actions.')} />
     <header className={styles.header}><button className={styles.settingsButton} onClick={() => { select(null); setInspect(null); setHelp(true); }} aria-label={locale.t('Меню игры', 'Game menu')}><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M13 3h6l1 4 3 2 4-1 3 5-3 3v3l3 3-3 5-4-1-3 2-1 4h-6l-1-4-3-2-4 1-3-5 3-3v-3l-3-3 3-5 4 1 3-2z"/><circle cx="16" cy="17" r="5"/></svg></button></header>
 
@@ -262,7 +264,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent }:
       art={heroPortraitPath(inspectedHero.heroId)}
       actions={inspect.owner===0?<button className={styles.primary} disabled={!powerAction} onClick={()=>{if(powerAction)dispatch(powerAction);}}>{powerAction?<><span className={styles.costChip}>{effectivePowerCost(shown,0)}</span>{locale.powerName(inspectedHero.heroId)}</>:view.busy?locale.t('Действие завершается','Action in progress'):shown.turn!==0?locale.t('Ход противника','Enemy turn'):inspectedHero.heroPowerUsed?locale.t('Сила уже использована','Power already used'):locale.t('Недостаточно приказов','Not enough orders')}</button>:undefined}>
       <dl className={styles.inspectionStats}><div><dt>{locale.t('Казна','Treasury')}</dt><dd>{Math.max(0,inspectedHero.treasury)}</dd></div><div><dt>{locale.t('Цена силы','Power cost')}</dt><dd>{effectivePowerCost(shown,inspect.owner)}</dd></div></dl>
-      <section className={styles.powerDescription}><h3>{locale.powerName(inspectedHero.heroId)}</h3><p className={styles.inspectionRules}>{powerRules(inspectedHero.heroId,locale.locale)}</p><p>{locale.t('Один раз за ход.','Once per turn.')}</p></section>
+      <section className={styles.powerDescription}><h3>{locale.powerName(inspectedHero.heroId)}</h3><p className={styles.inspectionRules}>{powerRules(inspectedHero.heroId,locale.locale,rulesetOf(shown))}</p><p>{locale.t('Один раз за ход.','Once per turn.')}</p>{pendingValidatorOrders(shown,inspect.owner)>0&&<p className={styles.investmentPending}>{locale.t('+2 приказа в начале следующего своего хода.','+2 orders at the start of the next own turn.')}</p>}</section>
     </ArenaInspection>}
 
     {inspect&&['gas','block','deck','scroll'].includes(inspect.kind)&&<ArenaInspection key={inspect.kind} {...inspectionProps}
@@ -296,7 +298,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent }:
     {historyOpen&&<div className={styles.modalBackdrop}><section ref={historyPanel} className={styles.history} role="dialog" aria-modal="true" aria-label={locale.t('История боя','Battle history')}><button className={styles.close} onClick={()=>setHistoryOpen(false)} aria-label={locale.t('Закрыть историю','Close history')}><RomanIcon name="close"/></button><BattleChronicle entries={view.history} locale={locale.locale} cardName={locale.cardName} heroName={locale.heroName} powerName={locale.powerName} onCard={(cardId,owner)=>{setHistoryOpen(false);setInspect({kind:'queue',uid:'historical-card',owner,cardId});}}/></section></div>}
 
     {shown.winner !== null && !view.busy && <div className={styles.modalBackdrop}><section ref={resultPanel} className={`${styles.result} ${victorySrc?styles.resultWithFx:''}`} role="dialog" aria-modal="true" aria-label={locale.t('Результат боя','Battle result')}><span className={styles.eyebrow}>IMPERIVM</span><div className={victorySrc?styles.victoryBanner:undefined}>{victorySrc&&<video key={view.revision} src={victorySrc} autoPlay muted playsInline aria-hidden="true"/>}<h2>{shown.winner === 0 ? locale.t('Ваша империя устояла', 'Your empire stands') : shown.winner === 'draw' ? locale.t('Империи пали вместе', 'Both empires fell') : locale.t('Казна опустела', 'The treasury is empty')}</h2></div><p>{locale.t('Каждая потеря — урок для следующего блока.', 'Every loss is a lesson for the next block.')}</p><button className={styles.primary} onClick={() => restart()}>{locale.t('Ещё один бой', 'Another battle')}</button></section></div>}
-    {debug && <output hidden data-action={JSON.stringify({last:lastAction,turn:shown.turn,block:shown.block,busy:view.busy,command:view.busy?'busy':battleCommand(shown),history:view.history.length,orders:me.gas,capacity:me.maxGas,queued:mempoolOf(shown,0).map(entry=>entry.cardId)})}/>}
+    {debug && <output hidden data-action={JSON.stringify({last:lastAction,turn:shown.turn,block:shown.block,busy:view.busy,command:view.busy?'busy':battleCommand(shown),history:view.history.length,orders:me.gas,capacity:me.maxGas,pendingOrders:pendingValidatorOrders(shown,0),ruleset:rulesetOf(shown),queued:mempoolOf(shown,0).map(entry=>entry.cardId)})}/>}
     {debug && metrics && <output className={styles.metrics} hidden data-perf={JSON.stringify(metrics)}>{metrics.drawCalls} draws · {Math.round(metrics.triangles).toLocaleString()} triangles · {metrics.meshes} meshes · {metrics.models} models · {metrics.failedModels} failed · {metrics.frameMedianMs}/{metrics.frameP95Ms} ms median/p95 · 1 canvas</output>}
   </main>;
 }

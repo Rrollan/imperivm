@@ -11,10 +11,10 @@
 
 import { CARDS } from '../cards';
 import { HEROES } from '../heroes';
+import {rulesetOf,pendingValidatorOrders,type RulesetOptions,type RulesetId} from './ruleset';
 import type {
   Action,
   CardDef,
-  CreateGameOptions,
   EffectDef,
   Faction,
   GameState,
@@ -39,6 +39,7 @@ import type {
 
 interface EnginePlayer extends PlayerState {
   mempool: MempoolEntry[];
+  validatorIncome?:number;
 }
 
 interface EngineGame extends GameState {
@@ -49,6 +50,7 @@ interface EngineGame extends GameState {
   mulliganPhase: [boolean, boolean]; // true while that player may still mulligan
   /** Per-action ledger for targeted delayed effects. */
   spellEffects?: SpellEffectResult[];
+  rulesetVersion?:RulesetId;
 }
 
 /** Read a player's mempool (cast spells waiting to resolve next turn). */
@@ -470,6 +472,12 @@ function completeTurnStart(s: EngineGame): void {
   // 3. Gas refill: maxGas grows, staked minions add +1 gas each.
   me.maxGas = Math.min(10, me.maxGas + 1);
   me.gas = me.maxGas + me.board.filter(m => m.staked).length + queuedOrders;
+  const investment=pendingValidatorOrders(s,s.turn);
+  if(investment>0){
+    me.gas+=investment;
+    delete me.validatorIncome;
+    pushLog(s,`P${s.turn} validator investment pays ${investment} gas`);
+  }
   me.heroPowerUsed = false;
 
   // 3b. Pavilion reset for the new active player; additive stats above persist.
@@ -592,11 +600,11 @@ export function createGame(
   deckA: string[],
   heroB: string,
   deckB: string[],
-  arg5?: number | CreateGameOptions,
+  arg5?: number | RulesetOptions,
   arg6?: number,
 ): GameState {
   let seed: number | undefined;
-  let opts: CreateGameOptions | undefined;
+  let opts: RulesetOptions | undefined;
   if (typeof arg5 === 'number') {
     seed = arg5;
   } else if (arg5 && typeof arg5 === 'object') {
@@ -629,6 +637,7 @@ export function createGame(
   };
 
   const enableMulligan = opts?.enableMulligan === true;
+  if(opts?.ruleset!==undefined&&opts.ruleset!=='classic-v1'&&opts.ruleset!=='validator-investment-v1')throw new Error('unknown ruleset');
   if (opts?.mulliganCount !== undefined &&
       (!Number.isInteger(opts.mulliganCount) || opts.mulliganCount < 0 || opts.mulliganCount > 4)) {
     throw new Error('mulliganCount must be an integer from 0 to 4');
@@ -646,6 +655,7 @@ export function createGame(
     mulliganCount,
     mulliganPhase: enableMulligan ? [true, true] : [false, false],
   };
+  if(opts?.ruleset==='validator-investment-v1')s.rulesetVersion=opts.ruleset;
 
   shuffleDeck(s, s.players[0].deck);
   shuffleDeck(s, s.players[1].deck);
@@ -926,8 +936,13 @@ export function applyAction(state: GameState, action: Action): GameState {
           checkWinner(s);
           break;
         case 'gain-gas':
-          me.gas += 2;
-          pushLog(s, `P${s.turn} gains 2 gas`);
+          if(rulesetOf(s)==='validator-investment-v1'){
+            me.validatorIncome=(me.validatorIncome??0)+2;
+            pushLog(s,`P${s.turn} reserves 2 gas for next own turn`);
+          }else{
+            me.gas += 2;
+            pushLog(s, `P${s.turn} gains 2 gas`);
+          }
           break;
       }
       return s;

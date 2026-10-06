@@ -3,6 +3,8 @@ import {HEROES} from '../../lib/heroes';
 import {CARDS} from '../../lib/cards';
 import {cardIdentity} from './cardIdentity';
 import {directEffect,playedFighter} from './directPlay';
+import {rulesetOf} from '../../lib/engine/ruleset';
+import {validatorPayout} from './validatorInvestment';
 
 export const VIDEO_IDS = ['01-impact','02-builder-heal','03-whale-impact','04-degen-draw','05-validator-gas','06-victory','07-spell-impact','08-spell-buff','09-spell-counter','10-deploy-legionary','11-deploy-guard','12-deploy-commander','13-deploy-minister','14-deploy-priest','15-deploy-engineer','16-edict-weaken','17-edict-heal'] as const;
 export type VideoId = typeof VIDEO_IDS[number];
@@ -23,7 +25,7 @@ export function videoCues(batch: PresentationBatch): VideoCue[] {
   if(action.type==='hero-power'){
     switch(HEROES[batch.before.players[owner].heroId].power){
       case 'heal-treasury':return batch.after.players[owner].treasury>batch.before.players[owner].treasury?[{id:'02-builder-heal',anchor:hero,width:5}]:[];
-      case 'gain-gas':return [{id:'05-validator-gas',anchor:owner===0?'gas-counter':hero,width:5}];
+      case 'gain-gas':return rulesetOf(batch.before)==='validator-investment-v1'?[]:[{id:'05-validator-gas',anchor:owner===0?'gas-counter':hero,width:5}];
       case 'draw-burn':return [{id:'04-degen-draw',anchor:hero,width:4}];
       case 'damage-random-enemy':{
         const target=batch.events?.damages?.find(d=>batch.before.players[1-owner].board.some(m=>m.uid===d.uid))?.uid ?? `hero-${1-owner}`;
@@ -54,6 +56,8 @@ export function videoCues(batch: PresentationBatch): VideoCue[] {
     if(kind==='summon')return batch.after.players[s.owner].board.filter(m=>!batch.before.players[s.owner].board.some(old=>old.uid===m.uid)).map(m=>({id:'08-spell-buff' as VideoId,anchor:m.uid,width:4}));
     return [];
   }));
+  const investment=validatorPayout(batch);
+  if(investment)cues.push({id:'05-validator-gas',anchor:investment.owner===0?'gas-counter':`hero-${investment.owner}`,width:5,wave:'aftermath'});
   if(!played&&action.type!=='cast-spell')cues.push(...cancellations);
   // Two simultaneous sprite layers are enough. Reuse them for each source
   // window instead of spending the whole action's budget on its first edict.
