@@ -42,7 +42,7 @@ if (!isGameOver(state) || state.winner === null) {
 console.log('SMOKE OK');
 
 // Use the installed loader directly; it needs no CLI IPC socket or package download.
-for (const script of ['scripts/validate-content.ts', 'scripts/regressions.ts', 'scripts/edicts-check.ts', 'scripts/arena-actions-check.ts', 'scripts/arena-card-matrix.ts']) {
+for (const script of ['scripts/validate-content.ts', 'scripts/regressions.ts', 'scripts/edicts-check.ts', 'scripts/arena-actions-check.ts', 'scripts/arena-card-matrix.ts', 'scripts/presentation-check.ts', 'scripts/battle-readability-check.ts', 'scripts/battle-history-check.ts', 'scripts/mixed-queue-check.ts']) {
   const result = spawnSync(process.execPath, ['--import', 'tsx', script], { stdio: 'inherit' });
   if (result.status !== 0) process.exit(result.status ?? 1);
 }

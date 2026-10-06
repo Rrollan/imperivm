@@ -250,7 +250,7 @@ export class ArenaTextures {
       }
       ctx.restore();
     }else if(readiness==='fresh'){
-      ctx.save();ctx.fillStyle='#d7cdb8';ctx.strokeStyle='#483728';ctx.lineWidth=6;ctx.font=`800 58px ${this.font}`;ctx.textAlign='center';ctx.strokeText('Z',192,470);ctx.fillText('Z',192,470);ctx.restore();
+      ctx.save();ctx.fillStyle='#f1dec0';ctx.strokeStyle='#483728';ctx.lineWidth=6;ctx.font=`800 86px ${this.font}`;ctx.textAlign='center';ctx.strokeText('Z',265,86);ctx.fillText('Z',265,86);ctx.font=`800 56px ${this.font}`;ctx.strokeText('z',319,43);ctx.fillText('z',319,43);ctx.restore();
     }else if(readiness==='exhausted'||readiness==='no-target'){
       ctx.save();ctx.strokeStyle='#776e5b';ctx.lineWidth=7;ctx.beginPath();ctx.arc(192,452,24,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(179,465);ctx.lineTo(205,439);ctx.stroke();ctx.restore();
     }

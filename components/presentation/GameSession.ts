@@ -4,6 +4,7 @@ import { DECKS } from '../../lib/decks';
 import { HEROES } from '../../lib/heroes';
 import { diffAction, type BattleEvents } from '../../lib/events';
 import type { Action, GameState } from '../../lib/engine/types';
+import {historyEntry,type HistoryEntry} from './battleHistory';
 
 export interface PresentationBatch {
   id: number;
@@ -19,6 +20,7 @@ export interface SessionSnapshot {
   shown: GameState;
   busy: boolean;
   revision: number;
+  history: readonly HistoryEntry[];
 }
 
 /** A real, seeded mid-match encounter, reached entirely through legal engine actions. */
@@ -43,12 +45,14 @@ export class GameSession {
   private pending: PresentationBatch | null = null;
   private revision = 0;
   private serial = 0;
+  private history:HistoryEntry[]=[];
+  private recordedId:number|null=null;
   private listeners = new Set<(snapshot: SessionSnapshot) => void>();
 
   constructor(initial: GameState) { this.state = initial; this.shown = initial; }
 
   snapshot(): SessionSnapshot {
-    return { state: this.state, shown: this.shown, busy: this.pending !== null, revision: this.revision };
+    return { state: this.state, shown: this.shown, busy: this.pending !== null, revision: this.revision,history:this.history };
   }
 
   subscribe(listener: (snapshot: SessionSnapshot) => void) {
@@ -74,12 +78,14 @@ export class GameSession {
 
   impact(id: number) {
     if (this.pending?.id !== id) return;
+    this.record(this.pending);
     this.shown = this.pending.after;
     this.publish();
   }
 
   complete(id: number) {
     if (this.pending?.id !== id) return;
+    this.record(this.pending);
     this.shown = this.state;
     this.pending = null;
     this.publish();
@@ -89,8 +95,14 @@ export class GameSession {
     this.serial++;
     this.revision++;
     this.pending = null;
+    this.history=[];this.recordedId=null;
     this.state = initial;
     this.shown = initial;
     this.publish();
+  }
+
+  private record(batch:PresentationBatch){
+    if(this.recordedId===batch.id)return;
+    this.recordedId=batch.id;this.history=[...this.history,historyEntry(batch)].slice(-60);
   }
 }

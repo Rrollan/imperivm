@@ -21,6 +21,7 @@ import {roleName,rankName,cardIdentity} from './cardIdentity';
 import {ordersView} from './ordersView';
 import {cardArtPath} from '../../lib/cardArt';
 import {OpeningHand} from './OpeningHand';
+import {BattleChronicle} from './BattleChronicle';
 
 function usePanelFocus(open: boolean, panel: React.RefObject<HTMLElement>, modal = false) {
   useEffect(() => {
@@ -53,7 +54,8 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
   const [muted, updateMuted] = useState(true);
   const [quality,setQuality] = useState<RenderQuality>('auto');
   const [help, setHelp] = useState(false);
-  const helpOpen=useRef(help);helpOpen.current=help;
+  const [historyOpen,setHistoryOpen]=useState(false);
+  const pausedPanel=useRef(false);pausedPanel.current=help||historyOpen;
   const [keyboard, setKeyboard] = useState(false);
   const [metrics, setMetrics] = useState<ArenaMetrics | null>(null);
   const [lastAction,setLastAction] = useState<{type:string;owner:number;revision:number}|null>(null);
@@ -61,12 +63,13 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
   const [pageVisible,setPageVisible] = useState(true);
   const canvas = useRef<HTMLCanvasElement>(null);
   const renderer = useRef<ArenaRenderer | null>(null);
-  const helpPanel = useRef<HTMLElement>(null), actionPanel = useRef<HTMLElement>(null), resultPanel = useRef<HTMLElement>(null), mulliganPanel=useRef<HTMLElement>(null);
+  const helpPanel = useRef<HTMLElement>(null), actionPanel = useRef<HTMLElement>(null), resultPanel = useRef<HTMLElement>(null), mulliganPanel=useRef<HTMLElement>(null),historyPanel=useRef<HTMLElement>(null);
   const showMulligan=ready&&!view.busy&&view.state.turn===0&&mulliganAvailable(view.state);
   usePanelFocus(help, helpPanel, true);
   usePanelFocus(keyboard, actionPanel);
   usePanelFocus(view.shown.winner !== null, resultPanel, true);
   usePanelFocus(showMulligan,mulliganPanel,true);
+  usePanelFocus(historyOpen,historyPanel,true);
   const selectedRef = useRef<string | null>(null);
   const callbacks = useRef({ pick: (_target: ArenaTarget) => {}, play: (_uid: string) => {}, attack: (_uid: string, _target: string) => {} });
   const shown = view.shown, me = shown.players[0], foe = shown.players[1];
@@ -156,31 +159,31 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
   useEffect(() => { renderer.current?.sync(view.shown); }, [view.shown]);
   useEffect(() => { renderer.current?.setLocale(locale.locale); }, [locale.locale]);
   useEffect(() => { renderer.current?.setReducedMotion(reduced); }, [reduced]);
-  useEffect(()=>{renderer.current?.setPaused(help);},[help,ready]);
+  useEffect(()=>{renderer.current?.setPaused(help||historyOpen);},[help,historyOpen,ready]);
   useEffect(()=>{const visibility=()=>setPageVisible(!document.hidden);visibility();document.addEventListener('visibilitychange',visibility);return()=>document.removeEventListener('visibilitychange',visibility);},[]);
-  useEffect(() => {renderer.current?.setOverlayOpen(help||keyboard||inspect!==null||showMulligan||shown.winner!==null);},[help,keyboard,inspect,ready,showMulligan,shown.winner]);
+  useEffect(() => {renderer.current?.setOverlayOpen(help||historyOpen||keyboard||inspect!==null||showMulligan||shown.winner!==null);},[help,historyOpen,keyboard,inspect,ready,showMulligan,shown.winner]);
   useEffect(() => {
     try {const saved=localStorage.getItem('imperivm-arena-quality');if(saved==='auto'||saved==='sharp'||saved==='fast')setQuality(saved);} catch {}
   }, []);
   useEffect(() => {renderer.current?.setQuality(quality);}, [quality,ready]);
   useEffect(() => { updateMuted(isMuted()); return onMuteChange(updateMuted); }, []);
   useEffect(() => {
-    if (!ready || !pageVisible || help || view.busy || view.state.winner !== null || view.state.turn !== 1) return;
+    if (!ready || !pageVisible || help || historyOpen || view.busy || view.state.winner !== null || view.state.turn !== 1) return;
     const timer = window.setTimeout(() => {
       const current=session.snapshot();
-      if(document.hidden||helpOpen.current||current.busy||current.state.winner!==null||current.state.turn!==1)return;
+      if(document.hidden||pausedPanel.current||current.busy||current.state.winner!==null||current.state.turn!==1)return;
       dispatch(chooseAiAction(current.state));
     }, reduced ? 180 : 450);
     return () => window.clearTimeout(timer);
-  }, [view.revision, view.busy, view.state, ready, pageVisible, help, reduced, dispatch, session]);
+  }, [view.revision, view.busy, view.state, ready, pageVisible, help, historyOpen, reduced, dispatch, session]);
   useEffect(() => {
-    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { select(null); setInspect(null); setHelp(false); setKeyboard(false); setMulliganUids([]); } };
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { select(null); setInspect(null); setHelp(false); setHistoryOpen(false); setKeyboard(false); setMulliganUids([]); } };
     window.addEventListener('keydown', escape); return () => window.removeEventListener('keydown', escape);
   }, [select]);
 
   function restart(nextHero = me.heroId, fromOpening = true) {
     renderer.current?.cancel(); select(null); setInspect(null);
-    setHelp(false);setKeyboard(false);setMulliganUids([]);setLastAction(null);setFailure('');
+    setHelp(false);setHistoryOpen(false);setKeyboard(false);setMulliganUids([]);setLastAction(null);setFailure('');
     session.restart(createLabGame(nextHero, fromOpening,seed));
   }
 
@@ -229,7 +232,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
         <dl><div><dt>{locale.t('Стоимость', 'Cost')}</dt><dd>{card.cost}</dd></div>{card.type === 'minion' && <><div><dt>{locale.t('Атака', 'Attack')}</dt><dd>{inspectedMinion?.attack ?? card.attack}</dd></div><div><dt>{locale.t('Здоровье', 'Health')}</dt><dd>{inspectedMinion?`${inspectedMinion.health}/${inspectedMinion.maxHealth}`:card.health}</dd></div></>}</dl>
         {rules&&<p>{rules}</p>}
         {keywords.length>0&&<div className={styles.keywords}>{keywords.map(keyword=><details key={keyword.name}><summary>{keyword.name}</summary><p>{keyword.description}</p></details>)}</div>}
-        {card.type==='spell'&&<p className={styles.targetHint}>{locale.t('Указ: ждёт в очереди слева и срабатывает в начале следующего хода владельца.','Edict: waits in the left queue and resolves at the start of its owner’s next turn.')}</p>}
+        {card.type==='spell'&&<p className={styles.targetHint}>{locale.t('При розыгрыше попадает в очередь. Срабатывает в начале следующего хода владельца.','On play, enters the queue. Resolves at the start of its owner’s next turn.')}</p>}
         {inspectedReadiness&&<p className={styles.fighterStatus}>{readinessText(inspectedReadiness,locale.locale)}</p>}
         {inspectedMinion&&((inspectedMinion.attack!==card.attack)||(inspectedMinion.maxHealth!==card.health))&&<p className={styles.statChanges}>{locale.t('Базовые характеристики: ','Base stats: ')}{card.attack}/{card.health}. {locale.t('Сейчас: ','Now: ')}{inspectedMinion.attack}/{inspectedMinion.maxHealth}.</p>}
         {inspectedMinion&&card.halvingPeriod&&<p className={styles.statChanges}>{locale.t('Следующее усиление: блок ','Next growth: block ')}{nextHalvingBlock(shown.block,card.halvingPeriod)}.</p>}
@@ -252,7 +255,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
       {inspect.kind==='gas' && <><h2>{locale.t('Приказы','Orders')} {me.gas}</h2><p>{locale.t('Основной запас: ','Base capacity: ')}{me.maxGas}. {locale.t('Бонус: ','Bonus: ')}+{ordersView(me.gas,me.maxGas).bonus}.</p><p>{locale.t('Каждый светящийся камень — один доступный приказ. Золотистые камни — бонусные. При запасе больше 10 остаток указан числом. Приказы расходуются на карты и силу правителя; запас пополняется в начале вашего хода.','Each lit stone is one available order. Gold stones are bonuses. Beyond ten sockets, extra orders are counted numerically. Spend orders on cards and the ruler’s power; refill at the start of your turn.')}</p></>}
       {inspect.kind==='block' && <><h2>{locale.t('Ход','Turn')} {shown.block}</h2><p>{locale.t('В начале вашего хода срабатывают ваши указы и восстанавливается запас приказов.','Your edicts resolve and orders refill at the start of your turn.')}</p></>}
       {inspect.kind==='deck' && <><h2>{locale.t('Колода','Deck')}</h2><p>{me.deck.length} {locale.t('карт осталось. В начале хода вы берёте следующую карту. Пустая колода наносит урон казне.','cards remain. Draw a card at the start of your turn. An empty deck damages your treasury.')}</p></>}
-      {inspect.kind==='scroll' && <><h2>{locale.t('Очередь указов','Edict queue')}</h2><p>{locale.t('Указы срабатывают в начале следующего хода владельца, по порядку разыгрывания.','Edicts resolve at the start of their owner’s next turn, in cast order.')}</p>{([0,1] as const).map(owner=><div key={owner}><h3>{owner===0?locale.t('Ваши указы','Your edicts'):locale.t('Указы соперника','Enemy edicts')}</h3>{mempoolOf(shown,owner).length?mempoolOf(shown,owner).map((entry,index)=><button key={entry.uid} onClick={()=>setInspect({kind:'queue',uid:`queued-${entry.uid}`,owner,cardId:entry.cardId})}>{index+1}. {locale.cardName(entry.cardId)}</button>):<p>{locale.t('Очередь пуста.','No pending edicts.')}</p>}</div>)}</>}
+      {inspect.kind==='scroll' && <><h2>{locale.t('Очередь указов','Edict queue')}</h2><p>{locale.t('Указы срабатывают в начале следующего хода владельца, по порядку разыгрывания.','Edicts resolve at the start of their owner’s next turn, in cast order.')}</p>{([0,1] as const).map(owner=><div key={owner}><h3>{owner===0?locale.t('Ваши указы','Your edicts'):locale.t('Указы соперника','Enemy edicts')}</h3>{mempoolOf(shown,owner).length?mempoolOf(shown,owner).map((entry,index)=><button key={entry.uid} onClick={()=>setInspect({kind:'queue',uid:`queued-${entry.uid}`,owner,cardId:entry.cardId})}>{index+1}. {locale.cardName(entry.cardId)}</button>):<p>{locale.t('Очередь пуста.','No pending edicts.')}</p>}</div>)}<button onClick={()=>{setInspect(null);setHistoryOpen(true);}}>{locale.t('История боя','Battle history')}</button></>}
     </div></section>}
 
     {keyboard && <section ref={actionPanel} className={styles.actionsPanel} role="dialog" aria-label={locale.t('Доступные действия', 'Available actions')}><button className={styles.close} onClick={() => setKeyboard(false)} aria-label={locale.t('Закрыть действия', 'Close actions')}>×</button><h2>{locale.t('Доступные действия', 'Available actions')}</h2><p>{locale.t('Управление с клавиатуры: Tab, Enter. Esc закрывает окно.', 'Keyboard controls: Tab, Enter. Esc closes the panel.')}</p>{view.state.turn === 0 && !view.busy ? legal.map((action, index) => <button key={index} onClick={() => dispatch(action)}>{actionLabel(action)}</button>) : <p>{locale.t('Ожидаем завершения действия соперника.', 'Waiting for the opponent.')}</p>}</section>}
@@ -262,6 +265,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
       <h2>{locale.t('Пауза', 'Pause')}</h2>
       <div className={styles.menuActions}>
         <button className={styles.primary} onClick={() => setHelp(false)}>{locale.t('Продолжить', 'Resume')}</button>
+        <button onClick={()=>{setHelp(false);setHistoryOpen(true);}}>{locale.t('История боя','Battle history')}</button>
         <button onClick={() => { void unlockAudio(); setMuted(!muted); }}>{muted ? locale.t('Звук: выключен', 'Sound: off') : locale.t('Звук: включён', 'Sound: on')}</button>
         <button onClick={() => locale.setLocale(locale.locale === 'ru' ? 'en' : 'ru')}>{locale.locale === 'ru' ? 'Язык: Русский' : 'Language: English'}</button>
         <button onClick={() => {const next=quality==='auto'?'sharp':quality==='sharp'?'fast':'auto';setQuality(next);try{localStorage.setItem('imperivm-arena-quality',next);}catch{}}}>{locale.t('Изображение: ', 'Image: ')}{quality==='auto'?locale.t('авто','auto'):quality==='sharp'?locale.t('чётче','sharper'):locale.t('быстрее','faster')}</button>
@@ -271,8 +275,10 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
       <Link className={styles.leaveArena} href="/arena">{locale.t('Покинуть арену', 'Leave arena')}</Link>
     </section></div>}
 
+    {historyOpen&&<div className={styles.modalBackdrop}><section ref={historyPanel} className={styles.history} role="dialog" aria-modal="true" aria-label={locale.t('История боя','Battle history')}><button className={styles.close} onClick={()=>setHistoryOpen(false)} aria-label={locale.t('Закрыть историю','Close history')}>×</button><BattleChronicle entries={view.history} locale={locale.locale} cardName={locale.cardName} heroName={locale.heroName} powerName={locale.powerName} onCard={(cardId,owner)=>{setHistoryOpen(false);setInspect({kind:'queue',uid:'historical-card',owner,cardId});}}/></section></div>}
+
     {shown.winner !== null && <div className={styles.modalBackdrop}><section ref={resultPanel} className={`${styles.result} ${victorySrc?styles.resultWithFx:''}`} role="dialog" aria-modal="true" aria-label={locale.t('Результат боя','Battle result')}><span className={styles.eyebrow}>IMPERIVM</span><div className={victorySrc?styles.victoryBanner:undefined}>{victorySrc&&<video key={view.revision} src={victorySrc} autoPlay muted playsInline aria-hidden="true"/>}<h2>{shown.winner === 0 ? locale.t('Ваша империя устояла', 'Your empire stands') : shown.winner === 'draw' ? locale.t('Империи пали вместе', 'Both empires fell') : locale.t('Казна опустела', 'The treasury is empty')}</h2></div><p>{locale.t('Каждая потеря — урок для следующего блока.', 'Every loss is a lesson for the next block.')}</p><button className={styles.primary} onClick={() => restart()}>{locale.t('Ещё один бой', 'Another battle')}</button></section></div>}
-    {debug && <output hidden data-action={JSON.stringify({last:lastAction,turn:shown.turn,block:shown.block,busy:view.busy,command:view.busy?'busy':battleCommand(shown),orders:me.gas,capacity:me.maxGas,queued:mempoolOf(shown,0).map(entry=>entry.cardId)})}/>}
+    {debug && <output hidden data-action={JSON.stringify({last:lastAction,turn:shown.turn,block:shown.block,busy:view.busy,command:view.busy?'busy':battleCommand(shown),history:view.history.length,orders:me.gas,capacity:me.maxGas,queued:mempoolOf(shown,0).map(entry=>entry.cardId)})}/>}
     {debug && metrics && <output className={styles.metrics} hidden data-perf={JSON.stringify(metrics)}>{metrics.drawCalls} draws · {Math.round(metrics.triangles).toLocaleString()} triangles · {metrics.meshes} meshes · {metrics.models} models · {metrics.failedModels} failed · {metrics.frameMedianMs}/{metrics.frameP95Ms} ms median/p95 · 1 canvas</output>}
   </main>;
 }

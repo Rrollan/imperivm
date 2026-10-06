@@ -28,3 +28,10 @@ export function deathProgress(progress:number,contact:number){
   const after=(progress-contact)/Math.max(.001,1-contact);
   return smooth((after-.12)/.88);
 }
+
+/** Stagger within a phase, so long queues cannot push an accent past completion. */
+export function accentProgress(progress:number,contact:number,phase:'contact'|'after',delay:number){
+  const phaseTime=phase==='after'?(progress-contact)/Math.max(.001,1-contact):progress/Math.max(.001,contact);
+  const stagger=Math.min(.6,Math.max(0,delay));
+  return (phaseTime-stagger)/(1-stagger);
+}

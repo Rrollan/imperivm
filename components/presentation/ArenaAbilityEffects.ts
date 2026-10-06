@@ -6,7 +6,7 @@ import {Vector3} from '@babylonjs/core/Maths/math.vector';
 import type {Mesh} from '@babylonjs/core/Meshes/mesh';
 import type {Scene} from '@babylonjs/core/scene';
 import {abilityCues,type AccentKind,type AbilityCue} from './abilityCues';
-import {smooth} from './motionSpec';
+import {smooth,accentProgress} from './motionSpec';
 import type {PresentationBatch} from './GameSession';
 
 type Piece={mesh:Mesh;material:StandardMaterial};
@@ -51,7 +51,7 @@ export class ArenaAbilityEffects {
   }
   tick(progress:number,contact:number,reduced:boolean){
     this.live.forEach(({piece:{mesh,material},cue,from,to})=>{
-      const t=cue.phase==='after'?(progress-contact-cue.delay)/(1-contact-cue.delay):(progress-cue.delay)/Math.max(.01,contact-cue.delay);
+      const t=accentProgress(progress,contact,cue.phase,cue.delay);
       mesh.setEnabled(t>=0&&t<1);if(t<0||t>=1)return;
       const travel=reduced?1:smooth(t);
       mesh.position.copyFrom(Vector3.Lerp(from,to,travel));mesh.position.z=-8;

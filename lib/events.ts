@@ -57,6 +57,8 @@ export interface DeadMinion {
   owner: PlayerId;
   /** True for destruction by RUG PULL. */
   byRugi: boolean;
+  /** Explicit cause where known; `unknown` avoids guessing from a batch-wide RUG marker. */
+  cause?: 'damage' | 'rugpull' | 'unknown';
 }
 
 export interface DamageInstance {
@@ -184,6 +186,42 @@ function findMinion(
     if (m) return { owner, minion: m };
   }
   return null;
+}
+
+/**
+ * Identify the prior-board fighters that were still alive when a resolved
+ * RUG PULL reached the queue. The overall RUG log marker is batch-wide, so
+ * it cannot by itself assign a cause to every UID that disappeared.
+ */
+function rugPullVictimUids(
+  prev: GameState,
+  resolved: NonNullable<BattleEvents['spellResolved']> | undefined,
+  effectResults: SpellEffectResult[],
+): Set<string> {
+  const victims = new Set<string>();
+  if (!resolved) return victims;
+  const rugIndex = resolved.findIndex(entry => CARDS[entry.cardId]?.spell?.kind === 'rugpull');
+  if (rugIndex < 0) return victims;
+
+  const resolveOrder = new Map<string, number>();
+  resolved.forEach((entry, index) => resolveOrder.set(entry.mempoolUid, index));
+  const killedBeforeRug = new Set<string>();
+  for (const effect of effectResults) {
+    const index = resolveOrder.get(effect.mempoolUid);
+    if (index === undefined || index >= rugIndex || !effect.kind.startsWith('damage-')) continue;
+    for (const target of effect.targets) {
+      if (!target.uid.startsWith('hero-') && target.healthAfter === 0) {
+        killedBeforeRug.add(target.uid);
+      }
+    }
+  }
+
+  for (const player of prev.players) {
+    for (const minion of player.board) {
+      if (!killedBeforeRug.has(minion.uid)) victims.add(minion.uid);
+    }
+  }
+  return victims;
 }
 
 /** Treasury or minion health diff between prev and next. */
@@ -345,6 +383,8 @@ function diffBoards(
   prev: GameState,
   next: GameState,
   rugPullActive: boolean,
+  lethalDamageUids: Set<string>,
+  rugPullUids: Set<string>,
   into: BattleEvents,
 ): void {
   const damages: DamageInstance[] = [];
@@ -356,8 +396,17 @@ function diffBoards(
 
     prevByUid.forEach((m, uid) => {
       if (!nextByUid.has(uid)) {
-        deaths.push({ uid, name: m.name, owner, byRugi: rugPullActive });
-        if (!rugPullActive) damages.push({ uid, name: m.name, health: 0,
+        // Use the resolved RUG's UID set, not the batch-wide marker. A
+        // lethal damage ledger outranks a later RUG; unresolved ambiguity is
+        // kept neutral rather than converted into a fictitious damage float.
+        const cause: NonNullable<DeadMinion['cause']> = rugPullUids.has(uid)
+          ? 'rugpull'
+          : rugPullActive && !lethalDamageUids.has(uid)
+            ? 'unknown'
+            : 'damage';
+        const byRugi = cause === 'rugpull';
+        deaths.push({ uid, name: m.name, owner, byRugi, cause });
+        if (cause === 'damage') damages.push({ uid, name: m.name, health: 0,
           maxHealth: m.maxHealth, prevHealth: m.health, died: true });
       }
     });
@@ -456,9 +505,19 @@ export function diffAction(
   diffMempool(prev, next, newLog, startTurnIdx, ev);
   const effectResults = spellEffectsOf(next);
   if (effectResults.length > 0) ev.effectResults = effectResults;
+  const lethalDamageUids = new Set<string>();
+  for (const effect of effectResults) {
+    if (!effect.kind.startsWith('damage-')) continue;
+    for (const target of effect.targets) {
+      if (!target.uid.startsWith('hero-') && target.healthAfter === 0) {
+        lethalDamageUids.add(target.uid);
+      }
+    }
+  }
+  const rugPullUids = rugPullVictimUids(prev, ev.spellResolved, effectResults);
 
   // ── 5. Board deltas. ──
-  diffBoards(prev, next, rugPullActive, ev);
+  diffBoards(prev, next, rugPullActive, lethalDamageUids, rugPullUids, ev);
 
   // ── 6. Action-specific overlays (lunge, play, priority counter). ──
   if (action) applyActionContext(prev, next, action, ev);

@@ -8,6 +8,7 @@ import type { Mesh } from '@babylonjs/core/Meshes/mesh';
 import type { PresentationBatch } from './GameSession';
 
 type Flash = { mesh: Mesh; texture: DynamicTexture; material: StandardMaterial; origin: Vector3; kind: 'damage' | 'heal' | 'gas' | 'arrival' | 'buff' | 'weaken' };
+const MAX_FLASHES=18;
 
 /** Transient feedback uses the same battle clock and camera as the pieces. */
 export class ArenaEffects {
@@ -26,7 +27,7 @@ export class ArenaEffects {
     this.aimMesh = MeshBuilder.CreatePlane('targeting arc',{width:32,height:20},scene);
     this.aimMesh.position.z=-12; this.aimMesh.material=this.aimMaterial;
     this.aimMesh.isPickable=false; this.aimMesh.renderingGroupId=3; this.aimMesh.setEnabled(false);
-    for(let i=0;i<6;i++)this.allocate();
+    for(let i=0;i<MAX_FLASHES;i++)this.allocate();
   }
 
   private allocate(){
@@ -80,8 +81,8 @@ export class ArenaEffects {
   begin(batch:PresentationBatch,locate:(uid:string)=>Vector3|undefined,arrival?:Vector3) {
     this.clear();
     const add=(position:Vector3|undefined,label:string,kind:Flash['kind'])=>{
-      if(!position||this.flashes.length>=18)return;
-      const flash=this.pool[this.flashes.length]??this.allocate();
+      if(!position||this.flashes.length>=MAX_FLASHES)return;
+      const flash=this.pool[this.flashes.length];
       const {texture,mesh,material}=flash;
       const ctx=texture.getContext() as unknown as CanvasRenderingContext2D;
       ctx.clearRect(0,0,256,256);

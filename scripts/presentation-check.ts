@@ -4,7 +4,7 @@ import { chooseAiAction } from '../lib/ai';
 import { GameSession, createLabGame } from '../components/presentation/GameSession';
 import { PresentationScheduler } from '../components/presentation/PresentationScheduler';
 import { videoCues } from '../components/presentation/videoCue';
-import {MOTION,settle,attackTravel,deathProgress} from '../components/presentation/motionSpec';
+import {MOTION,settle,attackTravel,deathProgress,accentProgress} from '../components/presentation/motionSpec';
 import {HEROES} from '../lib/heroes';
 import {abilityCues} from '../components/presentation/abilityCues';
 import {pixelRatio} from '../components/presentation/renderQuality';
@@ -120,6 +120,10 @@ async function main() {
     assert.equal(deathProgress(contact,contact),0,'Contact applies the result before the death departure');
     assert.ok(deathProgress((1+contact)/2,contact)>0,'Death departure must follow contact');
     assert.equal(deathProgress(1,contact),1,'The death departure must finish with the batch');
+    assert.ok(accentProgress(contact-.01,contact,'after',.9)<0,'A delayed accent cannot begin before contact');
+    const delayed=accentProgress(contact+(1-contact)*.8,contact,'after',.9);
+    assert.ok(delayed>0&&delayed<1,'Even a late counter in a long queue must have a visible phase');
+    assert.ok(Math.abs(accentProgress(1,contact,'after',.9)-1)<.00001);
   }
   const runSettle=(step:number)=>{let value=0;for(let elapsed=0;elapsed<210;elapsed+=step)value=settle(value,1,Math.min(step,210-elapsed),MOTION.hoverMs);return value;};
   assert.ok(Math.abs(runSettle(7)-runSettle(30))<.00001,'Hover motion must be independent of frame rate');
