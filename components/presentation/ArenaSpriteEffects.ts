@@ -28,7 +28,7 @@ export class ArenaSpriteEffects {
     const cached=this.clips.get(id);if(cached)return cached;
     const source=this.sources[id];
     if(this.disposed||!VIDEO_IDS.includes(id)||source?.src!==`/ui/arena-lab/fx/${id}.atlas.webp`||!source.columns||!source.rows||!source.frameCount||!source.fps)return;
-    // Keep all eight small combat atlases resident. Re-uploading an evicted atlas
+    // Keep the small combat atlases resident. Re-uploading an evicted atlas
     // and compiling its material at contact causes the first strike to stutter.
     const texture=new Texture(source.src,this.scene,false,true,Texture.BILINEAR_SAMPLINGMODE,this.invalidate,this.invalidate);
     texture.wrapU=Texture.CLAMP_ADDRESSMODE;texture.wrapV=Texture.CLAMP_ADDRESSMODE;

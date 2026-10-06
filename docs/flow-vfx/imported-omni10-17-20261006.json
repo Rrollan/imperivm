@@ -1,0 +1,142 @@
+{
+  "archive": "imperivm-omni-flash-vfx-10-17.zip",
+  "format": "1280x720, 24 fps, 4.01 seconds each; original audio excluded from game and previews",
+  "clips": [
+    {
+      "id": "10-deploy-legionary",
+      "sourceIndex": 10,
+      "sourceName": "10-deploy-legionary.mp4",
+      "sha256": "9bac503bd86062f93f812d941c63f6c972524bb9c69939347b758684871f9a49",
+      "sourceRange": [
+        0,
+        0.8333333333333334
+      ],
+      "playbackSeconds": 0.43333333333333335,
+      "preprocess": [
+        "setpts=0.520000000000*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Bronze dust at landing; omit isolated late flecks"
+    },
+    {
+      "id": "11-deploy-guard",
+      "sourceIndex": 11,
+      "sourceName": "11-deploy-guard.mp4",
+      "sha256": "e5cc90c3c130568893eaa19e0f4c30eb8656f93d43a458befe9eba45cb83632a",
+      "sourceRange": [
+        0,
+        0.5833333333333334
+      ],
+      "playbackSeconds": 0.5,
+      "preprocess": [
+        "setpts=0.857142857143*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "One shield glint and clean fade"
+    },
+    {
+      "id": "12-deploy-commander",
+      "sourceIndex": 12,
+      "sourceName": "12-deploy-commander.mp4",
+      "sha256": "be7c859f44d374a12a6f3134f2a5c1baaeca3ed5238c90e45c210db915332550",
+      "sourceRange": [
+        0,
+        1.0416666666666667
+      ],
+      "playbackSeconds": 0.6666666666666666,
+      "preprocess": [
+        "setpts=0.640000000000*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Crimson/gold commander laurel and short spark dissolution"
+    },
+    {
+      "id": "13-deploy-minister",
+      "sourceIndex": 13,
+      "sourceName": "13-deploy-minister.mp4",
+      "sha256": "67a8c8a6a3ec498ac8fee0461db70bf2e719cb6be0210dcf095aef5e395c8291",
+      "sourceRange": [
+        0,
+        0.9583333333333334
+      ],
+      "playbackSeconds": 0.5666666666666667,
+      "preprocess": [
+        "setpts=0.591304347826*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Violet seal persists throughout source; truncate and explicitly fade the whole silhouette"
+    },
+    {
+      "id": "14-deploy-priest",
+      "sourceIndex": 14,
+      "sourceName": "14-deploy-priest.mp4",
+      "sha256": "59582e2e1cf2c4926d2a8739899e46cf13119f6f840e773122c505e673f5cc19",
+      "sourceRange": [
+        0,
+        1.125
+      ],
+      "playbackSeconds": 0.6,
+      "preprocess": [
+        "setpts=0.533333333333*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Keep olive opening and first jade motes; omit long rising tail"
+    },
+    {
+      "id": "15-deploy-engineer",
+      "sourceIndex": 15,
+      "sourceName": "15-deploy-engineer.mp4",
+      "sha256": "fbcfe1f847a32b322fc7bf34a12be34cfbd48008514f074e70fd9e044f58c2d4",
+      "sourceRange": [
+        0,
+        0.8333333333333334
+      ],
+      "playbackSeconds": 0.5,
+      "preprocess": [
+        "setpts=0.600000000000*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "One cyan circuit trace; truncate falling amber tail"
+    },
+    {
+      "id": "16-edict-weaken",
+      "sourceIndex": 16,
+      "sourceName": "16-edict-weaken.mp4",
+      "sha256": "29846b8ad5f88b88fabaf56e32d536a51aeb3ca5613f24ab2c914c11de92cb29",
+      "sourceRange": [
+        0,
+        0.5833333333333334
+      ],
+      "playbackSeconds": 0.5666666666666667,
+      "preprocess": [
+        "setpts=0.971428571429*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Broken seal and spear dim at the actual weaken target"
+    },
+    {
+      "id": "17-edict-heal",
+      "sourceIndex": 17,
+      "sourceName": "17-edict-heal.mp4",
+      "sha256": "4ce8487fa620b8c343047c04372046f6e36aa2f9dc325916f3d80b6043af0262",
+      "sourceRange": [
+        0,
+        0.6666666666666666
+      ],
+      "playbackSeconds": 0.6,
+      "preprocess": [
+        "setpts=0.900000000000*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Open jade halo is reserved for actual health restoration"
+    }
+  ]
+}

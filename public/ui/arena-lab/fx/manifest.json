@@ -114,6 +114,110 @@
         0,
         0.5323333333333333
       ]
+    },
+    "10-deploy-legionary": {
+      "src": "/ui/arena-lab/fx/10-deploy-legionary.atlas.webp",
+      "maxMs": 433,
+      "columns": 4,
+      "rows": 4,
+      "frameCount": 13,
+      "fps": 30,
+      "bytes": 8404,
+      "sourceRange": [
+        0,
+        0.43233333333333335
+      ]
+    },
+    "11-deploy-guard": {
+      "src": "/ui/arena-lab/fx/11-deploy-guard.atlas.webp",
+      "maxMs": 500,
+      "columns": 4,
+      "rows": 4,
+      "frameCount": 15,
+      "fps": 30,
+      "bytes": 13120,
+      "sourceRange": [
+        0,
+        0.499
+      ]
+    },
+    "12-deploy-commander": {
+      "src": "/ui/arena-lab/fx/12-deploy-commander.atlas.webp",
+      "maxMs": 667,
+      "columns": 4,
+      "rows": 5,
+      "frameCount": 20,
+      "fps": 30,
+      "bytes": 13012,
+      "sourceRange": [
+        0,
+        0.6656666666666666
+      ]
+    },
+    "13-deploy-minister": {
+      "src": "/ui/arena-lab/fx/13-deploy-minister.atlas.webp",
+      "maxMs": 567,
+      "columns": 4,
+      "rows": 5,
+      "frameCount": 17,
+      "fps": 30,
+      "bytes": 14594,
+      "sourceRange": [
+        0,
+        0.5656666666666667
+      ]
+    },
+    "14-deploy-priest": {
+      "src": "/ui/arena-lab/fx/14-deploy-priest.atlas.webp",
+      "maxMs": 600,
+      "columns": 4,
+      "rows": 5,
+      "frameCount": 18,
+      "fps": 30,
+      "bytes": 19782,
+      "sourceRange": [
+        0,
+        0.599
+      ]
+    },
+    "15-deploy-engineer": {
+      "src": "/ui/arena-lab/fx/15-deploy-engineer.atlas.webp",
+      "maxMs": 500,
+      "columns": 4,
+      "rows": 4,
+      "frameCount": 15,
+      "fps": 30,
+      "bytes": 6156,
+      "sourceRange": [
+        0,
+        0.499
+      ]
+    },
+    "16-edict-weaken": {
+      "src": "/ui/arena-lab/fx/16-edict-weaken.atlas.webp",
+      "maxMs": 567,
+      "columns": 4,
+      "rows": 5,
+      "frameCount": 17,
+      "fps": 30,
+      "bytes": 8146,
+      "sourceRange": [
+        0,
+        0.5656666666666667
+      ]
+    },
+    "17-edict-heal": {
+      "src": "/ui/arena-lab/fx/17-edict-heal.atlas.webp",
+      "maxMs": 600,
+      "columns": 4,
+      "rows": 5,
+      "frameCount": 18,
+      "fps": 30,
+      "bytes": 14640,
+      "sourceRange": [
+        0,
+        0.599
+      ]
     }
   }
 }

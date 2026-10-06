@@ -4,12 +4,13 @@ import Link from 'next/link';
 import { useState } from 'react';
 import styles from './FlowKit.module.css';
 
-type FlowVideo = { id: string; title: string; duration: number; prompt: string; omniPrompt:string };
+type FlowVideo = { id: string; title: string; duration: number; prompt: string; omniPrompt:string;installed?:{preview:string;seconds:number} };
 const assetPath = '/ui/arena-lab/flow-kit';
 
 export default function FlowKit({ items }: { items: FlowVideo[] }) {
   const [copied, setCopied] = useState('');
   const [engine,setEngine]=useState<'omni'|'flow'>('omni');
+  const installedCount=items.filter(item=>item.installed).length;
   async function copyPrompt(item: FlowVideo) {
     try { await navigator.clipboard.writeText(engine==='omni'?item.omniPrompt:item.prompt); setCopied(item.id); }
     catch { setCopied('error'); }
@@ -17,9 +18,9 @@ export default function FlowKit({ items }: { items: FlowVideo[] }) {
   return <main className={styles.page}>
     <header><Link href="/arena-lab">← Арена</Link><span>IMPERIVM / АНИМАЦИИ</span><Link href="/arena-lab/balance">Баланс и материалы →</Link></header>
     <section className={styles.intro}>
-      <p>{items.length} новых видео · Эффекты 10–17</p><h1>Start. End. Промпт.</h1>
+      <p>{items.length} эффектов · {installedCount} подключено</p><h1>{installedCount===items.length?'Эффекты в игре.':'Start. End. Промпт.'}</h1>
       <p>Для каждого видео — отдельная папка с двумя картинками и готовым текстом. Номер папки, картинок и промпта совпадает.</p>
-      <p>Видео 01–09 уже подключены. Здесь только новые эффекты выхода бойцов, ослабления и лечения.</p>
+      <p>{installedCount===items.length?'Ролики 10–17 проверены и подключены: шесть ролей бойцов, ослабление и лечение. Ниже — принятый короткий результат и исходный пак для повторной генерации.':'Видео 01–09 уже подключены. Здесь только новые эффекты выхода бойцов, ослабления и лечения.'}</p>
       <div className={styles.promptActions} aria-label="Модель генерации">{(['omni','flow'] as const).map(mode=><button key={mode} aria-pressed={engine===mode} onClick={()=>{setEngine(mode);setCopied('');}}>{mode==='omni'?'Omni Flash':'Flow / Veo'}</button>)}</div>
       <a className={styles.download} href={engine==='omni'?'/ui/arena-lab/imperivm-omni-flash-vfx.zip':'/ui/arena-lab/imperivm-flow-vfx-phase2.zip'} download>Скачать {items.length} папок для {engine==='omni'?'Omni Flash':'Flow'} · ZIP</a>
     </section>
@@ -37,7 +38,8 @@ export default function FlowKit({ items }: { items: FlowVideo[] }) {
       {items.map(item => {
         const number = item.id.split('-')[0];
         return <article key={item.id}>
-          <div className={styles.heading}><span className={styles.number}>{number}</span><div><h2>{item.title}</h2><p>Одно видео · {item.duration} секунды</p></div></div>
+          <div className={styles.heading}><span className={styles.number}>{number}</span><div><h2>{item.title}</h2><p>Пак генерации · {item.duration} секунды</p></div></div>
+          {item.installed&&<figure className={styles.accepted}><video controls playsInline muted preload="none" poster={`${assetPath}/${item.id}.webp`} aria-label={`${number} — принятый эффект: ${item.title}`} width={640} height={360}><source src={item.installed.preview} type="video/mp4"/></video><figcaption>В игре · {item.installed.seconds.toFixed(2)} с · короткий эффект без звука</figcaption></figure>}
           <div className={styles.pair}>
             {(['START', 'END'] as const).map(phase => {
               const filename = `${number}-${phase}.png`;
@@ -54,6 +56,6 @@ export default function FlowKit({ items }: { items: FlowVideo[] }) {
       })}
     </section>
     {copied === 'error' && <p role="status">Открой «Показать готовый промпт» и скопируй весь текст вручную.</p>}
-    <footer>Кадры уже в формате 1280 × 720; загружай без обрезки. Пришли восемь MP4 одним ZIP, сохранив имена.<br/><a href={engine==='omni'?'https://ai.google.dev/gemini-api/docs/omni.md':'https://support.google.com/flow/answer/16352836?hl=en'} target="_blank" rel="noreferrer">{engine==='omni'?'Документация Omni Flash':'Возможности Flow'} ↗</a></footer>
+    <footer>{installedCount===items.length?'Все восемь MP4 получены. Исходный пак сохранён для новых вариантов.':'Кадры уже в формате 1280 × 720; загружай без обрезки. Пришли восемь MP4 одним ZIP, сохранив имена.'}<br/><a href={engine==='omni'?'https://ai.google.dev/gemini-api/docs/omni.md':'https://support.google.com/flow/answer/16352836?hl=en'} target="_blank" rel="noreferrer">{engine==='omni'?'Документация Omni Flash':'Возможности Flow'} ↗</a></footer>
   </main>;
 }
