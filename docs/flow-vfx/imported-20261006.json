@@ -1,0 +1,112 @@
+{
+  "archive": "Download (8).zip",
+  "format": "1280x720, 24 fps, 4.01 seconds each; AAC removed for game playback",
+  "clips": [
+    {
+      "id": "01-impact",
+      "sourceIndex": 5,
+      "sourceName": "Fantasy_game_sword_slash_VFX_20261006125421.mp4",
+      "sha256": "7b5c067f5ae9bcffc5937a2c7909fe555349ad95c30dcb244d4a62bbef156512",
+      "sourceRange": [
+        0,
+        0.8333333333
+      ],
+      "playbackSeconds": 0.4,
+      "preprocess": [
+        "setpts=0.480000000019*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Sword slash; keep the contact flare and short dispersal, omit four-second spark tail"
+    },
+    {
+      "id": "02-builder-heal",
+      "sourceIndex": 6,
+      "sourceName": "Create_game_VFX_clip_20261006125421.mp4",
+      "sha256": "ef9529ac00aac47bcb537c0c1448f809cc584ad6fcb55f707ec9793760bcedb1",
+      "sourceRange": [
+        0.25,
+        1.7916666667
+      ],
+      "playbackSeconds": 0.6666666666666666,
+      "preprocess": [
+        "scale=1024:576,pad=1280:720:(ow-iw)/2:(oh-ih)/2",
+        "setpts=0.432432432423*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Gold laurel restores treasury; keep the bright opening and dissolution at compact size"
+    },
+    {
+      "id": "03-whale-impact",
+      "sourceIndex": 3,
+      "sourceName": "Creating_judicial-strike_game_VF…_20261006125421.mp4",
+      "sha256": "7c8b6c7c8e178398d75e9a4754aed22b03dbccd4e41d280b4f70d9f1f665cc3f",
+      "sourceRange": [
+        0.25,
+        1.6666666667
+      ],
+      "playbackSeconds": 0.5,
+      "preprocess": [
+        "scale=832:468,pad=1280:720:(ow-iw)/2:(oh-ih)/2",
+        "setpts=0.352941176462*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Judicial strike is bound to damage, despite the original Validator filename; rules remain unchanged"
+    },
+    {
+      "id": "04-degen-draw",
+      "sourceIndex": 4,
+      "sourceName": "Die_fracturing_into_gold_facets_20261006125421.mp4",
+      "sha256": "bfb89f80c147ddb52fa313f1a7569a073a89131039a85bf465ac1a8a20db1c75",
+      "sourceRange": [
+        0.5833333333,
+        1.8333333333
+      ],
+      "playbackSeconds": 0.6,
+      "preprocess": [
+        "setpts=0.480000000000*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Die fracture starts after the static lead and shows its purple-gold dispersal"
+    },
+    {
+      "id": "05-validator-gas",
+      "sourceIndex": 2,
+      "sourceName": "Create_resource-restoration_game…_20261006125421.mp4",
+      "sha256": "e1618761cf1cab76a073821aaf51c9a9f32b2bfd116afb5db286be3e5d1a7d78",
+      "sourceRange": [
+        0.25,
+        1.8333333333
+      ],
+      "playbackSeconds": 0.6666666666666666,
+      "preprocess": [
+        "scale=896:504,pad=1280:720:(ow-iw)/2:(oh-ih)/2",
+        "setpts=0.421052631588*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Blue resource-restoration gem is bound to orders gain, despite the original Whale filename"
+    },
+    {
+      "id": "06-victory",
+      "sourceIndex": 1,
+      "sourceName": "Create_victory_VFX_clip_20261006125421.mp4",
+      "sha256": "5eb3a63c03575e5c07a7bee04a37c2ada19e991a573a920508d0555df19e5065",
+      "sourceRange": [
+        0.1666666667,
+        3.875
+      ],
+      "playbackSeconds": 1.8,
+      "preprocess": [
+        "scale=1088:612,pad=1280:720:(ow-iw)/2:(oh-ih)/2",
+        "setpts=0.485393258431*(PTS-STARTPTS)",
+        "fps=30",
+        "lutrgb=r='if(lt(val,10),0,val)':g='if(lt(val,10),0,val)':b='if(lt(val,10),0,val)'"
+      ],
+      "notes": "Victory wreath retains an open centre, accelerates its shimmer and final fade"
+    }
+  ]
+}
