@@ -32,7 +32,7 @@
 .inspectionDescription .fighterStatus { padding:9px 12px;border-left:3px solid #796037;background:#ad8c5930;font-size:16px;font-weight:700; }
 .inspectionExtra { margin-top:14px;border-top:1px solid #b79b70; }.inspectionExtra summary,.edictTiming summary { display:flex;align-items:center;min-height:44px;cursor:pointer;font-size:15px;font-weight:700; }.inspectionExtra summary::before,.edictTiming summary::before { content:'+';margin-right:8px; }.inspectionExtra[open] summary::before,.edictTiming details[open] summary::before { content:'−'; }
 .edictTiming { margin:14px 0 0;padding:12px 0 0;border-top:1px solid #b79b70; }.edictTiming strong { display:block;color:#674223;font-size:15px;line-height:1.35; }.edictTiming details p { margin-top:0; }
-.inspectionActions { display:flex;gap:10px;flex-wrap:wrap;padding:14px 20px 18px;background:#c9ab77;border-top:1px solid #9c7747; }
+.inspectionActions { display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 20px 18px;background:#c9ab77;border-top:1px solid #9c7747; }
 .shell .inspectionActions button { flex:1 1 190px;min-height:50px;margin:0;color:#fff0d0 !important;background:linear-gradient(#80603a,#453020) !important;border:2px solid #a58049;font-size:17px;font-weight:750;line-height:1.3;padding:10px 12px;text-shadow:0 1px 2px #1a0d06; }.shell .inspectionActions button:disabled { opacity:1;color:#f3e4c9 !important;background:#655744 !important;filter:none; }
 .queueGroup { margin-top:18px; }.queueGroup+.queueGroup { padding-top:8px;border-top:1px solid #ac8956; }.shell .queueEntry { display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:7px 10px;margin:8px 0;background:#ddc18e !important;color:#3b291c;border:1px solid #a98450;box-shadow:0 2px 4px #5b3a1a24; }.queueEntry>span { flex-shrink:0;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#694227;color:#f7e4ba;font-weight:800; }.queueEntry img { flex-shrink:0;width:40px;height:52px;object-fit:contain;background:#ddc18e;border-radius:3px; }.queueEntry strong { font-size:17px;line-height:1.2; }.inspectionDescription .queueEmpty { color:#705337;font-size:15px; }
 .inspectedCard { display:block;width:100%;height:100%; }
@@ -44,10 +44,10 @@
 .inspectionCard .inspectionDescription { align-self:center;width:100%;padding:14px 18px;border:2px solid #9f7847;border-radius:10px;background:#e2c996 url('/ui/arena-lab/playing-surface.webp') center/cover;box-shadow:inset 0 0 0 2px #eed8a6,0 6px 12px #160c0866; }
 .inspectionCard .inspectionDescription>p:first-child { margin-top:0; }.inspectionCard .inspectionDescription>details:last-child { margin-bottom:0; }
 .inspectionCard .inspectionActions { justify-content:center;padding:6px 0 0;background:none;border:0; }
-.shell .inspectionActions button { flex:0 1 300px;height:58px;padding:8px 35px;border:0;border-radius:0;background:transparent url('/ui/arena-lab/turn-command.webp') center/100% 100% no-repeat !important;box-shadow:none;font-size:18px; }
+.shell .inspectionActions button { display:flex;justify-content:center;align-items:center;gap:8px;flex:0 1 300px;height:58px;padding:8px 35px;border:0;border-radius:0;background:transparent url('/ui/arena-lab/turn-command.webp') center/100% 100% no-repeat !important;box-shadow:none;font-size:18px; }
 .shell .inspectionActions button:disabled { opacity:.8;background:transparent url('/ui/arena-lab/turn-command.webp') center/100% 100% no-repeat !important;filter:saturate(.35); }
-.inspectionRuler .inspectionArt { justify-self:center;width:210px;height:210px;padding:0;border:5px solid #976a38;border-radius:50%;overflow:hidden;background:none;box-shadow:inset 0 0 0 2px #e5bf7f,0 5px 12px #36201266; }
-.inspectionRuler .inspectionArt img { object-fit:cover;transform:scale(1.25);border-radius:50%; }
+.inspectionRuler .inspectionArt { justify-self:center;width:210px;height:210px;padding:0;border:0;overflow:visible;background:none;box-shadow:none;filter:drop-shadow(0 5px 6px #36201266); }
+.inspectionRuler .inspectionArt img { object-fit:contain;transform:none; }
 .inspectionRuler .inspectionBody { grid-template-columns:210px minmax(0,1fr);align-items:center; }
 @media(max-width:660px) { .inspectionCard .inspectionHeader{min-height:62px;padding-top:10px;padding-bottom:10px;}.inspectionCard .inspectionHeader h2{font-size:22px;}.inspectionCard .inspectionBody{grid-template-columns:1fr;gap:12px;padding:12px 4px 8px;}.inspectionCard .inspectionArt{justify-self:center;width:183px;height:320.25px;}.inspectionCard .inspectionDescription{padding:12px 15px;}.inspectionRuler .inspectionBody{grid-template-columns:1fr;gap:16px;}.inspectionRuler .inspectionArt{width:180px;height:180px;}.inspectionCard .inspectionActions{padding:2px 0 0;} }
 @media(max-height:540px) and (min-width:661px) { .inspectionCard .inspectionArt{width:170px;height:297.5px;}.inspectionCard .inspectionBody{grid-template-columns:170px minmax(0,1fr);}.inspectionCard .inspectionHeader{min-height:58px;padding-top:9px;padding-bottom:9px;}.inspectionCard .inspectionActions button{height:54px;}.inspectionRuler .inspectionArt{width:165px;height:165px;}.inspectionRuler .inspectionBody{grid-template-columns:165px minmax(0,1fr);} }
@@ -81,7 +81,7 @@
 .settingsButton svg{display:none;}
 
 .keywords details{border-top:1px solid #b79b70;}.keywords summary{display:flex;align-items:center;min-height:44px;cursor:pointer;font-size:16px;font-weight:750;color:#54391f;}.keywords summary::before{content:'+';margin-right:8px;font-size:22px;}.keywords details[open] summary::before{content:'−';}.keywords p{margin:0 0 12px;}
-.costChip{display:inline-grid;place-items:center;width:29px;height:29px;margin-right:9px;border:2px solid #d9bd80;border-radius:50%;background:#245f74;color:#fff1d1;font-weight:800;vertical-align:middle;}
+.costChip{display:inline-grid;place-items:center;width:29px;height:29px;margin:0;flex-shrink:0;border:2px solid #d9bd80;border-radius:50%;background:#245f74;color:#fff1d1;font-weight:800;vertical-align:middle;}
 .mulligan{width:min(800px,100%);max-height:96%;overflow:auto;border:3px solid #51361e;border-radius:24px;padding:22px;background:#dfc795 url('/ui/arena-lab/playing-surface.webp') center/cover;color:#412918;text-align:center;box-shadow:0 20px 65px #0009,inset 0 0 0 2px #d7b879,inset 0 0 0 6px #7d5831;}
 .mulligan h2{font-size:30px;line-height:1.15;margin:0 0 12px;}.mulligan p{margin:0 0 18px;font-size:16px;line-height:1.4;}
 .openingCards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px;}
@@ -98,4 +98,7 @@
 
 :global(html[data-imperivm-motion="off"]) .inspectionLayer,:global(html[data-imperivm-motion="off"]) .inspection,:global(html[data-imperivm-motion="off"]) .inspectedCard,:global(html[data-imperivm-motion="off"]) .inspectionDescription{animation:none;}
 
-.inspectionRuler .inspectionArt:has(img[src$="builder-medallion-front.webp"]){border:0;border-radius:0;overflow:visible;box-shadow:none;filter:drop-shadow(0 5px 6px #36201266);}.inspectionRuler .inspectionArt img[src$="builder-medallion-front.webp"]{object-fit:contain;transform:none;border-radius:0;}
+/* One bronze control family, with vector engravings at a legible fixed size. */
+.shell .close,.shell .inspectionBack{display:grid;place-items:center;padding:0;border:2px solid #c69b58;border-radius:10px;background:linear-gradient(145deg,#947044,#4b301d 65%) !important;box-shadow:inset 0 0 0 2px #4c321e,inset 0 0 0 3px #af874d,0 2px 4px #1b10084d;color:#f7e5bc;}
+.close svg,.inspectionBack svg{width:24px;height:24px;display:block;}
+.shell .close:hover,.shell .inspectionBack:hover{filter:brightness(1.14);}

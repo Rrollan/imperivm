@@ -4,16 +4,17 @@ import type { Scene } from '@babylonjs/core/scene';
 import { CARDS } from '../../lib/cards';
 import { type Locale } from '../../lib/locale';
 import type { Minion } from '../../lib/engine/types';
-import {CARD_FACE,CARD_FRAME_PATH,paintCardFace} from './cardFace';
+import {CARD_FACE,CARD_FRAME_PATH,paintCardFace,paintBadge} from './cardFace';
 import {heroPortraitPath} from './heroPortrait';
 import {cardArtPath} from '../../lib/cardArt';
 import {ordersLayout,ordersView} from './ordersView';
 import type {BattleCommand,FighterReadiness} from './battleReadability';
+import {drawRomanSymbol,type RomanSymbol} from './romanSymbols';
 
 export type Face =
   | { kind: 'card'; cardId: string; playable?:boolean }
   | { kind: 'minion'; minion: Minion; ready?: boolean;readiness?:FighterReadiness }
-  | { kind: 'hero'; heroId: string; treasury: number; model?: boolean }
+  | { kind: 'hero'; heroId: string; treasury: number; aspect?:number; model?: boolean }
   | { kind: 'power'; heroId: string; cost: number; available: boolean; model?: boolean }
   | { kind: 'command'; state: BattleCommand; engraved?: boolean }
   | { kind: 'gas'; gas: number; max: number; engraved?: boolean }
@@ -74,7 +75,7 @@ export class ArenaTextures {
   }
 
   make(name: string, initial: Face) {
-    const size = initial.kind==='card'?{width:CARD_FACE.width,height:CARD_FACE.height}:initial.kind==='orders'?{width:1248,height:160}:initial.kind==='queueTitle'?{width:512,height:312}:initial.kind === 'command' ? { width: 768, height: 288 } : initial.kind === 'power' ? { width: 384, height: 384 } : initial.kind === 'gas' ? { width: 384, height: 256 } : { width: 384, height: 512 };
+    const size = ['card','minion','queued'].includes(initial.kind)?{width:CARD_FACE.width,height:CARD_FACE.height}:initial.kind==='orders'?{width:1248,height:160}:initial.kind==='queueTitle'?{width:512,height:256}:initial.kind === 'command' ? { width: 768, height: 336 } : ['hero','power'].includes(initial.kind) ? { width: 384, height: 384 } : initial.kind === 'gas' ? { width: 384, height: 256 } : { width: 384, height: 512 };
     const texture = new DynamicTexture(name, size, this.scene, true, Texture.TRILINEAR_SAMPLINGMODE);
     texture.hasAlpha = true;
     const ctx = texture.getContext() as unknown as CanvasRenderingContext2D;
@@ -85,23 +86,13 @@ export class ArenaTextures {
       if (face.kind === 'back') this.drawBack(ctx,size.height);
       else if (face.kind === 'card') this.drawCard(ctx, face.cardId,face.playable);
       else if (face.kind === 'minion') this.drawMinion(ctx, face.minion, face.ready,face.readiness);
-      else if (face.kind === 'hero') this.drawHero(ctx, face.heroId, face.treasury, face.model);
+      else if (face.kind === 'hero') this.drawHero(ctx, face.heroId, face.treasury,face.aspect??1);
       else if (face.kind === 'power') this.drawPower(ctx, face);
       else if (face.kind === 'command') this.drawCommand(ctx, face.state, face.engraved);
       else if (face.kind === 'gas') this.drawGas(ctx, face.gas, face.max, face.engraved);
       else if(face.kind==='orders')this.drawOrders(ctx,face);
       else if(face.kind==='queued')this.drawQueued(ctx,face);
-      else if(face.kind==='queueTitle'){
-        // A physical rolled edict is the entry point. Counts live on their own
-        // stacks; three permanent miniature HUD lines add no useful reading.
-        ctx.save();ctx.shadowColor='#281408';ctx.shadowBlur=12;ctx.shadowOffsetY=8;
-        const paper=ctx.createLinearGradient(0,65,0,226);paper.addColorStop(0,'#a98348');paper.addColorStop(.2,'#e5cb91');paper.addColorStop(.8,'#cbae72');paper.addColorStop(1,'#856338');
-        ctx.fillStyle=paper;rounded(ctx,113,65,286,161,16);ctx.fill();ctx.shadowBlur=0;ctx.shadowOffsetY=0;
-        ctx.strokeStyle='#714b29';ctx.lineWidth=5;ctx.stroke();
-        for(const x of [106,398]){ctx.fillStyle='#d5b67b';rounded(ctx,x-17,50,34,194,14);ctx.fill();ctx.stroke();}
-        ctx.strokeStyle='#79552f';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(164,111);ctx.lineTo(337,111);ctx.moveTo(164,139);ctx.lineTo(290,139);ctx.stroke();
-        this.badge(ctx,'IV',266,209,'#682d28',49);ctx.restore();
-      }
+      else if(face.kind==='queueTitle')this.drawQueueTitle(ctx,face);
       else if (face.kind === 'block') this.drawBlock(ctx, face.block);
       else if (face.kind === 'deck') { if (!face.model) this.drawBack(ctx); this.badge(ctx, String(face.count), 192, 350, '#544026', 70); }
       else this.drawScroll(ctx);
@@ -122,19 +113,7 @@ export class ArenaTextures {
   preloadCards(ids:string[]){ids.forEach(id=>this.image(cardArtPath(id)));}
 
   private badge(ctx: CanvasRenderingContext2D, value: string, x: number, y: number, color: string, radius = 43) {
-    ctx.save();
-    ctx.shadowColor = '#110b08'; ctx.shadowBlur = 9; ctx.shadowOffsetY = 4;
-    const gradient = ctx.createRadialGradient(x - 10, y - 15, 5, x, y, radius);
-    gradient.addColorStop(0, color); gradient.addColorStop(1, '#251c16');
-    ctx.fillStyle = gradient; ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
-    ctx.shadowBlur = 0; ctx.shadowOffsetY = 0; ctx.strokeStyle = '#d9b973'; ctx.lineWidth = 7; ctx.stroke();
-    let fontSize = Math.min(164, radius * 1.7);
-    ctx.font = `800 ${fontSize}px ${this.font}`;
-    const measured = ctx.measureText(value).width;
-    if (measured > radius * 1.55) { fontSize *= radius * 1.55 / measured; ctx.font = `800 ${fontSize}px ${this.font}`; }
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.strokeStyle = '#1d130d'; ctx.lineWidth = 6; ctx.strokeText(value, x, y + 1);
-    ctx.fillStyle = '#fff4d4'; ctx.fillText(value, x, y + 1); ctx.restore();
+    paintBadge(ctx,this.font,value,x,y,color,radius);
   }
 
   private drawCard(ctx:CanvasRenderingContext2D,id:string,playable?:boolean){
@@ -142,15 +121,20 @@ export class ArenaTextures {
   }
 
   private drawQueued(ctx:CanvasRenderingContext2D,face:Extract<Face,{kind:'queued'}>){
-    const paper=ctx.createLinearGradient(25,0,359,0);paper.addColorStop(0,'#aa824a');paper.addColorStop(.12,'#ebd5a0');paper.addColorStop(.88,'#d5ba7f');paper.addColorStop(1,'#96703d');
-    ctx.fillStyle=paper;rounded(ctx,12,18,360,476,17);ctx.fill();ctx.strokeStyle='#77502a';ctx.lineWidth=6;ctx.stroke();
-    ctx.save();rounded(ctx,84,39,216,324,8);ctx.clip();ctx.fillStyle='#d5ba7f';ctx.fillRect(84,39,216,324);
-    const art=this.image(cardArtPath(face.cardId));if(art)contain(ctx,art,84,39,216,324);ctx.restore();
-    ctx.strokeStyle='#a27e47';ctx.lineWidth=5;rounded(ctx,84,39,216,324,8);ctx.stroke();
-    // Owner-coloured wax and a readable queue ordinal replace tiny rules/ribbons.
-    ctx.fillStyle=face.owner===0?'#315e59':'#713b32';ctx.fillRect(175,372,34,100);
-    this.badge(ctx,String(face.ordinal),192,424,face.owner===0?'#315e59':'#713b32',59);
-    if(face.ordinal===1&&face.count>3)this.badge(ctx,`+${face.count-3}`,322,470,'#745631',51);
+    paintCardFace(ctx,face.cardId,this.locale,this.font,this.image(cardArtPath(face.cardId)),undefined,undefined,this.image(CARD_FRAME_PATH),'queued');
+    // The original face identifies the edict; wax identifies owner and order.
+    this.badge(ctx,String(face.ordinal),192,599,face.owner===0?'#315e59':'#713b32',36);
+    if(face.ordinal===1&&face.count>3)this.badge(ctx,`+${face.count-3}`,315,624,'#745631',33);
+  }
+
+  private drawQueueTitle(ctx:CanvasRenderingContext2D,face:Extract<Face,{kind:'queueTitle'}>){
+    const art=this.image('/ui/arena-lab/native/edict-register-native.webp');
+    if(art)ctx.drawImage(art,3/1774*art.naturalWidth,93/887*art.naturalHeight,1768/1774*art.naturalWidth,654/887*art.naturalHeight,0,12,512,190);
+    else {rounded(ctx,10,12,492,190,18);ctx.fillStyle='#622e22';ctx.fill();}
+    ctx.font=`800 68px ${this.font}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle='#2a130b';ctx.lineWidth=5;
+    const label=this.locale==='ru'?'УКАЗЫ':'EDICTS';ctx.strokeText(label,256,95);ctx.fillStyle='#fff0c5';ctx.fillText(label,256,95);
+    this.badge(ctx,String(face.own),196,166,'#315e59',25);
+    this.badge(ctx,String(face.enemy),316,166,'#713b32',25);
   }
 
   private drawOrders(ctx:CanvasRenderingContext2D,face:Extract<Face,{kind:'orders'}>){
@@ -159,7 +143,7 @@ export class ArenaTextures {
     // Paint the sockets and counter from the same snapshot in one layer.
     // The HUD plane is wider than its 1248×160 texture. Compensate in texture
     // space so each gem remains round on the table, inset inside its painted rim.
-    const radius=34;
+    const radius=layout.radius*1248/layout.width;
     view.slots.forEach((status,index)=>{
       if(status==='locked')return;
       const x=layout.centers[index];ctx.save();ctx.translate(x,layout.centerY);ctx.scale(1,layout.verticalScale);
@@ -180,58 +164,26 @@ export class ArenaTextures {
   }
 
   private drawMinion(ctx: CanvasRenderingContext2D, minion: Minion, ready=false,readiness?:FighterReadiness) {
+    paintCardFace(ctx,minion.cardId,this.locale,this.font,this.image(cardArtPath(minion.cardId)),ready,{attack:minion.attack,health:minion.health},this.image(CARD_FRAME_PATH),'battlefield');
+    const symbol:RomanSymbol=minion.staked?'lock':ready||readiness==='ready'||readiness==='rush'?'gladius':readiness==='fresh'?'hourglass':'spent';
+    this.badge(ctx,'',323,61,minion.staked?'#315e59':ready?'#8b632d':'#514335',29);
+    drawRomanSymbol(ctx,symbol,323,61,40,minion.staked?'#a8e2da':'#f4dda7');
     if(minion.taunt){
-      ctx.save();ctx.beginPath();ctx.moveTo(21,100);ctx.quadraticCurveTo(192,-8,363,100);ctx.lineTo(351,322);ctx.quadraticCurveTo(326,404,192,470);ctx.quadraticCurveTo(58,404,33,322);ctx.closePath();
-      ctx.fillStyle='#726649';ctx.fill();ctx.strokeStyle='#ede0bc';ctx.lineWidth=13;ctx.stroke();ctx.restore();
+      drawRomanSymbol(ctx,'shield',192,599,42,'#3e6665');
     }
-    ctx.save();
-    ctx.beginPath(); ctx.ellipse(192, 225, 159, 197, 0, 0, Math.PI * 2);
-    ctx.fillStyle = '#593c24'; ctx.fill(); ctx.lineWidth = minion.taunt ? 24 : 17; ctx.strokeStyle = minion.taunt ? '#ddd1af' : '#d5aa63'; ctx.stroke();
-    ctx.clip();
-    const art = this.image(cardArtPath(minion.cardId));
-    // Battlefield pieces use an edge-to-edge portrait. Inspection shows the full illustration.
-    if (art) cover(ctx, art, 32, 27, 320, 400);
-    ctx.restore();
-    // Board figures communicate art, attack and health. Full rules/names live in inspection.
-    const definition=CARDS[minion.cardId];
-    this.badge(ctx, `${minion.attack}`, 100, 388, minion.attack>(definition.attack??0)?'#6b7c42':minion.attack<(definition.attack??0)?'#735140':'#a87924', 66);
-    this.badge(ctx, `${minion.health}`, 284, 388, minion.health<minion.maxHealth?'#963528':'#b04334', 66);
     if(minion.lifesteal){
-      ctx.save();ctx.translate(304,98);ctx.beginPath();ctx.arc(0,0,28,0,Math.PI*2);ctx.fillStyle='#632d29';ctx.fill();ctx.strokeStyle='#dcad78';ctx.lineWidth=4;ctx.stroke();
-      ctx.beginPath();ctx.moveTo(0,-19);ctx.bezierCurveTo(7,-8,15,0,15,8);ctx.arc(0,8,15,0,Math.PI);ctx.bezierCurveTo(-15,0,-7,-8,0,-19);ctx.fillStyle='#f0c8a9';ctx.fill();ctx.restore();
-    }
-    if (minion.staked) {
-      ctx.fillStyle = '#1b5557'; ctx.beginPath(); ctx.arc(192,456,39,0,Math.PI*2); ctx.fill();
-      ctx.strokeStyle = '#d9e5c8'; ctx.lineWidth = 9; ctx.beginPath(); ctx.arc(192,443,15,Math.PI,0); ctx.stroke();
-      ctx.fillStyle = '#d9e5c8'; rounded(ctx,171,442,42,35,5); ctx.fill();
-    } else if(ready||readiness==='ready'||readiness==='rush'){
-      ctx.save();ctx.translate(192,452);
-      ctx.fillStyle='#49301d';ctx.strokeStyle='#e6bc6b';ctx.lineWidth=5;
-      ctx.beginPath();ctx.arc(0,0,36,0,Math.PI*2);ctx.fill();ctx.stroke();
-      for(const angle of [-Math.PI/4,Math.PI/4]){
-        ctx.save();ctx.rotate(angle);ctx.beginPath();ctx.moveTo(0,-28);ctx.lineTo(7,-18);ctx.lineTo(5,13);ctx.lineTo(-5,13);ctx.lineTo(-7,-18);ctx.closePath();
-        ctx.fillStyle='#f7e5b9';ctx.fill();ctx.strokeStyle='#806342';ctx.lineWidth=2;ctx.stroke();
-        ctx.fillStyle='#d1a253';ctx.fillRect(-12,12,24,5);ctx.fillRect(-3,17,6,12);ctx.restore();
-      }
-      ctx.restore();
-    }else if(readiness==='fresh'){
-      ctx.save();ctx.fillStyle='#f1dec0';ctx.strokeStyle='#483728';ctx.lineWidth=6;ctx.font=`800 86px ${this.font}`;ctx.textAlign='center';ctx.strokeText('Z',265,86);ctx.fillText('Z',265,86);ctx.font=`800 56px ${this.font}`;ctx.strokeText('z',319,43);ctx.fillText('z',319,43);ctx.restore();
-    }else if(readiness==='exhausted'||readiness==='no-target'){
-      ctx.save();ctx.strokeStyle='#776e5b';ctx.lineWidth=7;ctx.beginPath();ctx.arc(192,452,24,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(179,465);ctx.lineTo(205,439);ctx.stroke();ctx.restore();
+      this.badge(ctx,'',312,420,'#632d29',24);drawRomanSymbol(ctx,'drop',312,420,30,'#f0c8a9');
     }
   }
 
-  private drawHero(ctx: CanvasRenderingContext2D, id: string, treasury: number, model = false) {
-    if (!model) {
-    // The loading portrait occupies exactly the coin's circular recess.
-    // Texture pixels and the mesh use different aspect ratios, hence the ellipse.
-    ctx.save();ctx.beginPath();ctx.ellipse(192,256,126,145,0,0,Math.PI*2);ctx.clip();
-    ctx.fillStyle='#594124';ctx.fillRect(60,96,264,320);
+  private drawHero(ctx: CanvasRenderingContext2D, id: string, treasury: number, aspect=1) {
     const art=this.image(heroPortraitPath(id));
-    if(art){if(id==='whale')ctx.drawImage(art,35,35,530,530,66,111,252,290);else if(id==='builder')ctx.drawImage(art,66,111,252,290);else cover(ctx,art,66,111,252,290);}
-    ctx.restore();
-    }
-    this.badge(ctx, `${Math.max(0,treasury)}`, 315, 355, '#a8322f', 59);
+    // Use only the inner relief. The painting supplies the single physical rim.
+    const bounds:Record<string,number[]>={builder:[44,37,1164,1164],degen:[34,37,1186,1177],validator:[31,35,1189,1185],whale:[40,38,1173,1172]};
+    ctx.save();ctx.beginPath();ctx.arc(192,192,156,0,Math.PI*2);ctx.clip();
+    if(art){const [x,y,w,h]=bounds[id]??[0,0,1254,1254];const inset=.1;ctx.drawImage(art,(x+w*inset)/1254*art.naturalWidth,(y+h*inset)/1254*art.naturalHeight,w*(1-inset*2)/1254*art.naturalWidth,h*(1-inset*2)/1254*art.naturalHeight,36,36,312,312);}
+    ctx.restore();ctx.save();ctx.translate(319,303);ctx.scale(1,aspect);
+    this.badge(ctx,`${Math.max(0,treasury)}`,0,0,'#a8322f',46);ctx.restore();
   }
 
   private drawPower(ctx: CanvasRenderingContext2D, face: Extract<Face, { kind: 'power' }>) {
@@ -257,22 +209,24 @@ export class ArenaTextures {
   }
 
   private drawCommand(ctx: CanvasRenderingContext2D, state: Extract<Face, { kind: 'command' }>['state'], engraved = false) {
-    const image = this.image('/ui/arena-lab/turn-command.webp');
+    const image=this.image('/ui/arena-lab/native/turn-inlay-fit.webp');
     const available=state==='own'||state==='done';
-    ctx.save(); ctx.globalAlpha = available ? 1 : .65;
-    if (!engraved) {
-      if (image) ctx.drawImage(image, 0, 0, 768, 288);
-      else { rounded(ctx, 10, 22, 748, 244, 30); ctx.fillStyle = '#553b24'; ctx.fill(); }
+    ctx.save();ctx.globalAlpha=available?1:.78;
+    if(image){
+      const sx=72/1984*image.naturalWidth,sy=88/793*image.naturalHeight,sw=1841/1984*image.naturalWidth,sh=582/793*image.naturalHeight;
+      const cap=sw*.2,destinationCap=cap/sh*336*(768/336)/2.52;
+      // Preserve the laurel proportions. Only the blank leather centre absorbs
+      // the difference between generated alpha bounds and the carved recess.
+      ctx.drawImage(image,sx,sy,cap,sh,0,0,destinationCap,336);
+      ctx.drawImage(image,sx+cap,sy,sw-cap*2,sh,destinationCap,0,768-destinationCap*2,336);
+      ctx.drawImage(image,sx+sw-cap,sy,cap,sh,768-destinationCap,0,destinationCap,336);
     }
+    else {rounded(ctx,0,0,768,336,26);ctx.fillStyle='#4d241c';ctx.fill();}
     ctx.restore();
-    if(state==='done'){
-      const light=ctx.createRadialGradient(384,145,35,384,145,310);light.addColorStop(0,'#e9b95840');light.addColorStop(1,'#e9b95800');ctx.fillStyle=light;rounded(ctx,96,67,576,156,35);ctx.fill();
-    }
-    const label = available ? (this.locale === 'ru' ? 'Конец хода' : 'End turn') : state === 'enemy' ? (this.locale === 'ru' ? 'Ход соперника' : 'Opponent') : state === 'busy' ? (this.locale === 'ru' ? 'Бой…' : 'Resolving…') : (this.locale === 'ru' ? 'Бой окончен' : 'Battle over');
-    ctx.font = `800 108px ${this.font}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    const size=Math.min(108,108*590/Math.max(1,ctx.measureText(label).width));ctx.font=`800 ${size}px ${this.font}`;
-    ctx.strokeStyle = '#1d100b'; ctx.lineWidth = 9; ctx.strokeText(label, 384, 145);
-    ctx.fillStyle = state === 'done' ? '#fff5d0' : state==='own'?'#f2dfb4':'#c2b39a'; ctx.fillText(label, 384, 145);
+    const labels=available?(this.locale==='ru'?['КОНЕЦ','ХОДА']:['END','TURN']):state==='enemy'?(this.locale==='ru'?['ХОД','СОПЕРНИКА']:['OPPONENT',"TURN"]):state==='busy'?(this.locale==='ru'?['ИДЁТ','БОЙ']:['RESOLVING']):(this.locale==='ru'?['БОЙ','ОКОНЧЕН']:['BATTLE','OVER']);
+    const roman=getComputedStyle(document.body).getPropertyValue('--font-roman').trim()||this.font;
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle='#25100b';ctx.lineWidth=6;ctx.fillStyle=state==='done'?'#fff5c5':available?'#f8e5b8':'#cbbda3';
+    labels.forEach((label,i)=>{ctx.font=`800 103px ${roman}`;const size=Math.min(103,103*365/Math.max(1,ctx.measureText(label).width));ctx.font=`800 ${size}px ${roman}`;const y=labels.length===1?168:122+i*92;ctx.strokeText(label,384,y);ctx.fillText(label,384,y);});
   }
 
   private drawGas(ctx: CanvasRenderingContext2D, gas: number, max: number, engraved = false) {

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "10-deploy-legionary",
+    "title": "Легионер · выход",
+    "activeSeconds": 0.42,
+    "prompt": "[# Sources <FIRST_FRAME>@Image1 <LAST_FRAME>@Image2]\n\nCreate one isolated IMPERIVM game VFX clip, landscape 16:9, 720p. Image1 is 10-START.png: use it as the exact starting frame. Image2 is 10-END.png: use it as the exact final frame.\n\nA single continuous shot, locked frontal orthographic camera. Keep the exact starting silhouette, palette, size, position and empty black centre. Uniform pure black RGB 0,0,0 background throughout.\n\n[0.00-0.12s] The existing bronze dust arc settles down once; its six copper flecks drift outward a few pixels.\n[0.12-0.42s] The existing contours and particles fade smoothly and completely to black. Keep the effect within its starting footprint.\n[0.42s-end] Hold completely pure black. The clip may be 4 seconds or the shortest available duration; do not stretch or repeat the active effect to fill it.\n\nNo scene cuts, camera movement, extra objects, additional rings, opaque centre, card, person, arena, UI, letters, numbers, smoke, bloom or full-screen flash. Silent audio: no music, speech or sound effects. The game supplies its own sounds.\n"
+  },
+  {
+    "id": "11-deploy-guard",
+    "title": "Страж · выход",
+    "activeSeconds": 0.5,
+    "prompt": "[# Sources <FIRST_FRAME>@Image1 <LAST_FRAME>@Image2]\n\nCreate one isolated IMPERIVM game VFX clip, landscape 16:9, 720p. Image1 is 11-START.png: use it as the exact starting frame. Image2 is 11-END.png: use it as the exact final frame.\n\nA single continuous shot, locked frontal orthographic camera. Keep the exact starting silhouette, palette, size, position and empty black centre. Uniform pure black RGB 0,0,0 background throughout.\n\n[0.00-0.12s] One ivory glint travels up the existing steel-blue shield contour; the contour stays open and then fades.\n[0.12-0.50s] The existing contours and particles fade smoothly and completely to black. Keep the effect within its starting footprint.\n[0.50s-end] Hold completely pure black. The clip may be 4 seconds or the shortest available duration; do not stretch or repeat the active effect to fill it.\n\nNo scene cuts, camera movement, extra objects, additional rings, opaque centre, card, person, arena, UI, letters, numbers, smoke, bloom or full-screen flash. Silent audio: no music, speech or sound effects. The game supplies its own sounds.\n"
+  },
+  {
+    "id": "12-deploy-commander",
+    "title": "Предводитель · выход",
+    "activeSeconds": 0.65,
+    "prompt": "[# Sources <FIRST_FRAME>@Image1 <LAST_FRAME>@Image2]\n\nCreate one isolated IMPERIVM game VFX clip, landscape 16:9, 720p. Image1 is 12-START.png: use it as the exact starting frame. Image2 is 12-END.png: use it as the exact final frame.\n\nA single continuous shot, locked frontal orthographic camera. Keep the exact starting silhouette, palette, size, position and empty black centre. Uniform pure black RGB 0,0,0 background throughout.\n\n[0.00-0.12s] One warm gold highlight travels along the existing crimson and gold laurel; its few sparks rise a short distance.\n[0.12-0.65s] The existing contours and particles fade smoothly and completely to black. Keep the effect within its starting footprint.\n[0.65s-end] Hold completely pure black. The clip may be 4 seconds or the shortest available duration; do not stretch or repeat the active effect to fill it.\n\nNo scene cuts, camera movement, extra objects, additional rings, opaque centre, card, person, arena, UI, letters, numbers, smoke, bloom or full-screen flash. Silent audio: no music, speech or sound effects. The game supplies its own sounds.\n"
+  },
+  {
+    "id": "13-deploy-minister",
+    "title": "Военный министр · выход",
+    "activeSeconds": 0.58,
+    "prompt": "[# Sources <FIRST_FRAME>@Image1 <LAST_FRAME>@Image2]\n\nCreate one isolated IMPERIVM game VFX clip, landscape 16:9, 720p. Image1 is 13-START.png: use it as the exact starting frame. Image2 is 13-END.png: use it as the exact final frame.\n\nA single continuous shot, locked frontal orthographic camera. Keep the exact starting silhouette, palette, size, position and empty black centre. Uniform pure black RGB 0,0,0 background throughout.\n\n[0.00-0.12s] One violet highlight traces the existing imperial seal rim; the small violet particles fall a short distance.\n[0.12-0.58s] The existing contours and particles fade smoothly and completely to black. Keep the effect within its starting footprint.\n[0.58s-end] Hold completely pure black. The clip may be 4 seconds or the shortest available duration; do not stretch or repeat the active effect to fill it.\n\nNo scene cuts, camera movement, extra objects, additional rings, opaque centre, card, person, arena, UI, letters, numbers, smoke, bloom or full-screen flash. Silent audio: no music, speech or sound effects. The game supplies its own sounds.\n"
+  },
+  {
+    "id": "14-deploy-priest",
+    "title": "Жрец · выход",
+    "activeSeconds": 0.58,
+    "prompt": "[# Sources <FIRST_FRAME>@Image1 <LAST_FRAME>@Image2]\n\nCreate one isolated IMPERIVM game VFX clip, landscape 16:9, 720p. Image1 is 14-START.png: use it as the exact starting frame. Image2 is 14-END.png: use it as the exact final frame.\n\nA single continuous shot, locked frontal orthographic camera. Keep the exact starting silhouette, palette, size, position and empty black centre. Uniform pure black RGB 0,0,0 background throughout.\n\n[0.00-0.12s] The existing jade olive branches shimmer once; the turquoise motes rise gently through the empty centre.\n[0.12-0.58s] The existing contours and particles fade smoothly and completely to black. Keep the effect within its starting footprint.\n[0.58s-end] Hold completely pure black. The clip may be 4 seconds or the shortest available duration; do not stretch or repeat the active effect to fill it.\n\nNo scene cuts, camera movement, extra objects, additional rings, opaque centre, card, person, arena, UI, letters, numbers, smoke, bloom or full-screen flash. Silent audio: no music, speech or sound effects. The game supplies its own sounds.\n"
+  },
+  {
+    "id": "15-deploy-engineer",
+    "title": "Инженер · выход",
+    "activeSeconds": 0.5,
+    "prompt": "[# Sources <FIRST_FRAME>@Image1 <LAST_FRAME>@Image2]\n\nCreate one isolated IMPERIVM game VFX clip, landscape 16:9, 720p. Image1 is 15-START.png: use it as the exact starting frame. Image2 is 15-END.png: use it as the exact final frame.\n\nA single continuous shot, locked frontal orthographic camera. Keep the exact starting silhouette, palette, size, position and empty black centre. Uniform pure black RGB 0,0,0 background throughout.\n\n[0.00-0.12s] One cyan highlight travels around the existing bronze schematic segments; the amber sparks settle down.\n[0.12-0.50s] The existing contours and particles fade smoothly and completely to black. Keep the effect within its starting footprint.\n[0.50s-end] Hold completely pure black. The clip may be 4 seconds or the shortest available duration; do not stretch or repeat the active effect to fill it.\n\nNo scene cuts, camera movement, extra objects, additional rings, opaque centre, card, person, arena, UI, letters, numbers, smoke, bloom or full-screen flash. Silent audio: no music, speech or sound effects. The game supplies its own sounds.\n"
+  },
+  {
+    "id": "16-edict-weaken",
+    "title": "Сенатское порицание · ослабление",
+    "activeSeconds": 0.55,
+    "prompt": "[# Sources <FIRST_FRAME>@Image1 <LAST_FRAME>@Image2]\n\nCreate one isolated IMPERIVM game VFX clip, landscape 16:9, 720p. Image1 is 16-START.png: use it as the exact starting frame. Image2 is 16-END.png: use it as the exact final frame.\n\nA single continuous shot, locked frontal orthographic camera. Keep the exact starting silhouette, palette, size, position and empty black centre. Uniform pure black RGB 0,0,0 background throughout.\n\n[0.00-0.12s] The existing broken vermilion seal and pale steel spear contour dim; their three burgundy fragments fall slightly.\n[0.12-0.55s] The existing contours and particles fade smoothly and completely to black. Keep the effect within its starting footprint.\n[0.55s-end] Hold completely pure black. The clip may be 4 seconds or the shortest available duration; do not stretch or repeat the active effect to fill it.\n\nNo scene cuts, camera movement, extra objects, additional rings, opaque centre, card, person, arena, UI, letters, numbers, smoke, bloom or full-screen flash. Silent audio: no music, speech or sound effects. The game supplies its own sounds.\n"
+  },
+  {
+    "id": "17-edict-heal",
+    "title": "Обряд восстановления · лечение бойцов",
+    "activeSeconds": 0.6,
+    "prompt": "[# Sources <FIRST_FRAME>@Image1 <LAST_FRAME>@Image2]\n\nCreate one isolated IMPERIVM game VFX clip, landscape 16:9, 720p. Image1 is 17-START.png: use it as the exact starting frame. Image2 is 17-END.png: use it as the exact final frame.\n\nA single continuous shot, locked frontal orthographic camera. Keep the exact starting silhouette, palette, size, position and empty black centre. Uniform pure black RGB 0,0,0 background throughout.\n\n[0.00-0.12s] One soft ivory highlight travels around the existing open turquoise halo; its six jade motes rise gently.\n[0.12-0.60s] The existing contours and particles fade smoothly and completely to black. Keep the effect within its starting footprint.\n[0.60s-end] Hold completely pure black. The clip may be 4 seconds or the shortest available duration; do not stretch or repeat the active effect to fill it.\n\nNo scene cuts, camera movement, extra objects, additional rings, opaque centre, card, person, arena, UI, letters, numbers, smoke, bloom or full-screen flash. Silent audio: no music, speech or sound effects. The game supplies its own sounds.\n"
+  }
+]

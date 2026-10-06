@@ -51,6 +51,7 @@ export function effectFrame(batch:PresentationBatch,timeline:EffectTimeline,elap
     if(spell.cardId==='rug-pull'&&!spell.fizzled)batch.events?.deaths?.filter(d=>d.cause==='rugpull').forEach(d=>{const fighter=fighters.get(d.uid);if(fighter)fighter.health=0;});
   }
   if(reached.has('growth'))batch.events?.halvings?.forEach(h=>{const fighter=fighters.get(h.uid);if(fighter){fighter.attack++;fighter.health++;fighter.maxHealth++;}});
+  if(reached.has('aftermath'))batch.after.players.forEach((p,i)=>treasuries[i]=p.treasury);
   if(elapsedMs>=timeline.tailMs){
     for(const m of batch.after.players.flatMap(p=>p.board))fighters.set(m.uid,{...m});
     batch.events?.deaths?.forEach(d=>{const fighter=fighters.get(d.uid);if(fighter)fighter.health=0;});

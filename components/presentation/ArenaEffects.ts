@@ -22,11 +22,11 @@ export class ArenaEffects {
   private timeline:EffectTimeline|null=null;
   private locate:((uid:string)=>Vector3|undefined)|null=null;
   private windowStart=-1;
-  private pendingAim: {from:Vector3;to:Vector3;valid:boolean}|null=null;
+  private pendingAim: {from:Vector3;to:Vector3;valid:boolean;sourceInset:number;targetInset:number;headLength:number}|null=null;
   private aimKey='';
 
   constructor(private scene: Scene, private invalidate: () => void) {
-    this.aimTexture = new DynamicTexture('target arrow', {width:800,height:500}, scene, false);
+    this.aimTexture = new DynamicTexture('target arrow', {width:1600,height:1000}, scene, false);
     this.aimTexture.hasAlpha = true;
     this.aimMaterial = this.ink('arrow ink', this.aimTexture);
     this.aimMesh = MeshBuilder.CreatePlane('targeting arc',{width:32,height:20},scene);
@@ -53,31 +53,42 @@ export class ArenaEffects {
     return material;
   }
 
-  aim(from:Vector3,to:Vector3,valid:boolean) {
-    const key=[from.x,from.y,to.x,to.y].map(v=>Math.round(v*25)).join(':')+valid;
+  aim(from:Vector3,to:Vector3,valid:boolean,sourceInset=60,targetInset=42,headLength=28) {
+    const key=[from.x,from.y,to.x,to.y,sourceInset,targetInset,headLength].map(v=>Math.round(v*25)).join(':')+valid;
     if(key===this.aimKey)return;this.aimKey=key;
-    this.pendingAim={from:from.clone(),to:to.clone(),valid};this.invalidate();
+    this.pendingAim={from:from.clone(),to:to.clone(),valid,sourceInset,targetInset,headLength};this.invalidate();
   }
-  flush(){const pending=this.pendingAim;this.pendingAim=null;if(pending)this.drawAim(pending.from,pending.to,pending.valid);}
-  private drawAim(from:Vector3,to:Vector3,valid:boolean) {
+  flush(){const pending=this.pendingAim;this.pendingAim=null;if(pending)this.drawAim(pending.from,pending.to,pending.valid,pending.sourceInset,pending.targetInset,pending.headLength);}
+  private drawAim(from:Vector3,to:Vector3,valid:boolean,sourceInset:number,targetInset:number,headLength:number) {
     const ctx=this.aimTexture.getContext() as unknown as CanvasRenderingContext2D;
-    ctx.setTransform(.5,0,0,.5,0,0);
+    ctx.setTransform(1,0,0,1,0,0);
     ctx.clearRect(0,0,1600,1000);
     const a={x:800+from.x*50,y:500-from.y*50},b={x:800+to.x*50,y:500-to.y*50};
     const length=Math.hypot(b.x-a.x,b.y-a.y);
-    if(length<70){this.hideAim();return;}
+    if(length<sourceInset+targetInset+3){this.hideAim();return;}
     const unit={x:(b.x-a.x)/length,y:(b.y-a.y)/length};
-    a.x+=unit.x*60;a.y+=unit.y*60;b.x-=unit.x*42;b.y-=unit.y*42;
-    const control={x:(a.x+b.x)/2+Math.min(85,length*.15),y:(a.y+b.y)/2-55};
-    ctx.lineCap='round'; ctx.lineJoin='round';
-    ctx.shadowColor='#170c08';ctx.shadowBlur=7;ctx.shadowOffsetY=3;
-    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(control.x,control.y,b.x,b.y);
-    ctx.strokeStyle='#5b2a19';ctx.lineWidth=14;ctx.stroke();
-    ctx.shadowBlur=0;ctx.shadowOffsetY=0;ctx.strokeStyle=valid?'#f5663e':'#e7bb66';ctx.lineWidth=8;ctx.stroke();
+    a.x+=unit.x*sourceInset;a.y+=unit.y*sourceInset;b.x-=unit.x*targetInset;b.y-=unit.y*targetInset;
+    const lane=Math.hypot(b.x-a.x,b.y-a.y),bend=Math.min(70,lane*.2),shaftWidth=Math.max(2.5,Math.min(10,lane*.15));
+    const control={x:(a.x+b.x)/2-unit.y*bend,y:(a.y+b.y)/2+unit.x*bend};
+    ctx.lineCap='round';ctx.lineJoin='round';
+    // A tapered bronze-edged ribbon, sampled along one smooth curve. The
+    // silhouette stays crisp at desktop scale without a low-resolution stroke.
+    const sides:[{x:number;y:number}[],{x:number;y:number}[]]=[[],[]];
+    for(let i=0;i<=32;i++){
+      const t=i/32,u=1-t,x=u*u*a.x+2*u*t*control.x+t*t*b.x,y=u*u*a.y+2*u*t*control.y+t*t*b.y;
+      const dx=2*u*(control.x-a.x)+2*t*(b.x-control.x),dy=2*u*(control.y-a.y)+2*t*(b.y-control.y),d=Math.max(1,Math.hypot(dx,dy)),width=shaftWidth*(1-.5*t);
+      sides[0].push({x:x-dy/d*width,y:y+dx/d*width});sides[1].push({x:x+dy/d*width,y:y-dx/d*width});
+    }
+    const gradient=ctx.createLinearGradient(a.x,a.y,b.x,b.y);gradient.addColorStop(0,valid?'#853122':'#886136');gradient.addColorStop(.5,valid?'#df5b35':'#dfb664');gradient.addColorStop(1,valid?'#f2a765':'#f7daa0');
+    ctx.shadowColor='#170c08';ctx.shadowBlur=5;ctx.shadowOffsetY=2;
+    ctx.beginPath();[...sides[0],...sides[1].reverse()].forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle=gradient;ctx.strokeStyle='#5b341e';ctx.lineWidth=4;ctx.fill();ctx.stroke();
+    ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(control.x,control.y,b.x,b.y);ctx.strokeStyle=valid?'#ffdb9b':'#ffebbc';ctx.lineWidth=2;ctx.stroke();
     const angle=Math.atan2(b.y-control.y,b.x-control.x);
     ctx.save();ctx.translate(b.x,b.y);ctx.rotate(angle);
-    ctx.beginPath();ctx.moveTo(23,0);ctx.lineTo(-20,-17);ctx.lineTo(-13,0);ctx.lineTo(-20,17);ctx.closePath();
-    ctx.fillStyle=valid?'#ff8750':'#f1d291';ctx.strokeStyle='#562817';ctx.lineWidth=4;ctx.fill();ctx.stroke();ctx.restore();
+    ctx.beginPath();ctx.moveTo(headLength,0);ctx.lineTo(-headLength*.4,-headLength*.64);ctx.lineTo(-headLength*.18,0);ctx.lineTo(-headLength*.4,headLength*.64);ctx.closePath();ctx.fillStyle=valid?'#f6bd7b':'#efcc87';ctx.strokeStyle='#5b341e';ctx.lineWidth=headLength<12?1.5:3;ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.moveTo(headLength*.85,0);ctx.lineTo(-headLength*.14,0);ctx.strokeStyle='#fff0c8';ctx.lineWidth=headLength<12?1:2;ctx.stroke();ctx.restore();
+    if(valid){ctx.strokeStyle='#f5c98b';ctx.lineWidth=2;for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(800+to.x*50,500-to.y*50,25,i*Math.PI/2+.2,i*Math.PI/2+1.1);ctx.stroke();}}
     this.aimTexture.update();this.aimMesh.setEnabled(true);
   }
 

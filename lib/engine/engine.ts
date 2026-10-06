@@ -300,8 +300,12 @@ function applyEffect(s: EngineGame, caster: PlayerId, eff: EffectDef): string[] 
       break;
     }
     case 'draw': {
+      const treasuryBefore = me.treasury;
       drawCards(s, caster, eff.amount ?? 1);
       pushLog(s, `P${caster} draws ${eff.amount ?? 1}`);
+      // Public attribution only: an empty draw can damage this ruler. Keep
+      // that delta attached to this edict rather than the later turn draw.
+      if (me.treasury !== treasuryBefore) targets = [`hero-${caster}`];
       break;
     }
     case 'buff-own': {
@@ -410,7 +414,7 @@ function completeTurnStart(s: EngineGame): void {
     }
     pushLog(s, `${e.name} resolves`);
     const effectKind = def.spell.kind;
-    const shouldTrack = effectKind.startsWith('damage-') || effectKind === 'heal-treasury' || effectKind === 'heal-own-minions' || effectKind === 'weaken-random-enemy' || effectKind === 'buff-own';
+    const shouldTrack = effectKind.startsWith('damage-') || effectKind === 'heal-treasury' || effectKind === 'heal-own-minions' || effectKind === 'weaken-random-enemy' || effectKind === 'buff-own' || effectKind === 'draw';
     const beforeByUid = shouldTrack
       ? new Map(s.players.flatMap(player => player.board).map(minion => [minion.uid, {
           attack: minion.attack,
@@ -424,7 +428,7 @@ function completeTurnStart(s: EngineGame): void {
     // Delayed order rewards belong to this new turn. Preserve them when the
     // base stock refills below; do not change the established resolve order.
     if (effectKind === 'gain-gas') queuedOrders += me.gas - ordersBefore;
-    if (shouldTrack) {
+    if (shouldTrack && (effectKind !== 'draw' || targetUids?.length)) {
       const targets = (targetUids ?? []).flatMap(uid => {
         const before = beforeByUid?.get(uid);
         const after = s.players.flatMap(player => player.board).find(minion => minion.uid === uid);

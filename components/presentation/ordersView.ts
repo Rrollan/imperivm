@@ -8,6 +8,7 @@ export function ordersLayout(portrait:boolean){
     :[1157,1194,1229,1265,1301,1337,1373,1408,1443,1478].map(px=>px*1600/1586);
   const socketY=portrait?-130+.9*1147:754*1000/992;
   return {width,height,x,y,
+    radius:portrait?22:14.5,
     centers:worldCenters.map(center=>(center-(x-width/2))*1248/width),
     centerY:(socketY-(y-height/2))*160/height,
     verticalScale:(width/height)/(1248/160),

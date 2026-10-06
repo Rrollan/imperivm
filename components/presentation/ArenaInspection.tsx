@@ -2,6 +2,7 @@
 
 import {useCallback,useEffect,useRef,useState,type ReactNode} from 'react';
 import styles from './ArenaLab.module.css';
+import {RomanIcon} from './RomanIcon';
 
 /** A single inspection surface keeps the title, art and action rail in the same
  * places for a fighter, a ruler and an edict. Only its body scrolls. */
@@ -33,9 +34,9 @@ export function ArenaInspection({title,eyebrow,art,artAlt='',visual,kind='object
       }
     }}>
       <header className={styles.inspectionHeader}>
-        {onBack&&<button className={styles.inspectionBack} onClick={onBack} aria-label={backLabel}>‹</button>}
+        {onBack&&<button className={styles.inspectionBack} onClick={onBack} aria-label={backLabel}><RomanIcon name="back"/></button>}
         <div><span>{eyebrow}</span><h2>{title}</h2></div>
-        <button data-inspection-close className={styles.close} onClick={dismiss} aria-label={closeLabel}>×</button>
+        <button data-inspection-close className={styles.close} onClick={dismiss} aria-label={closeLabel}><RomanIcon name="close"/></button>
       </header>
       <div className={styles.inspectionBody}>
         {(art||visual)&&<figure className={styles.inspectionArt}>{visual??<img src={art} alt={artAlt}/>}</figure>}

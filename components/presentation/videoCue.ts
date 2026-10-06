@@ -13,7 +13,7 @@ export function videoCues(batch: PresentationBatch): VideoCue[] {
   const owner=batch.before.turn, hero=`hero-${owner}`, action=batch.action;
   const cues:VideoCue[]=[],played=playedFighter(batch),direct=directEffect(batch);
   const counters=batch.events?.spellCounters??(batch.events?.spellCountered?[batch.events.spellCountered]:[]);
-  const cancellations:VideoCue[]=counters.map(c=>({id:'09-spell-counter',anchor:`queued-${c.mempoolUid}`,width:4}));
+  const cancellations:VideoCue[]=counters.map(c=>({id:'09-spell-counter',anchor:`queued-${c.mempoolUid}`,width:2}));
   // Victory is displayed by the result dialog. It must not swallow the final hit.
   if(played){const role=cardIdentity(played.cardId).role;const id={legionary:'10-deploy-legionary',guard:'11-deploy-guard',commander:'12-deploy-commander',minister:'13-deploy-minister',priest:'14-deploy-priest',engineer:'15-deploy-engineer',edict:'10-deploy-legionary'}[role] as VideoId;cues.push({id,anchor:played.uid,width:4});}
   // Direct Priority gets the second sprite slot: damage already has its exact

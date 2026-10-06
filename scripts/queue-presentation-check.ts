@@ -4,8 +4,9 @@ import {battleFloats} from '../components/presentation/battleFloats';
 import {abilityCues} from '../components/presentation/abilityCues';
 import {videoCues} from '../components/presentation/videoCue';
 import {effectTimeline,effectFrame,deathWindow,EFFECT_POOL_SIZE} from '../components/presentation/effectTimeline';
-import {queueAnchor,queueSlot} from '../components/presentation/queueLayout';
+import {queueAnchor,queueSlot,QUEUED_CARD} from '../components/presentation/queueLayout';
 import {fighterRow} from '../components/presentation/battleLayout';
+import {edictRegister} from '../components/presentation/boardSockets';
 import {createGame} from '../lib/engine/engine';
 import {DECKS} from '../lib/decks';
 import {GameSession} from '../components/presentation/GameSession';
@@ -78,7 +79,20 @@ for(const health of [2,4] as const){
 }
 for(const owner of [0,1]){
   const row=fighterRow(7,owner,true),queue=queueSlot(owner,true);
-  assert.ok(queue.y-174/2>row.y+row.height/2,'The queue stack clears a complete narrow battle row');
+  assert.ok(queue.y-QUEUED_CARD.height/2>row.y+row.height/2,'The original-card queue clears a complete narrow battle row');
+  const wide=fighterRow(7,owner,false),wideQueue=queueSlot(owner,false);
+  assert.ok(wideQueue.x+QUEUED_CARD.width/2+14<wide.center-3*wide.spacing-wide.width/2,'The wide edict stack clears a complete battle row');
+}
+for(const portrait of [false,true]){
+  const header=edictRegister(portrait),top=queueSlot(1,portrait,2).y-QUEUED_CARD.height/2;
+  assert.ok(top>header.y+header.height/2+8,'The third edict must clear the full register, including its owner counters');
+  const ownTop=queueSlot(0,portrait,2).y-QUEUED_CARD.height/2,enemyBottom=queueSlot(1,portrait).y+QUEUED_CARD.height/2;
+  assert.ok(ownTop>enemyBottom+8,'Opposing edict stacks must remain separate');
+  for(const owner of [0,1]){
+    const anchor=queueSlot(owner,portrait,3),row=fighterRow(7,1-owner,portrait),left=row.center-3*row.spacing-row.width/2;
+    const {batch}=createPriorityFourthEntryFixture(),cue=videoCues(batch).find(c=>c.id==='09-spell-counter')!;
+    assert.ok(anchor.x+cue.width*50/2<left,'Cancelling a hidden fourth edict must clear a complete opposing fighter row');
+  }
 }
 {
   const batch=queueBatch(['rug-pull','rug-pull'],0,1),plan=effectTimeline(batch)!;

@@ -23,7 +23,7 @@ export type EffectKind =
   | 'rugpull' // destroy ALL minions on both boards
   | 'summon'; // summon minion by cardId (owner's board)
 
-/** Exact per-card deltas for delayed damage, healing, buff and weakening effects. */
+/** Exact per-card deltas for delayed effects, including empty-draw fatigue. */
 export interface SpellEffectResult {
   owner: PlayerId;
   cardId: string;

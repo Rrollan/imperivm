@@ -9,6 +9,9 @@ import {HEROES} from '../lib/heroes';
 import {abilityCues} from '../components/presentation/abilityCues';
 import {pixelRatio} from '../components/presentation/renderQuality';
 import {fighterRow} from '../components/presentation/battleLayout';
+import {rulerSocket,turnSocket,edictRegister} from '../components/presentation/boardSockets';
+import {ordersLayout} from '../components/presentation/ordersView';
+import {targetingEdge,targetingInsets} from '../components/presentation/targetingGeometry';
 
 async function main() {
   assert.ok(pixelRatio(1280,800,2,'auto')>1.4,'Retina must improve image resolution above CSS pixels');
@@ -18,8 +21,32 @@ async function main() {
   for(let count=1;count<=7;count++){
     const row=fighterRow(count,0,true),left=row.center-(count-1)*row.spacing/2-row.width/2,right=row.center+(count-1)*row.spacing/2+row.width/2;
     assert.ok(left>450&&right<1140,'A complete portrait row must clear both table edges and the hourglass socket');
-    assert.ok(row.y+row.height/2<621-72/2,'Fighter stats must finish above the turn button');
-    if(count>1)assert.ok(row.spacing>=row.width*(335/384),'Oval frames must not overlap in the complete row');
+    const turn=turnSocket(true);assert.ok(row.y+row.height/2<turn.y-turn.height/2,'Fighter stats must finish above the turn button');
+    if(count>1)assert.ok(row.spacing>=row.width+4,'Complete card faces must have a gap in a full row');
+    const enemy=fighterRow(count,1,true);
+    assert.ok(enemy.y+enemy.height/2+12<=row.y-row.height/2,'Opposing full cards must leave a clear attack lane');
+    const wideOwn=fighterRow(count,0,false),wideEnemy=fighterRow(count,1,false);
+    assert.ok(wideEnemy.y+wideEnemy.height/2+12<=wideOwn.y-wideOwn.height/2,'Wide rows must leave a clear attack lane');
+    const enemySocket=rulerSocket(1,false),ownSocket=rulerSocket(0,false);
+    assert.ok(wideEnemy.y-wideEnemy.height/2>enemySocket.y+enemySocket.height/2+4,'Wide cards must clear the entire enemy portrait');
+    assert.ok(wideOwn.y+wideOwn.height/2<ownSocket.y-ownSocket.height/2-4,'Wide cards must clear the entire own portrait');
+  }
+  for(const portrait of [false,true]){
+    const layout=ordersLayout(portrait),world=layout.centers.map(center=>layout.x-layout.width/2+center*layout.width/1248);
+    for(let i=1;i<world.length;i++)assert.ok(world[i]-world[i-1]>layout.radius*2+3,'Gem faces must leave the carved socket rims visible');
+    const register=edictRegister(portrait),clockBottom=portrait?109:259;
+    assert.ok(register.y-register.height/2>clockBottom+10,'The edict register must finish below the water clock');
+  }
+  for(const portrait of [false,true])for(const count of [1,5,7]){
+    const row=fighterRow(count,0,portrait);
+    assert.equal(targetingEdge(0,-1,row.width,row.height),row.height/2,'A vertical arrow must leave from the tall card edge');
+    const ruler=rulerSocket(1,portrait);
+    assert.equal(targetingEdge(0,-1,ruler.width,ruler.height,true),ruler.height/2,'A vertical target arrow must stop outside the native portrait');
+    const diagonal=targetingEdge(1,-1,row.width,row.height);
+    assert.ok(Math.abs(diagonal/Math.sqrt(2)-row.width/2)<.001,'A diagonal arrow must leave the nearer horizontal edge');
+    const enemy=fighterRow(count,1,portrait),distance=row.y-enemy.y,insets=targetingInsets(distance,row.height*.94/2,enemy.height*.94/2);
+    assert.ok(insets.sourceInset+insets.targetInset+3<distance,'Even a short lane between adjacent rows must retain a visible aiming arrow');
+    assert.ok(insets.targetInset-insets.headLength>=enemy.height*.94/2,'The lance tip must stay outside the target card');
   }
   const opening = createLabGame('builder', true, 2718);
   assert.ok(mulliganAvailable(opening), 'A new match must offer the real starting-hand choice');

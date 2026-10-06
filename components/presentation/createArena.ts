@@ -13,8 +13,6 @@ import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import { Texture } from '@babylonjs/core/Materials/Textures/texture';
 import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';
 import { DirectionalLight } from '@babylonjs/core/Lights/directionalLight';
-import { ShadowGenerator } from '@babylonjs/core/Lights/Shadows/shadowGenerator';
-import '@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent';
 import { SceneInstrumentation } from '@babylonjs/core/Instrumentation/sceneInstrumentation';
 import { PointerEventTypes } from '@babylonjs/core/Events/pointerEvents';
 import { mempoolOf, legalActions, effectivePowerCost } from '../../lib/engine/engine';
@@ -22,7 +20,6 @@ import type { GameState, Minion } from '../../lib/engine/types';
 import type { Locale } from '../../lib/locale';
 import { ArenaTextures, type Face } from './ArenaTextures';
 import { PresentationScheduler } from './PresentationScheduler';
-import { ArenaAssets, type ModelId, type ModelFit, type ModelHandle } from './ArenaAssets';
 import { ArenaEffects } from './ArenaEffects';
 import { ArenaSpriteEffects } from './ArenaSpriteEffects';
 import { videoCues, VIDEO_IDS } from './videoCue';
@@ -34,9 +31,11 @@ import {ArenaAbilityEffects} from './ArenaAbilityEffects';
 import {ArenaDeploymentEffects} from './ArenaDeploymentEffects';
 import {pixelRatio, type RenderQuality} from './renderQuality';
 import {effectTimeline,effectFrame,deathWindow} from './effectTimeline';
-import {queueSlot,queueAnchor} from './queueLayout';
+import {queueSlot,queueAnchor,QUEUED_CARD} from './queueLayout';
 import {CARD_FACE} from './cardFace';
 import {ordersLayout} from './ordersView';
+import {rulerSocket,turnSocket,edictRegister} from './boardSockets';
+import {targetingEdge,targetingInsets} from './targetingGeometry';
 
 export type ArenaTarget = { kind: 'hand' | 'minion' | 'hero' | 'power' | 'command' | 'gas' | 'block' | 'deck' | 'scroll' | 'queue'; uid: string; owner: 0 | 1; cardId?: string };
 export interface ArenaMetrics { meshes: number; triangles: number; drawCalls: number; renderScale: number; renderWidth: number; renderHeight: number; models: number; failedModels: number; frames: number; frameMedianMs: number; frameP95Ms: number; renderP95Ms: number; gpu: string; pending: string[] }
@@ -67,9 +66,7 @@ type Entity = {
   width: number;
   height: number;
   backing: Mesh;
-  modelKey: string;
   modelReady: boolean;
-  modelHandles: ModelHandle[];
   painted: Face;
   hoverLift: number;
   hoverTarget: number;
@@ -96,10 +93,6 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   ambient.intensity = .7; ambient.diffuse = Color3.FromHexString('#f3ead8'); ambient.groundColor = Color3.FromHexString('#524737');
   const key = new DirectionalLight('sun-upper-left', new Vector3(.3, -.45, 1), scene);
   key.position.set(-12, 16, -25); key.intensity = .45; key.diffuse = Color3.FromHexString('#ffe9c8');
-  const shadows = new ShadowGenerator(512, key);
-  shadows.usePercentageCloserFiltering = true; shadows.filteringQuality = ShadowGenerator.QUALITY_LOW; shadows.bias = .002; shadows.normalBias = .035;
-  const shadowMap=shadows.getShadowMap();if(shadowMap)shadowMap.refreshRate=0;
-  key.shadowMinZ = 1; key.shadowMaxZ = 55; shadows.setDarkness(.55);
   const instrument = new SceneInstrumentation(scene);
   let frameSamples:number[]=[],renderSamples:number[]=[];
   let nextMetricAt=0;
@@ -112,8 +105,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   const rowY=(owner:number)=>fighterRow(1,owner,portrait).y;
   // Measured recess centers in the delivered artwork. Portrait pixels map to
   // x=350+.9*px, y=-130+.9*py; landscape uses its 1600×1000 pixels directly.
-  const heroX=()=>portrait?793:800;
-  const heroY=(owner:number)=>owner===0?(portrait?774:686):(portrait?20:148);
+  const heroX=(owner=0)=>rulerSocket(owner,portrait).x;
+  const heroY=(owner:number)=>rulerSocket(owner,portrait).y;
   const queueX=()=>queueSlot(0,portrait).x;
   const queueY=(owner:number)=>queueSlot(owner,portrait).y;
   const handY=()=>portrait?1030:865;
@@ -135,7 +128,6 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   const videoEffects = new ArenaSpriteEffects(scene,request);
   // Warm every small combat atlas during loading, before its first contact.
   if(!options.reducedMotion)videoEffects.prepare(VIDEO_IDS.filter(id=>id!=='06-victory').map(id=>({id,anchor:'arena-center',width:4})));
-  const assets = new ArenaAssets(scene, shadows, () => { shadowMap?.resetRefreshCounter();if (shown && !activeBatch) sync(shown); request(); });
 
   function material(name: string, color: string, specular = .2) {
     const known = materials.get(name); if (known) return known;
@@ -144,7 +136,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   }
   const bronze = material('aged-bronze', '#87633a', .3);
   const board = MeshBuilder.CreatePlane('painted Roman arena', { width: 32, height: 20 }, scene);
-  board.position.z = 1.7; board.isPickable = false; board.receiveShadows = true;
+  board.position.z = 1.7; board.isPickable = false;
   const boardMaterial = material('painted arena surface', '#ffffff', 0);
   const painting = new Texture('/ui/arena-lab/native/roman-board-ten-orders.webp', scene, false, true, Texture.TRILINEAR_SAMPLINGMODE, request, request);
   painting.wrapU = Texture.CLAMP_ADDRESSMODE; painting.wrapV = Texture.CLAMP_ADDRESSMODE;
@@ -178,58 +170,41 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     if (entry.signature !== signature) { entry.texture.update(rendered); entry.signature = signature; }
   }
 
-  function modelPortrait(entry: Entity, face: Face) {
-    if (face.kind !== 'hero' && face.kind !== 'power') return;
-    const key = `${face.kind}-${face.heroId}`;
-    if (entry.modelKey === key) return;
-    entry.modelHandles.forEach(handle => handle.dispose()); entry.modelHandles = []; entry.modelKey = key; entry.modelReady = false;
-    const attach = async (id: ModelId, fit: ModelFit, position: Vector3) => {
-      const handle = await assets.attach(id, entry.root, fit, entry.data);
-      if (!handle) return null;
-      if (entry.root.isDisposed() || entry.modelKey !== key) { handle.dispose(); return null; }
-      handle.root.position.copyFrom(position); entry.modelHandles.push(handle); return handle;
-    };
-    if (face.kind === 'hero') {
-      // The Whale bas-relief's fine silhouette is clearer in its existing,
-      // well-lit model poster at this small size, with no extra GLB or shader.
-      if(face.heroId==='whale'||face.heroId==='builder'){entry.backing.setEnabled(false);return;}
-      // The painted socket is the frame; one real relief coin sits inside it.
-      // Avoid two conflicting frames and the incomplete inner geometry of the Tripo ring.
-      void attach(`hero-${face.heroId}` as ModelId, {width:(portrait?125:144)/50,height:(portrait?116:128)/50,depth:.20,stretch:true},new Vector3(0,0,-.65)).then(handle=>{
-        if(handle&&!entry.root.isDisposed()&&entry.modelKey===key){entry.modelReady=true;entry.backing.setEnabled(false);entry.face.position.z=-.84;paint(entry,entry.painted);request();}
-      });
-    } else {
-      // A painted relief has the same light and circular profile as its socket.
-      // The Tripo bust/treasury silhouettes were floating above a generic sphere.
-      entry.backing.setEnabled(false);
-    }
-  }
-
   function entity(keyId: string, data: ArenaTarget, face: Face, width: number, height: number): Entity {
     const known = entities.get(keyId);
-    if (known && known.width === width && known.height === height) return known;
-    if (known) { destroy(known); entities.delete(keyId); }
+    if (known) {
+      if(known.width!==width||known.height!==height){
+        // Keep the same visible card and texture when the formation gets denser.
+        // Resize its geometry; keep() compensates with a settling root scale.
+        const x=width/known.width,y=height/known.height;
+        for(const mesh of [known.face,known.backing]){mesh.scaling.x*=x;mesh.scaling.y*=y;}
+        known.halo.scaling.x*=x;
+        if(known.data.kind==='hero'||known.data.kind==='power')known.halo.scaling.z*=y;else known.halo.scaling.y*=y;
+        known.width=width;known.height=height;
+      }
+      return known;
+    }
     const root = new TransformNode(keyId, scene); root.rotation.x = 0;
-    const oval = face.kind === 'hero' || face.kind === 'minion' || face.kind === 'power';
+    const oval = face.kind === 'hero' || face.kind === 'power';
     const backing = oval
       ? MeshBuilder.CreateSphere(`${keyId}-thickness`, { diameter: 1, segments: 12 }, scene)
       : MeshBuilder.CreateBox(`${keyId}-thickness`, { width: width * .95, height: height * .93, depth: .13 }, scene);
-    if (oval) { backing.scaling.set(width * .85, height * .8, .17); backing.position.y = height * .055; }
+    if (oval) backing.scaling.set(width * .85, height * .85, .17);
     backing.parent = root; backing.position.z = .09; backing.material = bronze; backing.isPickable = false;
     if (['hero','power','command','gas','orders','block','deck','scroll','queueTitle'].includes(face.kind)) backing.setEnabled(false);
     const faceMesh = MeshBuilder.CreatePlane(`${keyId}-face`, { width, height, sideOrientation: Mesh.DOUBLESIDE }, scene);
     const texture = textures.make(`${keyId}-ink`, face);
     const mat = new StandardMaterial(`${keyId}-material`, scene); mat.diffuseTexture = texture.texture; mat.emissiveTexture = texture.texture; mat.emissiveColor = Color3.White(); mat.diffuseColor = Color3.Black(); mat.disableLighting = true; mat.specularColor = Color3.Black(); mat.useAlphaFromDiffuseTexture = true;
     faceMesh.parent = root; faceMesh.position.z = -.01; faceMesh.material = mat; faceMesh.metadata = data;
-    const halo = oval ? MeshBuilder.CreateTorus(`${keyId}-halo`, { diameter: 1, thickness: .045, tessellation: 48 }, scene) : MeshBuilder.CreatePlane(`${keyId}-halo`, { width: width * 1.06, height: height * 1.04 }, scene);
-    if (oval) { halo.rotation.x = Math.PI / 2; halo.scaling.set(width * .89, 1, height * .81); halo.position.y = height * .055; }
+    const halo = oval ? MeshBuilder.CreateTorus(`${keyId}-halo`, { diameter: 1, thickness: .045, tessellation: 48 }, scene) : MeshBuilder.CreateTube(`${keyId}-halo`, {path:[new Vector3(-width*.49,-height*.485,0),new Vector3(width*.49,-height*.485,0),new Vector3(width*.49,height*.485,0),new Vector3(-width*.49,height*.485,0),new Vector3(-width*.49,-height*.485,0)],radius:.025,tessellation:6},scene);
+    if (oval) { halo.rotation.x = Math.PI / 2; halo.scaling.set(width * .89, 1, height * .89); }
     const haloMat = new StandardMaterial(`${keyId}-halo-material`, scene); haloMat.diffuseColor = Color3.Black(); haloMat.emissiveColor = Color3.FromHexString('#427650'); haloMat.alpha = oval ? .9 : .22; haloMat.disableLighting = true;
     halo.parent = root; halo.position.z = -.03; halo.material = haloMat; halo.isPickable = false; halo.setEnabled(false);
-    const entry: Entity = { root, face: faceMesh, halo, material: mat, haloMaterial: haloMat, texture, data, base: Vector3.Zero(), signature: '', width, height, backing, modelKey: '', modelReady: false, modelHandles: [], painted: face,hoverLift:0,hoverTarget:0,fanAngle:0 };
+    const entry: Entity = { root, face: faceMesh, halo, material: mat, haloMaterial: haloMat, texture, data, base: Vector3.Zero(), signature: '', width, height, backing, modelReady: false, painted: face,hoverLift:0,hoverTarget:0,fanAngle:0 };
     entities.set(keyId, entry); return entry;
   }
 
-  function destroy(entry: Entity) { entry.modelHandles.forEach(handle => handle.dispose()); entry.root.dispose(false, false); entry.texture.dispose(); entry.material.dispose(); entry.haloMaterial.dispose(); }
+  function destroy(entry: Entity) { entry.root.dispose(false, false); entry.texture.dispose(); entry.material.dispose(); entry.haloMaterial.dispose(); }
 
   function highlights() {
     const legal = shown ? legalActions(shown) : [];
@@ -257,12 +232,14 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const playableCards=new Set(!activeBatch&&state.turn===0?stateActions.flatMap(action=>action.type==='play-minion'||action.type==='cast-spell'?[action.uid]:[]):[]);
     const used = new Set<string>();
     const keep = (id: string, data: ArenaTarget, face: Face, w: number, h: number, x: number, y: number, z = 0) => {
-      used.add(id);const old=entities.get(id),previous=old?.root.position.clone(); const entry = entity(id,data,face,w/50,h/50);
+      used.add(id);const old=entities.get(id),previous=old?.root.position.clone(),previousScale=old?.root.scaling.clone(),oldWidth=old?.width,oldHeight=old?.height; const entry = entity(id,data,face,w/50,h/50);
       entry.data=data;entry.face.metadata=data;entry.root.setEnabled(true);
-      paint(entry,face); modelPortrait(entry,face);
+      paint(entry,face);
       entry.base.copyFrom(point(x,y,z)); entry.root.position.copyFrom(entry.base); entry.root.scaling.setAll(1);
-      if(changed&&previous&&old===entry&&(data.kind==='minion'||data.kind==='hand'&&data.owner===0)&&Vector3.DistanceSquared(previous,entry.base)>.001&&!options.reducedMotion){
-        layoutMoves=layoutMoves.filter(m=>m.entry!==entry);layoutMoves.push({entry,start:previous,target:entry.base.clone(),elapsed:0});entry.root.position.copyFrom(previous);
+      const resized=oldWidth!==undefined&&(oldWidth!==entry.width||oldHeight!==entry.height);
+      if(changed&&previous&&old===entry&&(data.kind==='minion'||data.kind==='hand'&&data.owner===0)&&(resized||Vector3.DistanceSquared(previous,entry.base)>.001)&&!options.reducedMotion){
+        const startScale=resized?new Vector3((oldWidth!/entry.width)*(previousScale?.x??1),(oldHeight!/entry.height)*(previousScale?.y??1),1):undefined;
+        layoutMoves=layoutMoves.filter(m=>m.entry!==entry);layoutMoves.push({entry,start:previous,target:entry.base.clone(),elapsed:0,startScale});entry.root.position.copyFrom(previous);if(startScale)entry.root.scaling.copyFrom(startScale);
       }
       entry.fanAngle=data.kind === 'hand' && data.owner === 0 ? -(x-800)*.00015 : 0;
       entry.root.rotation.z = entry.fanAngle;
@@ -270,7 +247,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     };
     state.players.forEach((player,index)=>{
       const owner = index as 0|1;
-      keep(`hero-${owner}`,{kind:'hero',uid:`hero-${owner}`,owner},{kind:'hero',heroId:player.heroId,treasury:player.treasury},portrait?190:205,portrait?205:220,heroX(),heroY(owner),-1.6);
+      const socket=rulerSocket(owner,portrait);
+      keep(`hero-${owner}`,{kind:'hero',uid:`hero-${owner}`,owner},{kind:'hero',heroId:player.heroId,treasury:player.treasury,aspect:socket.width/socket.height},socket.width*384/312,socket.height*384/312,heroX(owner),heroY(owner),-1.6);
       const row=fighterRow(player.board.length,owner,portrait);
       player.board.forEach((m,i)=>keep(m.uid,{kind:'minion',uid:m.uid,owner,cardId:m.cardId},{kind:'minion',minion:m,ready:readyAttackers.has(m.uid),readiness:fighterReadiness(state,owner,m,stateActions)},row.width,row.height,row.center+(i-(player.board.length-1)/2)*row.spacing,row.y,-.15));
     });
@@ -283,19 +261,21 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       const spells=mempoolOf(state,owner);
       spells.slice(0,3).forEach((spell,i)=>{
         const id=`queued-${spell.uid}`;
-        const e=keep(id,{kind:'queue',uid:id,owner,cardId:spell.cardId},{kind:'queued',cardId:spell.cardId,owner,count:spells.length,ordinal:i+1},130,174,queueX()+i*7,queueY(owner)-i*7,-1+i*.03);
-        e.face.metadata=e.data;
+        const e=keep(id,{kind:'queue',uid:id,owner,cardId:spell.cardId},{kind:'queued',cardId:spell.cardId,owner,count:spells.length,ordinal:i+1},QUEUED_CARD.width,QUEUED_CARD.height,queueX()+i*7,queueY(owner)-i*7,-1+i*.03);
+        e.face.metadata=e.data;e.face.alphaIndex=3-i;
       });
     }
     const native = (id:string,kind:ArenaTarget['kind'],face:Face,w:number,h:number,x:number,y:number)=>keep(id,{kind,uid:id,owner:0},face,w,h,x,y,-.5);
     const me=state.players[0];
-    native('turn-command','command',{kind:'command',state:activeBatch?'busy':battleCommand(state,stateActions),engraved:true},190,72,portrait?1165:1452,portrait?621:465);
+    const turn=turnSocket(portrait);
+    native('turn-command','command',{kind:'command',state:activeBatch?'busy':battleCommand(state,stateActions),engraved:true},turn.width,turn.height,turn.x,turn.y);
     native('hero-power','power',{kind:'power',heroId:me.heroId,cost:effectivePowerCost(state,0),available:state.turn===0&&legalActions(state).some(a=>a.type==='hero-power')},101,101,portrait?960:975,portrait?792:703);
     const orders=ordersLayout(portrait);
     native('gas-counter','gas',ordersFace(state),orders.width,orders.height,orders.x,orders.y);
     native('block-counter','block',{kind:'block',block:state.block},60,78,portrait?446:234,portrait?70:220);
     const deck=native('own-deck','deck',{kind:'deck',count:me.deck.length},80,112,portrait?1163:1390,portrait?202:238);deck.modelReady=true;paint(deck,deck.painted);
-    native('battle-scroll','scroll',{kind:'queueTitle',own:mempoolOf(state,0).length,enemy:mempoolOf(state,1).length},180,110,queueX(),190);
+    const register=edictRegister(portrait);
+    native('battle-scroll','scroll',{kind:'queueTitle',own:mempoolOf(state,0).length,enemy:mempoolOf(state,1).length},register.width,register.height,register.x,register.y);
     hourglass.position.copyFrom(point(portrait?1178:1442,portrait?514:352,-.5));
     clock.position.copyFrom(point(portrait?446:234,portrait?57:218,-.5));
     deckStack.position.copyFrom(point(portrait?1163:1390,portrait?99:175,-.5));
@@ -322,7 +302,13 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const target=hitTarget(press?.entity.data.uid);
     const valid=target?.owner===1&&!!shown&&legalActions(shown).some(a=>a.type==='attack'&&a.attackerUid===selected&&a.target===(target.kind==='hero'?'hero':target.uid));
     const to=valid&&target?entities.get(target.uid)?.base:positionOnTable();
-    if(to)effects.aim(source.base,to,valid);else effects.hideAim();
+    if(to){
+      const dx=to.x-source.base.x,dy=to.y-source.base.y,destination=valid&&target?entities.get(target.uid):undefined;
+      const sourceEdge=targetingEdge(dx,dy,source.width*50*.94,source.height*50*.94);
+      const targetEdge=destination?targetingEdge(dx,dy,destination.width*50*(destination.data.kind==='hero'?.8125:.94),destination.height*50*(destination.data.kind==='hero'?.8125:.94),destination.data.kind==='hero'):0;
+      const insets=targetingInsets(Math.hypot(dx,dy)*50,sourceEdge,targetEdge);
+      effects.aim(source.base,to,valid,insets.sourceInset,insets.targetInset,insets.headLength);
+    }else effects.hideAim();
     canvas.style.cursor=valid?'crosshair':'pointer';
   }
   function clearPress(animateReturn=false) {
@@ -409,14 +395,13 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   document.addEventListener('visibilitychange', visibility);
   function reportMetrics(){
     const meshes=scene.meshes.filter(mesh=>mesh.isEnabled());
-    options.onMetrics({meshes:meshes.length,triangles:meshes.reduce((n,mesh)=>n+mesh.getTotalIndices()/3,0),drawCalls:instrument.drawCallsCounter.current,renderScale:engine.getHardwareScalingLevel(),renderWidth:engine.getRenderWidth(),renderHeight:engine.getRenderHeight(),models:assets.loaded.size,failedModels:assets.failed.size,frames:frameSamples.length,frameMedianMs:percentile(frameSamples,.5),frameP95Ms:percentile(frameSamples,.95),renderP95Ms:percentile(renderSamples,.95),gpu:engine.getGlInfo().renderer,pending:meshes.filter(mesh=>mesh.isVisible&&mesh.visibility>0&&!mesh.isReady(true)).slice(0,6).map(mesh=>mesh.name)});
+    options.onMetrics({meshes:meshes.length,triangles:meshes.reduce((n,mesh)=>n+mesh.getTotalIndices()/3,0),drawCalls:instrument.drawCallsCounter.current,renderScale:engine.getHardwareScalingLevel(),renderWidth:engine.getRenderWidth(),renderHeight:engine.getRenderHeight(),models:0,failedModels:0,frames:frameSamples.length,frameMedianMs:percentile(frameSamples,.5),frameP95Ms:percentile(frameSamples,.95),renderP95Ms:percentile(renderSamples,.95),gpu:engine.getGlInfo().renderer,pending:meshes.filter(mesh=>mesh.isVisible&&mesh.visibility>0&&!mesh.isReady(true)).slice(0,6).map(mesh=>mesh.name)});
   }
   function render() {
     if (disposed || document.hidden || paused) return;
     if(!readyReported){
-      const portraitsReady=shown?.players.every(p=>(p.heroId==='whale'||p.heroId==='builder')||assets.loaded.has(`hero-${p.heroId}` as ModelId)||assets.failed.has(`hero-${p.heroId}` as ModelId));
       const visibleReady=scene.meshes.every(mesh=>!mesh.isEnabled()||!mesh.isVisible||mesh.visibility<=0||mesh.isReady(true));
-      if(portraitsReady&&textures.isReady()&&painting.isReady()&&(!portrait||portraitPainting?.isReady())&&visibleReady){
+      if(shown&&textures.isReady()&&painting.isReady()&&(!portrait||portraitPainting?.isReady())&&visibleReady){
         readyReported=true;options.onReady?.();
       }
     }
@@ -501,7 +486,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const target = defender?.root.position.clone() ?? (batch.action.type === 'cast-spell'
       ? point(queueX()+Math.min(2,pendingIndex)*7,queueY(owner)-Math.min(2,pendingIndex)*7,-1)
       : point(boardRow.center+(addedIndex-(boardSize-1)/2)*boardRow.spacing,boardRow.y,-.15));
-    const landingScale = moving ? new Vector3((batch.action.type==='cast-spell'?130:boardRow.width)/(moving.width*50),(batch.action.type==='cast-spell'?174:boardRow.height)/(moving.height*50),1) : Vector3.One();
+    const landingScale = moving ? new Vector3((batch.action.type==='cast-spell'?QUEUED_CARD.width:boardRow.width)/(moving.width*50),(batch.action.type==='cast-spell'?QUEUED_CARD.height:boardRow.height)/(moving.height*50),1) : Vector3.One();
     const settling = handUid ? batch.after.players[owner].board.flatMap((m,index)=>{
       const entry=entities.get(m.uid); return entry ? [{entry,start:entry.root.position.clone(),target:point(boardRow.center+(index-(boardSize-1)/2)*boardRow.spacing,boardRow.y,-.15)}] : [];
     }) : [];
@@ -521,7 +506,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       if(key===frameKey)return;frameKey=key;
       const frame=effectFrame(batch,timeline,elapsedMs);
       frame.fighters.forEach(minion=>{const entry=entities.get(minion.uid);if(entry&&!entry.root.isDisposed())paint(entry,{kind:'minion',minion,ready:false});});
-      batch.after.players.forEach((player,p)=>{const entry=entities.get(`hero-${p}`);if(entry)paint(entry,{kind:'hero',heroId:player.heroId,treasury:frame.treasuries[p]});});
+      batch.after.players.forEach((player,p)=>{const entry=entities.get(`hero-${p}`);if(entry)paint(entry,{kind:'hero',heroId:player.heroId,treasury:frame.treasuries[p],aspect:rulerSocket(p,portrait).width/rulerSocket(p,portrait).height});});
     };
     const contactMs=options.reducedMotion?72:Math.max(spec.duration*spec.contact,(batch.events?.spellResolved?.length??0)*75+90);
     const duration=options.reducedMotion?Math.max(180,contactMs+(timeline?.tailMs??0)):Math.max(spec.duration,contactMs+(timeline?.tailMs??230)+(drawn.length?420+Math.max(0,drawn.length-1)*65:0));
@@ -652,7 +637,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       });
       batch.after.players.forEach((player, owner) => {
         const hero = entities.get(`hero-${owner}`);
-        if (hero) paint(hero,{ kind: 'hero', heroId: player.heroId, treasury: player.treasury });
+        if (hero) paint(hero,{ kind: 'hero', heroId: player.heroId, treasury: player.treasury,aspect:rulerSocket(owner,portrait).width/rulerSocket(owner,portrait).height });
         player.board.forEach(minion => { const entry = entities.get(minion.uid); if (entry) paint(entry, { kind: 'minion', minion,readiness:fighterReadiness(batch.after,owner as 0|1,minion) }); });
       });
       const gas = entities.get('gas-counter'); if (gas) paint(gas, ordersFace(batch.after));
@@ -687,7 +672,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     dispose: () => {
       disposed = true; scheduler.cancel(); releaseArrival();releaseDraws(); resizeObserver.disconnect(); document.removeEventListener('visibilitychange', visibility); canvas.removeEventListener('pointercancel', cancelPointer);
       canvas.removeEventListener('pointerleave', leavePointer);
-      engine.stopRenderLoop(render); videoEffects.dispose(); effects.dispose();abilities.dispose();deployments.dispose(); assets.dispose(); textures.dispose(); instrument.dispose(); scene.dispose(); engine.dispose(); entities.clear();
+      engine.stopRenderLoop(render); videoEffects.dispose(); effects.dispose();abilities.dispose();deployments.dispose(); textures.dispose(); instrument.dispose(); scene.dispose(); engine.dispose(); entities.clear();
     },
   };
 }

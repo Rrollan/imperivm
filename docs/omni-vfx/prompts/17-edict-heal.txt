@@ -1,0 +1,11 @@
+[# Sources <FIRST_FRAME>@Image1 <LAST_FRAME>@Image2]
+
+Create one isolated IMPERIVM game VFX clip, landscape 16:9, 720p. Image1 is 17-START.png: use it as the exact starting frame. Image2 is 17-END.png: use it as the exact final frame.
+
+A single continuous shot, locked frontal orthographic camera. Keep the exact starting silhouette, palette, size, position and empty black centre. Uniform pure black RGB 0,0,0 background throughout.
+
+[0.00-0.12s] One soft ivory highlight travels around the existing open turquoise halo; its six jade motes rise gently.
+[0.12-0.60s] The existing contours and particles fade smoothly and completely to black. Keep the effect within its starting footprint.
+[0.60s-end] Hold completely pure black. The clip may be 4 seconds or the shortest available duration; do not stretch or repeat the active effect to fill it.
+
+No scene cuts, camera movement, extra objects, additional rings, opaque centre, card, person, arena, UI, letters, numbers, smoke, bloom or full-screen flash. Silent audio: no music, speech or sound effects. The game supplies its own sounds.
