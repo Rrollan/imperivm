@@ -15,3 +15,6 @@
 
 :global(html[data-imperivm-motion="off"]) .contact canvas { display:none; }
 :global(html[data-imperivm-motion="off"]) .contactNumber { animation:none; }
+
+.ruler{min-width:0;max-width:100%}.ruler>div{min-width:0}.ruler small{overflow-wrap:anywhere}
+@media(max-width:520px){.battleHead{flex-wrap:wrap}.battleHead .turnClock{width:100%;text-align:left}.battleFooter{flex-wrap:wrap;align-items:flex-start}.actions{flex-wrap:wrap}.actions>button{flex:1 1 130px;min-width:0}.emptyCourt{font-size:20px;text-align:center}.header span{overflow-wrap:anywhere}}

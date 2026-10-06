@@ -1,0 +1,14 @@
+{
+  "name": "imperivm-rooms",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {"node": ">=22"},
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server/src/index.js",
+    "test": "tsc -p tsconfig.test.json && node --import tsx --test test/*.test.ts"
+  },
+  "dependencies": {"ws": "^8.18.3"},
+  "devDependencies": {"@types/node": "^22.0.0", "@types/ws": "^8.18.1", "tsx": "^4.20.0", "typescript": "^5.9.0"}
+}

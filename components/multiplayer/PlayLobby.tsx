@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import {useSearchParams} from 'next/navigation';
+import {useRouter, useSearchParams} from 'next/navigation';
 import {useEffect, useState} from 'react';
 import {HEROES} from '../../lib/heroes';
 import {useLocale} from '../LocaleContext';
@@ -10,6 +10,7 @@ import {powerRules} from '../presentation/rulesText';
 import {RomanIcon} from '../presentation/RomanIcon';
 import {useOnlineSession} from './useOnlineSession';
 import {OnlineBoard} from './OnlineBoard';
+import {CustomLobby} from './CustomLobby';
 import styles from './Multiplayer.module.css';
 
 const modeDefinitions = [
@@ -18,9 +19,13 @@ const modeDefinitions = [
   {id: 'random', icon: 'gladius', title: 'Случайный соперник', copy: 'Встретьтесь с другим игроком, который сейчас ищет бой.'},
 ] as const;
 export function PlayLobby() {
+  const params = useSearchParams();
+  return !params.get('room') && (params.get('mode') === 'friend' || params.has('code')) ? <CustomLobby/> : <MatchmakingLobby/>;
+}
+function MatchmakingLobby() {
   const {t, locale, heroName, heroTitle, powerName} = useLocale();
   const MODES = modeDefinitions.map((item, index) => ({...item, title: t(item.title, ['Against AI', 'With a friend', 'Random opponent'][index]), copy: t(item.copy, ['Learn your deck and try combos at your own pace.', 'Create a private table and invite a friend.', 'Meet another player who is looking for a match.'][index])}));
-  const params = useSearchParams(), invite = params.get('room');
+  const params = useSearchParams(), invite = params.get('room'), router = useRouter();
   const initial = params.get('mode');
   const [mode, setMode] = useState<'ai' | 'friend' | 'random'>(invite ? 'friend' : initial === 'friend' || initial === 'random' ? initial : 'ai');
   const [hero, setHero] = useState(() => Object.hasOwn(HEROES, params.get('hero') || '') ? params.get('hero')! : 'builder');
@@ -36,7 +41,7 @@ export function PlayLobby() {
     <SiteHeader active="play" />
     <section className={styles.lobby}>
       <div className={styles.intro}><p className={styles.eyebrow}>{t('Зал сражений · все стартовые колоды доступны', 'Hall of battles · all starter decks available')}</p><h1>{invite ? t('Вас пригласили за стол', 'You have been invited') : t('Выберите своё сражение', 'Choose your battle')}</h1><p>{t('Одна колода. Один предводитель. Ваш следующий ход.', 'One deck. One ruler. Your next move.')}</p></div>
-      <div className={styles.modeGrid} aria-label={t('Режим игры', 'Game mode')}>{MODES.map(item => <button key={item.id} className={styles.mode} data-active={mode === item.id} disabled={locked || !!invite} aria-pressed={mode === item.id} onClick={() => setMode(item.id)}><RomanIcon name={item.icon}/><span><strong>{item.title}</strong><small>{item.copy}</small></span></button>)}</div>
+      <div className={styles.modeGrid} aria-label={t('Режим игры', 'Game mode')}>{MODES.map(item => <button key={item.id} className={styles.mode} data-active={mode === item.id} disabled={locked || !!invite} aria-pressed={mode === item.id} onClick={() => item.id === 'friend' ? router.push(`/play?mode=friend&hero=${hero}`) : setMode(item.id)}><RomanIcon name={item.icon}/><span><strong>{item.title}</strong><small>{item.copy}</small></span></button>)}</div>
       <div className={styles.sectionHeading}><h2>{t('Кто поведёт вашу колоду?', 'Who will lead your deck?')}</h2><span>{t('30 карт · без покупки паков', '30 cards · no packs required')}</span></div>
       <div className={styles.heroes}>{Object.keys(HEROES).map(id => <button key={id} className={styles.heroChoice} data-active={hero === id} disabled={locked} aria-pressed={hero === id} onClick={() => setHero(id)}><img src={heroPortraitPath(id)} alt=""/><span><strong>{heroName(id)}</strong><small>{heroTitle(id)}</small></span></button>)}</div>
       <div className={styles.power}><RomanIcon name="laurel"/><div><strong>{powerName(hero)}</strong><p>{powerRules(hero, locale)}{t(' Цена — 2 приказа, один раз за ход.', ' Cost: 2 orders, once per turn.')}</p></div><Link href="/library#rulers">{t('Правители и способности →', 'Rulers and abilities →')}</Link></div>
