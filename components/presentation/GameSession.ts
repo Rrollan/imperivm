@@ -24,9 +24,9 @@ export interface SessionSnapshot {
 }
 
 /** A real, seeded mid-match encounter, reached entirely through legal engine actions. */
-export function createLabGame(heroId = 'builder', opening = false, seed = 2718): GameState {
-  const hero = HEROES[heroId] ? heroId : 'builder';
-  const foe = hero === 'degen' ? 'whale' : 'degen';
+export function createLabGame(heroId = 'builder', opening = false, seed = 2718, opponent?:string): GameState {
+  const hero = Object.hasOwn(HEROES,heroId) ? heroId : 'builder';
+  const foe = opponent&&Object.hasOwn(HEROES,opponent)?opponent:hero === 'degen' ? 'whale' : 'degen';
   let state = opening
     ? createGame(hero, DECKS[hero], foe, DECKS[foe], {enableMulligan:true}, seed)
     : createGame(hero, DECKS[hero], foe, DECKS[foe], seed);

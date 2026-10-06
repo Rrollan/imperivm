@@ -26,6 +26,7 @@ import {BattleChronicle} from './BattleChronicle';
 import {ArenaInspection} from './ArenaInspection';
 import {ArenaCardPreview} from './ArenaCardPreview';
 import {heroPortraitPath} from './heroPortrait';
+import {factionLink} from './factionLink';
 
 function usePanelFocus(open: boolean, panel: React.RefObject<HTMLElement>, modal = false) {
   useEffect(() => {
@@ -45,10 +46,10 @@ function usePanelFocus(open: boolean, panel: React.RefObject<HTMLElement>, modal
   }, [open, panel, modal]);
 }
 
-export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId: string; opening: boolean; debug: boolean; seed?:number }) {
+export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent }: { heroId: string; opening: boolean; debug: boolean; seed?:number;opponent?:string }) {
   const locale = useLocale(), reduced = useReducedMotion();
   const sessionRef = useRef<GameSession>();
-  if (!sessionRef.current) sessionRef.current = new GameSession(createLabGame(heroId, opening,seed));
+  if (!sessionRef.current) sessionRef.current = new GameSession(createLabGame(heroId, opening,seed,opponent));
   const session = sessionRef.current;
   const [view, setView] = useState<SessionSnapshot>(() => session.snapshot());
   const [selected, setSelected] = useState<string | null>(null);
@@ -188,7 +189,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
   function restart(nextHero = me.heroId, fromOpening = true) {
     renderer.current?.cancel(); select(null); setInspect(null);
     setHelp(false);setHistoryOpen(false);setKeyboard(false);setMulliganUids([]);setLastAction(null);setFailure('');
-    session.restart(createLabGame(nextHero, fromOpening,seed));
+    session.restart(createLabGame(nextHero, fromOpening,seed,opponent));
   }
 
   const card = inspect?.cardId ? CARDS[inspect.cardId] : null;
@@ -234,7 +235,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
 
     {inspect && card && <ArenaInspection key={`${inspect.kind}:${inspect.uid}`} {...inspectionProps}
       title={locale.cardName(card.id)} eyebrow={roleName(card.id,locale.locale)} kind="card"
-      visual={<ArenaCardPreview id={card.id} locale={locale.locale} label={`${locale.cardName(card.id)}. ${locale.t('Приказы','Orders')}: ${card.cost}${card.type==='minion'?`. ${locale.t('Атака','Attack')}: ${inspectedMinion?.attack??card.attack}. ${locale.t('Здоровье','Health')}: ${inspectedMinion?.health??card.health}`:''}`} stats={inspectedMinion?{attack:inspectedMinion.attack,health:inspectedMinion.health}:undefined}/>}
+      visual={<ArenaCardPreview id={card.id} locale={locale.locale} interactive reduced={reduced} label={`${locale.cardName(card.id)}. ${locale.t('Приказы','Orders')}: ${card.cost}${card.type==='minion'?`. ${locale.t('Атака','Attack')}: ${inspectedMinion?.attack??card.attack}. ${locale.t('Здоровье','Health')}: ${inspectedMinion?.health??card.health}`:''}`} stats={inspectedMinion?{attack:inspectedMinion.attack,health:inspectedMinion.health}:undefined}/>}
       onBack={inspect.kind==='queue'&&inspect.uid!=='historical-card'?()=>setInspect({kind:'scroll',uid:'arena-scroll',owner:0}):undefined}
       actions={inspect.owner===0&&(inspect.kind==='hand'||stakeAction||attackAction)?<>
         {inspect.kind==='hand'&&<button className={styles.primary} aria-label={playAction?locale.t('Разыграть','Play'):undefined} disabled={!playAction} onClick={()=>{if(playAction)dispatch(playAction);}}>{playAction?<><span className={styles.costChip}>{card.cost}</span>{locale.t('Разыграть','Play')}</>:unavailableCardText(view.state,card.id,locale.locale,view.busy)}</button>}
@@ -243,6 +244,10 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
       </>:undefined}>
       {inspectedReadiness&&<p className={styles.fighterStatus}>{readinessText(inspectedReadiness,locale.locale)}</p>}
       {rules&&<p className={styles.inspectionRules}>{rules}</p>}
+      {inspect.kind==='hand'&&inspect.owner===0&&shown.turn===0&&<div className={styles.factionLink} data-link-step={factionLink(me,card.faction).step}>
+        <strong>{card.faction} · {locale.t('Связка','Link')} {factionLink(me,card.faction).step}/2</strong>
+        <p>{factionLink(me,card.faction).earned?locale.t('Возврат +1 приказа за эту фракцию уже получен в этом ходу.','The +1 order refund for this faction has already been earned this turn.'):factionLink(me,card.faction).refundOnNext?locale.t('При розыгрыше этой карты: +1 приказ после оплаты полной цены.','On playing this card: refund +1 order after paying its full cost.'):locale.t('Вторая карта этой фракции за один ход возвращает +1 приказ.','The second card of this faction in one turn refunds +1 order.')}</p>
+      </div>}
       {keywords.length>0&&<div className={styles.keywords}>{keywords.map(keyword=><details key={keyword.name}><summary>{keyword.name}</summary><p>{keyword.description}</p></details>)}</div>}
       {card.type==='spell'&&<div className={styles.edictTiming}><strong>{locale.t('В начале следующего своего хода','At the start of your next turn')}</strong><details><summary>{locale.t('Как работает указ','How edicts work')}</summary><p>{locale.t('После розыгрыша указ ждёт в очереди. Затем срабатывает по порядку, в начале следующего хода владельца.','After play, the edict waits in the queue. It resolves in cast order at the start of its owner’s next turn.')}</p></details></div>}
       <details className={styles.inspectionExtra}><summary>{locale.t('Сведения о карте','Card details')}</summary><p>{rankName(card.id,locale.locale)}</p>
@@ -265,6 +270,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718 }: { heroId
       eyebrow={locale.t('Арена IMPERIVM','IMPERIVM arena')}
       actions={inspect.kind==='scroll'?<button onClick={()=>{setInspect(null);setHistoryOpen(true);}}>{locale.t('История боя','Battle history')}</button>:undefined}>
       {inspect.kind==='gas'&&<><dl className={styles.inspectionStats}><div><dt>{locale.t('Доступно','Available')}</dt><dd>{me.gas}</dd></div><div><dt>{locale.t('Запас','Capacity')}</dt><dd>{me.maxGas}</dd></div><div><dt>{locale.t('Бонус','Bonus')}</dt><dd>+{ordersView(me.gas,me.maxGas).bonus}</dd></div></dl><p className={styles.inspectionRules}>{locale.t('Карты и сила правителя расходуют приказы. Каждый светящийся камень — один доступный приказ.','Cards and the ruler’s power spend orders. Each lit stone is one available order.')}</p><details className={styles.inspectionExtra}><summary>{locale.t('Пополнение и бонусы','Refill and bonuses')}</summary><p>{locale.t('Запас пополняется в начале вашего хода. Золотистые камни — бонусные. За пределами десяти ячеек остаток указан числом.','Refill at the start of your turn. Gold stones are bonuses. Extra orders beyond ten sockets are counted numerically.')}</p></details></>}
+      {inspect.kind==='gas'&&<div className={styles.factionLink}><strong>{locale.t('Связка фракции · +1 приказ','Faction link · +1 order')}</strong><p>{locale.t('Разыграйте две карты одной фракции за один ход. Вторая вернёт один приказ, один раз за ход для каждой фракции. Сначала нужно оплатить полную цену карты.','Play two cards of the same faction in one turn. The second refunds one order, once per turn per faction. Pay the full card cost first.')}</p></div>}
       {inspect.kind==='block'&&<><dl className={styles.inspectionStats}><div><dt>{locale.t('Блок','Block')}</dt><dd>{shown.block}</dd></div></dl><p className={styles.inspectionRules}>{locale.t('В начале вашего хода срабатывают ваши указы и восстанавливается запас приказов.','Your edicts resolve and orders refill at the start of your turn.')}</p></>}
       {inspect.kind==='deck'&&<><dl className={styles.inspectionStats}><div><dt>{locale.t('Карт осталось','Cards remaining')}</dt><dd>{me.deck.length}</dd></div></dl><p className={styles.inspectionRules}>{locale.t('В начале хода вы берёте следующую карту.','Draw the next card at the start of your turn.')}</p><p>{locale.t('Пустая колода наносит урон казне.','An empty deck damages your treasury.')}</p></>}
       {inspect.kind==='scroll'&&<><p className={styles.inspectionRules}>{locale.t('В начале следующего хода владельца, по порядку.','At the start of the owner’s next turn, in cast order.')}</p>{([0,1] as const).map(owner=><section className={styles.queueGroup} key={owner}><h3>{owner===0?locale.t('Ваши указы','Your edicts'):locale.t('Указы соперника','Enemy edicts')}</h3>{mempoolOf(shown,owner).length?mempoolOf(shown,owner).map((entry,index)=><button className={styles.queueEntry} key={entry.uid} onClick={()=>setInspect({kind:'queue',uid:`queued-${entry.uid}`,owner,cardId:entry.cardId})}><span>{index+1}</span><img src={cardArtPath(entry.cardId)} alt=""/><strong>{locale.cardName(entry.cardId)}</strong></button>):<p className={styles.queueEmpty}>{locale.t('Очередь пуста.','No pending edicts.')}</p>}</section>)}</>}

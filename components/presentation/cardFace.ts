@@ -11,8 +11,10 @@ function rounded(ctx: CanvasRenderingContext2D, x: number, y: number, w: number,
   ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
 }
 
-function contain(ctx: CanvasRenderingContext2D, image: HTMLImageElement, x: number, y: number, w: number, h: number) {
-  const ratio = Math.min(w / image.naturalWidth, h / image.naturalHeight);
+function fillArt(ctx: CanvasRenderingContext2D, image: HTMLImageElement, x: number, y: number, w: number, h: number) {
+  // Square illustrations fill the same portrait window as tall illustrations.
+  // The surrounding clip owns the crop; no parchment/black bands inside the art.
+  const ratio = Math.max(w / image.naturalWidth, h / image.naturalHeight);
   const width = image.naturalWidth * ratio, height = image.naturalHeight * ratio;
   ctx.drawImage(image, x + (w - width) / 2, y + (h - height) / 2, width, height);
 }
@@ -57,7 +59,7 @@ export function paintBadge(ctx: CanvasRenderingContext2D,font:string, value: str
 export function paintCardFace(ctx:CanvasRenderingContext2D,id:string,locale:Locale,font:string,art:HTMLImageElement|null,playable?:boolean,stats?:{attack:number;health:number},frame?:HTMLImageElement|null,variant:'card'|'battlefield'|'queued'='card'){
     const def = CARDS[id];
     if(!frame){rounded(ctx,9,9,366,654,20);ctx.fillStyle='#8c693c';ctx.fill();rounded(ctx,17,17,350,638,14);ctx.fillStyle='#ead7ab';ctx.fill();}
-    ctx.save();rounded(ctx,45,48,294,416,18);ctx.clip();ctx.fillStyle='#c7ab77';ctx.fillRect(45,48,294,416);if(art)contain(ctx,art,45,48,294,416);ctx.restore();
+    ctx.save();rounded(ctx,45,48,294,416,18);ctx.clip();ctx.fillStyle='#c7ab77';ctx.fillRect(45,48,294,416);if(art)fillArt(ctx,art,45,48,294,416);ctx.restore();
     if(frame){ctx.save();if(playable){ctx.shadowColor='#fff0bc';ctx.shadowBlur=8;}ctx.drawImage(frame,0,0,CARD_FACE.width,CARD_FACE.height);ctx.restore();}
     else{ctx.fillStyle='#4d3423';rounded(ctx,18,469,348,74,8);ctx.fill();}
     ctx.fillStyle='#fff1cf';ctx.font=`750 36px ${font}`;ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.strokeStyle='#2a1a13';ctx.lineWidth=2;

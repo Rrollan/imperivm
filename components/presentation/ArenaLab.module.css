@@ -82,6 +82,7 @@
 
 .keywords details{border-top:1px solid #b79b70;}.keywords summary{display:flex;align-items:center;min-height:44px;cursor:pointer;font-size:16px;font-weight:750;color:#54391f;}.keywords summary::before{content:'+';margin-right:8px;font-size:22px;}.keywords details[open] summary::before{content:'−';}.keywords p{margin:0 0 12px;}
 .costChip{display:inline-grid;place-items:center;width:29px;height:29px;margin:0;flex-shrink:0;border:2px solid #d9bd80;border-radius:50%;background:#245f74;color:#fff1d1;font-weight:800;vertical-align:middle;}
+.factionLink{margin:14px 0 0;padding:10px 12px;border-left:3px solid #6a8463;background:#7c906318;}.factionLink strong{display:block;color:#475a39;font-size:14px;}.inspectionDescription .factionLink p{margin:6px 0 0;font-size:14px;line-height:1.4;}.factionLink[data-link-step="1"]{border-color:#327e78;background:#4b928420;}.factionLink[data-link-step="1"] strong{color:#2d625a;}.factionLink[data-link-step="2"]{border-color:#9b7b4d;background:#9b7b4d12;}
 .mulligan{width:min(800px,100%);max-height:96%;overflow:auto;border:3px solid #51361e;border-radius:24px;padding:22px;background:#dfc795 url('/ui/arena-lab/playing-surface.webp') center/cover;color:#412918;text-align:center;box-shadow:0 20px 65px #0009,inset 0 0 0 2px #d7b879,inset 0 0 0 6px #7d5831;}
 .mulligan h2{font-size:30px;line-height:1.15;margin:0 0 12px;}.mulligan p{margin:0 0 18px;font-size:16px;line-height:1.4;}
 .openingCards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px;}

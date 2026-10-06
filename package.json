@@ -42,6 +42,8 @@
   "name": "imperivm",
   "private": true,
   "scripts": {
+    "balance": "node --import tsx scripts/balance.ts",
+    "balance:check": "node --import tsx scripts/balance-check.ts",
     "build": "next build",
     "dev": "next dev",
     "smoke": "node --import tsx scripts/smoke.ts",

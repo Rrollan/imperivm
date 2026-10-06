@@ -1,0 +1,16 @@
+/* Independently authored Roman materials; pointer-driven layer/mask technique
+   studied in simeydotme/pokemon-cards-css. No Pokémon art, textures or styles copied. */
+.surface{--tilt-x:0deg;--tilt-y:0deg;--light-x:50%;--light-y:50%;--material-active:0;--metal:#cfb17f;--foil-strength:.12;position:relative;display:block;width:100%;height:100%;perspective:800px;touch-action:pan-y;}
+.surface:focus-visible{outline:2px solid #e7c68b;outline-offset:5px;border-radius:12px;}
+.face{position:relative;display:block;width:100%;height:100%;isolation:isolate;transform:rotateX(var(--tilt-x)) rotateY(var(--tilt-y));transform-origin:center;transition:transform 150ms cubic-bezier(.2,.7,.2,1);}
+.face canvas{position:relative;display:block;width:100%;height:100%;pointer-events:none;}
+.foil,.glare{position:absolute;inset:0;pointer-events:none;opacity:var(--material-active);transition:opacity 180ms ease;clip-path:polygon(24% 7.14%,88.28% 7.14%,88.28% 69.05%,11.72% 69.05%,11.72% 15%,24% 15%);}
+.foil{background:repeating-linear-gradient(118deg,transparent 0 10%,var(--metal) 13%,#fff0c8 14%,transparent 20% 30%);background-size:260% 260%;background-position:var(--light-x) var(--light-y);mix-blend-mode:soft-light;opacity:calc(var(--material-active)*var(--foil-strength));}
+.glare{background:radial-gradient(ellipse at var(--light-x) var(--light-y),#fff7df 0%,#fff0c655 20%,transparent 57%);mix-blend-mode:screen;opacity:calc(var(--material-active)*.16);}
+.surface[data-rarity=common] .foil{display:none;}
+.surface[data-rarity=rare]{--metal:#73c5c7;--foil-strength:.32;}
+.surface[data-rarity=epic]{--metal:#bd98d7;--foil-strength:.43;}
+.surface[data-rarity=legendary]{--metal:#ffc362;--foil-strength:.54;}
+.surface[data-rarity=legendary] .foil{background-image:repeating-linear-gradient(118deg,transparent 0 9%,#b47935 12%,#ffe3a0 15%,transparent 20% 30%),repeating-linear-gradient(28deg,transparent 0 25%,#f0d18c44 25.3% 25.7%,transparent 26% 50%);}
+.surface[data-motion=off] .face{transform:none;transition:none;}.surface[data-motion=off] .foil,.surface[data-motion=off] .glare{display:none;}
+@media(prefers-reduced-motion:reduce){.face{transform:none;transition:none;}.foil,.glare{display:none;}}

@@ -15,7 +15,7 @@ export default function FlowKit({ items }: { items: FlowVideo[] }) {
     catch { setCopied('error'); }
   }
   return <main className={styles.page}>
-    <header><Link href="/arena-lab">← Арена</Link><span>IMPERIVM / АНИМАЦИИ</span></header>
+    <header><Link href="/arena-lab">← Арена</Link><span>IMPERIVM / АНИМАЦИИ</span><Link href="/arena-lab/balance">Баланс и материалы →</Link></header>
     <section className={styles.intro}>
       <p>{items.length} новых видео · Эффекты 10–17</p><h1>Start. End. Промпт.</h1>
       <p>Для каждого видео — отдельная папка с двумя картинками и готовым текстом. Номер папки, картинок и промпта совпадает.</p>
