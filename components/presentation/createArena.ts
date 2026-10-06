@@ -1,4 +1,5 @@
 import { Engine } from '@babylonjs/core/Engines/engine';
+import {CARDS} from '../../lib/cards';
 import { Scene } from '@babylonjs/core/scene';
 import { FreeCamera } from '@babylonjs/core/Cameras/freeCamera';
 import { Camera } from '@babylonjs/core/Cameras/camera';
@@ -484,10 +485,18 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const boardRow=fighterRow(boardSize,owner,portrait);
     const addedIndex = added ? batch.after.players[owner].board.findIndex(m=>m.uid===added.uid) : 0;
     const pending = mempoolOf(batch.after, owner), pendingIndex = Math.min(5,pending.length-1);
-    const target = defender?.root.position.clone() ?? (batch.action.type === 'cast-spell'
+    const immediate=batch.events?.spellImmediate;
+    const directTargets=immediate?batch.events?.effectResults?.find(r=>r.mempoolUid===immediate.fromHandUid)?.targets??[]:[];
+    const affected=directTargets.flatMap(t=>{const entry=entities.get(t.uid);return entry?[entry.root.position]:[];});
+    const spell=immediate?CARDS[immediate.cardId].spell:undefined;
+    const effectOwner=spell?.kind==='damage-all-enemy-minions'||spell?.kind==='weaken-random-enemy'?1-owner:owner;
+    const spellRow=fighterRow(1,effectOwner,portrait);
+    const instantTarget=affected.length?affected.reduce((sum,p)=>sum.add(p),Vector3.Zero()).scale(1/affected.length):point(spellRow.center,spellRow.y,-1);
+    const target = defender?.root.position.clone() ?? (immediate?instantTarget:batch.action.type === 'cast-spell'
       ? point(queueX()+Math.min(2,pendingIndex)*7,queueY(owner)-Math.min(2,pendingIndex)*7,-1)
       : point(boardRow.center+(addedIndex-(boardSize-1)/2)*boardRow.spacing,boardRow.y,-.15));
-    const landingScale = moving ? new Vector3((batch.action.type==='cast-spell'?QUEUED_CARD.width:boardRow.width)/(moving.width*50),(batch.action.type==='cast-spell'?QUEUED_CARD.height:boardRow.height)/(moving.height*50),1) : Vector3.One();
+    const queuedCast=batch.action.type==='cast-spell'&&!immediate;
+    const landingScale = moving ? new Vector3((queuedCast?QUEUED_CARD.width:boardRow.width)/(moving.width*50),(queuedCast?QUEUED_CARD.height:boardRow.height)/(moving.height*50),1) : Vector3.One();
     const settling = handUid ? batch.after.players[owner].board.flatMap((m,index)=>{
       const entry=entities.get(m.uid); return entry ? [{entry,start:entry.root.position.clone(),target:point(boardRow.center+(index-(boardSize-1)/2)*boardRow.spacing,boardRow.y,-.15)}] : [];
     }) : [];
@@ -525,6 +534,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const spriteContacts=new Set<string>();
     if(!options.reducedMotion)videoEffects.prepare(cues);
     const locate=(uid:string)=>{
+      if(immediate&&uid===immediate.fromHandUid)return target.clone();
       if(uid==='arena-center')return Vector3.Zero();
       if(uid==='row-0'||uid==='row-1')return point(fighterRow(1,0,portrait).center,rowY(uid==='row-0'?0:1));
       if(uid==='gas-counter')return gasRack.position.clone();
@@ -620,7 +630,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         deadObjects.forEach(entry=>entities.delete(entry.data.uid));
         sync(batch.after);
         deadObjects.forEach(entry=>entities.set(entry.data.uid,entry));
-        landed=added?entities.get(added.uid):pending.length?entities.get(`queued-${pending[pending.length-1].uid}`):undefined;
+        landed=added?entities.get(added.uid):!immediate&&pending.length?entities.get(`queued-${pending[pending.length-1].uid}`):undefined;
         if(landed&&!options.reducedMotion){landed.material.alpha=0;landed.backing.visibility=0;}else releaseArrival();
       }else if(drawn.length||resolving.length){
         // Retain doomed pieces until their death phase, while real hand/queue changes commit.

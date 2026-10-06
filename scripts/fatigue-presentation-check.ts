@@ -1,3 +1,4 @@
+import {installDelayedSpellFixtures} from './delayed-spell-fixtures';
 import assert from 'node:assert/strict';
 import {CARDS} from '../lib/cards';
 import {DECKS} from '../lib/decks';
@@ -7,6 +8,8 @@ import {battleFloats} from '../components/presentation/battleFloats';
 import {effectTimeline,effectFrame} from '../components/presentation/effectTimeline';
 import {historyEntry} from '../components/presentation/battleHistory';
 import type {Action} from '../lib/engine/types';
+
+const restoreDelayedFixtures=installDelayedSpellFixtures(['flash-loan']);
 
 function resolve(cards:string[],deck:string[]=[],treasury=30):PresentationBatch{
   const state=createGame('builder',DECKS.builder,'degen',DECKS.degen,42);
@@ -23,7 +26,7 @@ function resolve(cards:string[],deck:string[]=[],treasury=30):PresentationBatch{
 }
 
 {
-  const batch=resolve(['flash-loan','flash-loan']),plan=effectTimeline(batch)!;
+  const batch=resolve(['delayed-fixture-flash-loan','delayed-fixture-flash-loan']),plan=effectTimeline(batch)!;
   const sources=batch.events!.spellResolved!.map(s=>`queued-${s.mempoolUid}`);
   assert.equal(batch.after.players[0].treasury,15,'Five empty draws remove 1+2+3+4+5 health');
   assert.deepEqual(battleFloats(batch).map(c=>[c.anchor,c.label,c.wave??'aftermath']),[
@@ -37,19 +40,19 @@ function resolve(cards:string[],deck:string[]=[],treasury=30):PresentationBatch{
   assert.deepEqual(historyEntry(batch).details.filter(d=>d.kind==='resolved').map(d=>d.kind==='resolved'?d.changes?.[0]?.health:undefined),[[30,27],[27,20]]);
 }
 {
-  const batch=resolve(['flash-loan','flash-loan'],['pixel-squire']);
+  const batch=resolve(['delayed-fixture-flash-loan','delayed-fixture-flash-loan'],['pixel-squire']);
   assert.equal(batch.after.players[0].fatigue,4);assert.equal(batch.after.players[0].treasury,20);
   assert.deepEqual(battleFloats(batch).map(c=>c.label),['−1','−5','−4'],'The successful first draw must not be counted as fatigue');
   assert.ok(historyEntry(batch).details.some(d=>d.kind==='draw'&&d.received===1&&d.fatigue===4));
 }
 {
-  const batch=resolve(['flash-loan'],['pixel-squire','pixel-squire','pixel-squire']);
+  const batch=resolve(['delayed-fixture-flash-loan'],['pixel-squire','pixel-squire','pixel-squire']);
   assert.equal(batch.after.players[0].treasury,30);
   assert.deepEqual(battleFloats(batch),[],'Ordinary card draws do not invent damage');
   assert.equal(batch.events?.effectResults,undefined,'Ordinary draws do not pretend to have a health target');
 }
 {
-  const batch=resolve(['flash-loan','flash-loan'],[],2),plan=effectTimeline(batch)!;
+  const batch=resolve(['delayed-fixture-flash-loan','delayed-fixture-flash-loan'],[],2),plan=effectTimeline(batch)!;
   assert.equal(batch.after.winner,1);assert.equal(batch.after.players[0].fatigue,2);
   assert.equal(batch.events?.spellResolved?.length,1,'Lethal fatigue stops the remaining edicts and normal draw');
   assert.deepEqual(battleFloats(batch).map(c=>c.label),['−2'],'Visible damage is capped to remaining health');
@@ -61,7 +64,7 @@ function resolve(cards:string[],deck:string[]=[],treasury=30):PresentationBatch{
 const id='fatigue-check-heal';
 CARDS[id]={id,name:id,faction:'DeFi',rarity:'common',cost:0,type:'spell',text:'Test-only heal.',spell:{kind:'heal-treasury',amount:5}};
 try{
-  for(const cards of [[id,'flash-loan'],['flash-loan',id]]){
+  for(const cards of [[id,'delayed-fixture-flash-loan'],['delayed-fixture-flash-loan',id]]){
     const batch=resolve(cards,[],20),floats=battleFloats(batch),plan=effectTimeline(batch)!;
     assert.equal(batch.after.players[0].treasury,19);
     assert.deepEqual(floats.map(c=>c.label),cards[0]===id?['+5','−3','−3']:['−3','+5','−3'],'A healing ledger must not swallow later fatigue');
@@ -70,3 +73,5 @@ try{
   }
 }finally{delete CARDS[id];}
 console.log('FATIGUE PRESENTATION OK: duplicate draw edicts, mixed full/empty draws, normal draw, lethal stop, both heal orderings, source-specific history and exact health contact.');
+
+restoreDelayedFixtures();

@@ -17,7 +17,7 @@ export function BattleChronicle({entries,locale,cardName,heroName,powerName,onCa
   const title=(entry:HistoryEntry)=>{
     switch(entry.kind){
       case 'play-minion':return t('Розыгрыш бойца','Fighter played');
-      case 'cast-spell':return t('Указ в очереди','Edict queued');
+      case 'cast-spell':return entry.details.some(d=>d.kind==='immediate')?t('Мгновенное заклинание','Instant spell'):t('Указ в очереди','Edict queued');
       case 'attack':return t('Атака','Attack');
       case 'hero-power':return entry.source?.heroId?powerName(entry.source.heroId):t('Сила правителя','Ruler power');
       case 'stake':return t('Отправлен в гарнизон','Sent to garrison');
@@ -38,7 +38,7 @@ export function BattleChronicle({entries,locale,cardName,heroName,powerName,onCa
       </div>}
       {entry.orders&&<p>{t('Приказы','Orders')}: {entry.orders[0]} → {entry.orders[1]}</p>}
       {entry.details.filter(detail=>detail.kind!=='queued').map((detail,index)=><div className={styles.historyDetail} key={index}>
-        {detail.kind==='resolved'||detail.kind==='countered'?<><p><strong>{cardName(detail.cardId)}</strong> · {detail.kind==='countered'?t('Отменено','Countered'):detail.fizzled?t('Не исполнено','Fizzled'):t('Исполнено','Resolved')} · {owner(detail.owner)}</p>{detail.kind==='resolved'&&!!detail.changes?.length&&changes(detail.changes)}{detail.kind==='resolved'&&detail.noChange&&<p>{t('Характеристики не изменились.','Stats unchanged.')}</p>}</>:null}
+        {detail.kind==='immediate'||detail.kind==='resolved'||detail.kind==='countered'?<><p><strong>{cardName(detail.cardId)}</strong> · {detail.kind==='immediate'?t('Применено сразу','Applied immediately'):detail.kind==='countered'?t('Отменено','Countered'):detail.fizzled?t('Не исполнено','Fizzled'):t('Исполнено','Resolved')} · {owner(detail.owner)}</p>{detail.kind==='resolved'&&!!detail.changes?.length&&changes(detail.changes)}{detail.kind==='resolved'&&detail.noChange&&<p>{t('Характеристики не изменились.','Stats unchanged.')}</p>}</>:null}
         {detail.kind==='growth'&&<p>{label(detail.piece)} · {t('пассивное усиление +1/+1','passive growth +1/+1')}</p>}
         {detail.kind==='draw'&&<p>{owner(detail.owner)}{detail.received>0?` · ${t('Добрано','Drawn')}: ${detail.received}`:''}{detail.burned>0?` · ${t('Сожжено','Burned')}: ${detail.burned}`:''}{detail.fatigue>0?` · ${t('Истощение','Fatigue')}: ${detail.fatigue}`:''}</p>}
       </div>)}

@@ -16,6 +16,7 @@ export function battleFloats(batch:PresentationBatch):FloatCue[]{
   // Preserve every resolved source. Two edicts hitting the same fighter are
   // two moments; combining them hides order, healing caps and passive growth.
   for(const result of batch.events?.effectResults??[]){
+    if(result.mempoolUid===batch.events?.spellImmediate?.fromHandUid)continue;
     const wave=`queued-${result.mempoolUid}`;
     for(const target of result.targets){
       const hp=target.healthAfter-target.healthBefore,ap=target.attackAfter-target.attackBefore;
@@ -30,7 +31,7 @@ export function battleFloats(batch:PresentationBatch):FloatCue[]{
   for(const result of results)for(const target of result.targets){
     attributeTreasury(target.uid,target.healthAfter-target.healthBefore);
     if((result.kind==='heal-own-minions'||result.kind==='heal-treasury')&&target.healthAfter>target.healthBefore)healed.set(target.uid,(healed.get(target.uid)??0)+target.healthAfter-target.healthBefore);
-    if(result.kind.startsWith('damage-')&&target.healthAfter<target.healthBefore)damaged.set(target.uid,(damaged.get(target.uid)??0)+target.healthBefore-target.healthAfter);
+    if((result.kind.startsWith('damage-')||result.kind==='draw')&&target.healthAfter<target.healthBefore)damaged.set(target.uid,(damaged.get(target.uid)??0)+target.healthBefore-target.healthAfter);
     if(result.kind==='weaken-random-enemy'&&target.attackAfter<target.attackBefore)weakened.set(target.uid,(weakened.get(target.uid)??0)+target.attackBefore-target.attackAfter);
     if(result.kind==='buff-own'){const value=buffed.get(target.uid)??{attack:0,health:0};value.attack+=target.attackAfter-target.attackBefore;value.health+=target.healthAfter-target.healthBefore;buffed.set(target.uid,value);}
   }

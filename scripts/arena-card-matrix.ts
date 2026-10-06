@@ -16,8 +16,11 @@ import {abilityCues} from '../components/presentation/abilityCues';
 import {videoCues,VIDEO_IDS} from '../components/presentation/videoCue';
 import {cardIdentity} from '../components/presentation/cardIdentity';
 import roles from '../components/presentation/cardRoles.json';
+import {isInstantSpell} from '../lib/engine/spellTiming';
+import {installDelayedSpellFixtures} from './delayed-spell-fixtures';
 
 const cardIds=Object.keys(CARDS).sort();
+const restoreDelayedFixtures=installDelayedSpellFixtures(['flash-loan']);
 const findings:string[]=[];
 const observedRoleAnimations=new Map<string,string>();
 const covered:{cardId:string;phase:'play'|'queue'|'resolve';cueCount:number}[]=[];
@@ -105,7 +108,7 @@ function seedEnemyQueue(game:GameSession,cardId:string,count:number){
   assert.ok(high,`${cardId}: priority fixture must have RUG PULL ready`);
   dispatch(game,cardId,'queue',action=>action.type==='cast-spell'&&action.uid===high.uid);
   if(count>1){
-    const low=game.snapshot().state.players[1].hand.find(card=>card.cardId==='flash-loan');
+    const low=game.snapshot().state.players[1].hand.find(card=>card.cardId==='delayed-fixture-flash-loan');
     assert.ok(low,`${cardId}: multi-counter fixture must have Flash Loan ready`);
     dispatch(game,cardId,'queue',action=>action.type==='cast-spell'&&action.uid===low.uid);
   }
@@ -169,14 +172,17 @@ function verifyBattlecry(card:CardDef,batch:PresentationBatch,newUid:string):voi
 }
 
 function verifySpell(card:CardDef,cast:PresentationBatch,resolve:PresentationBatch,sourceUid:string):void{
-  assert.equal(cast.events?.spellQueued?.cardId,card.id,`${card.id}: cast must enter the owner's queue`);
-  assert.equal(cast.events?.spellQueued?.mempoolUid,sourceUid,`${card.id}: queue event must preserve its UID`);
-  assert.equal(cast.after.players[0].gas,cast.before.players[0].gas-card.cost,`${card.id}: spell cost must be charged on cast`);
-  const resolved=resolve.events?.spellResolved?.find(entry=>entry.mempoolUid===sourceUid);
-  assert.ok(resolved,`${card.id}: its owner-turn must resolve the exact queued entry`);
-  assert.equal(resolved.cardId,card.id);
-  assert.equal(resolved.owner,0);
-  assert.equal(resolved.fizzled,false,`${card.id}: fixture should provide its required targets`);
+  assert.equal(cast.after.players[0].gas,cast.before.players[0].gas-card.cost,`${card.id}: spell cost is paid on cast`);
+  if(isInstantSpell(card)){
+    assert.equal(cast.events?.spellImmediate?.cardId,card.id);
+    assert.equal(cast.events?.spellQueued,undefined);
+    assert.equal(mempoolOf(cast.after,0).length,0);
+  }else{
+    assert.equal(cast.events?.spellQueued?.mempoolUid,sourceUid);
+    const resolved=resolve.events?.spellResolved?.find(entry=>entry.mempoolUid===sourceUid);
+    assert.ok(resolved,`${card.id}: owner turn resolves the exact queued entry`);
+    assert.equal(resolved.cardId,card.id);assert.equal(resolved.owner,0);assert.equal(resolved.fizzled,false);
+  }
 
   const effect=card.spell;
   if(!effect)return;
@@ -239,8 +245,8 @@ function verifySpell(card:CardDef,cast:PresentationBatch,resolve:PresentationBat
     case 'draw':
       // Owner-turn completion also performs the normal turn draw after the
       // queued effect and refill, so the delta is spell amount + one card.
-      assert.equal(friendlyAfter.hand.length,friendlyBefore.hand.length+amount+1,`${card.id}: queued draw plus normal turn draw`);
-      assert.equal(friendlyAfter.deck.length,friendlyBefore.deck.length-amount-1,`${card.id}: queued draw and normal turn draw consume deck cards`);
+      assert.equal(friendlyAfter.hand.length,friendlyBefore.hand.length+amount+(isInstantSpell(card)?-1:1),`${card.id}: queued draw plus normal turn draw`);
+      assert.equal(friendlyAfter.deck.length,friendlyBefore.deck.length-amount-(isInstantSpell(card)?0:1),`${card.id}: queued draw and normal turn draw consume deck cards`);
       break;
     case 'gain-gas':{
       // Delayed order rewards survive the base/stake refill at this turn start.
@@ -274,7 +280,7 @@ const spellCards=cardIds.filter(id=>CARDS[id].type==='spell');
 minionCards.forEach((cardId,index)=>{
   const card=CARDS[cardId];
   const priorityCount=cardId==='frontrun-bot'?2:card.priority?1:0;
-  const enemyCards=priorityCount===2?['rug-pull','flash-loan']:priorityCount===1?['rug-pull']:[];
+  const enemyCards=priorityCount===2?['rug-pull','delayed-fixture-flash-loan']:priorityCount===1?['rug-pull']:[];
   const game=createSession(cardId,enemyCards);
   if(priorityCount)seedEnemyQueue(game,cardId,priorityCount);
 
@@ -312,8 +318,8 @@ minionCards.forEach((cardId,index)=>{
   }
 });
 
-// Every decree must be cast, remain queued for the opposing turn, and resolve
-// on its owner's next turn from the exact mempool UID.
+// Live tactical spells resolve in the cast batch. Edicts preserve their
+// response window and resolve on the owner turn from the exact queue UID.
 spellCards.forEach((cardId,index)=>{
   const card=CARDS[cardId];
   const enemyCards=card.priority?['rug-pull']:[];
@@ -322,10 +328,15 @@ spellCards.forEach((cardId,index)=>{
 
   const handUid=game.snapshot().state.players[0].hand[0].uid;
   const cast=dispatch(game,cardId,'queue',action=>action.type==='cast-spell'&&action.uid===handUid);
+  if(isInstantSpell(card)){
+    verifySpell(card,cast,cast,handUid);
+    return;
+  }
   assert.equal(cast.events?.spellQueued?.cardId,cardId);
-  assert.equal(cast.after.players[0].board.find(minion=>minion.uid==='matrix-friendly-witness')?.health,1,`${cardId}: spell effect must not happen while queued`);
+  assert.equal(cast.after.players[0].board.find(minion=>minion.uid==='matrix-friendly-witness')?.health,1,`${cardId}: edict waits in queue`);
   const sourceUid=cast.events?.spellQueued?.mempoolUid;
-  assert.ok(sourceUid,`${cardId}: queued event must provide source UID`);
+  assert.ok(sourceUid);
+
   if(card.priority){
     assert.equal(cast.events?.spellCountered?.cardId,'rug-pull',`${cardId}: Priority removes the highest-cost enemy decree`);
     assert.equal(mempoolOf(cast.after,1).length,0);
@@ -338,7 +349,7 @@ spellCards.forEach((cardId,index)=>{
 // Exercise priority minions against more than one pending spell. The result
 // records actual engine behavior instead of assuming a one-counter event shape.
 {
-  const game=createSession('frontrun-bot',['rug-pull','flash-loan']);
+  const game=createSession('frontrun-bot',['rug-pull','delayed-fixture-flash-loan']);
   seedEnemyQueue(game,'frontrun-bot',2);
   const before=mempoolOf(game.snapshot().state,1);
   const play=dispatch(game,'frontrun-bot','play',action=>action.type==='play-minion');
@@ -346,7 +357,7 @@ spellCards.forEach((cardId,index)=>{
   const removed=before.filter(entry=>!after.some(next=>next.uid===entry.uid));
   assert.ok(removed.length>=1,'Priority minion must counter at least the highest-cost pending decree');
   assert.equal(play.events?.spellCountered?.cardId,'rug-pull','Structured counter event must name the highest-cost decree');
-  assert.deepEqual(play.events?.spellCounters?.map(counter=>counter.cardId),['rug-pull','flash-loan'],'All counter triggers must publish each removed decree in engine order');
+  assert.deepEqual(play.events?.spellCounters?.map(counter=>counter.cardId),['rug-pull','delayed-fixture-flash-loan'],'All counter triggers must publish each removed decree in engine order');
   assert.deepEqual(play.events?.spellCounters?.map(counter=>counter.mempoolUid),removed.map(entry=>entry.uid),'Counter events must retain each exact removed mempool UID');
   assert.equal(play.events?.spellCountered?.mempoolUid,play.events?.spellCounters?.[0]?.mempoolUid,'Legacy singular counter must remain the first counter');
   const counterCues=abilityCues(play).filter(cue=>cue.kind==='counter'&&cue.phase==='after');
@@ -370,10 +381,12 @@ for(const id of cardIds){
 
 console.log(`ARENA CARD MATRIX: ${cardIds.length} cards (${minionCards.length} minions, ${spellCards.length} spells) dispatched legally through GameSession.`);
 console.log(`ROLES: ${minionRoles.join(', ')}; deployment cue IDs: ${deploymentCueIds.join(', ')}.`);
-console.log(`CHECKED: minion cost/battlecry/keywords/priority/halving where defined; spell queue UID/owner-turn resolution/effect result; all emitted video IDs and cue/result target UIDs.`);
+console.log(`CHECKED: minion cost/battlecry/keywords/priority/halving where defined; instant cast effects and edict queue UID/owner-turn resolution/effect result; all emitted video IDs and cue/result target UIDs.`);
 if(findings.length){
   console.log('FINDINGS');
   findings.forEach(finding=>console.log(`  - ${finding}`));
   process.exitCode=1;
 }else console.log('FINDINGS: none.');
 console.log(`MATRIX COMPLETE: ${covered.length} legal card actions/transitions checked; output includes ${covered.reduce((sum,row)=>sum+row.cueCount,0)} ability/video cues validated.`);
+
+restoreDelayedFixtures();

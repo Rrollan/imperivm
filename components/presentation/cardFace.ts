@@ -1,3 +1,4 @@
+import {isInstantSpell} from '../../lib/engine/spellTiming';
 import {CARDS} from '../../lib/cards';
 import {cardName,type Locale} from '../../lib/locale';
 
@@ -66,15 +67,16 @@ export function paintCardFace(ctx:CanvasRenderingContext2D,id:string,locale:Loca
     words(ctx,cardName(id,locale),192,499,305,34);
     paintBadge(ctx,font,`${def.cost}`,48,56,variant==='card'&&playable===false?'#566967':'#287f9a',39);
     if(def.type==='minion'){
-      const radius=variant==='battlefield'?44:37;
+      const radius=37;
       paintBadge(ctx,font,`${stats?.attack??def.attack}`,64,599,stats&&stats.attack>(def.attack??0)?'#6e8040':'#b38637',radius);
       paintBadge(ctx,font,`${stats?.health??def.health}`,320,599,'#b7483c',radius);
     }else if(variant!=='queued'){
-      ctx.font=`750 29px ${font}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#70502b';ctx.fillText(locale==='ru'?'УКАЗ':'EDICT',192,599);
+      ctx.font=`750 29px ${font}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#70502b';ctx.fillText(isInstantSpell(def)?(locale==='ru'?'МГНОВЕННО':'INSTANT'):(locale==='ru'?'УКАЗ':'EDICT'),192,599,270);
     }
+    // The top rim keeps rarity clear of the cost, title and battlefield readiness badge.
     // One inset stone communicates rarity. Roles and rules live in inspection,
     // leaving the compact face with art, name, cost and combat values only.
     const colors={common:'#a88355',rare:'#59bad4',epic:'#a77ad3',legendary:'#e9a243'};
-    ctx.save();ctx.translate(192,553);ctx.beginPath();ctx.moveTo(0,-16);ctx.lineTo(13,0);ctx.lineTo(0,16);ctx.lineTo(-13,0);ctx.closePath();
+    ctx.save();ctx.translate(192,32);ctx.beginPath();ctx.moveTo(0,-10);ctx.lineTo(8,0);ctx.lineTo(0,10);ctx.lineTo(-8,0);ctx.closePath();
     ctx.fillStyle=colors[def.rarity];ctx.fill();ctx.strokeStyle='#613f24';ctx.lineWidth=4;ctx.stroke();ctx.beginPath();ctx.moveTo(-8,-1);ctx.lineTo(0,-11);ctx.lineTo(6,-2);ctx.strokeStyle='#fff1c680';ctx.lineWidth=2;ctx.stroke();ctx.restore();
 }

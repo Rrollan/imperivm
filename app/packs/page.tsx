@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { CardDef } from '../../lib/engine/types';
-import CardView, { CardBack, RARITY_COLORS } from '../../components/CardView';
+import { CardBack, RARITY_COLORS } from '../../components/CardView';
 import WalletBar from '../../components/WalletBar';
+import {SiteHeader, SiteFooter} from '../../components/home/SiteChrome';
+import styles from '../../components/home/Home.module.css';
 import { play } from '../../lib/audio/sfx';
 import { markAmbientStarted, shouldStartAmbient } from '../../lib/audio/events';
 import { startAmbient } from '../../lib/audio/sfx';
@@ -13,11 +15,15 @@ import { useCollection } from '../../components/CollectionContext';
 import { PACK_COST, RARITY_WEIGHTS } from '../../lib/collection/gateway';
 import NftPack from '../../components/NftPack';
 import { useLocale } from '../../components/LocaleContext';
+import {CardDialog} from '../../components/home/CardDialog';
+import {CardFacts} from '../../components/home/CardFacts';
+import {LibraryCardFace} from '../../components/home/LibraryCardFace';
 import { CoinPreview } from '../../components/3d/CoinPreview';
 
 export default function PacksPage() {
-  const { t, rarityName, errorText } = useLocale();
+  const { t, rarityName, errorText, cardName } = useLocale();
   const collection = useCollection();
+  const [inspected, setInspected] = useState<string | null>(null);
   const [pack, setPack] = useState<CardDef[]>([]);
   const [revealed, setRevealed] = useState(0);
   const [opened, setOpened] = useState(false);
@@ -73,10 +79,10 @@ export default function PacksPage() {
   };
 
   return (
-    <div className="min-h-screen bg-abyss text-parchment">
-      <WalletBar />
+    <div className={styles.shell}>
+      <SiteHeader active="packs" />
 
-      <main className="max-w-5xl mx-auto px-6 py-12 text-center">
+      <main className={`${styles.hubMain} max-w-5xl mx-auto px-6 py-12 text-center`}>
         <h1 className="font-display text-5xl font-bold gold-text tracking-widest">{t('ПАКИ', 'PACKS')}</h1>
         <p className="mt-3 text-lavender italic font-display text-lg">
           {collection.snapshot?.mode === 'idos' ? t('Карты и валюта хранятся в iDos Games.', 'Cards and currency managed by iDos Games.') : t('Пять карт. Шансы зависят от редкости. Коллекция сохраняется в этом браузере.', 'Five cards. Weighted by rarity. Yours to keep in this browser.')}
@@ -84,7 +90,7 @@ export default function PacksPage() {
         <div className="collection-wallet"><strong>{collection.snapshot?.rug ?? '—'} $RUG</strong><span>{collection.snapshot?.mode === 'idos' ? t('Виртуальная валюта iDos', 'iDos virtual currency') : t('Локальная демо-валюта', 'Local demo currency')} · {t('не имеет денежной стоимости', 'no cash value')}</span><Link href="/collection">{t('Открыть коллекцию →', 'View collection →')}</Link></div>
         {collection.error && <div className="integration-error" role="status"><p>{errorText(collection.error)}</p><div className="dialog-actions"><button className="secondary-button" onClick={() => void collection.refresh()} disabled={collection.busy}>{t('Повторить', 'Retry')}</button><button className="secondary-button" onClick={() => void collection.useLocalDemo()} disabled={collection.busy}>{t('Локальное демо', 'Use local demo')}</button></div></div>}
 
-        <div className="mt-6 flex justify-center gap-4 text-xs">
+        <div className="mt-6 flex flex-wrap justify-center gap-4 text-xs">
           {RARITY_WEIGHTS.map(r => (
             <span key={rarityName(r.rarity)} className="flex items-center gap-1.5 text-parchment/70">
               <span
@@ -100,8 +106,8 @@ export default function PacksPage() {
           {opened
             ? pack.map((card, i) =>
                 i < revealed ? (
-                  <div key={`${card.id}-${i}`} className="flip-in">
-                    <CardView card={card} size="md" />
+                  <div key={`${card.id}-${i}`} className={`flip-in ${styles.packReveal}`}>
+                    <button type="button" className={styles.hubCard} onClick={event => {event.currentTarget.focus({preventScroll:true}); setInspected(card.id);}} aria-label={t(`Рассмотреть карту «${cardName(card.id)}»`, `Inspect ${cardName(card.id)}`)}><LibraryCardFace id={card.id}/><CardFacts id={card.id}/></button>
                   </div>
                 ) : (
                   <div key={`back-${i}`}>
@@ -128,14 +134,16 @@ export default function PacksPage() {
         </div>
 
         <p className="mt-6 text-xs text-lavender/60">{collection.snapshot?.mode === 'idos' ? t('Коллекция и валюта через iDos SDK.', 'Collection and currency via iDos SDK.') : t('Локальное демо · 500 стартовых $RUG · без кошелька и минта.', 'Local fallback · 500 starter $RUG · no wallet or minting required.')}</p>
-        <NftPack />
+        <details className={styles.optionalNft}><summary>{t('Коллекционные NFT · devnet (необязательно)', 'Collectible NFTs · devnet (optional)')}</summary><WalletBar /><NftPack /></details>
 
         <div className="mt-4">
           <Link href="/" className="text-sm text-lavender/70 hover:text-lavender">
-            {t('← Вернуться на форум', '← Back to the forum')}
+            {t('← В главный зал', '← Back to the hall')}
           </Link>
         </div>
       </main>
+      <SiteFooter />
+      {inspected && <CardDialog id={inspected} onClose={() => setInspected(null)} />}
     </div>
   );
 }

@@ -11,6 +11,7 @@
 
 import { CARDS } from '../cards';
 import { HEROES } from '../heroes';
+import {isInstantSpell} from './spellTiming';
 import {rulesetOf,pendingValidatorOrders,type RulesetOptions,type RulesetId} from './ruleset';
 import type {
   Action,
@@ -400,22 +401,10 @@ function startTurn(s: EngineGame): void {
   completeTurnStart(s);
 }
 
-function completeTurnStart(s: EngineGame): void {
-  const me = s.players[s.turn];
-  pushLog(s, `Block ${s.block} — P${s.turn} turn`);
-
-  // 1. Resolve the new active player's mempool entries in cast order.
-  let queuedOrders = 0;
-  const entries = me.mempool;
-  me.mempool = [];
-  for (const e of entries) {
-    const def = cardDef(e.cardId);
-    if (def.type !== 'spell' || !def.spell) {
-      pushLog(s, `${e.name} fizzles`);
-      continue;
-    }
-    pushLog(s, `${e.name} resolves`);
-    const effectKind = def.spell.kind;
+/** Record the actual effect before any turn-start growth/refill changes.
+ * The legacy mempoolUid field also identifies a direct spell by its hand UID. */
+function resolveSpellEffect(s: EngineGame, owner: PlayerId, def: CardDef, sourceUid: string): void {
+    const effectKind = def.spell!.kind;
     const shouldTrack = effectKind.startsWith('damage-') || effectKind === 'heal-treasury' || effectKind === 'heal-own-minions' || effectKind === 'weaken-random-enemy' || effectKind === 'buff-own' || effectKind === 'draw';
     const beforeByUid = shouldTrack
       ? new Map(s.players.flatMap(player => player.board).map(minion => [minion.uid, {
@@ -425,11 +414,7 @@ function completeTurnStart(s: EngineGame): void {
         }] as const))
       : undefined;
     if(beforeByUid)for(const player of s.players)beforeByUid.set(`hero-${player.id}`,{attack:0,health:player.treasury,maxHealth:30});
-    const ordersBefore = me.gas;
-    const targetUids = applyEffect(s, s.turn, def.spell);
-    // Delayed order rewards belong to this new turn. Preserve them when the
-    // base stock refills below; do not change the established resolve order.
-    if (effectKind === 'gain-gas') queuedOrders += me.gas - ordersBefore;
+    const targetUids = applyEffect(s, owner, def.spell!);
     if (shouldTrack && (effectKind !== 'draw' || targetUids?.length)) {
       const targets = (targetUids ?? []).flatMap(uid => {
         const before = beforeByUid?.get(uid);
@@ -446,13 +431,34 @@ function completeTurnStart(s: EngineGame): void {
         }];
       });
       (s.spellEffects ??= []).push({
-        owner: s.turn,
-        cardId: e.cardId,
-        mempoolUid: e.uid,
+        owner,
+        cardId: def.id,
+        mempoolUid: sourceUid,
         kind: effectKind,
         targets,
       });
     }
+}
+
+function completeTurnStart(s: EngineGame): void {
+  const me = s.players[s.turn];
+  pushLog(s, `Block ${s.block} — P${s.turn} turn`);
+
+  // 1. Resolve the new active player's mempool entries in cast order.
+  let queuedOrders = 0;
+  const entries = me.mempool;
+  me.mempool = [];
+  for (const e of entries) {
+    const def = cardDef(e.cardId);
+    if (def.type !== 'spell' || !def.spell) {
+      pushLog(s, `${e.name} fizzles`);
+      continue;
+    }
+    pushLog(s, `${e.name} resolves`);
+    const ordersBefore = me.gas;
+    resolveSpellEffect(s, s.turn, def, e.uid);
+    // Delayed rewards must survive the new turn's base refill.
+    if (def.spell.kind === 'gain-gas') queuedOrders += me.gas - ordersBefore;
     if (s.winner !== null) return;
   }
 
@@ -858,11 +864,13 @@ export function applyAction(state: GameState, action: Action): GameState {
       const def = cardDef(hc.cardId);
       me.hand.splice(idx, 1);
       me.gas -= def.cost;
-      me.mempool.push({ uid: nextUid(s), cardId: def.id, name: def.name, owner: s.turn });
-      pushLog(s, `P${s.turn} casts ${def.name} -> mempool`);
+      const instant = isInstantSpell(def);
+      if (!instant) me.mempool.push({ uid: nextUid(s), cardId: def.id, name: def.name, owner: s.turn });
+      pushLog(s, `P${s.turn} casts ${def.name} -> ${instant ? 'instant' : 'mempool'}`);
       if (s.mulliganPhase[s.turn]) s.mulliganPhase[s.turn] = false;
       noteFactionPlay(s, def.faction);
       if (def.priority) counterMempool(s, s.turn);
+      if (instant && def.spell) resolveSpellEffect(s, s.turn, def, hc.uid);
       checkWinner(s);
       return s;
     }

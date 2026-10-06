@@ -50,6 +50,7 @@ import type {
 } from './engine/types';
 import { mempoolOf, spellEffectsOf } from './engine/engine';
 import { CARDS } from './cards';
+import {isInstantSpell} from './engine/spellTiming';
 
 export interface DeadMinion {
   uid: string;
@@ -84,6 +85,8 @@ export interface CounteredSpell {
 export interface BattleEvents {
   /** New card played onto our board. */
   play?: { cardId: string; name: string; fromHandUid: string };
+  /** Tactical spell applied in the cast action, without entering the queue. */
+  spellImmediate?: {owner:PlayerId;cardId:string;name:string;fromHandUid:string};
   /** Spell cast into a mempool (does not resolve yet). */
   spellQueued?: { owner: PlayerId; cardId: string; name: string; mempoolUid: string };
   /** Spells actually resolved from the mempool at start-of-turn. */
@@ -524,7 +527,7 @@ export function diffAction(
 
   // ── 7. Suppress empty envelopes. ──
   if (
-    !ev.play && !ev.spellQueued && !ev.spellResolved && !ev.effectResults && !ev.spellCountered &&
+    !ev.play && !ev.spellImmediate && !ev.spellQueued && !ev.spellResolved && !ev.effectResults && !ev.spellCountered &&
     !ev.attack && !ev.damages && !ev.deaths && !ev.halvings &&
     !ev.rugPull && !ev.gameOver
   ) {
@@ -554,9 +557,11 @@ function applyActionContext(
       break;
     }
     case 'cast-spell': {
-      // Cast-spell adds to mempool (already captured by diffMempool as
-      // `spellQueued`). The priority-counter side effect, if any, is
-      // surfaced by diffMempool's `P0 counters X` scan.
+      const owner=prev.turn,card=prev.players[owner].hand.find(h=>h.uid===action.uid);
+      if(card && isInstantSpell(CARDS[card.cardId]) && !next.players[owner].hand.some(h=>h.uid===action.uid)) {
+        ev.spellImmediate={owner,cardId:card.cardId,name:CARDS[card.cardId].name,fromHandUid:action.uid};
+      }
+      // Edict queue additions and Priority victims are captured by diffMempool.
       break;
     }
     case 'attack': {

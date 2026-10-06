@@ -68,10 +68,11 @@ export function abilityCues(batch:PresentationBatch):AbilityCue[]{
   });
   const counters=batch.events?.spellCounters??(batch.events?.spellCountered?[batch.events.spellCountered]:[]);
   const castSource=batch.action.type==='cast-spell'&&batch.events?.spellQueued?`queued-${batch.events.spellQueued.mempoolUid}`:undefined;
+  const immediateSource=batch.events?.spellImmediate?.fromHandUid;
   const counterSources=resolved.filter(s=>!s.fizzled&&CARDS[s.cardId]?.spell?.kind==='counter-mempool');
   // A direct card is an unambiguous source. With several delayed counters the
   // ledger names victims, not source-victim pairs: keep those outcomes local.
-  const counterSource=played?.uid??castSource??(counterSources.length===1?`queued-${counterSources[0].mempoolUid}`:undefined);
+  const counterSource=played?.uid??castSource??immediateSource??(counterSources.length===1?`queued-${counterSources[0].mempoolUid}`:undefined);
   counters.forEach((counter,index)=>{const uid=`queued-${counter.mempoolUid}`;add('counter',counterSource??uid,uid,'after',index*.06);});
   batch.events?.halvings?.forEach(h=>add('buff',h.uid,h.uid,'after',0,'growth'));
   batch.after.players.forEach((p,i)=>{

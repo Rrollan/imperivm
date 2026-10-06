@@ -1,3 +1,4 @@
+import {installDelayedSpellFixtures} from './delayed-spell-fixtures';
 import assert from 'node:assert/strict';
 import {createGame,applyAction,legalActions,effectivePowerCost} from '../lib/engine/engine';
 import {pendingValidatorOrders,rulesetOf} from '../lib/engine/ruleset';
@@ -50,7 +51,8 @@ let comeback=experiment();comeback.players[0].treasury=10;comeback.players[0].ga
 assert.equal(effectivePowerCost(comeback,0),1);
 comeback=applyAction(comeback,{type:'hero-power'});assert.equal(comeback.players[0].gas,0);assert.equal(pendingValidatorOrders(comeback,0),2);
 
-let earlyLethal=experiment();earlyLethal.players[0].gas=6;earlyLethal.players[0].hand=[{uid:'draw',cardId:'flash-loan'}];
+const restoreDelayedFixtures=installDelayedSpellFixtures(['flash-loan']);
+let earlyLethal=experiment();earlyLethal.players[0].gas=6;earlyLethal.players[0].hand=[{uid:'draw',cardId:'delayed-fixture-flash-loan'}];
 earlyLethal=applyAction(earlyLethal,{type:'cast-spell',uid:'draw'});
 earlyLethal=applyAction(earlyLethal,{type:'hero-power'});
 earlyLethal.players[0].deck=[];earlyLethal.players[0].treasury=1;
@@ -58,6 +60,7 @@ earlyLethal=applyAction(earlyLethal,{type:'end-turn'});
 const lethal=batch(earlyLethal,{type:'end-turn'});
 assert.equal(lethal.after.winner,1);assert.equal(pendingValidatorOrders(lethal.after,0),2,'Lethal queued draw ends the game before refill/income');
 assert(!videoCues(lethal).some(c=>c.id==='05-validator-gas'));
+restoreDelayedFixtures();
 
 let opposite=createGame('builder',DECKS.builder,'validator',DECKS.validator,{ruleset:'validator-investment-v1'},42);
 opposite=applyAction(opposite,{type:'end-turn'});opposite.players[1].gas=2;

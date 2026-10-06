@@ -60,7 +60,7 @@ export interface CardDef {
   text: string; // English rules text
   halvingPeriod?: number; // minion: every N blocks gets +1/+1
   battlecry?: EffectDef; // minion: on play
-  spell?: EffectDef; // spell: on resolve from mempool
+  spell?: EffectDef; // spellTiming.ts selects direct cast or next-turn edict resolution
   priority?: boolean; // on play/cast: immediately counter highest-cost enemy mempool spell
   /* --- package 4A: additive keywords (all optional, default false) --- */
   taunt?: boolean; // enemy attackers must target this minion before non-taunt minions or hero
@@ -203,8 +203,9 @@ export interface CreateGameOptions {
  *   THEN maxGas = min(10, maxGas+1); gas = maxGas + (# own staked minions);
  *   heroPowerUsed = false; draw 1 (fatigue: treasury -= ++fatigue if deck empty;
  *   burn drawn card with log if hand already 10); own unstaked minions get canAttack = true.
- * - Casting a spell: pay cost, move card from hand to YOUR mempool (visible to both).
- *   It resolves at the START of YOUR next turn (before you act).
+ * - Casting a spell: pay cost and remove it from hand. Tactical spells listed in
+ *   spellTiming.ts resolve immediately. Other spells enter YOUR mempool (public)
+ *   and resolve at the START of YOUR next turn (before you act).
  * - priority: when a card with priority:true is played/cast, immediately remove the
  *   highest-cost enemy mempool entry (ties -> earliest). Log it. (A priority spell
  *   still enters your mempool and resolves next turn.)

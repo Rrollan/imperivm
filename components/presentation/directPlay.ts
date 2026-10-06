@@ -15,6 +15,12 @@ export type DirectEffect={kind:EffectKind;source:string;targets:SpellEffectResul
  * delayed queues keep their separate per-spell ledger. A new buffed fighter's
  * baseline is its printed stats, not zero and not an existing fighter's stats. */
 export function directEffect(batch:PresentationBatch):DirectEffect|undefined{
+  const immediate=batch.events?.spellImmediate;
+  if(immediate){
+    const effect=CARDS[immediate.cardId].spell;if(!effect)return;
+    const result=batch.events?.effectResults?.find(r=>r.mempoolUid===immediate.fromHandUid);
+    return {kind:effect.kind,source:immediate.fromHandUid,targets:(result?.targets??[]).filter(t=>t.healthAfter!==t.healthBefore||t.attackAfter!==t.attackBefore),ordersGain:0};
+  }
   const played=playedFighter(batch);if(!played)return;
   const card=CARDS[played.cardId],effect=card.battlecry;if(!effect)return;
   const owner=batch.before.turn,before=batch.before.players,after=batch.after.players;

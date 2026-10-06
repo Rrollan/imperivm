@@ -65,7 +65,7 @@ export function soundsForEvents(events: BattleEvents, context?: SoundContext): S
     }
   }
   // Plays (cards entering our board)
-  if (events.play) add('play');
+  if (events.play || events.spellImmediate) add('play');
 
   // Mempool lifecycle
   if (events.spellQueued) add('mempool-queue');

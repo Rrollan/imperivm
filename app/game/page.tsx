@@ -677,7 +677,7 @@ function GameBoard() {
               <span className="mempool-runes" aria-hidden>ᚠ · ᚢ · ᚦ · ᚨ · ᚱ · ᚲ · ᚷ · ᚹ</span>
               <button className="chain-label" onClick={() => setHelpOpen(true)} title={mechanicText('Mempool')}><BattleIcon kind="chain" /> {t('МЕМПУЛ', 'MEMPOOL')} <b>{myMempool.length + foeMempool.length}</b></button>
               <div className="chain-entries thin-scroll">
-                {!myMempool.length && !foeMempool.length && <span className="chain-empty">{t('Заклинание сработает в следующем вашем блоке.', 'Resolves at the start of your next block.')}</span>}
+                {!myMempool.length && !foeMempool.length && <span className="chain-empty">{t('Мгновенные заклинания действуют сразу. Указы — в начале следующего своего хода.', 'Instant spells resolve on play. Edicts resolve at the start of your next turn.')}</span>}
                 {[...foeMempool, ...myMempool].map(e => <button key={e.uid} className={`queued-spell ${e.owner === ME ? 'mine' : 'theirs'} mempool-glow`}
                   onClick={() => setInspectCardId(e.cardId)} title={cardText(e.cardId)}>
                   <img src={`/cards/${e.cardId}.webp`} alt="" /><span>{cardName(e.cardId)}</span><small>{t('Следующий блок', 'Next block')} · {e.owner === ME ? t('ВАШЕ', 'YOURS') : t('ВРАГ', 'RIVAL')}</small>

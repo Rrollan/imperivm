@@ -9,7 +9,8 @@ const first=probeMatch('builder',DECKS.builder,'degen',DECKS.degen,104729);
 assert.deepEqual(first,probeMatch('builder',DECKS.builder,'degen',DECKS.degen,104729),'Same seed and policy must reproduce metrics exactly');
 assert.notEqual(first.winner,null);assert(first.actions<2000);assert(first.counters<=first.casts);
 assert.notEqual(probeMatch('validator',DECKS.validator,'whale',DECKS.whale,112648,['pressure','pressure']).winner,null);
-assert(mechanicalTwins().some(group=>group.differentCost&&group.cards.some(c=>c.id==='solar-sapper')&&group.cards.some(c=>c.id==='reveal-ceremony')));
+assert(!mechanicalTwins().some(group=>group.cards.some(c=>c.id==='solar-sapper')&&group.cards.some(c=>c.id==='reveal-ceremony')),'Instant and delayed effects have different tactical timing');
+assert(mechanicalTwins().some(group=>group.differentCost&&group.cards.some(c=>c.id==='amm-centurion')&&group.cards.some(c=>c.id==='pepito')));
 
 let state=createGame('builder',DECKS.builder,'degen',DECKS.degen,42);
 state.players[0].gas=3;state.players[0].hand=[{uid:'one',cardId:'amm-centurion'},{uid:'two',cardId:'amm-centurion'},{uid:'three',cardId:'lending-legionnaire'}];

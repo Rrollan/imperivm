@@ -8,6 +8,7 @@
 
 import { CARDS } from './cards';
 import { HEROES } from './heroes';
+import {isInstantSpell} from './engine/spellTiming';
 import { effectivePowerCost, legalActions, mempoolOf } from './engine/engine';
 import type { Action, CardDef, GameState, HandCard } from './engine/types';
 
@@ -86,7 +87,21 @@ export function chooseAiAction(state: GameState): Action {
   const plays = acts
     .filter(a => {
       if (a.type !== 'play-minion' && a.type !== 'cast-spell') return false;
-      if (cardOf(state, a.uid)?.id !== 'rug-pull') return true;
+      const card=cardOf(state,a.uid);
+      if(card&&isInstantSpell(card)){
+        switch(card.spell?.kind){
+          case 'heal-own-minions':return me.board.some(m=>m.health<m.maxHealth);
+          case 'weaken-random-enemy':return foe.board.some(m=>m.attack>0);
+          case 'buff-own':return me.board.length>0;
+          case 'damage-all-enemy-minions':return foe.board.length>0;
+          case 'draw':{
+            const missing=Math.max(0,(card.spell.amount??1)-me.deck.length);
+            const fatigueDamage=missing*(2*me.fatigue+missing+1)/2;
+            return me.deck.length>0&&me.hand.length<10&&me.treasury>fatigueDamage;
+          }
+        }
+      }
+      if (card?.id !== 'rug-pull') return true;
       // A delayed reset should recover a losing board, not erase our winning army.
       const value = (board: typeof me.board) => board.reduce((sum, m) => sum + m.attack + m.health / 2, 0);
       return foe.board.length > 0 && (value(foe.board) > value(me.board) + 3 || foe.board.reduce((sum, m) => sum + (m.staked ? 0 : m.attack), 0) >= me.treasury);

@@ -89,7 +89,7 @@ function finishOwnerQueue(game:GameSession,owner:PlayerId):PresentationBatch{
  */
 export function createFullBoardMixedEffectsFixture():QueuePresentationFixture<FullBoardMixedEffectsExpected>{
   const state=createGame('builder',DECKS.builder,'degen',DECKS.degen,42);
-  const spellIds=['solar-sapper','senate-censure','restoration-rite','audit'];
+  const spellIds=['delayed-fixture-solar-sapper','delayed-fixture-senate-censure','delayed-fixture-restoration-rite','audit'];
   const spellHandUids=spellIds.map((_,i)=>`mixed-spell-${i}`);
   state.players[0].hand=spellIds.map((cardId,i)=>({uid:spellHandUids[i],cardId}));
   state.players[0].gas=state.players[0].maxGas=10;
@@ -115,9 +115,9 @@ export function createFullBoardMixedEffectsFixture():QueuePresentationFixture<Fu
       enemyUids,
       spellUidsByCardId,
       effectTargetUidsByCardId:{
-        'solar-sapper':enemyUids,
-        'senate-censure':['foe-4'],
-        'restoration-rite':ownUids,
+        'delayed-fixture-solar-sapper':enemyUids,
+        'delayed-fixture-senate-censure':['foe-4'],
+        'delayed-fixture-restoration-rite':ownUids,
         audit:ownUids,
       },
       halvingUids:['own-ape','foe-ape'],
@@ -134,7 +134,7 @@ export function createSolarRugPullFixture(targetHealth:2|4):QueuePresentationFix
   const targetUid=targetHealth===2?'solar-lethal':'solar-then-rug';
   const spellHandUids={solar:'solar-before-rug',rug:'rug-after-solar'};
   state.players[0].hand=[
-    {uid:spellHandUids.solar,cardId:'solar-sapper'},
+    {uid:spellHandUids.solar,cardId:'delayed-fixture-solar-sapper'},
     {uid:spellHandUids.rug,cardId:'rug-pull'},
   ];
   state.players[0].gas=state.players[0].maxGas=11;
@@ -154,8 +154,8 @@ export function createSolarRugPullFixture(targetHealth:2|4):QueuePresentationFix
       targetHealthBefore:targetHealth,
       targetHealthAfterSolar:Math.max(0,targetHealth-2),
       deathCause:targetHealth===2?'damage':'rugpull',
-      resolvedCardIds:['solar-sapper','rug-pull'],
-      solarSpellUid:queued.find(entry=>entry.cardId==='solar-sapper')?.uid??'',
+      resolvedCardIds:['delayed-fixture-solar-sapper','rug-pull'],
+      solarSpellUid:queued.find(entry=>entry.cardId==='delayed-fixture-solar-sapper')?.uid??'',
       rugPullSpellUid:queued.find(entry=>entry.cardId==='rug-pull')?.uid??'',
       solarTargetUids:[targetUid],
       rugPullVictimUids:death?.cause==='rugpull'?[targetUid]:[],
@@ -170,7 +170,7 @@ export function createSolarRugPullFixture(targetHealth:2|4):QueuePresentationFix
  */
 export function createPriorityFourthEntryFixture():QueuePresentationFixture<PriorityFourthEntryExpected>{
   const state=createGame('builder',DECKS.builder,'degen',DECKS.degen,907);
-  const queuedCards=['senate-censure','restoration-rite','solar-sapper','rug-pull'] as const;
+  const queuedCards=['delayed-fixture-senate-censure','delayed-fixture-restoration-rite','delayed-fixture-solar-sapper','rug-pull'] as const;
   const enemyHandUids=queuedCards.map((_,i)=>`enemy-spell-${i}`);
   const priorityHandUid='priority-fee-hand';
   state.players[0].hand=[{uid:priorityHandUid,cardId:'priority-fee'}];

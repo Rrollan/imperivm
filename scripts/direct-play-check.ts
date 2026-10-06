@@ -1,3 +1,4 @@
+import {installDelayedSpellFixtures} from './delayed-spell-fixtures';
 import assert from 'node:assert/strict';
 import {createGame,mempoolOf} from '../lib/engine/engine';
 import {CARDS} from '../lib/cards';
@@ -8,6 +9,8 @@ import {playedFighter,directEffect} from '../components/presentation/directPlay'
 import {battleFloats} from '../components/presentation/battleFloats';
 import {abilityCues} from '../components/presentation/abilityCues';
 import {videoCues} from '../components/presentation/videoCue';
+
+const restoreDelayedFixtures=installDelayedSpellFixtures(['flash-loan']);
 
 function fighter(uid:string,cardId:string,overrides:Partial<Minion>={}):Minion{
   const c=CARDS[cardId];return {uid,cardId,name:c.name,attack:c.attack??0,health:c.health??1,maxHealth:c.health??1,canAttack:true,fresh:false,staked:false,...overrides};
@@ -26,7 +29,7 @@ function dispatch(game:GameSession,match:(a:Action)=>boolean):PresentationBatch{
 const play=(g:GameSession)=>dispatch(g,a=>a.type==='play-minion');
 const pass=(g:GameSession)=>dispatch(g,a=>a.type==='end-turn');
 function queued(cardId:string,count:number){
-  const game=fixture(cardId,[],[],['rug-pull','flash-loan'].slice(0,count));
+  const game=fixture(cardId,[],[],['rug-pull','delayed-fixture-flash-loan'].slice(0,count));
   if(count){pass(game);for(let i=0;i<count;i++)dispatch(game,a=>a.type==='cast-spell');pass(game);}
   return game;
 }
@@ -120,3 +123,5 @@ for(const count of [0,1,2]){
   assert.ok(videoCues(batch).some(c=>c.id==='07-spell-impact'&&c.anchor==='hero-1'),'The final strike must remain visible before the result dialog');
 }
 console.log('DIRECT PLAY OK: real buff baselines, source/target ownership, 0/1/2 counters, simultaneous outcomes, summon identity, capped/empty results and final strike.');
+
+restoreDelayedFixtures();

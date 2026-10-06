@@ -1,5 +1,6 @@
 import { CARDS } from '../../lib/cards';
 import { HEROES } from '../../lib/heroes';
+import {isInstantSpell} from '../../lib/engine/spellTiming';
 import type { EffectDef } from '../../lib/engine/types';
 import type { Locale } from '../../lib/locale';
 import type {RulesetId} from '../../lib/engine/ruleset';
@@ -16,7 +17,7 @@ export function effectText(effect: EffectDef, locale: Locale): string {
     case 'heal-treasury': return ru ? `Восстанавливает ${n} здоровья казне.` : `Restore ${n} treasury health.`;
     case 'draw': return ru ? `Добирает карты: ${n}.` : `Draw ${n} card${n === 1 ? '' : 's'}.`;
     case 'buff-own': return ru ? `Вашим бойцам +${effect.attack ?? 0}/+${effect.health ?? 0}.` : `Give your fighters +${effect.attack ?? 0}/+${effect.health ?? 0}.`;
-    case 'gain-gas': return ru ? `Даёт ${n} приказов.` : `Gain ${n} orders.`;
+    case 'gain-gas': return ru ? `Даёт ${n} ${n % 100 >= 11 && n % 100 <= 14 ? 'приказов' : n % 10 === 1 ? 'приказ' : n % 10 >= 2 && n % 10 <= 4 ? 'приказа' : 'приказов'}.` : `Gain ${n} ${n === 1 ? 'order' : 'orders'}.`;
     case 'counter-mempool': return ru ? 'Отменяет самое дорогое ожидающее заклинание противника.' : 'Counter the most expensive pending enemy spell.';
     case 'rugpull': return ru ? 'Уничтожает всех бойцов на поле.' : 'Destroy every fighter on the court.';
     case 'summon': return ru ? 'Призывает дополнительного бойца.' : 'Summon an additional fighter.';
@@ -42,7 +43,7 @@ export function cardRules(id: string, locale: Locale,includeKeywords=true) {
     if (card.priority) rules.push(ru ? 'Приоритет.' : 'Priority.');
   }
   if (card.battlecry) rules.push(`${ru ? 'При выходе:' : 'On arrival:'} ${effectText(card.battlecry, locale)}`);
-  if (card.spell) rules.push(effectText(card.spell, locale));
+  if (card.spell) rules.push(`${isInstantSpell(card)?(ru?'Мгновенно:':'Instant:'):(ru?'В начале следующего своего хода:':'At the start of your next turn:')} ${effectText(card.spell, locale)}`);
   if (card.halvingPeriod) rules.push(ru ? `Каждые ${card.halvingPeriod} блока: +1/+1.` : `Every ${card.halvingPeriod} blocks: +1/+1.`);
   return rules.join(' ') || (!includeKeywords&&cardKeywords(id,locale).length?'':ru ? 'Боец без дополнительных способностей.' : 'A fighter with no additional abilities.');
 }

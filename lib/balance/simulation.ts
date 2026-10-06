@@ -1,5 +1,6 @@
 import {chooseAiAction} from '../ai';
 import {CARDS} from '../cards';
+import {spellTiming} from '../engine/spellTiming';
 import {createGame,applyAction,legalActions,mempoolOf} from '../engine/engine';
 import type {Action,GameState,PlayerId} from '../engine/types';
 import {pendingValidatorOrders,type RulesetId} from '../engine/ruleset';
@@ -57,7 +58,7 @@ export function probeMatch(heroA:string,deckA:string[],heroB:string,deckB:string
 export function mechanicalTwins(){
   const groups=new Map<string,string[]>();
   for(const card of Object.values(CARDS)){
-    const signature=JSON.stringify([card.type,card.attack??null,card.health??null,card.taunt??false,card.rush??false,card.lifesteal??false,card.priority??false,card.halvingPeriod??null,card.battlecry??null,card.spell??null]);
+    const signature=JSON.stringify([card.type,card.attack??null,card.health??null,card.taunt??false,card.rush??false,card.lifesteal??false,card.priority??false,card.halvingPeriod??null,card.battlecry??null,card.spell??null,card.type==='spell'?spellTiming(card):null]);
     groups.set(signature,[...(groups.get(signature)??[]),card.id]);
   }
   return Array.from(groups.values()).filter(ids=>ids.length>1).map(ids=>({cards:ids.map(id=>({id,cost:CARDS[id].cost,faction:CARDS[id].faction})),differentCost:new Set(ids.map(id=>CARDS[id].cost)).size>1}));

@@ -1,11 +1,12 @@
 import { CARDS } from './cards';
 import { HEROES } from './heroes';
+import {isInstantSpell} from './engine/spellTiming';
 import type { Rarity, CardDef } from './engine/types';
 
 export type Locale = 'ru' | 'en';
 export const CARD_RU: Record<string, { name: string; text: string }> = {
-  'senate-censure': {name:'Сенатское порицание',text:'Указ: случайный боец врага теряет 1 атаку, минимум до 0.'},
-  'restoration-rite': {name:'Обряд восстановления',text:'Указ: восстанавливает 2 здоровья всем вашим бойцам, до их максимума.'},
+  'senate-censure': {name:'Сенатское порицание',text:'Случайный боец врага теряет 1 атаку, минимум до 0.'},
+  'restoration-rite': {name:'Обряд восстановления',text:'Восстанавливает 2 здоровья всем вашим бойцам, до их максимума.'},
   'lending-legionnaire': { name: 'Легионер кредитов', text: 'Одолжит щит. Денарии — никогда.' },
   'amm-centurion': { name: 'Центурион AMM', text: 'Постоянное произведение крови и стали. x × y = k, а k — это Рим.' },
   'liquidation-officer': { name: 'Ликвидатор', text: 'Похищение жизни. Боевой клич: наносит 1 урон случайному вражескому существу. Ваш залог был восхитителен.' },
@@ -59,7 +60,7 @@ export const KEYWORD_RU: Record<string, string> = { Gas: 'Приказы', Treas
 export const MECHANICS_RU: Record<string, string> = {
   Gas: 'Оплачивает карты и силу героя. Запас растёт на 1 в начале каждого вашего хода, до 10. Каждое существо в стейкинге добавляет 1 приказ при пополнении.',
   Treasury: 'Ваш запас из 30 здоровья. Опустошите казну соперника, чтобы победить. Лечение не поднимает здоровье выше 30.',
-  Mempool: 'Разыграйте заклинание сейчас — оно сработает в начале вашего следующего хода. У соперника есть ход, чтобы ответить.',
+  Mempool: 'В очереди ждут только указы: они срабатывают в начале следующего хода владельца. Мгновенные заклинания действуют сразу при розыгрыше.',
   Priority: 'Сразу отменяет самое дорогое заклинание противника в очереди. При равной стоимости первым отменяется самое раннее.',
   Staking: 'Существо лишается возможности атаковать и даёт +1 приказ в начале каждого вашего хода. Его по-прежнему можно атаковать. Вывод из стейкинга не возвращает атаку в этом же ходу.',
   Halving: 'Через указанное число блоков существо получает +1 к атаке и +1 к здоровью. Счётчик работает на обоих полях; сначала срабатывают заклинания, затем это усиление.',
@@ -74,7 +75,11 @@ export const MECHANICS_RU: Record<string, string> = {
   Fatigue: 'Когда колода пуста, каждая попытка взять карту наносит урон вашей казне: сначала 1, затем 2, затем 3…',
 };
 export function cardName(id: string, locale: Locale) { return locale === 'ru' ? CARD_RU[id]?.name ?? CARDS[id]?.name ?? id : CARDS[id]?.name ?? id; }
-export function cardText(id: string, locale: Locale) { return locale === 'ru' ? CARD_RU[id]?.text ?? CARDS[id]?.text ?? '' : (CARDS[id]?.text ?? '').replace(/\bgas\b/gi,'orders').replace(/\bmempool\b/gi,'edict queue'); }
+export function cardText(id: string, locale: Locale) {
+  const card=CARDS[id];
+  const text=locale === 'ru' ? CARD_RU[id]?.text ?? card?.text ?? '' : (card?.text ?? '').replace(/\bgas\b/gi,'orders').replace(/\bmempool\b/gi,'edict queue');
+  return card&&isInstantSpell(card)?`${locale==='ru'?'Мгновенно.':'Instant.'} ${text}`:text;
+}
 export function displayCard(card: CardDef, locale: Locale): CardDef { return { ...card, name: cardName(card.id, locale), text: cardText(card.id, locale) }; }
 export function heroName(id: string, locale: Locale) { return locale === 'ru' ? HERO_RU[id]?.name ?? HEROES[id]?.name ?? id : HEROES[id]?.name ?? id; }
 export function heroTitle(id: string, locale: Locale) { return locale === 'ru' ? HERO_RU[id]?.title ?? HEROES[id]?.title ?? '' : HEROES[id]?.title ?? ''; }
@@ -244,6 +249,7 @@ export function logLine(line: string, locale: Locale): string {
     [/^P([01]) keeps opening hand$/, p => `${player(p)}: стартовая рука сохранена`],
     [/^P([01]) mulligans (\d+) card\(s\)$/, (p, n) => `${player(p)}: заменено карт — ${n}`],
     [/^P([01]) plays (.+)$/, (p, name) => `${player(p)}: разыграно «${name}»`],
+    [/^P([01]) casts (.+) -> instant$/, (p, name) => `${player(p)}: «${name}» применено мгновенно`],
     [/^P([01]) casts (.+) -> mempool$/, (p, name) => `${player(p)}: «${name}» отправлено в очередь указов`],
     [/^P([01]) (.+) hits treasury for (\d+)$/, (p, name, n) => `${player(p)}: ${name} наносит казне ${n} урона`],
     [/^(.+) trades with (.+)$/, (a, b) => `${a} сражается с ${b}`],

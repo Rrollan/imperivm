@@ -1,0 +1,893 @@
+{
+  "schema": 1,
+  "ruleset": "classic-v1",
+  "sourceDigest": "bcef5d3fa0dcb3589828ceccbe5250c379d7890920d8ff3950d36235afa860af",
+  "engineCommit": "09baf11b825f7c625e6d28cd23b1507d1a16ae39",
+  "seedsPerOrderedPair": 30,
+  "seedFormula": "104729 + 7919 * i; i = 0..seeds-1",
+  "mulligan": true,
+  "scope": "All 16 ordered pairs including mirrors. Both seats are counted. Shared-deck suite uses Builder deck for every hero. No hidden-state lookahead. Automated policies are probes, not estimates of human PvP win rates. Wilson intervals are descriptive per cell; hero aggregate samples include correlated same-match seats.",
+  "cardCount": 43,
+  "mechanicalTwins": [
+    {
+      "cards": [
+        {
+          "id": "lending-legionnaire",
+          "cost": 1,
+          "faction": "DeFi"
+        },
+        {
+          "id": "pixel-squire",
+          "cost": 1,
+          "faction": "NFT"
+        },
+        {
+          "id": "antenna-auxilia",
+          "cost": 1,
+          "faction": "DePIN"
+        }
+      ],
+      "differentCost": false
+    },
+    {
+      "cards": [
+        {
+          "id": "amm-centurion",
+          "cost": 2,
+          "faction": "DeFi"
+        },
+        {
+          "id": "pepito",
+          "cost": 3,
+          "faction": "Meme"
+        }
+      ],
+      "differentCost": true
+    },
+    {
+      "cards": [
+        {
+          "id": "floor-sweeper",
+          "cost": 3,
+          "faction": "NFT"
+        },
+        {
+          "id": "relay-runner",
+          "cost": 3,
+          "faction": "DePIN"
+        }
+      ],
+      "differentCost": false
+    }
+  ],
+  "results": [
+    {
+      "id": "starters-greedy",
+      "sameDeck": false,
+      "policies": [
+        "greedy",
+        "greedy"
+      ],
+      "matches": 480,
+      "firstWins": 292,
+      "firstWinRate": 60.8,
+      "draws": 0,
+      "incomplete": 0,
+      "blocks": {
+        "p10": 15,
+        "median": 24,
+        "p90": 36
+      },
+      "casts": 3242,
+      "counters": 341,
+      "stakes": 1043,
+      "factionRefunds": 2234,
+      "powers": {
+        "whale": {
+          "uses": 1505,
+          "neutral": 0
+        },
+        "builder": {
+          "uses": 769,
+          "neutral": 0
+        },
+        "degen": {
+          "uses": 833,
+          "neutral": 0
+        },
+        "validator": {
+          "uses": 869,
+          "neutral": 681
+        }
+      },
+      "heroRates": [
+        {
+          "hero": "whale",
+          "wins": 181,
+          "losses": 59,
+          "winRate": 75.4
+        },
+        {
+          "hero": "builder",
+          "wins": 72,
+          "losses": 168,
+          "winRate": 30
+        },
+        {
+          "hero": "degen",
+          "wins": 146,
+          "losses": 94,
+          "winRate": 60.8
+        },
+        {
+          "hero": "validator",
+          "wins": 81,
+          "losses": 159,
+          "winRate": 33.8
+        }
+      ],
+      "cells": [
+        {
+          "a": "whale",
+          "b": "whale",
+          "wins": 26,
+          "losses": 4,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 86.7,
+          "interval95": [
+            70.3,
+            94.7
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "builder",
+          "wins": 30,
+          "losses": 0,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 100,
+          "interval95": [
+            88.6,
+            100
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "degen",
+          "wins": 20,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            48.8,
+            80.8
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "validator",
+          "wins": 30,
+          "losses": 0,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 100,
+          "interval95": [
+            88.6,
+            100
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "whale",
+          "wins": 4,
+          "losses": 26,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 13.3,
+          "interval95": [
+            5.3,
+            29.7
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "builder",
+          "wins": 16,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 53.3,
+          "interval95": [
+            36.1,
+            69.8
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "degen",
+          "wins": 7,
+          "losses": 23,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 23.3,
+          "interval95": [
+            11.8,
+            40.9
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "validator",
+          "wins": 19,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 63.3,
+          "interval95": [
+            45.5,
+            78.1
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "whale",
+          "wins": 9,
+          "losses": 21,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 30,
+          "interval95": [
+            16.7,
+            47.9
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "builder",
+          "wins": 27,
+          "losses": 3,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 90,
+          "interval95": [
+            74.4,
+            96.5
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "degen",
+          "wins": 17,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 56.7,
+          "interval95": [
+            39.2,
+            72.6
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "validator",
+          "wins": 28,
+          "losses": 2,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 93.3,
+          "interval95": [
+            78.7,
+            98.2
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "whale",
+          "wins": 6,
+          "losses": 24,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 20,
+          "interval95": [
+            9.5,
+            37.3
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "builder",
+          "wins": 21,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70,
+          "interval95": [
+            52.1,
+            83.3
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "degen",
+          "wins": 11,
+          "losses": 19,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 36.7,
+          "interval95": [
+            21.9,
+            54.5
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "validator",
+          "wins": 21,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70,
+          "interval95": [
+            52.1,
+            83.3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "starters-pressure",
+      "sameDeck": false,
+      "policies": [
+        "pressure",
+        "pressure"
+      ],
+      "matches": 480,
+      "firstWins": 296,
+      "firstWinRate": 61.7,
+      "draws": 0,
+      "incomplete": 0,
+      "blocks": {
+        "p10": 13,
+        "median": 15,
+        "p90": 20
+      },
+      "casts": 1880,
+      "counters": 193,
+      "stakes": 937,
+      "factionRefunds": 1092,
+      "powers": {
+        "whale": {
+          "uses": 509,
+          "neutral": 0
+        },
+        "builder": {
+          "uses": 229,
+          "neutral": 0
+        },
+        "degen": {
+          "uses": 195,
+          "neutral": 0
+        },
+        "validator": {
+          "uses": 186,
+          "neutral": 170
+        }
+      },
+      "heroRates": [
+        {
+          "hero": "whale",
+          "wins": 166,
+          "losses": 74,
+          "winRate": 69.2
+        },
+        {
+          "hero": "builder",
+          "wins": 95,
+          "losses": 145,
+          "winRate": 39.6
+        },
+        {
+          "hero": "degen",
+          "wins": 134,
+          "losses": 106,
+          "winRate": 55.8
+        },
+        {
+          "hero": "validator",
+          "wins": 85,
+          "losses": 155,
+          "winRate": 35.4
+        }
+      ],
+      "cells": [
+        {
+          "a": "whale",
+          "b": "whale",
+          "wins": 20,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            48.8,
+            80.8
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "builder",
+          "wins": 28,
+          "losses": 2,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 93.3,
+          "interval95": [
+            78.7,
+            98.2
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "degen",
+          "wins": 26,
+          "losses": 4,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 86.7,
+          "interval95": [
+            70.3,
+            94.7
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "validator",
+          "wins": 25,
+          "losses": 5,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 83.3,
+          "interval95": [
+            66.4,
+            92.7
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "whale",
+          "wins": 7,
+          "losses": 23,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 23.3,
+          "interval95": [
+            11.8,
+            40.9
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "builder",
+          "wins": 18,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 60,
+          "interval95": [
+            42.3,
+            75.4
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "degen",
+          "wins": 13,
+          "losses": 17,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 43.3,
+          "interval95": [
+            27.4,
+            60.8
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "validator",
+          "wins": 22,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 73.3,
+          "interval95": [
+            55.6,
+            85.8
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "whale",
+          "wins": 13,
+          "losses": 17,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 43.3,
+          "interval95": [
+            27.4,
+            60.8
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "builder",
+          "wins": 24,
+          "losses": 6,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 80,
+          "interval95": [
+            62.7,
+            90.5
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "degen",
+          "wins": 18,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 60,
+          "interval95": [
+            42.3,
+            75.4
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "validator",
+          "wins": 26,
+          "losses": 4,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 86.7,
+          "interval95": [
+            70.3,
+            94.7
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "whale",
+          "wins": 13,
+          "losses": 17,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 43.3,
+          "interval95": [
+            27.4,
+            60.8
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "builder",
+          "wins": 15,
+          "losses": 15,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            33.2,
+            66.8
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "degen",
+          "wins": 10,
+          "losses": 20,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 33.3,
+          "interval95": [
+            19.2,
+            51.2
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "validator",
+          "wins": 18,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 60,
+          "interval95": [
+            42.3,
+            75.4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shared-deck-greedy",
+      "sameDeck": true,
+      "policies": [
+        "greedy",
+        "greedy"
+      ],
+      "matches": 480,
+      "firstWins": 298,
+      "firstWinRate": 62.1,
+      "draws": 0,
+      "incomplete": 0,
+      "blocks": {
+        "p10": 15,
+        "median": 24,
+        "p90": 36
+      },
+      "casts": 1086,
+      "counters": 0,
+      "stakes": 1364,
+      "factionRefunds": 2036,
+      "powers": {
+        "whale": {
+          "uses": 1213,
+          "neutral": 0
+        },
+        "builder": {
+          "uses": 716,
+          "neutral": 0
+        },
+        "degen": {
+          "uses": 863,
+          "neutral": 0
+        },
+        "validator": {
+          "uses": 1107,
+          "neutral": 1005
+        }
+      },
+      "heroRates": [
+        {
+          "hero": "whale",
+          "wins": 156,
+          "losses": 84,
+          "winRate": 65
+        },
+        {
+          "hero": "builder",
+          "wins": 90,
+          "losses": 150,
+          "winRate": 37.5
+        },
+        {
+          "hero": "degen",
+          "wins": 144,
+          "losses": 96,
+          "winRate": 60
+        },
+        {
+          "hero": "validator",
+          "wins": 90,
+          "losses": 150,
+          "winRate": 37.5
+        }
+      ],
+      "cells": [
+        {
+          "a": "whale",
+          "b": "whale",
+          "wins": 21,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70,
+          "interval95": [
+            52.1,
+            83.3
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "builder",
+          "wins": 27,
+          "losses": 3,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 90,
+          "interval95": [
+            74.4,
+            96.5
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "degen",
+          "wins": 22,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 73.3,
+          "interval95": [
+            55.6,
+            85.8
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "validator",
+          "wins": 27,
+          "losses": 3,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 90,
+          "interval95": [
+            74.4,
+            96.5
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "whale",
+          "wins": 10,
+          "losses": 20,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 33.3,
+          "interval95": [
+            19.2,
+            51.2
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "builder",
+          "wins": 16,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 53.3,
+          "interval95": [
+            36.1,
+            69.8
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "degen",
+          "wins": 12,
+          "losses": 18,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 40,
+          "interval95": [
+            24.6,
+            57.7
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "validator",
+          "wins": 16,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 53.3,
+          "interval95": [
+            36.1,
+            69.8
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "whale",
+          "wins": 20,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            48.8,
+            80.8
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "builder",
+          "wins": 25,
+          "losses": 5,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 83.3,
+          "interval95": [
+            66.4,
+            92.7
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "degen",
+          "wins": 23,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 76.7,
+          "interval95": [
+            59.1,
+            88.2
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "validator",
+          "wins": 25,
+          "losses": 5,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 83.3,
+          "interval95": [
+            66.4,
+            92.7
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "whale",
+          "wins": 10,
+          "losses": 20,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 33.3,
+          "interval95": [
+            19.2,
+            51.2
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "builder",
+          "wins": 16,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 53.3,
+          "interval95": [
+            36.1,
+            69.8
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "degen",
+          "wins": 12,
+          "losses": 18,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 40,
+          "interval95": [
+            24.6,
+            57.7
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "validator",
+          "wins": 16,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 53.3,
+          "interval95": [
+            36.1,
+            69.8
+          ]
+        }
+      ]
+    }
+  ]
+}

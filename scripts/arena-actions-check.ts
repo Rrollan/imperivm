@@ -1,3 +1,4 @@
+import {installDelayedSpellFixtures} from './delayed-spell-fixtures';
 /**
  * Focused, headless coverage for every Action variant and its presentation cues.
  * Run with: node --import tsx scripts/arena-actions-check.ts
@@ -13,6 +14,8 @@ import {DECKS} from '../lib/decks';
 import {abilityCues} from '../components/presentation/abilityCues';
 import {GameSession,type PresentationBatch} from '../components/presentation/GameSession';
 import {videoCues} from '../components/presentation/videoCue';
+
+const restoreDelayedFixtures=installDelayedSpellFixtures(['senate-censure', 'restoration-rite']);
 
 const coverage:{type:Action['type'];label:string}[]=[];
 const gaps:string[]=[];
@@ -167,12 +170,12 @@ function passTurn(game:GameSession,label:string){
 // the owner-turn resolution reports the exact debuff target through both cue
 // systems. A full ally and a zero-attack target exercise no-op filtering.
 {
-  const state=fixture('builder',['senate-censure'],[],[
+  const state=fixture('builder',['delayed-fixture-senate-censure'],[],[
     fighter('weaken-target','pixel-squire',{attack:2,health:4,maxHealth:4}),
   ]);
   const game=session(state);
   const cast=dispatch(game,'cast delayed weaken edict',action=>action.type==='cast-spell');
-  assert.equal(cast.events?.spellQueued?.cardId,'senate-censure');
+  assert.equal(cast.events?.spellQueued?.cardId,'delayed-fixture-senate-censure');
   assert.equal(mempoolOf(cast.after,0).length,1);
   noCues(cast,'a queued edict must not show its resolution effect early');
   passTurn(game,'end turn before enemy response');
@@ -184,7 +187,7 @@ function passTurn(game:GameSession,label:string){
   assert.deepEqual(cueIds(resolve),[{id:'16-edict-weaken',anchor:'weaken-target'}]);
 }
 {
-  const state=fixture('builder',['senate-censure'],[],[
+  const state=fixture('builder',['delayed-fixture-senate-censure'],[],[
     fighter('passive-ape','ape-praetorian',{attack:2,health:3,maxHealth:3}),
   ]);
   const game=session(state);
@@ -199,7 +202,7 @@ function passTurn(game:GameSession,label:string){
   }
 }
 {
-  const state=fixture('builder',['restoration-rite'],[
+  const state=fixture('builder',['delayed-fixture-restoration-rite'],[
     fighter('wounded-ally','amm-centurion',{health:1,maxHealth:4}),
     fighter('full-ally','pixel-squire',{health:1,maxHealth:1}),
   ],[fighter('enemy-unhealed','pixel-squire',{health:1,maxHealth:1})]);
@@ -213,7 +216,7 @@ function passTurn(game:GameSession,label:string){
   assert.deepEqual(cueIds(resolve),[{id:'17-edict-heal',anchor:'wounded-ally'}]);
 }
 {
-  const state=fixture('builder',['senate-censure'],[],[fighter('zero-attack','pixel-squire',{attack:0})]);
+  const state=fixture('builder',['delayed-fixture-senate-censure'],[],[fighter('zero-attack','pixel-squire',{attack:0})]);
   const game=session(state);
   dispatch(game,'queue no-op weaken',action=>action.type==='cast-spell');
   passTurn(game,'pass before no-op weaken');
@@ -317,3 +320,5 @@ if(gaps.length){
 }else console.log('OPEN PRESENTATION GAPS: none observed in the probed paths.');
 console.log('LIMITS: fixtures use one enemy for random targeting; this verifies the legal target/event contract but not seed distribution, Babylon rendering, asset playback, or every card/effect combination.');
 console.log(`ARENA ACTION AUDIT ${gaps.length?'FOUND GAPS':'PASSED'}: ${coverage.length} legal GameSession transitions checked.`);
+
+restoreDelayedFixtures();

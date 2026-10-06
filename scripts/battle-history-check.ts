@@ -1,3 +1,4 @@
+import {installDelayedSpellFixtures} from './delayed-spell-fixtures';
 import assert from 'node:assert/strict';
 import {CARDS} from '../lib/cards';
 import {DECKS} from '../lib/decks';
@@ -5,6 +6,8 @@ import {createGame,legalActions} from '../lib/engine/engine';
 import type {Action,Minion} from '../lib/engine/types';
 import {GameSession} from '../components/presentation/GameSession';
 import {historyEntry} from '../components/presentation/battleHistory';
+
+const restoreDelayedFixtures=installDelayedSpellFixtures(['senate-censure']);
 
 function fixture(hand:string[]=[]){
   const state=createGame('builder',DECKS.builder,'degen',DECKS.degen,22);
@@ -18,14 +21,14 @@ function dispatch(game:GameSession,matches:(action:Action)=>boolean){
   const action=game.legal().find(matches);assert.ok(action,'Use a real legal engine action');
   const batch=game.dispatch(action)!;game.impact(batch.id);game.complete(batch.id);return batch;
 }
-const state=fixture(['senate-censure','senate-censure']);state.players[1].board=[fighter('public-target')];
+const state=fixture(['delayed-fixture-senate-censure','delayed-fixture-senate-censure']);state.players[1].board=[fighter('public-target')];
 state.players[1].hand=[{cardId:'rug-pull',uid:'enemy-secret-hand-uid'}];state.players[1].deck=['rug-pull'];
 const game=new GameSession(state);
 const first=game.dispatch(legalActions(state).find(a=>a.type==='cast-spell')!)!;
 assert.equal(game.snapshot().history.length,0,'History waits for actual contact');
 game.impact(first.id);game.impact(first.id);game.complete(first.id);
 assert.equal(game.snapshot().history.length,1,'Duplicate contact and completion cannot duplicate history');
-assert.equal(game.snapshot().history[0].source?.cardId,'senate-censure');
+assert.equal(game.snapshot().history[0].source?.cardId,'delayed-fixture-senate-censure');
 assert.deepEqual(game.snapshot().history[0].changes,[],'Queueing does not pretend to resolve an effect');
 dispatch(game,a=>a.type==='cast-spell');
 const enemyStart=dispatch(game,a=>a.type==='end-turn');
@@ -55,3 +58,5 @@ const burned=historyEntry(dispatch(new GameSession(burn),a=>a.type==='end-turn')
 assert.ok(burned.details.some(detail=>detail.kind==='draw'&&detail.burned===1&&detail.received===0));
 assert.ok(!JSON.stringify(burned).includes('rug-pull'),'A burned opponent card is not revealed by this UI');
 console.log('HISTORY OK: contact deduplication, per-edict versus aggregate outcomes, hidden opponent draws/burns, fatigue, restart/stale callbacks, failure fallback and bounded retention.');
+
+restoreDelayedFixtures();

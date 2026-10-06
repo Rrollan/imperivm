@@ -1,3 +1,4 @@
+import {installDelayedSpellFixtures} from './delayed-spell-fixtures';
 import assert from 'node:assert/strict';
 import {applyAction,createGame,mempoolOf,spellEffectsOf} from '../lib/engine/engine';
 import {DECKS} from '../lib/decks';
@@ -12,6 +13,8 @@ import {CARDS} from '../lib/cards';
 import {cardText,keywordName} from '../lib/locale';
 import type {EffectDef,GameState,Minion} from '../lib/engine/types';
 import type {PresentationBatch} from '../components/presentation/GameSession';
+
+const restoreDelayedFixtures=installDelayedSpellFixtures(['senate-censure', 'restoration-rite', 'flash-loan', 'trait-reroll', 'solar-sapper']);
 
 const minion=(uid:string,attack=2,health=2,maxHealth=health):Minion=>({uid,cardId:'amm-centurion',name:'AMM Centurion',attack,health,maxHealth,staked:false,canAttack:true,fresh:false,taunt:false,rush:false,lifesteal:false});
 const ape=(uid:string,attack=2,health=3,maxHealth=health):Minion=>({...minion(uid,attack,health,maxHealth),cardId:'ape-praetorian',name:'Ape Praetorian'});
@@ -58,7 +61,7 @@ function withTestSpells(spells:Array<{id:string;spell:EffectDef}>,run:()=>void){
   }
 }
 
-const healing=fixture('restoration-rite');
+const healing=fixture('delayed-fixture-restoration-rite');
 healing.players[0].board=[minion('wounded',2,1,4),minion('almost-full',2,3,4),minion('full',2,4,4)];
 healing.players[1].board=[minion('enemy-wounded',2,1,4)];
 healing.players[0].treasury=18;
@@ -71,13 +74,13 @@ assert.deepEqual(videoCues(heal.batch).map(c=>c.anchor).sort(),['almost-full','w
 assert.equal(heal.batch.events?.damages?.find(d=>d.uid==='almost-full')?.health,4);
 assert.equal(soundsForEvents(heal.batch.events!).filter(sound=>sound==='heal').length,1,'Group healing plays one contact cue rather than stacking one sound per fighter');
 
-const healthyApe=fixture('restoration-rite');healthyApe.players[0].board=[ape('full-ape')];
+const healthyApe=fixture('delayed-fixture-restoration-rite');healthyApe.players[0].board=[ape('full-ape')];
 const healBeforeHalving=queueAndResolve(healthyApe);
 assert.deepEqual(healBeforeHalving.batch.events?.effectResults?.[0]?.targets,[], 'A full-health Ape must not be reported as healed by the later halving tick');
 assert.equal(healBeforeHalving.after.players[0].board[0].health,4,'The subsequent halving tick still raises the Ape health normally');
 assert.equal(soundsForEvents(healBeforeHalving.batch.events!).includes('heal'),false,'Passive growth after a capped heal must not sound like healing');
 
-const weakenedApe=fixture('senate-censure');weakenedApe.players[1].board=[ape('enemy-ape')];
+const weakenedApe=fixture('delayed-fixture-senate-censure');weakenedApe.players[1].board=[ape('enemy-ape')];
 const weakenBeforeHalving=queueAndResolve(weakenedApe);
 const apeResult=weakenBeforeHalving.batch.events?.effectResults?.[0];
 assert.equal(apeResult?.kind,'weaken-random-enemy');
@@ -85,13 +88,13 @@ assert.deepEqual(apeResult?.targets,[{uid:'enemy-ape',attackBefore:2,attackAfter
 assert.equal(weakenBeforeHalving.after.players[1].board[0].attack,2,'The later halving tick can restore the final attack without erasing the weaken result');
 assert.deepEqual(weakenBeforeHalving.batch.events?.halvings?.map(h=>h.uid),['enemy-ape'],'Compensated weakening must not erase the passive halving cue');
 assert.ok(abilityCues(weakenBeforeHalving.batch).some(c=>c.kind==='buff'&&c.to==='enemy-ape'),'The passive buff and the weakening both need feedback');
-const woundedApe=fixture('restoration-rite');woundedApe.players[0].board=[{...ape('wounded-ape'),health:1}];
+const woundedApe=fixture('delayed-fixture-restoration-rite');woundedApe.players[0].board=[{...ape('wounded-ape'),health:1}];
 const healedApe=queueAndResolve(woundedApe);
 assert.deepEqual(healedApe.batch.events?.halvings?.map(h=>h.uid),['wounded-ape'],'A heal followed by halving must retain both abilities');
 assert.deepEqual(healedApe.batch.events?.effectResults?.[0]?.targets.map(t=>[t.healthBefore,t.healthAfter]),[[1,3]],'The heal amount excludes subsequent passive growth');
 assert.ok(soundsForEvents(healedApe.batch.events!).includes('heal'),'Healing before halving retains its own audio feedback');
 
-const aoeApe=fixture('solar-sapper');aoeApe.players[1].board=[ape('aoe-ape',2,3,3)];
+const aoeApe=fixture('delayed-fixture-solar-sapper');aoeApe.players[1].board=[ape('aoe-ape',2,3,3)];
 const aoeBeforeHalving=queueAndResolve(aoeApe);
 assert.equal(aoeBeforeHalving.after.players[1].board[0].health,2,'AOE damage resolves before the Ape gains +1 health');
 assert.equal(aoeBeforeHalving.after.players[1].board[0].maxHealth,4,'The subsequent passive tick still raises max health');
@@ -100,7 +103,7 @@ assert.deepEqual(aoeResult?.targets.map(target=>[target.uid,target.healthBefore,
 assert.deepEqual(aoeBeforeHalving.batch.events?.halvings?.map(event=>event.uid),['aoe-ape']);
 assert.ok(soundsForEvents(aoeBeforeHalving.batch.events!).includes('damage'),'Damage compensated by subsequent passive growth still sounds at contact');
 
-const lethalAoe=fixture('solar-sapper');lethalAoe.players[1].board=[minion('lethal-aoe-target',2,2,5)];
+const lethalAoe=fixture('delayed-fixture-solar-sapper');lethalAoe.players[1].board=[minion('lethal-aoe-target',2,2,5)];
 const lethalAoeResult=queueAndResolve(lethalAoe);
 assert.equal(lethalAoeResult.after.players[1].board.length,0,'Lethal AOE removes the fighter from the board');
 assert.deepEqual(lethalAoeResult.batch.events?.effectResults?.[0]?.targets.map(target=>[target.uid,target.healthBefore,target.healthAfter,target.maxHealth]),[['lethal-aoe-target',2,0,5]],'The effect ledger must keep a dead target UID and report healthAfter 0');
@@ -143,7 +146,7 @@ withTestSpells([
   assert.deepEqual(strike.batch.events?.effectResults?.[0]?.targets.map(target=>[target.uid,target.healthBefore,target.healthAfter,target.maxHealth]),[['hero-1',20,18,30]],'Treasury damage must identify the enemy ruler UID');
 });
 
-const buffSpell=fixture('trait-reroll');buffSpell.players[0].board=[minion('buffed',2,3,3)];
+const buffSpell=fixture('delayed-fixture-trait-reroll');buffSpell.players[0].board=[minion('buffed',2,3,3)];
 const buff=queueAndResolve(buffSpell);
 assert.deepEqual(buff.batch.events?.effectResults?.[0]?.targets.map(target=>[target.uid,target.attackBefore,target.attackAfter,target.healthBefore,target.healthAfter]),[['buffed',2,3,3,3]],'Buff results must retain the source target and stat delta');
 const healthBuff=fixture('audit');healthBuff.players[0].board=[minion('audit-buff',2,3,3)];
@@ -151,17 +154,17 @@ assert.equal(soundsForEvents(queueAndResolve(healthBuff).batch.events!).includes
 const leaderBuff=fixture('genesis-pfp');leaderBuff.players[0].gas=10;leaderBuff.players[0].board=[minion('leader-buff',2,3,3)];
 const leaderAfter=applyAction(leaderBuff,{type:'play-minion',uid:'fixture-card'});
 assert.equal(soundsForEvents(diffAction(leaderBuff,leaderAfter,{type:'play-minion',uid:'fixture-card'})!).includes('heal'),false,'A leader battlecry must not mislabel extra health as restoration');
-const powerBefore=fixture('senate-censure');powerBefore.players[0].treasury=27;
+const powerBefore=fixture('delayed-fixture-senate-censure');powerBefore.players[0].treasury=27;
 const powerAfter=applyAction(powerBefore,{type:'hero-power'});
 assert.ok(soundsForEvents({}, {action:{type:'hero-power'},before:powerBefore,after:powerAfter}).includes('heal'),'Actual ruler healing has audio even without a fighter delta');
-const cappedBefore=fixture('senate-censure');
+const cappedBefore=fixture('delayed-fixture-senate-censure');
 assert.equal(soundsForEvents({}, {action:{type:'hero-power'},before:cappedBefore,after:applyAction(cappedBefore,{type:'hero-power'})}).includes('heal'),false,'A full ruler still has activation feedback without a false heal');
-const garrisonBefore=fixture('senate-censure');garrisonBefore.players[0].board=[minion('garrison')];
+const garrisonBefore=fixture('delayed-fixture-senate-censure');garrisonBefore.players[0].board=[minion('garrison')];
 const garrisonAfter=applyAction(garrisonBefore,{type:'stake',uid:'garrison'});
 assert.deepEqual(soundsForEvents({}, {action:{type:'stake',uid:'garrison'},before:garrisonBefore,after:garrisonAfter}),['stake'],'Garrison actions retain feedback without a BattleEvents envelope');
 
-const duplicateHeals=fixture('restoration-rite');duplicateHeals.players[0].board=[minion('twice-wounded',2,1,5)];
-const twoHeals=queueCopiesAndResolve(duplicateHeals,['restoration-rite','restoration-rite']);
+const duplicateHeals=fixture('delayed-fixture-restoration-rite');duplicateHeals.players[0].board=[minion('twice-wounded',2,1,5)];
+const twoHeals=queueCopiesAndResolve(duplicateHeals,['delayed-fixture-restoration-rite','delayed-fixture-restoration-rite']);
 const healResults=twoHeals.batch.events?.effectResults??[];
 assert.equal(healResults.length,2,'Both copies of a queued edict need independent results');
 assert.deepEqual(healResults.map(result=>result.mempoolUid),twoHeals.sourceUids,'Each result must retain the originating mempool UID');
@@ -173,35 +176,35 @@ assert.equal(spellEffectsOf(twoHeals.after).length,2,'The public getter exposes 
 assert.deepEqual(spellEffectsOf(twoHeals.after)[0].targets,healResults[0].targets,'The public getter returns the recorded target data');
 assert.deepEqual(spellEffectsOf(applyAction(twoHeals.after,{type:'end-turn'})),[],'The effect ledger resets on the next action');
 
-const weak=fixture('senate-censure');
+const weak=fixture('delayed-fixture-senate-censure');
 weak.players[1].board=[minion('defender',1,3)];
 const debuff=queueAndResolve(weak);
 assert.equal(debuff.after.players[1].board[0].attack,0);
 assert.equal(debuff.after.players[1].board[0].health,3,'Weakening must not masquerade as damage');
 assert.equal(abilityCues(debuff.batch).find(c=>c.kind==='weaken')?.to,'defender');
 assert.equal(videoCues(debuff.batch).find(c=>c.id==='16-edict-weaken')?.anchor,'defender');
-const noAttack=fixture('senate-censure');noAttack.players[1].board=[minion('zero',0)];
+const noAttack=fixture('delayed-fixture-senate-censure');noAttack.players[1].board=[minion('zero',0)];
 const noChange=queueAndResolve(noAttack);
 assert.equal(noChange.after.players[1].board[0].attack,0,'Attack cannot go negative');
 assert.equal(abilityCues(noChange.batch).some(c=>c.kind==='weaken'),false,'No changed stat means no false debuff float');
-const empty=fixture('senate-censure');
+const empty=fixture('delayed-fixture-senate-censure');
 assert.equal(queueAndResolve(empty).after.players[1].treasury,empty.players[1].treasury,'An empty enemy board must not redirect weakening to the ruler');
 
-const randomized=fixture('senate-censure',123);randomized.players[1].board=[minion('enemy-a'),minion('enemy-b')];
+const randomized=fixture('delayed-fixture-senate-censure',123);randomized.players[1].board=[minion('enemy-a'),minion('enemy-b')];
 const runA=queueAndResolve(randomized),runB=queueAndResolve(randomized);
 assert.deepEqual(runA.after,runB.after,'Random selection must remain seeded');
 const changed=runA.after.players[1].board.filter(m=>m.attack===1).map(m=>m.uid);
 assert.equal(changed.length,1);
 assert.deepEqual(abilityCues(runA.batch).filter(c=>c.kind==='weaken').map(c=>c.to),changed);
 
-const canceled=fixture('senate-censure');canceled.players[1].board=[minion('untouched')];
+const canceled=fixture('delayed-fixture-senate-censure');canceled.players[1].board=[minion('untouched')];
 let cancellation=applyAction(canceled,{type:'cast-spell',uid:'fixture-card'});
 cancellation=applyAction(cancellation,{type:'end-turn'});
 cancellation.players[1].hand=[{uid:'counter',cardId:'audit'}];cancellation.players[1].gas=5;
 const counter=applyAction(cancellation,{type:'cast-spell',uid:'counter'});
 assert.equal(mempoolOf(counter,0).length,0,'Priority must cancel the queued new edict');
 assert.equal(applyAction(counter,{type:'end-turn'}).players[1].board[0].attack,2);
-assert.equal(diffAction(cancellation,counter,{type:'cast-spell',uid:'counter'})?.spellCountered?.cardId,'senate-censure','A real counter log must still produce a counter event');
+assert.equal(diffAction(cancellation,counter,{type:'cast-spell',uid:'counter'})?.spellCountered?.cardId,'delayed-fixture-senate-censure','A real counter log must still produce a counter event');
 
 const ordersReward=queueAndResolve(fixture('priority-fee'));
 assert.equal(ordersReward.after.players[0].maxGas,6);
@@ -213,7 +216,7 @@ const ordersAndGarrison=fixture('priority-fee');ordersAndGarrison.players[0].boa
 assert.equal(queueAndResolve(ordersAndGarrison).after.players[0].gas,8,'Garrison income and the edict reward both survive refill');
 
 const multiCounter=fixture('frontrun-bot');multiCounter.players[0].gas=10;
-multiCounter.players[1].hand=[{uid:'first-victim',cardId:'rug-pull'},{uid:'second-victim',cardId:'flash-loan'}];
+multiCounter.players[1].hand=[{uid:'first-victim',cardId:'rug-pull'},{uid:'second-victim',cardId:'delayed-fixture-flash-loan'}];
 multiCounter.players[1].gas=multiCounter.players[1].maxGas=10;
 let multiWaiting=applyAction(multiCounter,{type:'end-turn'});
 multiWaiting=applyAction(multiWaiting,{type:'cast-spell',uid:'first-victim'});
@@ -222,7 +225,7 @@ multiWaiting=applyAction(multiWaiting,{type:'end-turn'});
 const multiAction={type:'play-minion' as const,uid:'fixture-card'};
 const multiAfter=applyAction(multiWaiting,multiAction);
 const multiBatch:PresentationBatch={id:3,revision:3,action:multiAction,before:multiWaiting,after:multiAfter,events:diffAction(multiWaiting,multiAfter,multiAction)};
-assert.deepEqual(multiBatch.events?.spellCounters?.map(entry=>entry.cardId),['rug-pull','flash-loan'],'Every actual cancelled UID must be published in engine order');
+assert.deepEqual(multiBatch.events?.spellCounters?.map(entry=>entry.cardId),['rug-pull','delayed-fixture-flash-loan'],'Every actual cancelled UID must be published in engine order');
 assert.equal(multiBatch.events?.spellCountered?.cardId,'rug-pull','The legacy singular counter keeps the first target');
 assert.deepEqual(abilityCues(multiBatch).filter(cue=>cue.kind==='counter'&&cue.phase==='after').map(cue=>cue.to),multiBatch.events!.spellCounters!.map(entry=>`queued-${entry.mempoolUid}`),'Both cancelled entries get their own local feedback');
 assert.equal(soundsForEvents(multiBatch.events!).filter(sound=>sound==='priority').length,1,'Double cancellation does not double the priority sound');
@@ -240,8 +243,8 @@ withTestSpells([{id:'edicts-check-delayed-counter',spell:{kind:'counter-mempool'
   assert.deepEqual(events?.spellCounters?.map(entry=>[entry.owner,entry.cardId]),[[1,'rug-pull']]);
 });
 
-const lethalQueue=fixture('flash-loan');
-lethalQueue.players[0].hand=[{uid:'lethal-first',cardId:'flash-loan'},{uid:'after-lethal',cardId:'senate-censure'}];
+const lethalQueue=fixture('delayed-fixture-flash-loan');
+lethalQueue.players[0].hand=[{uid:'lethal-first',cardId:'delayed-fixture-flash-loan'},{uid:'after-lethal',cardId:'delayed-fixture-senate-censure'}];
 lethalQueue.players[0].gas=lethalQueue.players[0].maxGas=5;
 lethalQueue.players[0].treasury=1;lethalQueue.players[0].deck=[];
 let lethalWaiting=applyAction(lethalQueue,{type:'cast-spell',uid:'lethal-first'});
@@ -260,6 +263,7 @@ assert.equal(six.slots[0],'ready');
 const bonus=ordersView(6,5);assert.equal(bonus.bonus,1);assert.equal(bonus.slots.filter(s=>s==='bonus').length,1);
 const overflow=ordersView(12,10);assert.equal(overflow.available,12);assert.equal(overflow.overflow,2);assert.equal(overflow.bonus,2);assert.equal(overflow.slots.length,10);
 assert.equal(ordersView(0,6).slots.filter(s=>s==='spent').length,6);
+restoreDelayedFixtures();
 for(const id of Object.keys(CARDS)){assert.ok(id in roles,`${id}: explicit role is required`);assert.ok(cardIdentity(id).rank>=1&&cardIdentity(id).rank<=4);}
 assert.equal(keywordName('Gas','ru'),'Приказы');assert.equal(keywordName('Gas','en'),'Orders');
 assert.equal(/газ/i.test(cardText('priority-fee','ru')),false);

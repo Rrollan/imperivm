@@ -37,8 +37,8 @@ export function videoCues(batch: PresentationBatch): VideoCue[] {
     const id:VideoId|undefined=direct.kind.startsWith('damage-')?'07-spell-impact':direct.kind==='buff-own'||direct.kind==='heal-treasury'?'08-spell-buff':direct.kind==='heal-own-minions'?'17-edict-heal':direct.kind==='weaken-random-enemy'?'16-edict-weaken':undefined;
     if(id)direct.targets.forEach(target=>cues.push({id,anchor:target.uid,width:4}));
     if(direct.ordersGain)cues.push({id:'05-validator-gas',anchor:owner===0?'gas-counter':hero,width:4});
-    if(direct.kind==='draw'&&batch.after.players[owner].deck.length<batch.before.players[owner].deck.length)cues.push({id:'04-degen-draw',anchor:played!.uid,width:4});
-    if(direct.kind==='summon')batch.after.players[owner].board.filter(m=>m.uid!==played!.uid&&!batch.before.players[owner].board.some(old=>old.uid===m.uid)).forEach(m=>cues.push({id:'08-spell-buff',anchor:m.uid,width:4}));
+    if(direct.kind==='draw'&&batch.after.players[owner].deck.length<batch.before.players[owner].deck.length)cues.push({id:'04-degen-draw',anchor:direct.source,width:4});
+    if(direct.kind==='summon')batch.after.players[owner].board.filter(m=>m.uid!==direct.source&&!batch.before.players[owner].board.some(old=>old.uid===m.uid)).forEach(m=>cues.push({id:'08-spell-buff',anchor:m.uid,width:4}));
   }
   cues.push(...(batch.events?.spellResolved??[]).filter(s=>!s.fizzled).flatMap(s=>{
     const tag=(items:VideoCue[])=>items.map(c=>({...c,wave:`queued-${s.mempoolUid}`}));

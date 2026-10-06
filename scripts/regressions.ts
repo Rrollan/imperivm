@@ -65,7 +65,7 @@ test('halving at actual next block, staking and unstaking', () => {
   s = round(s); assert(legalActions(s).some(a => a.type === 'attack'));
 });
 test('mempool resolves on owner turn, in order, before halving', () => {
-  let s = fixture(); hand(s, 0, 'solar-sapper'); minion(s, 1, 'pixel-squire', { health: 1 });
+  let s = fixture(); hand(s, 0, 'reveal-ceremony'); minion(s, 1, 'pixel-squire', { health: 1 });
   s = play(s); assert.equal(mempoolOf(s, 0).length, 1); s = end(s);
   assert.equal(mempoolOf(s, 0).length, 1); assert.equal(s.players[1].board.length, 1);
   s = end(s); assert.equal(mempoolOf(s, 0).length, 0); assert.equal(s.players[1].board.length, 0);

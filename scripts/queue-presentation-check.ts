@@ -1,3 +1,4 @@
+import {installDelayedSpellFixtures} from './delayed-spell-fixtures';
 import assert from 'node:assert/strict';
 import {createFullBoardMixedEffectsFixture,createSolarRugPullFixture,createPriorityFourthEntryFixture} from './queue-presentation-fixtures';
 import {battleFloats} from '../components/presentation/battleFloats';
@@ -11,6 +12,8 @@ import {createGame} from '../lib/engine/engine';
 import {DECKS} from '../lib/decks';
 import {GameSession} from '../components/presentation/GameSession';
 import type {Action,Minion} from '../lib/engine/types';
+
+const restoreDelayedFixtures=installDelayedSpellFixtures(['senate-censure','solar-sapper','restoration-rite','flash-loan','trait-reroll']);
 
 function queueBatch(cards:string[],ownCount=0,enemyCount=0){
   const state=createGame('builder',DECKS.builder,'degen',DECKS.degen,42);
@@ -102,7 +105,7 @@ for(const portrait of [false,true]){
   assert.equal(plan.windows[0].key,deathWindow(batch,plan,'overflow-foe-0')?.key);
 }
 {
-  const batch=queueBatch(['senate-censure','audit'],1),plan=effectTimeline(batch)!;
+  const batch=queueBatch(['delayed-fixture-senate-censure','audit'],1),plan=effectTimeline(batch)!;
   assert.equal(batch.events?.effectResults?.[0].targets.length,0);
   assert.deepEqual(plan.windows.map(w=>w.key),batch.events?.spellResolved?.map(s=>`queued-${s.mempoolUid}`),'An edict with no target is acknowledged before the next edict');
 }
@@ -118,3 +121,5 @@ for(const portrait of [false,true]){
   for(const fighter of batch.after.players[0].board)assert.deepEqual(effectFrame(batch,plan,plan.tailMs).fighters.get(fighter.uid),fighter);
 }
 console.log('QUEUE PRESENTATION OK: 24 mixed outcomes, bounded reused slots, ordered contacts, separate passives, real destruction, no-op acknowledgement, 70 reduced-motion outcomes, fourth-entry anchors and narrow-row clearance.');
+
+restoreDelayedFixtures();

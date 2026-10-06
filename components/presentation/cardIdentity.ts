@@ -1,4 +1,5 @@
 import {CARDS} from '../../lib/cards';
+import {isInstantSpell} from '../../lib/engine/spellTiming';
 import type {Locale} from '../../lib/locale';
 import roles from './cardRoles.json';
 
@@ -11,7 +12,7 @@ export function cardIdentity(id:string){
   const role=(roles as Record<string,CardRole>)[id]??(card.type==='spell'?'edict':'legionary');
   return {role,rank:ranks[card.rarity],color:ROLE_COLORS[role]};
 }
-export function roleName(id:string,locale:Locale){return ROLE_LABELS[cardIdentity(id).role][locale==='ru'?0:1];}
+export function roleName(id:string,locale:Locale){if(isInstantSpell(CARDS[id]))return locale==='ru'?'Мгновенное заклинание':'Instant spell';return ROLE_LABELS[cardIdentity(id).role][locale==='ru'?0:1];}
 export function rankName(id:string,locale:Locale){
   const rarity={common:['обычная','common'],rare:['редкая','rare'],epic:['эпическая','epic'],legendary:['легендарная','legendary']}[CARDS[id].rarity][locale==='ru'?0:1];
   return `${locale==='ru'?'Редкость':'Rarity'}: ${rarity} (${['','I','II','III','IV'][cardIdentity(id).rank]})`;

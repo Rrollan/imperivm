@@ -4,7 +4,7 @@ import type {PresentationBatch} from './GameSession';
 export type PublicPiece={owner:PlayerId;cardId?:string;heroId?:string};
 export type HistoryChange={piece:PublicPiece;health?:[number,number];attack?:[number,number];removed?:boolean;arrived?:boolean};
 export type HistoryDetail=
-  | {kind:'queued'|'resolved'|'countered';owner:PlayerId;cardId:string;fizzled?:boolean;changes?:HistoryChange[];noChange?:boolean}
+  | {kind:'queued'|'immediate'|'resolved'|'countered';owner:PlayerId;cardId:string;fizzled?:boolean;changes?:HistoryChange[];noChange?:boolean}
   | {kind:'growth';piece:PublicPiece}
   | {kind:'draw';owner:PlayerId;received:number;burned:number;fatigue:number};
 export type HistoryEntry={
@@ -34,6 +34,7 @@ export function historyEntry(batch:PresentationBatch):HistoryEntry{
     entry.source=locate(action.attackerUid);entry.target=locate(action.target==='hero'?`hero-${1-actor}`:action.target);
   }else if(action.type==='stake'||action.type==='unstake')entry.source=locate(action.uid);
   else if(action.type==='mulligan')entry.replaced=action.uids.length;
+  if(events?.spellImmediate)entry.details.push({kind:'immediate',owner:events.spellImmediate.owner,cardId:events.spellImmediate.cardId});
   if(events?.spellQueued)entry.details.push({kind:'queued',owner:events.spellQueued.owner,cardId:events.spellQueued.cardId});
   for(const resolved of events?.spellResolved??[]){
     const changes:HistoryChange[]=[];
