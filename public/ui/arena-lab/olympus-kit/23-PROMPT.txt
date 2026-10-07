@@ -1,0 +1,5 @@
+IMPERIVM game VFX, Image1 to Image2, 16:9, 1280x720, 4 seconds.
+Image1 is the authored START. Image2 is an entirely black END.
+Preserve Zeus face, silver hair, violet cloak, gold armor and cyan spear from Image1. At 0.0s the figure is already readable, at 0.2s lift him slightly with a brief teal-gold silhouette glow. He lowers the spear once, cloak follows with restrained motion. Hold the readable full figure to 0.8s, then dissolve feet to head into cyan light by 1.55s. No locomotion, no new camera angle.
+The complete active animation MUST finish by 1.55 seconds. From 1.55 seconds to the final frame: perfectly flat black #000000, with no residual particles or glow. Fixed camera, fixed framing, no zoom, no pan, no crop. Keep the whole effect within the image bounds. Pure black background throughout; no floor, environment, shadows, UI, text, logo or watermark. Broad readable shapes, limited particles, simplified stylized 3D materials. No sound; the game adds synchronized audio. Do not render a game board or cards.
+Return the file as 23-zeus-apparition.mp4.

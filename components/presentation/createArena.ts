@@ -25,7 +25,7 @@ import { ArenaEffects } from './ArenaEffects';
 import { ArenaSpriteEffects } from './ArenaSpriteEffects';
 import { videoCues, VIDEO_IDS } from './videoCue';
 import type { PresentationBatch } from './GameSession';
-import {MOTION, smooth, settle, attackTravel,deathProgress,publicPlayPhase} from './motionSpec';
+import {MOTION, smooth, settle, attackTravel,deathProgress,publicPlayPhase,drawPhase} from './motionSpec';
 import {battleCommand,fighterReadiness} from './battleReadability';
 import {fighterRow} from './battleLayout';
 import {ArenaAbilityEffects} from './ArenaAbilityEffects';
@@ -466,7 +466,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   function releaseArrival(){if(heldArrival){destroy(heldArrival);heldArrival=null;}}
   function releaseDraws(){drawFlights.forEach(f=>{if(f.temporary){entities.delete(f.entry.data.uid);destroy(f.entry);}else if(!f.entry.root.isDisposed()){f.entry.root.rotation.y=0;paint(f.entry,f.face);}});drawFlights=[];}
   function resetClock(){sandStream.setEnabled(false);}
-  function cancel() { scheduler.cancel(); releaseArrival(); releaseDraws();layoutMoves=[];effects.clear();projectiles.clear();abilities.clear();deployments.clear(); videoEffects.cancel(); activeBatch = null; released=null; entities.forEach(entry=>{entry.material.alpha=1;entry.backing.visibility=1;entry.hoverLift=0;}); resetClock(); clearPress(); if (shown) sync(shown); }
+  function cancel() { scheduler.cancel(); releaseArrival(); releaseDraws();layoutMoves=[];effects.clear();projectiles.clear();abilities.clear();deployments.clear(); videoEffects.cancel(); activeBatch = null; released=null; entities.forEach(entry=>{entry.material.alpha=1;entry.backing.visibility=1;entry.hoverLift=0;entry.root.rotation.x=0;entry.root.rotation.y=0;}); resetClock(); clearPress(); if (shown) sync(shown); }
 
   async function present(batch: PresentationBatch, impact: () => void) {
     scheduler.cancel(); releaseArrival();releaseDraws();layoutMoves=[]; activeBatch = batch; options.onHover(null); hovered = null; selected = null; highlights();
@@ -518,9 +518,11 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     let landed: Entity | undefined;
     const deaths = new Set(batch.events?.deaths?.map(dead => dead.uid) ?? []);
     const deadObjects = Array.from(entities.values()).filter(entry => deaths.has(entry.data.uid));
-    const publicPlay=handUid!==null&&owner===1&&!options.reducedMotion;
-    const revealAt=point(portrait?1070:1205,325,-6),revealScale=new Vector3(portrait?1.85:1.65,portrait?1.85:1.65,1);
-    const spec=attack?MOTION.attack:handUid?(publicPlay?MOTION.enemyPlay:MOTION.play):batch.action.type==='hero-power'?MOTION.power:MOTION.turn;
+    const playedCard=handUid?CARDS[moving?.data.cardId??'']:undefined;
+    const legendaryPlay=!!playedCard&&playedCard.type==='minion'&&(playedCard.cost>=6||playedCard.rarity==='legendary')&&!options.reducedMotion;
+    const publicPlay=handUid!==null&&(owner===1||legendaryPlay)&&!options.reducedMotion;
+    const revealAt=legendaryPlay?point(800,475,-7):point(portrait?1070:1205,325,-6),revealSize=legendaryPlay?1.95:portrait?1.85:1.65,revealScale=new Vector3(revealSize,revealSize,1);
+    const spec=attack?MOTION.attack:handUid?(legendaryPlay?MOTION.legendaryPlay:publicPlay?MOTION.enemyPlay:MOTION.play):batch.action.type==='hero-power'?MOTION.power:MOTION.turn;
     const drawn=batch.after.players.flatMap((p,owner)=>p.hand.filter(c=>!batch.before.players[owner].hand.some(old=>old.uid===c.uid)).map(c=>({...c,owner:owner as 0|1,index:p.hand.findIndex(h=>h.uid===c.uid)})));
     textures.preloadCards(drawn.filter(c=>c.owner===0).map(c=>c.cardId));
     const timeline=effectTimeline(batch,options.reducedMotion);
@@ -541,7 +543,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       if(investmentPayout?.owner===0)paintOrdersFrame(elapsedMs>=timeline.tailMs||timeline.windows.some(w=>w.key==='aftermath'&&elapsedMs>=w.contactMs));
     };
     const contactMs=options.reducedMotion?72:Math.max(spec.duration*spec.contact,(batch.events?.spellResolved?.length??0)*75+90);
-    const duration=options.reducedMotion?Math.max(180,contactMs+(timeline?.tailMs??0)):Math.max(spec.duration,contactMs+(timeline?.tailMs??230)+(drawn.length?420+Math.max(0,drawn.length-1)*65:0));
+    const duration=options.reducedMotion?Math.max(180,contactMs+(timeline?.tailMs??0)):Math.max(spec.duration,contactMs+(timeline?.tailMs??230)+(drawn.length?MOTION.drawMs+Math.max(0,drawn.length-1)*65:0));
     const impactAt=contactMs/duration;
     if(batch.after.winner!==null)videoEffects.cancel();
     // Victory belongs inside the result dialog; ordinary accents belong on battle pieces.
@@ -567,10 +569,11 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     await scheduler.play(duration, impactAt, progress => {
       rejected.forEach(item=>{
         if(item.entry.root.isDisposed()||progress>=impactAt)return;
-        const t=smooth(progress/impactAt),destination=batch.before.turn===0?deckStack.position:point(portrait?1156:1370,portrait?95:90,-4);
+        const raw=Math.min(1,progress/impactAt),t=raw*raw*raw,destination=batch.before.turn===0?deckStack.position:point(portrait?1156:1370,portrait?95:90,-4);
         item.entry.root.position.copyFrom(Vector3.Lerp(item.start,destination,t));item.entry.root.position.z=-5;
         item.entry.root.scaling.copyFrom(Vector3.Lerp(item.scale,new Vector3(.45,.45,.45),t));item.entry.root.rotation.z=item.rotation*(1-t);
-        if(batch.before.turn===0&&!item.flipped&&t>.45){paint(item.entry,{kind:'back'});item.flipped=true;}
+        item.entry.root.rotation.y=batch.before.turn===0?Math.sin(Math.min(1,raw/.5)*Math.PI)*Math.PI/2:0;
+        if(batch.before.turn===0&&!item.flipped&&raw>.25){paint(item.entry,{kind:'back'});item.flipped=true;}
       });
       if (moving && start && !moving.root.isDisposed()) {
         // Attacks lunge and return. A played card travels once and stays at its destination.
@@ -581,12 +584,13 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
           moving.root.position.copyFrom(Vector3.Lerp(approach,target,phase.landing));
           moving.root.scaling.copyFrom(Vector3.Lerp(Vector3.Lerp(startScale,revealScale,phase.approach),landingScale,phase.landing));
           moving.root.rotation.z=startRotation*(1-phase.approach);
+          if(legendaryPlay){const rise=Math.sin(phase.approach*Math.PI/2)*(1-phase.landing);moving.root.rotation.x=-.18*rise;moving.root.rotation.y=.3*rise*(1-phase.landing);moving.root.position.z-=rise*1.4;}
         }else{
           const recoil=combat.delivery==='melee'?combat.recoil:combat.recoil*Math.min(1,2/Math.max(.001,Vector3.Distance(start,target)));
           moving.root.position.copyFrom(Vector3.Lerp(start, target, handUid ? eased : options.reducedMotion ? 0 : eased * recoil));
           moving.root.position.z -= Math.sin(Math.max(0,eased) * Math.PI) * (options.reducedMotion ? 0 : .35);
           if(heldArrival===moving)moving.root.position.z-=.65;
-          if(handUid){moving.root.scaling.copyFrom(Vector3.Lerp(startScale,landingScale,eased));moving.root.rotation.z=startRotation*(1-eased);}
+          if(handUid){moving.root.scaling.copyFrom(Vector3.Lerp(startScale,landingScale,eased));moving.root.rotation.z=startRotation*(1-eased);moving.root.rotation.x=0;moving.root.rotation.y=0;}
           else moving.root.scaling.setAll(options.reducedMotion?1:1 + Math.sin(progress * Math.PI) * .04);
         }
       }
@@ -600,11 +604,19 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       drawFlights.forEach(f=>{
         const elapsed=(progress-impactAt)*duration-(timeline?.tailMs??0)-f.delay;
         f.entry.root.setEnabled(options.reducedMotion||elapsed>=0);
-        const t=options.reducedMotion?1:Math.max(0,Math.min(1,elapsed/420));
-        const ease=smooth(t);f.entry.root.position.copyFrom(Vector3.Lerp(f.start,f.target,ease));f.entry.root.position.z=-6+ease*4;
-        if(!options.reducedMotion)f.entry.root.position.y+=Math.sin(t*Math.PI)*1.5;
-        f.entry.root.scaling.setAll(.45+.55*ease);f.entry.root.rotation.z=f.entry.fanAngle*ease;
-        if(f.entry.data.owner===0){f.entry.root.rotation.y=t<.45?t/.45*Math.PI/2:-(1-(t-.45)/.55)*Math.PI/2;if(t>=.45&&!f.revealed){paint(f.entry,f.face);f.revealed=true;}}
+        const t=options.reducedMotion?1:Math.max(0,Math.min(1,elapsed/MOTION.drawMs));
+        const own=f.entry.data.owner===0,phase=drawPhase(t);
+        const reveal=own?point(portrait?1040:1080,665,-7):Vector3.Lerp(f.start,f.target,.65);
+        const approach=Vector3.Lerp(f.start,reveal,phase.approach);
+        f.entry.root.position.copyFrom(Vector3.Lerp(approach,f.target,phase.landing));
+        f.entry.root.position.z=-7+phase.landing*5;
+        const readScale=own?1.18:.8;
+        f.entry.root.scaling.setAll((.45+(readScale-.45)*phase.approach)*(1-phase.landing)+phase.landing);
+        f.entry.root.rotation.z=f.entry.fanAngle*phase.landing;
+        if(own){
+          f.entry.root.rotation.y=phase.flip<.5?phase.flip*Math.PI:-(1-phase.flip)*Math.PI;
+          if(phase.flip>=.5&&!f.revealed){paint(f.entry,f.face);f.revealed=true;}
+        }
         f.entry.root.getChildMeshes().forEach(mesh=>mesh.renderingGroupId=2);
       });
       resolving.forEach(({entry,start,delay})=>{
@@ -687,7 +699,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     }, () => {
       if (activeBatch?.id !== batch.id) return;
       releaseArrival();releaseDraws();if(landed&&!landed.root.isDisposed()){landed.material.alpha=1;landed.backing.visibility=1;}
-      entities.forEach(entry=>{entry.material.alpha=1;entry.face.isPickable=entry.data.owner===0||entry.data.kind!=='hand';entry.root.rotation.y=0;});
+      entities.forEach(entry=>{entry.material.alpha=1;entry.face.isPickable=entry.data.owner===0||entry.data.kind!=='hand';entry.root.rotation.y=0;entry.root.rotation.x=0;});
       activeBatch = null; sync(batch.after);
       effects.clear();projectiles.clear();abilities.clear();deployments.clear();
       resetClock();

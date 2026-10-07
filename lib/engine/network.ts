@@ -1,5 +1,6 @@
 /** DOM-free facade: this exact engine and content run in Next and in the WS service. */
 import {CARDS} from '../cards';
+import {boardCapacity} from './tactics';
 import {applyAction, createGame, effectivePowerCost, legalActions, mempoolOf, mulliganAvailable} from './engine';
 import type {Action, GameState, PlayerId} from './types';
 import type {OnlineGame, OnlinePlayer} from '../multiplayer/types';
@@ -40,9 +41,10 @@ export function gameSnapshot(state: GameState, seat: PlayerId, turnDeadline: num
     id: p.id, heroId: p.heroId, treasury: p.treasury, gas: p.gas, maxGas: p.maxGas,
     fatigue: p.fatigue, heroPowerUsed: p.heroPowerUsed, powerCost: effectivePowerCost(state, index as PlayerId),
     handCount: p.hand.length, deckCount: p.deck.length,
+    boardCapacity: boardCapacity(p), factionPlaysThisTurn: {...p.factionPlaysThisTurn}, pavilionBonuses: [...(p.pavilionBonuses??[])],
     board: p.board.map(m => ({uid: m.uid, cardId: m.cardId, name: m.name, attack: m.attack, health: m.health,
       maxHealth: m.maxHealth, canAttack: m.canAttack, staked: m.staked, taunt: !!m.taunt, rush: !!m.rush,
-      lifesteal: !!m.lifesteal, fresh: !!m.fresh})),
+      lifesteal: !!m.lifesteal, fresh: !!m.fresh, ...(m.arrivedBlock===undefined?{}:{arrivedBlock:m.arrivedBlock})})),
     edicts: mempoolOf(state, index as PlayerId).map(e => ({...e})),
     ...(index === seat ? {hand: p.hand.map(c => ({...c}))} : {}),
   })) as [OnlinePlayer, OnlinePlayer];

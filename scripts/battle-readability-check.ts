@@ -57,8 +57,8 @@ state.winner=1;assert.equal(battleCommand(state),'over');
 
 state=fixture(['pixel-squire']);state.players[0].gas=0;
 assert.equal(unavailableCardText(state,'pixel-squire','ru'),'Не хватает приказов: 1');
-state.players[0].gas=10;state.players[0].board=Array.from({length:7},(_,i)=>fighter(`full-${i}`));
-assert.equal(unavailableCardText(state,'pixel-squire','en'),'Court full: 7 fighters');
+state.players[0].gas=10;state.players[0].board=Array.from({length:5},(_,i)=>fighter(`full-${i}`));
+assert.equal(unavailableCardText(state,'pixel-squire','en'),'Court full: 5 fighters. Expand the agora.');
 assert.equal(unavailableCardText(state,'pixel-squire','ru',true),'Действие выполняется');
 const opening=createGame('builder',DECKS.builder,'degen',DECKS.degen,{enableMulligan:true},13);
 assert.equal(battleCommand(opening),'busy');
@@ -69,7 +69,7 @@ for(const card of Object.values(CARDS)){
     const keywords=cardKeywords(card.id,locale);
     assert.equal(keywords.length,[card.taunt,card.rush,card.lifesteal,card.priority].filter(Boolean).length);
     assert.ok(keywords.every(keyword=>keyword.description.length>20));
-    if(!card.battlecry&&!card.spell&&!card.halvingPeriod&&keywords.length)assert.equal(cardRules(card.id,locale,false),'','Do not repeat keyword labels in the rules paragraph');
+    if(!card.battlecry&&!card.ultimate&&!card.spell&&!card.halvingPeriod&&keywords.length)assert.equal(cardRules(card.id,locale,false),'','Do not repeat keyword labels in the rules paragraph');
   }
 }
 console.log('READABILITY OK: engine-backed fresh/Rush/ready/spent/garrison states, legal zero-attack, finish signal, card denial reasons and bilingual keyword explanations.');

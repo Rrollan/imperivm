@@ -1,4 +1,5 @@
 import {CARDS} from '../../lib/cards';
+import {battlecryFor} from '../../lib/engine/tactics';
 import type {EffectKind,Minion,SpellEffectResult} from '../../lib/engine/types';
 import type {PresentationBatch} from './GameSession';
 
@@ -22,7 +23,7 @@ export function directEffect(batch:PresentationBatch):DirectEffect|undefined{
     return {kind:effect.kind,source:immediate.fromHandUid,targets:(result?.targets??[]).filter(t=>t.healthAfter!==t.healthBefore||t.attackAfter!==t.attackBefore),ordersGain:0};
   }
   const played=playedFighter(batch);if(!played)return;
-  const card=CARDS[played.cardId],effect=card.battlecry;if(!effect)return;
+  const card=CARDS[played.cardId],effect=battlecryFor(batch.before,batch.before.turn,card);if(!effect)return;
   const owner=batch.before.turn,before=batch.before.players,after=batch.after.players;
   const targets:DirectEffect['targets']=[];
   const fighter=(old:Minion,next:Minion|undefined)=>({uid:old.uid,attackBefore:old.attack,attackAfter:next?.attack??old.attack,healthBefore:old.health,healthAfter:next?.health??0,maxHealth:next?.maxHealth??old.maxHealth});

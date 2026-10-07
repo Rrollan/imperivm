@@ -1,3 +1,4 @@
+import {boardCapacity,MAX_BOARD_CAPACITY} from './engine/tactics';
 /**
  * IMPERIVM — greedy AI (lib/ai.ts).
  *
@@ -90,6 +91,7 @@ export function chooseAiAction(state: GameState): Action {
       const card=cardOf(state,a.uid);
       if(card&&isInstantSpell(card)){
         switch(card.spell?.kind){
+          case 'expand-board':return boardCapacity(me)<MAX_BOARD_CAPACITY&&me.board.length>=boardCapacity(me)-1;
           case 'heal-own-minions':return me.board.some(m=>m.health<m.maxHealth);
           case 'weaken-random-enemy':return foe.board.some(m=>m.attack>0);
           case 'buff-own':return me.board.length>0;

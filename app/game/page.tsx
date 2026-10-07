@@ -1,4 +1,5 @@
 'use client';
+import {boardCapacity} from '../../lib/engine/tactics';
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -666,7 +667,7 @@ function GameBoard() {
               <span className="combatant-label">{t('ПРОТИВНИК · ИИ', 'RIVAL · AI')}</span>
             </div></DroppableFoeHero>
             <div className="rank-row enemy-rank" aria-label={t('Существа противника', 'Rival minions')}>
-              <div className="rank-label">{t('Ряды противника', 'Rival ranks')} <span>{foe.board.length}/7</span></div>
+              <div className="rank-label">{t('Ряды противника', 'Rival ranks')} <span>{foe.board.length}/{boardCapacity(foe)}</span></div>
               <BoardRank cards={foe.board.map(m => ({ uid: m.uid, node: <DroppableMinion uid={m.uid} foe attackable={foeAttackable(m)}>
                 <MinionToken inFlight={combatFlight?.minion.uid === m.uid} minion={m} attackable={foeAttackable(m)} shaking={attackAnim?.targetUid === m.uid}
                   justPlayed={playedUids.has(m.uid)} floats={floatsFor(m.uid)}
@@ -690,7 +691,7 @@ function GameBoard() {
               {attackerUid && <button className="cancel-target" onClick={() => setInspectUid(attackerUid)}>{t('Карта / стейкинг', 'Card / staking')}</button>}
             </div>
             <DroppableBoard><div id="my-board-slot" className="rank-row own-rank" aria-label={t('Ваши существа', 'Your minions')}>
-              <div className="rank-label">{t('Ваш легион', 'Your ranks')} <span>{me.board.length}/7</span>
+              <div className="rank-label">{t('Ваш легион', 'Your ranks')} <span>{me.board.length}/{boardCapacity(me)}</span>
                 {!!me.pavilionBonuses?.length && <b className="pavilion-tag" title={mechanicText('Pavilion')}>{t('Синергия +1 мана', 'Pavilion +1 mana')}</b>}
               </div>
               <BoardRank own cards={me.board.map(m => {

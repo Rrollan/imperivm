@@ -5,10 +5,10 @@ const landscape = (x:number,y:number,width:number,height:number) => ({
 });
 export function rulerSocket(owner:number,portrait:boolean){
   if(portrait)return owner===0?{x:796,y:774,width:137,height:136}:{x:794,y:25,width:130,height:127};
-  return owner===0?landscape(794,683,142,122):landscape(792,143,126,98);
+  return owner===0?landscape(792,679,146,130):landscape(792,142,129,105);
 }
 export function turnSocket(portrait:boolean){
-  return portrait?{x:1138,y:631,width:177,height:70}:landscape(1424,456,168,68);
+  return portrait?{x:1138,y:631,width:177,height:70}:landscape(1424,456,178,73);
 }
 export function powerSocket(portrait:boolean){
   return portrait?{x:960,y:792,width:84,height:84}:landscape(970,698,79,73);

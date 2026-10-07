@@ -41,5 +41,11 @@
   "fud-hydra": "legionary",
   "to-the-moon-militia": "legionary",
   "rug-pull": "edict",
-  "audit": "edict"
+  "audit": "edict",
+  "agora-expansion": "edict",
+  "diamond-aegis": "edict",
+  "hermes-relayer": "engineer",
+  "athena-diamond-guard": "guard",
+  "zeus-liquidator": "minister",
+  "hades-rugkeeper": "minister"
 }

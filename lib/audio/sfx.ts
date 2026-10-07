@@ -17,6 +17,9 @@ export type SfxName =
   | 'attack'
   | 'arcane-impact'
   | 'bolt-impact'
+  | 'lightning-impact'
+  | 'shield-impact'
+  | 'rift-impact'
   | 'damage'
   | 'heal'
   | 'death'
@@ -100,6 +103,19 @@ function arcaneImpact(c: AudioContext, t: number, out: AudioNode): void {
 function boltImpact(c: AudioContext, t: number, out: AudioNode): void {
   materialNoise(c,t,out,3200,.24,.085);materialNoise(c,t+.02,out,540,.34,.17);
   const o=osc(c,'sine',160,t,t+.18),g=envGain(c,t,.002,.01,.16,.16);o.frequency.exponentialRampToValueAtTime(75,t+.17);o.connect(g).connect(out);
+}
+
+function lightningImpact(c:AudioContext,t:number,out:AudioNode):void {
+  materialNoise(c,t,out,4100,.3,.09);materialNoise(c,t+.025,out,240,.3,.3);
+  const o=osc(c,'sine',110,t,t+.3),g=envGain(c,t,.002,.01,.28,.18);o.frequency.exponentialRampToValueAtTime(48,t+.28);o.connect(g).connect(out);
+}
+function shieldImpact(c:AudioContext,t:number,out:AudioNode):void {
+  materialNoise(c,t,out,740,.28,.14);
+  [430,645,1075].forEach((f,i)=>{const o=osc(c,'sine',f,t,t+.24),g=envGain(c,t,.003,.02,.21,.10/(i+1));o.connect(g).connect(out);});
+}
+function riftImpact(c:AudioContext,t:number,out:AudioNode):void {
+  materialNoise(c,t,out,390,.23,.32);
+  const o=osc(c,'sine',240,t,t+.34),g=envGain(c,t,.025,.035,.27,.18);o.frequency.exponentialRampToValueAtTime(65,t+.3);o.connect(g).connect(out);
 }
 
 function damageHit(c: AudioContext, t: number, out: AudioNode): void {
@@ -360,6 +376,9 @@ export function play(name: SfxName): boolean {
     case 'attack': attackClang(c, t, out); return true;
     case 'arcane-impact': arcaneImpact(c, t, out); return true;
     case 'bolt-impact': boltImpact(c, t, out); return true;
+    case 'lightning-impact': lightningImpact(c,t,out);return true;
+    case 'shield-impact': shieldImpact(c,t,out);return true;
+    case 'rift-impact': riftImpact(c,t,out);return true;
     case 'damage': damageHit(c, t, out); return true;
     case 'heal': healChime(c, t, out); return true;
     case 'death': death(c, t, out); return true;

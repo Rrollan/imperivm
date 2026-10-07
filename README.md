@@ -14,7 +14,7 @@ A Hearthstone-style card battler set in imperial Rome — on Solana. Read the me
 ![License](https://img.shields.io/badge/License-MIT-2C784C)
 ![i18n](https://img.shields.io/badge/UI-RU_/_EN-D4A24C)
 
-**41 cards · 4 heroes · No wallet required**
+**49 cards · 4 heroes · No wallet required**
 
 </div>
 
@@ -30,23 +30,26 @@ A Hearthstone-style card battler set in imperial Rome — on Solana. Read the me
 
 ## ⚔️ The chain is the board
 
-Every turn creates a block. Spells wait in a **public mempool** until your next turn — your opponent sees them coming and can counter. This isn't flavor text. **The mempool IS the game.**
+Every turn creates a block. Tactical **instant spells** act immediately; **edicts** wait in a public mempool until your next turn, giving the opponent a response window.
 
 | Mechanic | What it does |
 | --- | --- |
 | **Mempool** | Cast spells resolve at the start of your next turn, in cast order. Both players see the queue. |
-| **Gas** | Mana crystals, 1→10. Grows each turn. Staked creatures add gas. |
+| **Orders / Приказы** | Mana crystals, 1→10. Grows each turn. Staked creatures add gas. |
 | **Priority** | Instantly counters the most expensive enemy queued spell. Frontrunning as gameplay. |
 | **Staking** | A creature earns +1 gas each turn but cannot attack. Still attackable. |
 | **Halving** | Creatures gain +1/+1 at block intervals. Both boards tick. |
 | **RUG PULL** | The trap card. Clears both boards on resolution. Hold it long enough — or watch **Audit** cancel it. |
 | **Taunt / Rush / Lifesteal** | Protect the Treasury. Strike on summon turn. Heal from combat damage. |
 
-Deck **30** · hand **10** · board **7**. Treasuries start at **30 HP**. Reduce the rival's to zero.
+Deck **30** · hand **10** · board **5**, expandable to **7** with Agora Expansion. Treasuries start at **30 HP**. Reduce the rival's to zero.
 
 ---
 
 ## 🃏 Cards & Heroes
+
+Olympus adds six cards with public preparation and conditional arrival effects. All previous cards remain available. See [design, research and validation](docs/research/olympus-design-20261007.md) and [Omni Flash pack 18–25](docs/olympus-vfx/00-START-HERE.md).
+
 
 Hearthstone-grade card anatomy: blue mana crystal, oval art portrait, gold name ribbon, parchment rules text, gold attack orb, red health drop. Rarity frames from silver to dragon-claw legendary.
 
@@ -69,7 +72,7 @@ Hearthstone-grade card anatomy: blue mana crystal, oval art portrait, gold name 
 
 ![Arena gates](readme/arena.png)
 
-*Training against AI is live. Online duels and private rooms are honest previews — networking is next.*
+*Training and free online 1v1 share the imperial arena. Private rooms and matchmaking use the authoritative WS service; see [server/README.md](server/README.md).*
 
 ---
 

@@ -18,6 +18,7 @@ import type { SfxName } from './sfx';
 import type { BattleEvents } from '../events';
 import type { Action, GameState } from '../engine/types';
 import { CARDS } from '../cards';
+import {battlecryFor,ultimateReady} from '../engine/tactics';
 import {combatStyle} from '../../components/presentation/combatStyle';
 
 type SoundContext = { action: Action; before: GameState; after: GameState };
@@ -67,6 +68,9 @@ export function soundsForEvents(events: BattleEvents, context?: SoundContext): S
   }
   // Plays (cards entering our board)
   if (events.play || events.spellImmediate) add('play');
+  if(events.play&&context&&ultimateReady(context.before,context.before.turn,CARDS[events.play.cardId])){
+    const style=combatStyle(events.play.cardId);if(style.shape)add(style.sound);
+  }
 
   // Mempool lifecycle
   if (events.spellQueued) add('mempool-queue');
@@ -97,7 +101,8 @@ export function soundsForEvents(events: BattleEvents, context?: SoundContext): S
   if (events.damages) {
     for (const d of events.damages) {
       if (covered.has(d.uid) || events.halvings?.some(h => h.uid === d.uid)) continue;
-      if (d.health > d.prevHealth && CARDS[events.play?.cardId ?? '']?.battlecry?.kind !== 'buff-own') add('heal');
+      const played=CARDS[events.play?.cardId??''],effect=played&&context?battlecryFor(context.before,context.before.turn,played):played?.battlecry;
+      if (d.health > d.prevHealth && effect?.kind !== 'buff-own') add('heal');
       else if (d.health < d.prevHealth && !events.attack) add('damage');
     }
   }

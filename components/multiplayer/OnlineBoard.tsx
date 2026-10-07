@@ -7,6 +7,7 @@ import {useCallback, useEffect, useMemo, useRef, useState, type RefObject} from 
 import {CARDS} from '../../lib/cards';
 import {cardArtPath} from '../../lib/cardArt';
 import {isInstantSpell} from '../../lib/engine/spellTiming';
+import {BattleResultEmblem} from '../presentation/BattleResultEmblem';
 import type {Action, GameState, HandCard, MempoolEntry, PlayerState} from '../../lib/engine/types';
 import type {BattleEvents} from '../../lib/events';
 import type {OnlineCommand, OnlineGame, OnlineRoom} from '../../lib/multiplayer/types';
@@ -23,6 +24,7 @@ import {OpeningHand} from '../presentation/OpeningHand';
 import {RomanIcon} from '../presentation/RomanIcon';
 import {heroPortraitPath} from '../presentation/heroPortrait';
 import {cardKeywords, cardRules, powerRules} from '../presentation/rulesText';
+import {ultimateProgress,ultimateReady} from '../../lib/engine/tactics';
 import {rankName, roleName} from '../presentation/cardIdentity';
 import {fighterReadiness, readinessText, unavailableCardText} from '../presentation/battleReadability';
 import arenaStyles from '../presentation/ArenaLab.module.css';
@@ -44,6 +46,7 @@ function arenaView(game: OnlineGame, seat: 0 | 1): ArenaView {
     if (owner === 1) Object.defineProperty(hand, Symbol.iterator, {value: function* (): Generator<HandCard> {}});
     return {id: owner, heroId: source.heroId, treasury: source.treasury,
       gas: source.gas, maxGas: source.maxGas, heroPowerUsed: source.heroPowerUsed, fatigue: source.fatigue,
+      boardCapacity: source.boardCapacity, factionPlaysThisTurn: {...source.factionPlaysThisTurn}, pavilionBonuses: [...(source.pavilionBonuses??[])],
       deck: Array<string>(source.deckCount).fill(''), hand, board: source.board.map(m => ({...m})),
       mempool: source.edicts.map(e => ({...e, owner}))};
   };
@@ -267,6 +270,7 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
       </> : undefined}>
       {minion && <p className={arenaStyles.fighterStatus}>{readinessText(fighterReadiness(view, inspect.owner, minion, game.actions), locale)}</p>}
       <p className={arenaStyles.inspectionRules}>{cardRules(card.id, locale, false)}</p>
+      {card.ultimate&&inspect.kind==='hand'&&<p className={arenaStyles.fighterStatus}>{ultimateReady(view,inspect.owner,card)?t('Ультимейт готов','Ultimate ready'):`${t('Подготовка','Preparation')}: ${Math.min(card.ultimate.count,ultimateProgress(view,inspect.owner,card))}/${card.ultimate.count}`}</p>}
       <div className={arenaStyles.keywords}>{cardKeywords(card.id, locale).map(keyword => <details key={keyword.name}><summary>{keyword.name}</summary><p>{keyword.description}</p></details>)}</div>
       {card.type === 'spell' && <div className={arenaStyles.edictTiming}><strong>{isInstantSpell(card) ? t('Мгновенно · в этом ходу', 'Instant · this turn') : t('Указ · в начале следующего своего хода', 'Edict · at the start of your next turn')}</strong></div>}
       <details className={arenaStyles.inspectionExtra}><summary>{t('Сведения о карте', 'Card details')}</summary><p>{rankName(card.id, locale)}</p></details>
@@ -294,7 +298,7 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
       </div>{concede && <div className={styles.netConcede}><p>{t('Подтвердить поражение?', 'Confirm concession?')}</p><button disabled={!connected || pending} onClick={() => void send({type: 'concede', roomId: room.id, revision: room.revision})}>{t('Подтвердить', 'Confirm')}</button><button onClick={() => setConcede(false)}>{t('Продолжить бой', 'Continue playing')}</button></div>}
     </div></section></div>}
     {history && <div className={arenaStyles.modalBackdrop}><section ref={historyPanel} className={arenaStyles.history} role="dialog" aria-modal="true" aria-label={t('История боя', 'Battle history')}><button className={arenaStyles.close} onClick={() => setHistory(false)} aria-label={t('Закрыть историю', 'Close history')}><RomanIcon name="close"/></button><h2>{t('История боя', 'Battle history')}</h2><ol className={styles.netHistory}>{room.history.map(e => <li key={e.revision}>{locale === 'en' ? e.textEn ?? e.text : e.text}</li>)}</ol></section></div>}
-    {game.winner !== null && !animating && <div className={arenaStyles.modalBackdrop}><section ref={resultPanel} className={`${arenaStyles.result} ${game.winner === room.seat && !reduced ? arenaStyles.resultWithFx : ''}`} role="dialog" aria-modal="true" aria-label={t('Результат боя', 'Battle result')}><span className={arenaStyles.eyebrow}>IMPERIVM</span><div className={game.winner === room.seat && !reduced ? arenaStyles.victoryBanner : undefined}>{game.winner === room.seat && !reduced && <video src="/ui/arena-lab/fx/06-victory.mp4" autoPlay muted playsInline aria-hidden="true"/>}<h2>{result}</h2></div><p>{room.resultReason === 'concede' ? t('Матч завершён сдачей.', 'Match ended by concession.') : room.resultReason === 'disconnect' ? t('Соперник не вернулся в матч.', 'Your opponent did not return to the match.') : t('Бой завершён.', 'Battle completed.')}</p><button className={arenaStyles.primary} disabled={pending} onClick={leave}>{t('Вернуться в зал', 'Back to the hall')}</button></section></div>}
+    {game.winner !== null && !animating && <div className={arenaStyles.modalBackdrop}><section ref={resultPanel} className={`${arenaStyles.result} ${arenaStyles.resultWithFx}`} role="dialog" aria-modal="true" aria-label={t('Результат боя','Battle result')}><span className={arenaStyles.eyebrow}>IMPERIVM</span><BattleResultEmblem outcome={game.winner===room.seat?'win':game.winner==='draw'?'draw':'loss'} reduced={reduced} title={result} replayLabel={t('Повторить триумф','Replay triumph')}/><p>{room.resultReason==='concede'?t('Матч завершён сдачей.','Match ended by concession.'):t('Бой завершён.','Battle completed.')}</p><button className={arenaStyles.primary} disabled={pending} onClick={leave}>{t('Вернуться в зал','Back to the hall')}</button></section></div>}
     {selected && <span className={styles.netAccessible} role="status">{t('Выберите цель для атаки.', 'Choose an attack target.')}</span>}
   </main>;
 }

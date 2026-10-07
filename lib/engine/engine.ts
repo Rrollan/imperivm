@@ -12,6 +12,7 @@
 import { CARDS } from '../cards';
 import { HEROES } from '../heroes';
 import {isInstantSpell} from './spellTiming';
+import {boardCapacity, battlecryFor, ultimateReady, MAX_BOARD_CAPACITY} from './tactics';
 import {rulesetOf,pendingValidatorOrders,type RulesetOptions,type RulesetId} from './ruleset';
 import type {
   Action,
@@ -220,6 +221,7 @@ function makeMinion(s: EngineGame, def: CardDef): Minion {
     rush: def.rush === true,
     lifesteal: def.lifesteal === true,
     fresh: true, // package 4A: gate for "first turn" rules
+    arrivedBlock: s.block,
   };
 }
 
@@ -329,6 +331,12 @@ function applyEffect(s: EngineGame, caster: PlayerId, eff: EffectDef): string[] 
       pushLog(s, `P${caster} gains ${amt} gas`);
       break;
     }
+    case 'expand-board': {
+      me.boardCapacity = Math.min(MAX_BOARD_CAPACITY, boardCapacity(me) + Math.max(0, eff.amount ?? 1));
+      pushLog(s, `P${caster} expands court to ${me.boardCapacity} slots`);
+      targets = [];
+      break;
+    }
     case 'counter-mempool': {
       counterMempool(s, caster);
       break;
@@ -349,7 +357,7 @@ function applyEffect(s: EngineGame, caster: PlayerId, eff: EffectDef): string[] 
         pushLog(s, 'Summon fizzles (not a minion)');
         break;
       }
-      if (me.board.length >= 7) {
+      if (me.board.length >= boardCapacity(me)) {
         pushLog(s, 'Board full — summon fizzles');
         break;
       }
@@ -555,7 +563,7 @@ export function canPlay(state: GameState, pid: PlayerId, uid: string): boolean {
   if (!hc || state.winner !== null || state.turn !== pid || mulliganAvailable(state)) return false;
   const def = cardDef(hc.cardId);
   if (def.cost > me.gas) return false;
-  if (def.type === 'minion') return me.board.length < 7;
+  if (def.type === 'minion') return me.board.length < boardCapacity(me);
   return true; // spell
 }
 
@@ -702,7 +710,7 @@ export function legalActions(state: GameState): Action[] {
     const def = cardDef(hc.cardId);
     if (def.cost > me.gas) continue;
     if (def.type === 'minion') {
-      if (me.board.length < 7) acts.push({ type: 'play-minion', uid: hc.uid });
+      if (me.board.length < boardCapacity(me)) acts.push({ type: 'play-minion', uid: hc.uid });
     } else {
       acts.push({ type: 'cast-spell', uid: hc.uid });
     }
@@ -843,6 +851,7 @@ export function applyAction(state: GameState, action: Action): GameState {
       if (idx < 0) throw new Error(`card not in hand: ${action.uid}`);
       const hc = me.hand[idx];
       const def = cardDef(hc.cardId);
+      const cry = battlecryFor(s, s.turn, def), ultimate = ultimateReady(s, s.turn, def);
       me.hand.splice(idx, 1);
       me.gas -= def.cost;
       const m = makeMinion(s, def);
@@ -851,7 +860,8 @@ export function applyAction(state: GameState, action: Action): GameState {
       if (s.mulliganPhase[s.turn]) s.mulliganPhase[s.turn] = false;
       // package 4A: pavilion (faction synergy) tracks plays; battlecry resolves separately.
       noteFactionPlay(s, def.faction);
-      if (def.battlecry) applyEffect(s, s.turn, def.battlecry);
+      if (ultimate) pushLog(s, `P${s.turn} ultimate: ${def.ultimate!.name}`);
+      if (cry) applyEffect(s, s.turn, cry);
       if (def.priority) counterMempool(s, s.turn);
       checkWinner(s);
       return s;

@@ -27,7 +27,7 @@ const covered:{cardId:string;phase:'play'|'queue'|'resolve';cueCount:number}[]=[
 const knownVideoIds=new Set<string>(VIDEO_IDS);
 const semanticAnchors=new Set(['arena-center','row-0','row-1','gas-counter','hero-power','hero-0','hero-1']);
 
-assert.equal(cardIds.length,43,'The catalog matrix expects all 43 current cards');
+assert.equal(cardIds.length,49,'The catalog matrix expects all 49 current cards');
 
 function minion(uid:string,cardId:string,overrides:Partial<Minion>={}):Minion{
   const card=CARDS[cardId];
@@ -235,11 +235,13 @@ function verifySpell(card:CardDef,cast:PresentationBatch,resolve:PresentationBat
       assert.equal(target.attackAfter,Math.max(0,target.attackBefore-amount));
       break;
     }
+    case 'expand-board':
+      assert.equal(friendlyAfter.boardCapacity,6,'Expansion applies in this turn');break;
     case 'buff-own':{
       const result=resolve.events?.effectResults?.find(entry=>entry.mempoolUid===sourceUid);
       assert.ok(result,`${card.id}: buff must have a source-keyed effect result`);
-      assert.ok(result.targets.some(target=>target.uid==='matrix-friendly-witness'&&target.attackAfter>target.attackBefore));
-      assert.equal(friendlyAfter.board.find(minion=>minion.uid==='matrix-friendly-witness')?.attack,3);
+      assert.ok(result.targets.some(target=>target.uid==='matrix-friendly-witness'&&target.attackAfter>target.attackBefore||target.healthAfter>target.healthBefore));
+      assert.equal(friendlyAfter.board.find(minion=>minion.uid==='matrix-friendly-witness')?.attack,friendlyBefore.board.find(minion=>minion.uid==='matrix-friendly-witness')!.attack+(effect.attack??0));
       break;
     }
     case 'draw':
@@ -372,7 +374,7 @@ assert.equal(minionRoles.length,6,'The catalog must exercise six distinct fighte
 assert.equal(observedRoleAnimations.size,6,'Every fighter role must have a deployment clip');
 const deploymentCueIds=Array.from(new Set(observedRoleAnimations.values()));
 assert.equal(deploymentCueIds.length,6,'Six fighter roles must map to six distinct deployment clips');
-assert.equal(spellCards.length+minionCards.length,43);
+assert.equal(spellCards.length+minionCards.length,cardIds.length);
 for(const id of cardIds){
   assert.equal(CARDS[id].id,id,`${id}: map key and CardDef ID must agree`);
   assert.ok(Object.prototype.hasOwnProperty.call(roles,id),`${id}: every catalog card needs an explicit role`);

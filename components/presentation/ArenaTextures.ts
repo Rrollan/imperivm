@@ -210,24 +210,18 @@ export class ArenaTextures {
   }
 
   private drawCommand(ctx: CanvasRenderingContext2D, state: Extract<Face, { kind: 'command' }>['state'], engraved = false) {
-    const image=this.image('/ui/arena-lab/native/turn-inlay-fit.webp');
     const available=state==='own'||state==='done';
-    ctx.save();ctx.globalAlpha=available?1:.78;
-    if(image){
-      const sx=72/1984*image.naturalWidth,sy=88/793*image.naturalHeight,sw=1841/1984*image.naturalWidth,sh=582/793*image.naturalHeight;
-      const cap=sw*.2,destinationCap=cap/sh*336*(768/336)/2.52;
-      // Preserve the laurel proportions. Only the blank leather centre absorbs
-      // the difference between generated alpha bounds and the carved recess.
-      ctx.drawImage(image,sx,sy,cap,sh,0,0,destinationCap,336);
-      ctx.drawImage(image,sx+cap,sy,sw-cap*2,sh,destinationCap,0,768-destinationCap*2,336);
-      ctx.drawImage(image,sx+sw-cap,sy,cap,sh,768-destinationCap,0,destinationCap,336);
-    }
-    else {rounded(ctx,0,0,768,336,26);ctx.fillStyle='#4d241c';ctx.fill();}
-    ctx.restore();
+    // The board owns the carved frame. This leather face fills its aperture;
+    // no second decorative frame or generated-image transparent padding.
+    ctx.beginPath();ctx.moveTo(45,0);ctx.lineTo(723,0);ctx.lineTo(768,47);ctx.lineTo(768,289);ctx.lineTo(723,336);ctx.lineTo(45,336);ctx.lineTo(0,289);ctx.lineTo(0,47);ctx.closePath();
+    const leather=ctx.createLinearGradient(0,0,0,336);leather.addColorStop(0,available?'#862d20':'#4c241e');leather.addColorStop(.5,available?'#662119':'#361a16');leather.addColorStop(1,'#29130f');
+    ctx.fillStyle=leather;ctx.fill();ctx.strokeStyle=state==='done'?'#f1d492':'#b69157';ctx.lineWidth=10;ctx.stroke();
+    // Two restrained laurel branches preserve the imperial style without crowding the label.
+    for(const side of [-1,1]){ctx.save();ctx.translate(side===-1?72:696,168);ctx.scale(side,1);ctx.strokeStyle='#b89959';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(5,100);ctx.quadraticCurveTo(-34,0,5,-100);ctx.stroke();ctx.fillStyle='#c2a369';for(let i=0;i<5;i++){ctx.beginPath();ctx.ellipse(-13,80-i*40,19,6,-.7,0,Math.PI*2);ctx.fill();}ctx.restore();}
     const labels=available?(this.locale==='ru'?['КОНЕЦ','ХОДА']:['END','TURN']):state==='enemy'?(this.locale==='ru'?['ХОД','СОПЕРНИКА']:['OPPONENT',"TURN"]):state==='busy'?(this.locale==='ru'?['ИДЁТ','БОЙ']:['RESOLVING']):(this.locale==='ru'?['БОЙ','ОКОНЧЕН']:['BATTLE','OVER']);
     const roman=getComputedStyle(document.body).getPropertyValue('--font-roman').trim()||this.font;
     ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle='#25100b';ctx.lineWidth=6;ctx.fillStyle=state==='done'?'#fff5c5':available?'#f8e5b8':'#cbbda3';
-    labels.forEach((label,i)=>{ctx.font=`800 103px ${roman}`;const size=Math.min(103,103*365/Math.max(1,ctx.measureText(label).width));ctx.font=`800 ${size}px ${roman}`;const y=labels.length===1?168:122+i*92;ctx.strokeText(label,384,y);ctx.fillText(label,384,y);});
+    labels.forEach((label,i)=>{ctx.font=`800 103px ${roman}`;const size=Math.min(103,103*470/Math.max(1,ctx.measureText(label).width));ctx.font=`800 ${size}px ${roman}`;const y=labels.length===1?168:122+i*92;ctx.strokeText(label,384,y);ctx.fillText(label,384,y);});
   }
 
   private drawGas(ctx: CanvasRenderingContext2D, gas: number, max: number, engraved = false) {

@@ -30,8 +30,8 @@ function run(game:GameSession,action:Action):PresentationBatch{
   return batch;
 }
 const instantIds=Object.values(CARDS).filter(isInstantSpell).map(c=>c.id);
-assert.deepEqual(instantIds.slice().sort(),['flash-loan','restoration-rite','senate-censure','solar-sapper','trait-reroll']);
-assert.equal(Object.keys(CARDS).length,43,'Preserve the entire live catalogue');
+assert.deepEqual(instantIds.slice().sort(),['agora-expansion','diamond-aegis','flash-loan','restoration-rite','senate-censure','solar-sapper','trait-reroll']);
+assert.equal(Object.keys(CARDS).length,49,'Preserve the entire live catalogue');
 for(const owner of [0,1] as const)for(const id of instantIds){
   const before=fixture(id,owner),original=JSON.stringify(before),game=new GameSession(before);
   const batch=run(game,{type:'cast-spell',uid:'instant-card'}),after=batch.after;
@@ -123,4 +123,4 @@ for(const id of ['priority-fee','audit','reveal-ceremony','rug-pull']){
   enemy=applyAction(enemy,{type:'cast-spell',uid:'counter'});assert.equal(mempoolOf(enemy,0).length,0);
   assert.equal(enemy.players[0].hand.length,2,'Priority cannot undo a completed instant draw');
 }
-console.log('INSTANT SPELLS OK: five live cards, both owners, same-turn combos, exact contact/VFX/history, no double resolution, no-op AI, fatigue, affordability, deterministic targets and four delayed edicts.');
+console.log('INSTANT SPELLS OK: seven live cards, both owners, same-turn combos, exact contact/VFX/history, no double resolution, no-op AI, fatigue, affordability, deterministic targets and four delayed edicts.');

@@ -17,6 +17,7 @@ const EFFECT_KINDS: EffectKind[] = [
   'counter-mempool',
   'rugpull',
   'summon',
+  'expand-board',
 ];
 
 const errors: string[] = [];
@@ -56,7 +57,7 @@ for (const id of ids) {
     failIf(!c.spell, `${id}: spell missing effect`);
     failIf(c.attack !== undefined || c.health !== undefined, `${id}: spell has stats`);
   } else fail(`${id}: bad type`);
-  for (const e of [c.battlecry, c.spell]) {
+  for (const e of [c.battlecry, c.spell, c.ultimate?.effect]) {
     if (e) failIf(!EFFECT_KINDS.includes(e.kind), `${id}: unknown effect kind ${e.kind}`);
   }
   if (c.spell && c.spell.kind === 'summon' || c.battlecry?.kind === 'summon') {

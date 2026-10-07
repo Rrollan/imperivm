@@ -9,6 +9,7 @@ import {validatorPayout} from './validatorInvestment';
 export type AccentKind='steel'|'heal'|'gas'|'dice'|'seal'|'buff'|'counter'|'weaken'|'destroy';
 export type AbilityCue={kind:AccentKind;from:string;to:string;phase:'contact'|'after';delay:number;wave?:string};
 const glyph:Record<EffectKind,AccentKind>={
+  'expand-board':'buff',
   'damage-all-enemy-minions':'steel','damage-random-enemy':'steel','damage-enemy-treasury':'steel',
   'heal-own-minions':'heal','weaken-random-enemy':'weaken','heal-treasury':'heal',draw:'dice','buff-own':'buff','gain-gas':'gas','counter-mempool':'counter',rugpull:'destroy',summon:'buff',
 };
@@ -59,6 +60,7 @@ export function abilityCues(batch:PresentationBatch):AbilityCue[]{
     if(direct.targets.length)direct.targets.forEach((target,i)=>add(glyph[direct.kind],direct.source,target.uid,'after',i*.025));
     else if(direct.kind==='gain-gas'&&direct.ordersGain)add('gas',direct.source,gas(owner),'after');
     else if(direct.kind==='draw'&&batch.after.players[owner].deck.length<batch.before.players[owner].deck.length)add('dice',direct.source,direct.source,'after');
+    else if(direct.kind==='expand-board')add('buff',direct.source,`row-${owner}`,'after');
     else if(direct.kind==='summon')batch.after.players[owner].board.filter(m=>m.uid!==direct.source&&!batch.before.players[owner].board.some(old=>old.uid===m.uid)).forEach((m,i)=>add('buff',direct.source,m.uid,'after',i*.025));
   }
   const resolved=batch.events?.spellResolved??[];

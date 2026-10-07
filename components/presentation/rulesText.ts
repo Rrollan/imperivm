@@ -21,6 +21,7 @@ export function effectText(effect: EffectDef, locale: Locale): string {
     case 'counter-mempool': return ru ? 'Отменяет самое дорогое ожидающее заклинание противника.' : 'Counter the most expensive pending enemy spell.';
     case 'rugpull': return ru ? 'Уничтожает всех бойцов на поле.' : 'Destroy every fighter on the court.';
     case 'summon': return ru ? 'Призывает дополнительного бойца.' : 'Summon an additional fighter.';
+    case 'expand-board': return ru ? `Навсегда добавляет ${n} место в строю, максимум до 7.` : `Permanently add ${n} court slot, up to 7.`;
   }
 }
 
@@ -43,6 +44,11 @@ export function cardRules(id: string, locale: Locale,includeKeywords=true) {
     if (card.priority) rules.push(ru ? 'Приоритет.' : 'Priority.');
   }
   if (card.battlecry) rules.push(`${ru ? 'При выходе:' : 'On arrival:'} ${effectText(card.battlecry, locale)}`);
+  if (card.ultimate) {
+    const u=card.ultimate;
+    const condition=u.condition==='staked'?(ru?`${u.count} ваших бойца пережили ход соперника и находятся в стейкинге`:`${u.count} established friendly fighters are staked`):u.condition==='faction-allies'?(ru?`${u.count} других бойца ${u.faction??card.faction} пережили ход соперника`:`${u.count} other ${u.faction??card.faction} fighters survived the opponent’s turn`):(ru?`ранее в этом ходу разыграно ${u.count} карт ${u.faction??card.faction}`:`you already played ${u.count} ${u.faction??card.faction} cards this turn`);
+    rules.push(`${ru?'Ультимейт':'Ultimate'} «${ru?u.nameRu:u.name}»: ${ru?'если':'if'} ${condition}, ${card.battlecry?(ru?'вместо обычного эффекта:':'replace the ordinary effect:'):''} ${effectText(u.effect,locale)}`);
+  }
   if (card.spell) rules.push(`${isInstantSpell(card)?(ru?'Мгновенно:':'Instant:'):(ru?'В начале следующего своего хода:':'At the start of your next turn:')} ${effectText(card.spell, locale)}`);
   if (card.halvingPeriod) rules.push(ru ? `Каждые ${card.halvingPeriod} блока: +1/+1.` : `Every ${card.halvingPeriod} blocks: +1/+1.`);
   return rules.join(' ') || (!includeKeywords&&cardKeywords(id,locale).length?'':ru ? 'Боец без дополнительных способностей.' : 'A fighter with no additional abilities.');

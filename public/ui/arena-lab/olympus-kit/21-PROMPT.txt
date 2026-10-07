@@ -1,0 +1,5 @@
+IMPERIVM game VFX, Image1 to Image2, 16:9, 1280x720, 4 seconds.
+Image1 is the authored START. Image2 is an entirely black END.
+A gold summoning seal expands in perspective. Three teal rays rise from it, one broad gold halo peaks at 0.35s, then the rays sink and the seal dissolves. No character in this clip.
+The complete active animation MUST finish by 1.2 seconds. From 1.2 seconds to the final frame: perfectly flat black #000000, with no residual particles or glow. Fixed camera, fixed framing, no zoom, no pan, no crop. Keep the whole effect within the image bounds. Pure black background throughout; no floor, environment, shadows, UI, text, logo or watermark. Broad readable shapes, limited particles, simplified stylized 3D materials. No sound; the game adds synchronized audio. Do not render a game board or cards.
+Return the file as 21-legendary-descent.mp4.

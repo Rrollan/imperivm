@@ -1,4 +1,4 @@
-import type {Action, HandCard, MempoolEntry, Minion, PlayerId} from '../engine/types';
+import type {Action, HandCard, MempoolEntry, Minion, PlayerId, PlayerState} from '../engine/types';
 
 /** Deliberate wire allowlist. Never send GameState, hidden decks, RNG, or guest credentials. */
 export interface OnlinePlayer {
@@ -15,6 +15,9 @@ export interface OnlinePlayer {
   board: Minion[];
   edicts: MempoolEntry[];
   hand?: HandCard[];
+  boardCapacity?: number;
+  factionPlaysThisTurn?: PlayerState['factionPlaysThisTurn'];
+  pavilionBonuses?: PlayerState['pavilionBonuses'];
 }
 export interface OnlineGame {
   block: number;

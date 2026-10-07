@@ -20,6 +20,7 @@ export type EffectKind =
   | 'buff-own' // all own minions
   | 'gain-gas'
   | 'counter-mempool' // remove highest-cost enemy mempool spell
+  | 'expand-board' // permanently add slots, capped at seven
   | 'rugpull' // destroy ALL minions on both boards
   | 'summon'; // summon minion by cardId (owner's board)
 
@@ -66,6 +67,8 @@ export interface CardDef {
   taunt?: boolean; // enemy attackers must target this minion before non-taunt minions or hero
   rush?: boolean; // can attack the turn played, but only enemy minions (not hero)
   lifesteal?: boolean; // damage dealt heals damage source owner's treasury by actual hp removed
+  /** Replaces the ordinary Battlecry when its public preparation condition holds. */
+  ultimate?: { condition: 'staked' | 'faction-allies' | 'faction-plays'; count: number; faction?: Faction; effect: EffectDef; name: string; nameRu: string };
 }
 
 export type HeroPowerKind =
@@ -104,6 +107,8 @@ export interface Minion {
   lifesteal?: boolean;
   /* true until the start of this minion owner's next turn; gate for "first turn" rules */
   fresh?: boolean;
+  /** Public arrival turn, independent of attack readiness / unstaking. */
+  arrivedBlock?: number;
 }
 
 export interface MempoolEntry {
@@ -128,6 +133,7 @@ export interface PlayerState {
   mulliganUsed?: boolean;
   factionPlaysThisTurn?: Partial<Record<Faction, number>>;
   pavilionBonuses?: Faction[];
+  boardCapacity?: number; // default five; expansion cards can raise it to seven
 }
 
 export interface GameState {
@@ -209,7 +215,7 @@ export interface CreateGameOptions {
  * - priority: when a card with priority:true is played/cast, immediately remove the
  *   highest-cost enemy mempool entry (ties -> earliest). Log it. (A priority spell
  *   still enters your mempool and resolves next turn.)
- * - Minions: max 7 per board. Just played -> canAttack = false.
+ * - Minions: five slots, permanently expandable to seven. Just played -> canAttack = false.
  * - stake: minion.staked = true, canAttack = false. unstake: staked = false,
  *   canAttack = false (can't attack the same turn). Staked minions give +1 gas
  *   each at turn start (see above). Staked minions can still be attacked / die.

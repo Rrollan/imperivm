@@ -1,0 +1,5 @@
+IMPERIVM game VFX, Image1 to Image2, 16:9, 1280x720, 4 seconds.
+Image1 is the authored START. Image2 is an entirely black END.
+Preserve Hades face, dark hair, purple-black robes, gold armor and burgundy rug from Image1. He gives the rug one small theatrical pull, emerald coins briefly fall into a violet rift at his feet. Hold the recognizable figure to 0.8s, then dissolve into violet shadow by 1.55s. No camera movement, no extra limbs or character redesign.
+The complete active animation MUST finish by 1.55 seconds. From 1.55 seconds to the final frame: perfectly flat black #000000, with no residual particles or glow. Fixed camera, fixed framing, no zoom, no pan, no crop. Keep the whole effect within the image bounds. Pure black background throughout; no floor, environment, shadows, UI, text, logo or watermark. Broad readable shapes, limited particles, simplified stylized 3D materials. No sound; the game adds synchronized audio. Do not render a game board or cards.
+Return the file as 25-hades-apparition.mp4.

@@ -3,6 +3,8 @@ import type {CardDef} from './types';
 /** Tactical spells resolve during the cast action. Other spells are edicts;
  * Priority on an edict still counters immediately, before its delayed effect. */
 const INSTANT_SPELLS = new Set([
+  'agora-expansion',
+  'diamond-aegis',
   'senate-censure',
   'restoration-rite',
   'flash-loan',

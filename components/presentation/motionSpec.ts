@@ -3,6 +3,8 @@ export const MOTION = {
   attack: { duration: 460, contact: .42 },
   play: { duration: 440, contact: .62 },
   enemyPlay: { duration: 1050, contact: .78 },
+  legendaryPlay: { duration: 1550, contact: .84 },
+  drawMs: 700,
   power: { duration: 500, contact: .36 },
   turn: { duration: 480, contact: .40 },
   hoverMs: 70,
@@ -17,6 +19,12 @@ export function publicPlayPhase(progress:number){
   if(t<.22)return {approach:smooth(t/.22),landing:0};
   if(t<.77)return {approach:1,landing:0};
   return {approach:1,landing:smooth((t-.77)/.23)};
+}
+
+/** Face recognition happens before settling into the hand, with an exact endpoint. */
+export function drawPhase(progress:number){
+  const t=Math.max(0,Math.min(1,progress));
+  return {approach:smooth(t/.38),landing:smooth((t-.58)/.42),flip:smooth((t-.16)/.22)};
 }
 /** Exponential settling is stable at different frame rates and after a slow frame. */
 export function settle(current: number, target: number, delta: number, timeConstant: number) {

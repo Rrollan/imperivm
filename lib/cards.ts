@@ -17,6 +17,39 @@ export const CARDS: Record<string, CardDef> = {
     id:'restoration-rite',name:'Restoration Rite',faction:'NFT',rarity:'rare',cost:2,type:'spell',
     spell:{kind:'heal-own-minions',amount:2},text:'Restore 2 health to every friendly fighter, up to their maximum health.',
   },
+  // Olympus: public preparation, a payoff, and room for the opponent to answer.
+  'agora-expansion': {
+    id:'agora-expansion', name:'Agora Expansion', faction:'DePIN', rarity:'rare', cost:3, type:'spell',
+    spell:{kind:'expand-board',amount:1}, text:'Instant. Permanently add one fighter slot, up to seven. Scaling the agora, not the hype.',
+  },
+  'diamond-aegis': {
+    id:'diamond-aegis', name:'Diamond Aegis', faction:'NFT', rarity:'rare', cost:3, type:'spell',
+    spell:{kind:'buff-own',attack:0,health:2}, text:'Instant. Give all your fighters +0/+2. Diamond hands hold the line.',
+  },
+  'hermes-relayer': {
+    id:'hermes-relayer', name:'Hermes Relayer', faction:'DePIN', rarity:'rare', cost:3, type:'minion', attack:2, health:2,
+    battlecry:{kind:'draw',amount:1},
+    ultimate:{condition:'faction-plays',count:1,faction:'DePIN',name:'Relay Alpha',nameRu:'Альфа-сигнал',effect:{kind:'draw',amount:2}},
+    text:'Battlecry: Draw one. Ultimate — if you already played a DePIN card this turn, draw two instead. Alpha at the speed of gossip.',
+  },
+  'athena-diamond-guard': {
+    id:'athena-diamond-guard', name:'Athena of Diamond Hands', faction:'NFT', rarity:'legendary', cost:6, type:'minion', attack:3, health:5, taunt:true,
+    ultimate:{condition:'faction-allies',count:2,faction:'NFT',name:'Diamond Phalanx',nameRu:'Алмазная фаланга',effect:{kind:'buff-own',attack:1,health:1}},
+    text:'Taunt. Ultimate — if two other NFT fighters survived since your previous turn, give your whole army +1/+1. Never sells the bottom.',
+  },
+  'zeus-liquidator': {
+    id:'zeus-liquidator', name:'Zeus the Liquidator', faction:'DeFi', rarity:'legendary', cost:8, type:'minion', attack:5, health:5,
+    battlecry:{kind:'damage-all-enemy-minions',amount:1},
+    ultimate:{condition:'staked',count:2,name:'Olympian Margin Call',nameRu:'Маржин-колл Олимпа',effect:{kind:'damage-all-enemy-minions',amount:3}},
+    text:'Battlecry: Deal one to all enemy fighters. Ultimate — if two of your established fighters are staked, deal three instead. Olympus liquidates your leverage.',
+  },
+  'hades-rugkeeper': {
+    id:'hades-rugkeeper', name:'Hades the Rugkeeper', faction:'Meme', rarity:'legendary', cost:7, type:'minion', attack:4, health:5,
+    battlecry:{kind:'damage-enemy-treasury',amount:1},
+    ultimate:{condition:'faction-plays',count:2,faction:'Meme',name:'Underworld Exit Liquidity',nameRu:'Выход в ликвидность',effect:{kind:'damage-enemy-treasury',amount:4}},
+    text:'Battlecry: Deal one to the enemy treasury. Ultimate — if you already played two Meme cards this turn, deal four instead. Exit liquidity is eternal.',
+  },
+
   // ---------------------------------------------------------------- DeFi
   'lending-legionnaire': {
     id: 'lending-legionnaire',
