@@ -1,0 +1,26 @@
+Generate ONE character illustration for this job. Use the two supplied references for the shared style.
+
+IMPERIVM ART DIRECTION — SIMPLIFIED CLASSICAL CRYPTO FANTASY
+Create original character illustrations for a tactical Greek/Roman crypto-fantasy card game. The world combines classical Mediterranean people, gods, crafts, bronze objects and architecture with crypto ideas expressed through physical visual jokes. Keep it warm, charming and premium, with the immediate readability of a good fantasy trading-card illustration.
+
+LOOK: hand-painted stylized fantasy, broad deliberate brushwork, pleasantly exaggerated proportions, appealing expressive faces, tactile cloth/bronze/ceramic, large simple material planes. A restrained single magical accent is allowed. Avoid photographic portraits, dark muddy realism, generic over-armoured mobile-game heroes, plastic 3D, anime and flat vector clip art. The references set a shared finish; simplify minor costume detail further where it improves readability. Borrow their visual hierarchy, not their exact face, costume, pose or background for every character.
+
+COMPOSITION: portrait 2:3 preferred, target 1024x1536 or higher native resolution if available. If Flow only offers another portrait ratio, use the nearest available option, preferably 3:4, and report the actual dimensions; do not pretend a size was supported. One dominant character per image, framed from waist or mid-thigh upward, complete head visible. The face must read at 96x144 thumbnail size. Put the face around the upper-middle, not against an edge; keep face, gripping hands and identifying object in the central 80% of width and between 12% and 78% of image height. Calm top-left background will sit behind the future cost badge. No floating bust with arbitrary white/black margins. Paint the background to all edges.
+
+SIMPLICITY: one clear action, one identifying major object, one readable silhouette. Use two or three major colour masses. Secondary details must stay subordinate. Quiet atmospheric backdrop with at most one soft contextual architecture shape; no crowds or detailed panoramic cities. Each face, hairstyle, build, expression, stance and identifying object should distinguish this character from the others. Same universe and rendering quality, not fifty palette-swapped clones. Nonhuman characters still get a large readable face and clean anatomy.
+
+PALETTES: shared ivory cloth and antique bronze unify the set. DeFi uses deep teal/emerald and amber light; NFT uses indigo/lavender with ivory ceramic and marble; DePIN uses jade/cyan and copper engineering; Meme uses burgundy/coral/rose with warm expressive faces. These are art palettes, not faction badges. Skin/fur/material colour stays believable. Preserve light/dark separation and saturated focal accents without washing everything beige or covering it in bloom.
+
+COMMON AND RARE: compact readable identity, ordinary physical object, restrained light. EPIC AND LEGENDARY: equally simple anatomy; greater presence and one bold signature motif, not extra engraving or decoration. Every tier gets a polished illustration; metadata does not become a visible rarity jewel.
+
+STRICT OUTPUT: illustration only. NO card frame, border, text box, titles, captions, readable text, letters, numbers, mana crystals used as UI, health/attack circles, rarity dots, logos, token tickers, watermark, infographic, grid, contact sheet or card mockup. Small in-world crystals described as physical props are allowed. No modern monitors, price charts, neon cyberpunk equipment or copied token branding. Avoid excessive laurels, gems, filigree, scattered coins, crowds, extra arms, extra fingers, weapon clutter and magical particle storms. A natural clearly gripping hand matters more than microscopic detail.
+
+REFERENCES: reference-01-signal-oracle.png demonstrates a readable human, restrained engineering magic, warm/cool light and simple classical costume. reference-02-hopium-augur.png demonstrates an original crypto-meme animal with the same painterly finish and clear face/prop hierarchy. They are STYLE references for the whole set and subject references only for jobs 32 and 46 respectively. They are not extra deliverables, and not a mandate to make all characters look like those two.
+
+JOB 20/50 — Reveal Diviner / Прорицатель раскрытия
+Stable character ID: reveal-diviner
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An adult female diviner with long white curls, deep brown skin and an eager smile lifts one simple indigo cloth to reveal a glowing lavender pearl in her other palm. Plain ivory sleeves and a narrow bronze wristband. Waist-up portrait with the reveal action below her face and plenty of separation between both hands. Background is one blurred violet theatre curtain. No jewellery waterfall, cards, lettering or many magical objects.
+Output asset name: 20-reveal-diviner.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.

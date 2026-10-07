@@ -1,0 +1,118 @@
+You are the Google Flow Agent, working as an art-production assistant for IMPERIVM.
+EXECUTE the image generation task below, not merely an outline or a rewrite of the prompts.
+
+TASK: create exactly 50 DISTINCT CHARACTER ILLUSTRATIONS, one separately generated image per numbered job. Use Nano Banana 2.1 if available in this project's image settings. If it is unavailable or the Agent cannot enforce the selected model, report the actual model before using an alternative; do not silently claim Nano Banana 2.1 was used. Respect the account's generation confirmations and limits.
+
+These are 50 new character concepts for a later card expansion. Do not draw complete UI cards, decide gameplay numbers, rewrite abilities or replace existing game cards. Both uploaded references are references only and do not count toward the fifty. Their subjects are regenerated as jobs 32 and 46 so the output roster still contains 50 distinct jobs.
+
+WORKFLOW:
+1. Keep the common art direction below active for every generation. Use both reference files as shared STYLE references. For job 32 use reference 01 additionally as the subject concept; for job 46 use reference 02 additionally as the subject concept. Do not propagate those identities into other jobs.
+2. Work in five batches: jobs 01-10, 11-20, 21-30, 31-40, 41-50. These are ten different jobs, not ten random variations of a single image. If a batch exceeds a supported request size, split it into smaller consecutive groups without skipping or merging jobs. Do not turn the batch into one collage.
+3. Produce one first-pass image per job; do not create multiple optional variants or videos. If a generation technically fails, record it as failed, not completed. Keep completed work and continue the remaining jobs when the platform permits. If generation cannot continue because of a quota/credit/confirmation limit, report the exact completed IDs and the next unfinished ID. Never invent finished images or download links.
+4. Review each output: large readable face, distinguishing object, anatomy, faction palette, subdued backdrop, portrait crop, no baked UI or text. Flag failures for a focused repair rather than silently accepting them or regenerating the entire batch. Further repair generations use the separate repair instruction; do not automatically spend credits on indefinite retries.
+5. Name each generated asset with its exact requested two-digit prefix and ID. Create the Collection 'IMPERIVM — Agora After Hours — 50' if Collections are available, grouping only this task's assets. Do not delete or overwrite unrelated assets or references. If renaming/Collections are unavailable, supply a numbered mapping from requested filename to actual asset.
+6. Preserve the highest available native-quality individual image. Prefer PNG; if the platform exports JPEG/WebP, preserve that format and the same base filename. Do not mislabel extensions, fake resolution, upscale a tiny preview and call it a native master, or export screenshots of the editor.
+7. At completion give a compact 50-row checklist with ID, filename, actual model, dimensions, status and any quality issue. If ZIP export is actually available, include the fifty individual masters plus this mapping in one archive. Otherwise leave individually named project assets ready for normal user export and report that fact. A contact sheet may be an additional review aid only; it never substitutes for any individual image.
+
+Do not count written prompts, existing references, proposed concepts or duplicate variants as completed jobs. Generate all fifty within supported batch limits. Avoid creative clarification: the brief is complete. Keep platform-required account confirmations intact.
+
+
+SCOPE OVERRIDE FOR THIS MESSAGE: generate ONLY jobs 31-40, ten distinct images. Do not run the other forty jobs from the full production plan. Preserve prior completed assets.
+IMPERIVM ART DIRECTION — SIMPLIFIED CLASSICAL CRYPTO FANTASY
+Create original character illustrations for a tactical Greek/Roman crypto-fantasy card game. The world combines classical Mediterranean people, gods, crafts, bronze objects and architecture with crypto ideas expressed through physical visual jokes. Keep it warm, charming and premium, with the immediate readability of a good fantasy trading-card illustration.
+
+LOOK: hand-painted stylized fantasy, broad deliberate brushwork, pleasantly exaggerated proportions, appealing expressive faces, tactile cloth/bronze/ceramic, large simple material planes. A restrained single magical accent is allowed. Avoid photographic portraits, dark muddy realism, generic over-armoured mobile-game heroes, plastic 3D, anime and flat vector clip art. The references set a shared finish; simplify minor costume detail further where it improves readability. Borrow their visual hierarchy, not their exact face, costume, pose or background for every character.
+
+COMPOSITION: portrait 2:3 preferred, target 1024x1536 or higher native resolution if available. If Flow only offers another portrait ratio, use the nearest available option, preferably 3:4, and report the actual dimensions; do not pretend a size was supported. One dominant character per image, framed from waist or mid-thigh upward, complete head visible. The face must read at 96x144 thumbnail size. Put the face around the upper-middle, not against an edge; keep face, gripping hands and identifying object in the central 80% of width and between 12% and 78% of image height. Calm top-left background will sit behind the future cost badge. No floating bust with arbitrary white/black margins. Paint the background to all edges.
+
+SIMPLICITY: one clear action, one identifying major object, one readable silhouette. Use two or three major colour masses. Secondary details must stay subordinate. Quiet atmospheric backdrop with at most one soft contextual architecture shape; no crowds or detailed panoramic cities. Each face, hairstyle, build, expression, stance and identifying object should distinguish this character from the others. Same universe and rendering quality, not fifty palette-swapped clones. Nonhuman characters still get a large readable face and clean anatomy.
+
+PALETTES: shared ivory cloth and antique bronze unify the set. DeFi uses deep teal/emerald and amber light; NFT uses indigo/lavender with ivory ceramic and marble; DePIN uses jade/cyan and copper engineering; Meme uses burgundy/coral/rose with warm expressive faces. These are art palettes, not faction badges. Skin/fur/material colour stays believable. Preserve light/dark separation and saturated focal accents without washing everything beige or covering it in bloom.
+
+COMMON AND RARE: compact readable identity, ordinary physical object, restrained light. EPIC AND LEGENDARY: equally simple anatomy; greater presence and one bold signature motif, not extra engraving or decoration. Every tier gets a polished illustration; metadata does not become a visible rarity jewel.
+
+STRICT OUTPUT: illustration only. NO card frame, border, text box, titles, captions, readable text, letters, numbers, mana crystals used as UI, health/attack circles, rarity dots, logos, token tickers, watermark, infographic, grid, contact sheet or card mockup. Small in-world crystals described as physical props are allowed. No modern monitors, price charts, neon cyberpunk equipment or copied token branding. Avoid excessive laurels, gems, filigree, scattered coins, crowds, extra arms, extra fingers, weapon clutter and magical particle storms. A natural clearly gripping hand matters more than microscopic detail.
+
+REFERENCES: reference-01-signal-oracle.png demonstrates a readable human, restrained engineering magic, warm/cool light and simple classical costume. reference-02-hopium-augur.png demonstrates an original crypto-meme animal with the same painterly finish and clear face/prop hierarchy. They are STYLE references for the whole set and subject references only for jobs 32 and 46 respectively. They are not extra deliverables, and not a mandate to make all characters look like those two.
+
+JOB 31/50 — Bridge Riveter / Клепальщик мостов
+Stable character ID: bridge-riveter
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A muscular adult woman builder with deep olive skin, shaved hair and a confident grin rests one short square-headed bronze riveting hammer against her shoulder. Simple jade tunic and ivory work scarf, no heavy ornate armour. Mid-thigh portrait, hammer and face separated. Behind her is one broad soft bridge arch under a pale cyan sky. No scattered tools, huge construction scene, numerous rivets or glowing forge.
+Output asset name: 31-bridge-riveter.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 32/50 — Signal Oracle / Оракул сигнала
+Stable character ID: signal-oracle
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: A confident adult woman engineer-priestess with warm olive skin, cropped dark curls and an ivory shoulder cape over a simple jade tunic holds one bronze tuning-fork staff with a floating cyan crystal between its two tines. Intelligent playful expression, one bronze work glove. Large mid-thigh portrait, staff tip and face clear, muted turquoise sky with one distant aqueduct curve. One soft signal arc only. Use the matching supplied reference for this concept, keeping its uncomplicated composition.
+Output asset name: 32-signal-oracle.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 33/50 — Mesh Shieldbearer / Щитоносец mesh-сети
+Stable character ID: mesh-shieldbearer
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An adult male defender with dark brown skin, a short angular beard and vigilant eyes holds one broad translucent cyan shield braced by a simple bronze rim. Only three large hexagonal cells are visible in the shield. Plain jade cloak and simple bronze chestplate. Tight mid-thigh portrait; shield low, face fully visible. Background is quiet warm dust. No dense mesh, many glowing nodes, HUD, technological suit or huge energy flare.
+Output asset name: 33-mesh-shieldbearer.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 34/50 — Agora Sitewarden / Смотритель стройки агоры
+Stable character ID: agora-sitewarden
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: A mature adult woman forewoman with grey curls tied high, strong cheekbones and a stern amused gaze plants one oversized bronze measuring compass against her hip. Simple ivory shirt with jade belt and one leather shoulder guard. Mid-thigh portrait, broad compass legs form a readable triangle without numbers or scale marks. A single blurred unfinished arch sits behind her. No blueprint writing, many tools or tiny building labourers.
+Output asset name: 34-agora-sitewarden.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 35/50 — Packet Ferryman / Паромщик пакетов
+Stable character ID: packet-ferryman
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An older adult male ferryman with a narrow white beard, weathered tan skin and a dry smile holds one short bronze ferry pole ending in a smooth cyan capsule. Plain ivory hood pushed back, jade vest, close waist-up portrait. One quiet horizontal water reflection behind him; no visible boat passengers. The capsule should read as a physical sealed object, not a glowing UI packet. No multiple capsules, data strings or spooky skulls.
+Output asset name: 35-packet-ferryman.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 36/50 — Atlas the Nodebearer / Атлант узлов
+Stable character ID: atlas-nodebearer
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: epic — metadata only; never render it.
+Required character and scene: A gigantic adult male titan with deep bronze skin, close curly dark hair and a focused tired face supports one large simple bronze ring on his shoulders. Three cyan beads sit around the ring, well separated and not resembling a UI diagram. Simple jade waist drape, mid-thigh portrait so the head stays large. Pale cyan sky and one soft mountain silhouette behind him. No globe full of circuitry, orbit swarm, inscriptions or elaborate armour.
+Output asset name: 36-atlas-nodebearer.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 37/50 — Daedalus the Protocolwright / Дедал, мастер протоколов
+Stable character ID: daedalus-protocolwright
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: epic — metadata only; never render it.
+Required character and scene: An elderly adult male inventor with unruly white hair, thick eyebrows and a delighted frown adjusts one compact folded bronze mechanical wing held at chest level. Simple jade work robe and ivory scarf, only three large feather-shaped wing plates. Close waist-up portrait against one blurred sunlit workshop arch. Face and wing separated; no wall of inventions, goggles stack, blueprint text, many gears or tiny machines.
+Output asset name: 37-daedalus-protocolwright.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 38/50 — Hephaestus of Public Nodes / Гефест общественных узлов
+Stable character ID: hephaestus-public-nodes
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: legendary — metadata only; never render it.
+Required character and scene: A powerful adult forge god with warm dark skin, dense short black curls, a trimmed beard and a proud crooked smile raises one enormous simple bronze smith hammer. Ivory work drape and a jade leather apron. One cyan molten seam glows along the hammer head. Large mid-thigh portrait, readable face, broad shoulders and a single quiet warm furnace arch behind him. No sparks shower, gear cathedral, many automata, wings or excessive ornament.
+Output asset name: 38-hephaestus-public-nodes.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 39/50 — Copium Jester / Шут копиума
+Stable character ID: copium-jester
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: An adult human jester with olive skin, a long expressive face, tousled auburn curls and an overly optimistic grin holds one small smooth coral-coloured ceramic inhaler shaped like an ancient incense cup. Plain wine-red short toga and a single crooked bronze laurel leaf tucked behind his ear. Waist-up portrait with cup below the face. Soft rose sky, no smoke cloud covering features, modern medical equipment, labels or copied internet mascot.
+Output asset name: 39-copium-jester.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 40/50 — Exit Liquidity Goose / Гусь выходной ликвидности
+Stable character ID: liquidity-goose
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: An original anthropomorphic white goose with a very offended orange-beaked face wears a simple burgundy Roman sash and clutches one small unmarked bronze coin purse like a precious secret. Upper-body portrait at human head scale, long neck forms a funny clean S curve, one wing clearly grips the purse. Quiet coral market awning behind it. No honking text, money shower, charts, copied meme layout or complex costume.
+Output asset name: 40-liquidity-goose.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+Report this batch's ten actual assets and any unfinished IDs.

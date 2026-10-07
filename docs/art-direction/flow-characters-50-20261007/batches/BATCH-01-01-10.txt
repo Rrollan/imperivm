@@ -1,0 +1,118 @@
+You are the Google Flow Agent, working as an art-production assistant for IMPERIVM.
+EXECUTE the image generation task below, not merely an outline or a rewrite of the prompts.
+
+TASK: create exactly 50 DISTINCT CHARACTER ILLUSTRATIONS, one separately generated image per numbered job. Use Nano Banana 2.1 if available in this project's image settings. If it is unavailable or the Agent cannot enforce the selected model, report the actual model before using an alternative; do not silently claim Nano Banana 2.1 was used. Respect the account's generation confirmations and limits.
+
+These are 50 new character concepts for a later card expansion. Do not draw complete UI cards, decide gameplay numbers, rewrite abilities or replace existing game cards. Both uploaded references are references only and do not count toward the fifty. Their subjects are regenerated as jobs 32 and 46 so the output roster still contains 50 distinct jobs.
+
+WORKFLOW:
+1. Keep the common art direction below active for every generation. Use both reference files as shared STYLE references. For job 32 use reference 01 additionally as the subject concept; for job 46 use reference 02 additionally as the subject concept. Do not propagate those identities into other jobs.
+2. Work in five batches: jobs 01-10, 11-20, 21-30, 31-40, 41-50. These are ten different jobs, not ten random variations of a single image. If a batch exceeds a supported request size, split it into smaller consecutive groups without skipping or merging jobs. Do not turn the batch into one collage.
+3. Produce one first-pass image per job; do not create multiple optional variants or videos. If a generation technically fails, record it as failed, not completed. Keep completed work and continue the remaining jobs when the platform permits. If generation cannot continue because of a quota/credit/confirmation limit, report the exact completed IDs and the next unfinished ID. Never invent finished images or download links.
+4. Review each output: large readable face, distinguishing object, anatomy, faction palette, subdued backdrop, portrait crop, no baked UI or text. Flag failures for a focused repair rather than silently accepting them or regenerating the entire batch. Further repair generations use the separate repair instruction; do not automatically spend credits on indefinite retries.
+5. Name each generated asset with its exact requested two-digit prefix and ID. Create the Collection 'IMPERIVM — Agora After Hours — 50' if Collections are available, grouping only this task's assets. Do not delete or overwrite unrelated assets or references. If renaming/Collections are unavailable, supply a numbered mapping from requested filename to actual asset.
+6. Preserve the highest available native-quality individual image. Prefer PNG; if the platform exports JPEG/WebP, preserve that format and the same base filename. Do not mislabel extensions, fake resolution, upscale a tiny preview and call it a native master, or export screenshots of the editor.
+7. At completion give a compact 50-row checklist with ID, filename, actual model, dimensions, status and any quality issue. If ZIP export is actually available, include the fifty individual masters plus this mapping in one archive. Otherwise leave individually named project assets ready for normal user export and report that fact. A contact sheet may be an additional review aid only; it never substitutes for any individual image.
+
+Do not count written prompts, existing references, proposed concepts or duplicate variants as completed jobs. Generate all fifty within supported batch limits. Avoid creative clarification: the brief is complete. Keep platform-required account confirmations intact.
+
+
+SCOPE OVERRIDE FOR THIS MESSAGE: generate ONLY jobs 01-10, ten distinct images. Do not run the other forty jobs from the full production plan. Preserve prior completed assets.
+IMPERIVM ART DIRECTION — SIMPLIFIED CLASSICAL CRYPTO FANTASY
+Create original character illustrations for a tactical Greek/Roman crypto-fantasy card game. The world combines classical Mediterranean people, gods, crafts, bronze objects and architecture with crypto ideas expressed through physical visual jokes. Keep it warm, charming and premium, with the immediate readability of a good fantasy trading-card illustration.
+
+LOOK: hand-painted stylized fantasy, broad deliberate brushwork, pleasantly exaggerated proportions, appealing expressive faces, tactile cloth/bronze/ceramic, large simple material planes. A restrained single magical accent is allowed. Avoid photographic portraits, dark muddy realism, generic over-armoured mobile-game heroes, plastic 3D, anime and flat vector clip art. The references set a shared finish; simplify minor costume detail further where it improves readability. Borrow their visual hierarchy, not their exact face, costume, pose or background for every character.
+
+COMPOSITION: portrait 2:3 preferred, target 1024x1536 or higher native resolution if available. If Flow only offers another portrait ratio, use the nearest available option, preferably 3:4, and report the actual dimensions; do not pretend a size was supported. One dominant character per image, framed from waist or mid-thigh upward, complete head visible. The face must read at 96x144 thumbnail size. Put the face around the upper-middle, not against an edge; keep face, gripping hands and identifying object in the central 80% of width and between 12% and 78% of image height. Calm top-left background will sit behind the future cost badge. No floating bust with arbitrary white/black margins. Paint the background to all edges.
+
+SIMPLICITY: one clear action, one identifying major object, one readable silhouette. Use two or three major colour masses. Secondary details must stay subordinate. Quiet atmospheric backdrop with at most one soft contextual architecture shape; no crowds or detailed panoramic cities. Each face, hairstyle, build, expression, stance and identifying object should distinguish this character from the others. Same universe and rendering quality, not fifty palette-swapped clones. Nonhuman characters still get a large readable face and clean anatomy.
+
+PALETTES: shared ivory cloth and antique bronze unify the set. DeFi uses deep teal/emerald and amber light; NFT uses indigo/lavender with ivory ceramic and marble; DePIN uses jade/cyan and copper engineering; Meme uses burgundy/coral/rose with warm expressive faces. These are art palettes, not faction badges. Skin/fur/material colour stays believable. Preserve light/dark separation and saturated focal accents without washing everything beige or covering it in bloom.
+
+COMMON AND RARE: compact readable identity, ordinary physical object, restrained light. EPIC AND LEGENDARY: equally simple anatomy; greater presence and one bold signature motif, not extra engraving or decoration. Every tier gets a polished illustration; metadata does not become a visible rarity jewel.
+
+STRICT OUTPUT: illustration only. NO card frame, border, text box, titles, captions, readable text, letters, numbers, mana crystals used as UI, health/attack circles, rarity dots, logos, token tickers, watermark, infographic, grid, contact sheet or card mockup. Small in-world crystals described as physical props are allowed. No modern monitors, price charts, neon cyberpunk equipment or copied token branding. Avoid excessive laurels, gems, filigree, scattered coins, crowds, extra arms, extra fingers, weapon clutter and magical particle storms. A natural clearly gripping hand matters more than microscopic detail.
+
+REFERENCES: reference-01-signal-oracle.png demonstrates a readable human, restrained engineering magic, warm/cool light and simple classical costume. reference-02-hopium-augur.png demonstrates an original crypto-meme animal with the same painterly finish and clear face/prop hierarchy. They are STYLE references for the whole set and subject references only for jobs 32 and 46 respectively. They are not extra deliverables, and not a mandate to make all characters look like those two.
+
+JOB 01/50 — Collateral Squire / Оруженосец залога
+Stable character ID: collateral-squire
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A young adult male legionary with a blunt dark fringe and a worried but determined face hugs one oversized bronze lock-shaped shield. Plain short teal tunic, one leather shoulder pad, no helmet. Three-quarter waist-up view with the shield angled across the lower body. A softly painted treasury doorway behind him. The joke is protecting collateral more carefully than himself; the shield has no lettering or keyhole logo.
+Output asset name: 01-collateral-squire.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 02/50 — Reserve Matron / Матрона резервов
+Stable character ID: reserve-matron
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A broad-shouldered middle-aged woman with silver-streaked black braids and a calm authoritative expression carries a single sealed terracotta reserve jar against her hip. Simple ivory tunic and emerald sash, one broad bronze clasp. Mid-thigh portrait, jar kept below the face. Soft deep-teal vault interior, one warm light patch. The jar is chunky and unmarked; her silhouette should feel dependable rather than heavily armoured.
+Output asset name: 02-reserve-matron.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 03/50 — Interest Shepherd / Пастух процентов
+Stable character ID: interest-shepherd
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A lean elderly male shepherd-accountant with a short white beard and a knowing grin holds one simple crook with a tiny bronze bell hanging from its curved end. A plain sand-coloured cloak over muted turquoise cloth; weathered hands, no armour. Large upper-body portrait against a low-detail sunlit olive hillside. One small golden glow sits inside the bell, suggesting slowly accumulated yield, without floating coins or animals.
+Output asset name: 03-interest-shepherd.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 04/50 — Spread Duelist / Дуэлянт спреда
+Stable character ID: spread-duelist
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A wiry adult woman duelist with a sharp nose, short copper hair and a challenging half-smile wears a plain dark-teal chiton and one bronze forearm guard. She holds a single narrow leaf-shaped sword upright beside her face, its clean edge catching warm light. Torso twists in a readable fencing pose. Behind her is one blurred market awning. No second weapon, no tiny jewellery, no price charts.
+Output asset name: 04-spread-duelist.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 05/50 — Slippage Netter / Ловец проскальзывания
+Stable character ID: slippage-netter
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A sturdy adult fisherman with tan skin, a square jaw and shaved head wears a rolled teal tunic and hoists one compact bronze-handled fishing net over his shoulder. The net contains a single smooth luminous blue pebble, not fish or coin symbols. Close mid-thigh portrait; big simple mesh shapes and a sly expression. Background is a quiet muted harbour horizon with no fleet or detailed buildings.
+Output asset name: 05-slippage-netter.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 06/50 — Credit Lanternist / Фонарщик кредита
+Stable character ID: credit-lanternist
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A slender adult male night watchman with dark curly hair, a long nose and attentive eyes holds one squat bronze lantern at chest height. Simple ivory hood pushed back and teal sleeves. Inside the lantern is a warm amber light, no book, symbols or money. Waist-up view, face lit from the side, restrained dark turquoise night background with one out-of-focus arch. Curious, helpful, slightly sleep-deprived.
+Output asset name: 06-credit-lanternist.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 07/50 — AMM Tidekeeper / Хранитель прилива AMM
+Stable character ID: amm-tidekeeper
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An adult male tide priest with deep brown skin, smooth bald head and a composed gaze cradles one shallow bronze bowl containing a sculpted curl of turquoise water. A simple ivory mantle forms a broad triangle over his shoulders. Upper-body view, the bowl below his face, blue water a small secondary focus. Background is a flat atmospheric sea cave opening. No ritual crowd, jewellery chains, trident or coins.
+Output asset name: 07-amm-tidekeeper.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 08/50 — Margin Hoplite / Гоплит маржи
+Stable character ID: margin-hoplite
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: A stocky adult male hoplite with a broken nose and close brown beard braces one broad triangular bronze shield with a visible single repair seam. Plain teal shoulder cloak; simple helmet pushed high enough to show the face. Tight mid-thigh portrait, eyes focused upward, shield occupies the lower left. Soft dusty arena background. The repair seam should be bold and readable, not a pattern of micro-scratches.
+Output asset name: 08-margin-hoplite.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 09/50 — Mempool Usher / Распорядитель мемпула
+Stable character ID: mempool-usher
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: A tall thin adult woman court usher with a severe bob haircut raises one smooth bronze baton with a wax-seal tip, as if stopping an impatient visitor. Plain ivory robe with one dark jade lapel, arched eyebrow and dry humour. Waist-up portrait in front of one blurred burgundy curtain. The baton and open stopping palm remain separate and anatomically clear. No scroll text, clocks, UI, floating queue cards or multiple seals.
+Output asset name: 09-mempool-usher.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 10/50 — Liquidation Bailiff / Пристав ликвидации
+Stable character ID: liquidation-bailiff
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An imposing older male bailiff with a shaved scalp, thick grey moustache and tired frown wears a simple bronze chestplate over teal cloth. He carries one short heavy hooked staff, hook safely away from his body. Mid-thigh three-quarter view with an unhurried stance. Muted emerald courthouse wall behind him. One strong face, one staff, large armour planes; no chains, skulls, torture scene or extra weapons.
+Output asset name: 10-liquidation-bailiff.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+Report this batch's ten actual assets and any unfinished IDs.

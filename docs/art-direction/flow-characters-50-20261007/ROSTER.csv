@@ -1,0 +1,51 @@
+﻿index,id,name_ru,name_en,faction,planned_rarity,future_role,future_hook_not_implemented,synergy,requested_filename
+1,collateral-squire,Оруженосец залога,Collateral Squire,DeFi,common,Ранний защитник,Защита уязвимого стейкинга; небольшой эффект при выходе.,staking,01-collateral-squire.png
+2,reserve-matron,Матрона резервов,Reserve Matron,DeFi,common,Сохранение ресурсов,Вознаграждение за сохранённого союзника вместо ранней атаки.,staking,02-reserve-matron.png
+3,interest-shepherd,Пастух процентов,Interest Shepherd,DeFi,common,Экономический двигатель,Малая постепенная награда за пережитые ходы в стейкинге.,staking,03-interest-shepherd.png
+4,spread-duelist,Дуэлянт спреда,Spread Duelist,DeFi,common,Выгодные размены,Небольшая награда за размен с более дорогим противником.,market-control,04-spread-duelist.png
+5,slippage-netter,Ловец проскальзывания,Slippage Netter,DeFi,common,Ослабление угрозы,Краткое ослабление бойца; точные правила выбора цели обсудим отдельно.,market-control,05-slippage-netter.png
+6,credit-lanternist,Фонарщик кредита,Credit Lanternist,DeFi,common,Поддержка руки,Ограниченный добор после экономической подготовки.,staking,06-credit-lanternist.png
+7,amm-tidekeeper,Хранитель прилива AMM,AMM Tidekeeper,DeFi,rare,Управление темпом,Обмен текущей атаки на полезный эффект для сохранённого стола.,staking,07-amm-tidekeeper.png
+8,margin-hoplite,Гоплит маржи,Margin Hoplite,DeFi,rare,Контрдавление,Усиление после повреждения или утраты экономического союзника.,market-control,08-margin-hoplite.png
+9,mempool-usher,Распорядитель мемпула,Mempool Usher,DeFi,rare,Работа с указами,Узкое вмешательство в открытую очередь; без полного запрета хода врага.,market-control,09-mempool-usher.png
+10,liquidation-bailiff,Пристав ликвидации,Liquidation Bailiff,DeFi,rare,Адресный контроль,"Ответ на уже ослабленного противника, с ценой подготовки.",market-control,10-liquidation-bailiff.png
+11,delta-sphinx,Сфинкс дельты,Delta Sphinx,DeFi,epic,Выбор между двумя планами,Будущий выбор: экономическая поддержка или размен; интерфейс выбора ещё не реализован.,staking,11-delta-sphinx.png
+12,oracle-of-solvency,Оракул платёжеспособности,Oracle of Solvency,DeFi,epic,Планирование ресурсов,Ограниченное преобразование запаса ресурсов в защиту или добор.,staking,12-oracle-of-solvency.png
+13,poseidon-deep-liquidity,Посейдон глубокой ликвидности,Poseidon of Deep Liquidity,DeFi,legendary,Финишер экономики,Большой условный эффект за сохранённый стейкинг; соперник должен иметь окно ответа.,staking,13-poseidon-deep-liquidity.png
+14,clay-mint-apprentice,Подмастерье глиняного минта,Clay Mint Apprentice,NFT,common,Ранний строитель поля,Подготовка NFT-союзников; небольшой эффект выхода.,mint-workshop,14-clay-mint-apprentice.png
+15,provenance-scribe,Писец происхождения,Provenance Scribe,NFT,common,Поддержка руки,Добор при сохранённом NFT-союзнике; проверка доступности связки позже.,mint-workshop,15-provenance-scribe.png
+16,mosaic-mender,Реставратор мозаик,Mosaic Mender,NFT,common,Сохранение бойцов,Восстановление союзника для условий Афины и других защитных наград.,diamond-preservation,16-mosaic-mender.png
+17,gallery-gatekeeper,Привратник галереи,Gallery Gatekeeper,NFT,common,Ранний защитник,Защита хрупких NFT-двигателей; недорогая Провокация как кандидат.,diamond-preservation,17-gallery-gatekeeper.png
+18,patina-curator,Куратор патины,Patina Curator,NFT,common,Награда за выживание,"Малое усиление бойца, пережившего ход соперника.",diamond-preservation,18-patina-curator.png
+19,blank-canvas-sentinel,Страж чистого холста,Blank Canvas Sentinel,NFT,common,Гибкий боец,Небольшое усиление от поддержки; без бесконечного масштабирования.,mint-workshop,19-blank-canvas-sentinel.png
+20,reveal-diviner,Прорицатель раскрытия,Reveal Diviner,NFT,rare,Условный выход,Эффект раскрытия после заранее сохранённого NFT-союзника.,mint-workshop,20-reveal-diviner.png
+21,soulbound-companion,Соулбаунд-спутник,Soulbound Companion,NFT,rare,Связка с союзником,Связать пользу с одним союзником; точная механика связи ещё требует реализации.,diamond-preservation,21-soulbound-companion.png
+22,royalty-chorister,Хорист роялти,Royalty Chorister,NFT,rare,Ограниченный двигатель,"Небольшая награда за NFT-розыгрыш, с явным лимитом срабатываний.",mint-workshop,22-royalty-chorister.png
+23,unbroken-marble-warden,Страж цельного мрамора,Unbroken Marble Warden,NFT,rare,Опора защитной колоды,Защитная награда за сохранённый стол; уязвимость к точечному ответу.,diamond-preservation,23-unbroken-marble-warden.png
+24,medusa-of-missing-mints,Медуза пропущенных минтов,Medusa of Missing Mints,NFT,epic,Условный контроль,Кратко ограничить подготовленную угрозу; постоянное окаменение не обещано.,mint-workshop,24-medusa-of-missing-mints.png
+25,palimpsest-guardian,Страж палимпсеста,Palimpsest Guardian,NFT,epic,Работа с усилениями,Сохранить или перенести ограниченный бафф; новое правило пока только концепт.,diamond-preservation,25-palimpsest-guardian.png
+26,persephone-second-mint,Персефона второго минта,Persephone of the Second Mint,NFT,legendary,Финишер восстановления,Условный возврат ценности после потерь; история павших и ограничения ещё будут спроектированы.,diamond-preservation,26-persephone-second-mint.png
+27,relay-page,Паж ретрансляции,Relay Page,DePIN,common,Дешёвое начало связки,Недорогой DePIN-розыгрыш перед Гермесом и другими наградами последовательности.,relay-chain,27-relay-page.png
+28,copper-lineworker,Монтажница медной линии,Copper Lineworker,DePIN,common,Поддержка инфраструктуры,Малый полезный эффект после союзного DePIN-розыгрыша.,public-works,28-copper-lineworker.png
+29,beacon-scout,Разведчик маяков,Beacon Scout,DePIN,common,Темп и разведка,Кандидат на Рывок или ограниченный просмотр; выбор эффекта позже.,relay-chain,29-beacon-scout.png
+30,ceramic-cachekeeper,Хранитель керамического кеша,Ceramic Cachekeeper,DePIN,common,Небольшой запас ценности,Сохранённый боец даёт ограниченную поддержку руки или следующего розыгрыша.,public-works,30-ceramic-cachekeeper.png
+31,bridge-riveter,Клепальщик мостов,Bridge Riveter,DePIN,common,Сохранение союзников,Защита инфраструктурных бойцов для последующих наград.,public-works,31-bridge-riveter.png
+32,signal-oracle,Оракул сигнала,Signal Oracle,DePIN,rare,Добор через последовательность,Продолжение DePIN-цепочки с ограниченным добором или выбором; конкретный эффект позже.,relay-chain,32-signal-oracle.png
+33,mesh-shieldbearer,Щитоносец mesh-сети,Mesh Shieldbearer,DePIN,rare,Защита цепочки,Защитная награда после DePIN-подготовки.,relay-chain,33-mesh-shieldbearer.png
+34,agora-sitewarden,Смотритель стройки агоры,Agora Sitewarden,DePIN,rare,Поддержка расширенного поля,Награда за приобретённое дополнительное место; без обхода потолка семь.,public-works,34-agora-sitewarden.png
+35,packet-ferryman,Паромщик пакетов,Packet Ferryman,DePIN,rare,Возврат и повтор выхода,Ограниченный возврат союзника в руку; сетевой и UI-флоу будут проверены при реализации.,relay-chain,35-packet-ferryman.png
+36,atlas-nodebearer,Атлант узлов,Atlas the Nodebearer,DePIN,epic,Большая опора инфраструктуры,Выгода от развитого или расширенного поля; с ограничением масштабирования.,public-works,36-atlas-nodebearer.png
+37,daedalus-protocolwright,"Дедал, мастер протоколов",Daedalus the Protocolwright,DePIN,epic,Подготовка уникального выхода,Один ограниченный инфраструктурный помощник; токен и цена ещё будут спроектированы.,public-works,37-daedalus-protocolwright.png
+38,hephaestus-public-nodes,Гефест общественных узлов,Hephaestus of Public Nodes,DePIN,legendary,Финишер инфраструктуры,Условный выход за DePIN-подготовку и свободное место; без бесконечного производства.,public-works,38-hephaestus-public-nodes.png
+39,copium-jester,Шут копиума,Copium Jester,Meme,common,Дешёвое начало цепочки,Недорогой Meme с небольшой пользой при выходе.,hype-chain,39-copium-jester.png
+40,liquidity-goose,Гусь выходной ликвидности,Exit Liquidity Goose,Meme,common,Раннее давление,"Недорогая угроза, полезная в подготовке Аида.",hype-chain,40-liquidity-goose.png
+41,bagholder-donkey,Осёл тяжёлых бэгов,Bagholder Donkey,Meme,common,Защитник с недостатком,Плотный недорогой боец с понятной ценой или ограничением.,fallen-bags,41-bagholder-donkey.png
+42,gm-rooster,Петух GM,GM Rooster,Meme,common,Запуск агрессивного хода,Малая награда за первый Meme-розыгрыш хода.,hype-chain,42-gm-rooster.png
+43,paperhand-merchant,Торговец бумажных рук,Paperhand Merchant,Meme,common,Обмен тела на ценность,Ограниченная польза при потере бойца; механика павших пока требует разработки.,fallen-bags,43-paperhand-merchant.png
+44,fomo-trumpeter,Трубач FOMO,FOMO Trumpeter,Meme,rare,Награда последовательности,Ограниченное усиление после нескольких Meme-розыгрышей.,hype-chain,44-fomo-trumpeter.png
+45,diamond-paw-mastiff,Мастиф алмазной лапы,Diamond Paw Mastiff,Meme,rare,Сохранение давления,Небольшая защитная награда после подготовки Meme.,hype-chain,45-diamond-paw-mastiff.png
+46,hopium-augur,Авгур хопиума,Hopium Augur,Meme,rare,Продолжение цепочки,Поддержка руки или следующего Meme; точный эффект после балансировки.,hype-chain,46-hopium-augur.png
+47,salt-miner-satyr,Сатир соляной шахты,Salt Miner Satyr,Meme,rare,Ответ на потерю темпа,Ограниченная компенсация после потери союзника; без бесконечного цикла.,fallen-bags,47-salt-miner-satyr.png
+48,sir-rug-of-velvet,Сэр Раг Бархатный,Sir Rug of Velvet,Meme,epic,Рискованный ресурсный ход,Сильная ограниченная награда с потерей собственной ценности; без бесплатного мгновенного убийства.,fallen-bags,48-sir-rug-of-velvet.png
+49,sisyphus-of-the-pump,Сизиф вечного пампа,Sisyphus of the Pump,Meme,epic,Нарастающая угроза,"Постепенная награда за повторяемое ограниченное действие, с возможностью убрать двигатель.",hype-chain,49-sisyphus-of-the-pump.png
+50,dionysus-last-pump,Дионис последнего пампа,Dionysus of the Last Pump,Meme,legendary,Финишер последовательности,Условная награда за Meme-цепочку; сила и стоимость будут проверены против Аида.,hype-chain,50-dionysus-last-pump.png

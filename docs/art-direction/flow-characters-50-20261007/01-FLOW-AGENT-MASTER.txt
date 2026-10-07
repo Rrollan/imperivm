@@ -1,0 +1,445 @@
+You are the Google Flow Agent, working as an art-production assistant for IMPERIVM.
+EXECUTE the image generation task below, not merely an outline or a rewrite of the prompts.
+
+TASK: create exactly 50 DISTINCT CHARACTER ILLUSTRATIONS, one separately generated image per numbered job. Use Nano Banana 2.1 if available in this project's image settings. If it is unavailable or the Agent cannot enforce the selected model, report the actual model before using an alternative; do not silently claim Nano Banana 2.1 was used. Respect the account's generation confirmations and limits.
+
+These are 50 new character concepts for a later card expansion. Do not draw complete UI cards, decide gameplay numbers, rewrite abilities or replace existing game cards. Both uploaded references are references only and do not count toward the fifty. Their subjects are regenerated as jobs 32 and 46 so the output roster still contains 50 distinct jobs.
+
+WORKFLOW:
+1. Keep the common art direction below active for every generation. Use both reference files as shared STYLE references. For job 32 use reference 01 additionally as the subject concept; for job 46 use reference 02 additionally as the subject concept. Do not propagate those identities into other jobs.
+2. Work in five batches: jobs 01-10, 11-20, 21-30, 31-40, 41-50. These are ten different jobs, not ten random variations of a single image. If a batch exceeds a supported request size, split it into smaller consecutive groups without skipping or merging jobs. Do not turn the batch into one collage.
+3. Produce one first-pass image per job; do not create multiple optional variants or videos. If a generation technically fails, record it as failed, not completed. Keep completed work and continue the remaining jobs when the platform permits. If generation cannot continue because of a quota/credit/confirmation limit, report the exact completed IDs and the next unfinished ID. Never invent finished images or download links.
+4. Review each output: large readable face, distinguishing object, anatomy, faction palette, subdued backdrop, portrait crop, no baked UI or text. Flag failures for a focused repair rather than silently accepting them or regenerating the entire batch. Further repair generations use the separate repair instruction; do not automatically spend credits on indefinite retries.
+5. Name each generated asset with its exact requested two-digit prefix and ID. Create the Collection 'IMPERIVM — Agora After Hours — 50' if Collections are available, grouping only this task's assets. Do not delete or overwrite unrelated assets or references. If renaming/Collections are unavailable, supply a numbered mapping from requested filename to actual asset.
+6. Preserve the highest available native-quality individual image. Prefer PNG; if the platform exports JPEG/WebP, preserve that format and the same base filename. Do not mislabel extensions, fake resolution, upscale a tiny preview and call it a native master, or export screenshots of the editor.
+7. At completion give a compact 50-row checklist with ID, filename, actual model, dimensions, status and any quality issue. If ZIP export is actually available, include the fifty individual masters plus this mapping in one archive. Otherwise leave individually named project assets ready for normal user export and report that fact. A contact sheet may be an additional review aid only; it never substitutes for any individual image.
+
+Do not count written prompts, existing references, proposed concepts or duplicate variants as completed jobs. Generate all fifty within supported batch limits. Avoid creative clarification: the brief is complete. Keep platform-required account confirmations intact.
+
+IMPERIVM ART DIRECTION — SIMPLIFIED CLASSICAL CRYPTO FANTASY
+Create original character illustrations for a tactical Greek/Roman crypto-fantasy card game. The world combines classical Mediterranean people, gods, crafts, bronze objects and architecture with crypto ideas expressed through physical visual jokes. Keep it warm, charming and premium, with the immediate readability of a good fantasy trading-card illustration.
+
+LOOK: hand-painted stylized fantasy, broad deliberate brushwork, pleasantly exaggerated proportions, appealing expressive faces, tactile cloth/bronze/ceramic, large simple material planes. A restrained single magical accent is allowed. Avoid photographic portraits, dark muddy realism, generic over-armoured mobile-game heroes, plastic 3D, anime and flat vector clip art. The references set a shared finish; simplify minor costume detail further where it improves readability. Borrow their visual hierarchy, not their exact face, costume, pose or background for every character.
+
+COMPOSITION: portrait 2:3 preferred, target 1024x1536 or higher native resolution if available. If Flow only offers another portrait ratio, use the nearest available option, preferably 3:4, and report the actual dimensions; do not pretend a size was supported. One dominant character per image, framed from waist or mid-thigh upward, complete head visible. The face must read at 96x144 thumbnail size. Put the face around the upper-middle, not against an edge; keep face, gripping hands and identifying object in the central 80% of width and between 12% and 78% of image height. Calm top-left background will sit behind the future cost badge. No floating bust with arbitrary white/black margins. Paint the background to all edges.
+
+SIMPLICITY: one clear action, one identifying major object, one readable silhouette. Use two or three major colour masses. Secondary details must stay subordinate. Quiet atmospheric backdrop with at most one soft contextual architecture shape; no crowds or detailed panoramic cities. Each face, hairstyle, build, expression, stance and identifying object should distinguish this character from the others. Same universe and rendering quality, not fifty palette-swapped clones. Nonhuman characters still get a large readable face and clean anatomy.
+
+PALETTES: shared ivory cloth and antique bronze unify the set. DeFi uses deep teal/emerald and amber light; NFT uses indigo/lavender with ivory ceramic and marble; DePIN uses jade/cyan and copper engineering; Meme uses burgundy/coral/rose with warm expressive faces. These are art palettes, not faction badges. Skin/fur/material colour stays believable. Preserve light/dark separation and saturated focal accents without washing everything beige or covering it in bloom.
+
+COMMON AND RARE: compact readable identity, ordinary physical object, restrained light. EPIC AND LEGENDARY: equally simple anatomy; greater presence and one bold signature motif, not extra engraving or decoration. Every tier gets a polished illustration; metadata does not become a visible rarity jewel.
+
+STRICT OUTPUT: illustration only. NO card frame, border, text box, titles, captions, readable text, letters, numbers, mana crystals used as UI, health/attack circles, rarity dots, logos, token tickers, watermark, infographic, grid, contact sheet or card mockup. Small in-world crystals described as physical props are allowed. No modern monitors, price charts, neon cyberpunk equipment or copied token branding. Avoid excessive laurels, gems, filigree, scattered coins, crowds, extra arms, extra fingers, weapon clutter and magical particle storms. A natural clearly gripping hand matters more than microscopic detail.
+
+REFERENCES: reference-01-signal-oracle.png demonstrates a readable human, restrained engineering magic, warm/cool light and simple classical costume. reference-02-hopium-augur.png demonstrates an original crypto-meme animal with the same painterly finish and clear face/prop hierarchy. They are STYLE references for the whole set and subject references only for jobs 32 and 46 respectively. They are not extra deliverables, and not a mandate to make all characters look like those two.
+
+THE FIFTY JOBS
+
+JOB 01/50 — Collateral Squire / Оруженосец залога
+Stable character ID: collateral-squire
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A young adult male legionary with a blunt dark fringe and a worried but determined face hugs one oversized bronze lock-shaped shield. Plain short teal tunic, one leather shoulder pad, no helmet. Three-quarter waist-up view with the shield angled across the lower body. A softly painted treasury doorway behind him. The joke is protecting collateral more carefully than himself; the shield has no lettering or keyhole logo.
+Output asset name: 01-collateral-squire.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 02/50 — Reserve Matron / Матрона резервов
+Stable character ID: reserve-matron
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A broad-shouldered middle-aged woman with silver-streaked black braids and a calm authoritative expression carries a single sealed terracotta reserve jar against her hip. Simple ivory tunic and emerald sash, one broad bronze clasp. Mid-thigh portrait, jar kept below the face. Soft deep-teal vault interior, one warm light patch. The jar is chunky and unmarked; her silhouette should feel dependable rather than heavily armoured.
+Output asset name: 02-reserve-matron.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 03/50 — Interest Shepherd / Пастух процентов
+Stable character ID: interest-shepherd
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A lean elderly male shepherd-accountant with a short white beard and a knowing grin holds one simple crook with a tiny bronze bell hanging from its curved end. A plain sand-coloured cloak over muted turquoise cloth; weathered hands, no armour. Large upper-body portrait against a low-detail sunlit olive hillside. One small golden glow sits inside the bell, suggesting slowly accumulated yield, without floating coins or animals.
+Output asset name: 03-interest-shepherd.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 04/50 — Spread Duelist / Дуэлянт спреда
+Stable character ID: spread-duelist
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A wiry adult woman duelist with a sharp nose, short copper hair and a challenging half-smile wears a plain dark-teal chiton and one bronze forearm guard. She holds a single narrow leaf-shaped sword upright beside her face, its clean edge catching warm light. Torso twists in a readable fencing pose. Behind her is one blurred market awning. No second weapon, no tiny jewellery, no price charts.
+Output asset name: 04-spread-duelist.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 05/50 — Slippage Netter / Ловец проскальзывания
+Stable character ID: slippage-netter
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A sturdy adult fisherman with tan skin, a square jaw and shaved head wears a rolled teal tunic and hoists one compact bronze-handled fishing net over his shoulder. The net contains a single smooth luminous blue pebble, not fish or coin symbols. Close mid-thigh portrait; big simple mesh shapes and a sly expression. Background is a quiet muted harbour horizon with no fleet or detailed buildings.
+Output asset name: 05-slippage-netter.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 06/50 — Credit Lanternist / Фонарщик кредита
+Stable character ID: credit-lanternist
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A slender adult male night watchman with dark curly hair, a long nose and attentive eyes holds one squat bronze lantern at chest height. Simple ivory hood pushed back and teal sleeves. Inside the lantern is a warm amber light, no book, symbols or money. Waist-up view, face lit from the side, restrained dark turquoise night background with one out-of-focus arch. Curious, helpful, slightly sleep-deprived.
+Output asset name: 06-credit-lanternist.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 07/50 — AMM Tidekeeper / Хранитель прилива AMM
+Stable character ID: amm-tidekeeper
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An adult male tide priest with deep brown skin, smooth bald head and a composed gaze cradles one shallow bronze bowl containing a sculpted curl of turquoise water. A simple ivory mantle forms a broad triangle over his shoulders. Upper-body view, the bowl below his face, blue water a small secondary focus. Background is a flat atmospheric sea cave opening. No ritual crowd, jewellery chains, trident or coins.
+Output asset name: 07-amm-tidekeeper.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 08/50 — Margin Hoplite / Гоплит маржи
+Stable character ID: margin-hoplite
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: A stocky adult male hoplite with a broken nose and close brown beard braces one broad triangular bronze shield with a visible single repair seam. Plain teal shoulder cloak; simple helmet pushed high enough to show the face. Tight mid-thigh portrait, eyes focused upward, shield occupies the lower left. Soft dusty arena background. The repair seam should be bold and readable, not a pattern of micro-scratches.
+Output asset name: 08-margin-hoplite.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 09/50 — Mempool Usher / Распорядитель мемпула
+Stable character ID: mempool-usher
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: A tall thin adult woman court usher with a severe bob haircut raises one smooth bronze baton with a wax-seal tip, as if stopping an impatient visitor. Plain ivory robe with one dark jade lapel, arched eyebrow and dry humour. Waist-up portrait in front of one blurred burgundy curtain. The baton and open stopping palm remain separate and anatomically clear. No scroll text, clocks, UI, floating queue cards or multiple seals.
+Output asset name: 09-mempool-usher.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 10/50 — Liquidation Bailiff / Пристав ликвидации
+Stable character ID: liquidation-bailiff
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An imposing older male bailiff with a shaved scalp, thick grey moustache and tired frown wears a simple bronze chestplate over teal cloth. He carries one short heavy hooked staff, hook safely away from his body. Mid-thigh three-quarter view with an unhurried stance. Muted emerald courthouse wall behind him. One strong face, one staff, large armour planes; no chains, skulls, torture scene or extra weapons.
+Output asset name: 10-liquidation-bailiff.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 11/50 — Delta Sphinx / Сфинкс дельты
+Stable character ID: delta-sphinx
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: epic — metadata only; never render it.
+Required character and scene: An original small lion-bodied sphinx with the face of an adult woman, charcoal curls and amber eyes sits upright. One compact teal wing folds behind a broad shoulder; a single bronze balance pan rests beneath a forepaw. Calm questioning smile. Frame closely from seated waist level upward, giving the face the same scale as human portraits. Soft sand-and-teal temple backdrop. No hieroglyphs, pyramids, elaborate jewellery or sprawling wings.
+Output asset name: 11-delta-sphinx.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 12/50 — Oracle of Solvency / Оракул платёжеспособности
+Stable character ID: oracle-of-solvency
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: epic — metadata only; never render it.
+Required character and scene: An older adult woman oracle with a dark complexion, a shaved head and an amused knowing expression holds a single large smooth translucent amber cube between both palms. Simple turquoise shawl over ivory cloth. Waist-up portrait; face and cube separated clearly, fingers anatomically readable. Behind her is one blurred brass-toned window. The cube shows a soft inner light only, with no rune, number, token logo or circuitry.
+Output asset name: 12-oracle-of-solvency.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 13/50 — Poseidon of Deep Liquidity / Посейдон глубокой ликвидности
+Stable character ID: poseidon-deep-liquidity
+Faction: DeFi. Financial guardians, liquidity, collateral, lending and market control, translated into bronze tools, containers and sea motifs; humour is dry and intelligent.
+Planned rarity: legendary — metadata only; never render it.
+Required character and scene: A powerful mature sea god with deep olive skin, flowing dark hair threaded with grey and a broad short beard holds one stout bronze trident upright. A simple ivory drape over a broad bare shoulder, not ornate armour. A single large turquoise wave curls behind his upper body without obscuring face or weapon. Mid-thigh portrait, commanding but slightly sardonic expression. Strong silhouette, three clear trident prongs, quiet sea horizon, no crown of shells or particle storm.
+Output asset name: 13-poseidon-deep-liquidity.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 14/50 — Clay Mint Apprentice / Подмастерье глиняного минта
+Stable character ID: clay-mint-apprentice
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: An adult young male potter with soft round features, black unruly curls and dusty sleeves proudly lifts one small terracotta guardian figurine at chest height. Simple muted-violet tunic and ivory apron, a single clay smear on his cheek. Close waist-up view so the tiny sculpture remains readable as one chunky humanoid shape. Background is a softly blurred warm workshop niche. No rows of pottery, labels, kilns or additional people.
+Output asset name: 14-clay-mint-apprentice.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 15/50 — Provenance Scribe / Писец происхождения
+Stable character ID: provenance-scribe
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: An adult woman scribe with warm brown skin, tightly gathered silver hair and curious eyes holds one closed violet wax tablet against her chest. Plain ivory wrap, slim bronze stylus tucked behind one ear as a minor accessory. Waist-up portrait, friendly slightly raised eyebrow. Muted lavender archive arch behind her with no bookshelves. Tablet is blank and unmarked, no text, glyphs, jewellery clusters or floating documents.
+Output asset name: 15-provenance-scribe.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 16/50 — Mosaic Mender / Реставратор мозаик
+Stable character ID: mosaic-mender
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A broad adult woman artisan with cropped dark hair, strong hands and a reassuring smile presses one large lavender mosaic tile into a cracked plain bronze shoulder plate she holds. A simple indigo work tunic and ivory scarf. Close waist-up view with tile and plate forming one clear action. Warm blurred workshop wall; just three broad coloured tile shapes on the plate, no miniature mosaics, gems or intricate engraved patterns.
+Output asset name: 16-mosaic-mender.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 17/50 — Gallery Gatekeeper / Привратник галереи
+Stable character ID: gallery-gatekeeper
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A tall adult male guard with a long solemn face and straight shoulder-length black hair grips one very broad violet oval shield with a single ivory mosaic inset. A simple bronze cap without a plume and one ivory shoulder sash. Mid-thigh portrait, shield low enough to show the full face. Behind him is one soft dark gallery doorway. The shield pattern has three large shapes only, not a painting or ornate golden frame.
+Output asset name: 17-gallery-gatekeeper.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 18/50 — Patina Curator / Куратор патины
+Stable character ID: patina-curator
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: An elderly adult man curator with deep-set eyes, a neat white beard and an affectionate crooked smile polishes one small bronze bust using a folded ivory cloth. Plain faded violet robe, no crown. Tight waist-up portrait, bust below the face and tilted toward the viewer. Background is a quiet muted indigo wall and one warm light patch. Bust is a bold simple sculpted head, no display cases or museum crowd.
+Output asset name: 18-patina-curator.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 19/50 — Blank Canvas Sentinel / Страж чистого холста
+Stable character ID: blank-canvas-sentinel
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: An original squat clay construct with one friendly face carved into a single broad ivory ceramic head holds a plain violet shield-shaped ceramic slab. Rounded shoulders, two stout arms, only three large repaired seams. Upper-body portrait at human face scale, protective gentle posture. A softly painted lavender workshop sky behind it. The slab is blank, the construct is matte hand-painted pottery rather than plastic robot, with no circuitry or UI.
+Output asset name: 19-blank-canvas-sentinel.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 20/50 — Reveal Diviner / Прорицатель раскрытия
+Stable character ID: reveal-diviner
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An adult female diviner with long white curls, deep brown skin and an eager smile lifts one simple indigo cloth to reveal a glowing lavender pearl in her other palm. Plain ivory sleeves and a narrow bronze wristband. Waist-up portrait with the reveal action below her face and plenty of separation between both hands. Background is one blurred violet theatre curtain. No jewellery waterfall, cards, lettering or many magical objects.
+Output asset name: 20-reveal-diviner.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 21/50 — Soulbound Companion / Соулбаунд-спутник
+Stable character ID: soulbound-companion
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: A calm adult male companion with curly auburn hair, freckles and earnest eyes holds one ivory half-mask at chest level. Simple violet traveller cloak. A single soft lavender ribbon of light curves from the mask around his own wrist, not toward another character. Close upper-body portrait against a quiet pale-indigo dusk. Only one readable light ribbon, no runes, chains, extra faces, clones or ornate mask decoration.
+Output asset name: 21-soulbound-companion.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 22/50 — Royalty Chorister / Хорист роялти
+Stable character ID: royalty-chorister
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An adult woman singer with a broad smile, short dark bob and olive skin holds one compact five-string bronze lyre. Simple ivory tunic with an indigo waist sash, shoulders relaxed, one hand clearly plucks a string. Waist-up portrait, instrument below her chin. Behind her is one softly painted lavender arcade. No musical notation, text, coins or glowing shower; one restrained warm highlight along the lyre is enough.
+Output asset name: 22-royalty-chorister.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 23/50 — Unbroken Marble Warden / Страж цельного мрамора
+Stable character ID: unbroken-marble-warden
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: A massive living marble guardian with a broad human face, a single repaired crack across its brow and kind heavy-lidded eyes wears one plain bronze shoulder band. It braces one large ivory shield against its torso. Tight mid-thigh view, matte stone with broad violet shadow planes, face warmly lit. Quiet dusk garden background. No engraved names, sprawling architecture, vines covering the face or diamond sockets.
+Output asset name: 23-unbroken-marble-warden.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 24/50 — Medusa of Missing Mints / Медуза пропущенных минтов
+Stable character ID: medusa-of-missing-mints
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: epic — metadata only; never render it.
+Required character and scene: An original adult gorgon with olive skin, an expressive annoyed face and only five broad dark-violet snake locks flowing behind her shoulders raises one palm in refusal. Plain ivory drape and one bronze clasp. Waist-up portrait; both eyes fully visible, serpents framing rather than covering the face. A single lavender stone fragment floats near the raised hand. Soft muted temple wall, no victim, gore, snake swarm or numerous glowing eyes.
+Output asset name: 24-medusa-of-missing-mints.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 25/50 — Palimpsest Guardian / Страж палимпсеста
+Stable character ID: palimpsest-guardian
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: epic — metadata only; never render it.
+Required character and scene: An adult woman guardian with a shaved side haircut, dark blue-black curls and steady eyes carries one round bronze shield whose surface has a single broad translucent lavender layer peeling upward like a second skin. Simple ivory breast wrap and purple cloak. Mid-thigh portrait, one obvious layered-shield motif, no lettering on either layer. Quiet indigo sky, bold material contrast, no nested frames, multiple shields or magical clutter.
+Output asset name: 25-palimpsest-guardian.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 26/50 — Persephone of the Second Mint / Персефона второго минта
+Stable character ID: persephone-second-mint
+Faction: NFT. Makers, preservation, provenance, revelation and second chances, translated into clay, mosaic, marble and theatrical reveals; no digital gallery interface.
+Planned rarity: legendary — metadata only; never render it.
+Required character and scene: An adult spring-and-underworld goddess with deep brown skin, long dark wavy hair and a serene determined gaze holds one split pomegranate made of matte ivory ceramic, revealing a restrained violet glow inside. Simple ivory gown with one indigo sash and a tiny single blossom by her ear. Mid-thigh portrait, face and fruit large and distinct. Background divides into two broad quiet fields: dusky plum shade and warm spring light, with no graveyard crowd or floating souls.
+Output asset name: 26-persephone-second-mint.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 27/50 — Relay Page / Паж ретрансляции
+Stable character ID: relay-page
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A young adult male messenger with tan skin, closely cropped black hair and an excited grin holds one small bronze relay baton topped by a cyan bead. Plain jade short tunic and ivory shoulder strap, no winged helmet. Dynamic waist-up portrait leaning slightly forward; baton remains near the torso rather than crossing the face. Soft aqueduct sky behind him. No letters, envelope, large bag or many floating signal rings.
+Output asset name: 27-relay-page.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 28/50 — Copper Lineworker / Монтажница медной линии
+Stable character ID: copper-lineworker
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: An adult woman technician with auburn hair in a short braid, freckles and a practical half-smile holds one thick copper loop at chest level with a visible clean repaired join. Plain jade work tunic, rolled sleeves and one bronze glove. Waist-up portrait, the copper loop forming a strong oval below her face. Quiet warm stone workshop and muted cyan light. No modern wiring cabinet, tiny electronic parts, sparks shower or power-tool logos.
+Output asset name: 28-copper-lineworker.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 29/50 — Beacon Scout / Разведчик маяков
+Stable character ID: beacon-scout
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: An adult female scout with dark skin, short coiled hair and alert eyes raises one compact bronze signal lantern at shoulder height. Simple ivory cape over jade leather vest, a low crouching upper-body pose, face unobstructed. The lantern emits one narrow soft cyan beam pointing diagonally away from the face. Background is one blurred coastline tower shape. No bow, binoculars, multiple lights, tactical HUD or decorative armour.
+Output asset name: 29-beacon-scout.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 30/50 — Ceramic Cachekeeper / Хранитель керамического кеша
+Stable character ID: ceramic-cachekeeper
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A stout adult male keeper with a warm brown complexion, round bald head and a cheerful patient face hugs one large jade-glazed ceramic amphora with a bronze stopper. Plain ivory apron and rolled sleeves, hands visible on either side of the pot. Close mid-thigh portrait; the amphora has one broad cyan stripe and no writing. Quiet storage alcove backdrop, no piles of crates, treasure or tiny circuitry.
+Output asset name: 30-ceramic-cachekeeper.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 31/50 — Bridge Riveter / Клепальщик мостов
+Stable character ID: bridge-riveter
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: A muscular adult woman builder with deep olive skin, shaved hair and a confident grin rests one short square-headed bronze riveting hammer against her shoulder. Simple jade tunic and ivory work scarf, no heavy ornate armour. Mid-thigh portrait, hammer and face separated. Behind her is one broad soft bridge arch under a pale cyan sky. No scattered tools, huge construction scene, numerous rivets or glowing forge.
+Output asset name: 31-bridge-riveter.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 32/50 — Signal Oracle / Оракул сигнала
+Stable character ID: signal-oracle
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: A confident adult woman engineer-priestess with warm olive skin, cropped dark curls and an ivory shoulder cape over a simple jade tunic holds one bronze tuning-fork staff with a floating cyan crystal between its two tines. Intelligent playful expression, one bronze work glove. Large mid-thigh portrait, staff tip and face clear, muted turquoise sky with one distant aqueduct curve. One soft signal arc only. Use the matching supplied reference for this concept, keeping its uncomplicated composition.
+Output asset name: 32-signal-oracle.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 33/50 — Mesh Shieldbearer / Щитоносец mesh-сети
+Stable character ID: mesh-shieldbearer
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An adult male defender with dark brown skin, a short angular beard and vigilant eyes holds one broad translucent cyan shield braced by a simple bronze rim. Only three large hexagonal cells are visible in the shield. Plain jade cloak and simple bronze chestplate. Tight mid-thigh portrait; shield low, face fully visible. Background is quiet warm dust. No dense mesh, many glowing nodes, HUD, technological suit or huge energy flare.
+Output asset name: 33-mesh-shieldbearer.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 34/50 — Agora Sitewarden / Смотритель стройки агоры
+Stable character ID: agora-sitewarden
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: A mature adult woman forewoman with grey curls tied high, strong cheekbones and a stern amused gaze plants one oversized bronze measuring compass against her hip. Simple ivory shirt with jade belt and one leather shoulder guard. Mid-thigh portrait, broad compass legs form a readable triangle without numbers or scale marks. A single blurred unfinished arch sits behind her. No blueprint writing, many tools or tiny building labourers.
+Output asset name: 34-agora-sitewarden.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 35/50 — Packet Ferryman / Паромщик пакетов
+Stable character ID: packet-ferryman
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An older adult male ferryman with a narrow white beard, weathered tan skin and a dry smile holds one short bronze ferry pole ending in a smooth cyan capsule. Plain ivory hood pushed back, jade vest, close waist-up portrait. One quiet horizontal water reflection behind him; no visible boat passengers. The capsule should read as a physical sealed object, not a glowing UI packet. No multiple capsules, data strings or spooky skulls.
+Output asset name: 35-packet-ferryman.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 36/50 — Atlas the Nodebearer / Атлант узлов
+Stable character ID: atlas-nodebearer
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: epic — metadata only; never render it.
+Required character and scene: A gigantic adult male titan with deep bronze skin, close curly dark hair and a focused tired face supports one large simple bronze ring on his shoulders. Three cyan beads sit around the ring, well separated and not resembling a UI diagram. Simple jade waist drape, mid-thigh portrait so the head stays large. Pale cyan sky and one soft mountain silhouette behind him. No globe full of circuitry, orbit swarm, inscriptions or elaborate armour.
+Output asset name: 36-atlas-nodebearer.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 37/50 — Daedalus the Protocolwright / Дедал, мастер протоколов
+Stable character ID: daedalus-protocolwright
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: epic — metadata only; never render it.
+Required character and scene: An elderly adult male inventor with unruly white hair, thick eyebrows and a delighted frown adjusts one compact folded bronze mechanical wing held at chest level. Simple jade work robe and ivory scarf, only three large feather-shaped wing plates. Close waist-up portrait against one blurred sunlit workshop arch. Face and wing separated; no wall of inventions, goggles stack, blueprint text, many gears or tiny machines.
+Output asset name: 37-daedalus-protocolwright.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 38/50 — Hephaestus of Public Nodes / Гефест общественных узлов
+Stable character ID: hephaestus-public-nodes
+Faction: DePIN. Public works, physical networks, relay chains and infrastructure, translated into aqueducts, copper tools, beacons and simple clockwork; not futuristic robot soldiers.
+Planned rarity: legendary — metadata only; never render it.
+Required character and scene: A powerful adult forge god with warm dark skin, dense short black curls, a trimmed beard and a proud crooked smile raises one enormous simple bronze smith hammer. Ivory work drape and a jade leather apron. One cyan molten seam glows along the hammer head. Large mid-thigh portrait, readable face, broad shoulders and a single quiet warm furnace arch behind him. No sparks shower, gear cathedral, many automata, wings or excessive ornament.
+Output asset name: 38-hephaestus-public-nodes.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 39/50 — Copium Jester / Шут копиума
+Stable character ID: copium-jester
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: An adult human jester with olive skin, a long expressive face, tousled auburn curls and an overly optimistic grin holds one small smooth coral-coloured ceramic inhaler shaped like an ancient incense cup. Plain wine-red short toga and a single crooked bronze laurel leaf tucked behind his ear. Waist-up portrait with cup below the face. Soft rose sky, no smoke cloud covering features, modern medical equipment, labels or copied internet mascot.
+Output asset name: 39-copium-jester.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 40/50 — Exit Liquidity Goose / Гусь выходной ликвидности
+Stable character ID: liquidity-goose
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: An original anthropomorphic white goose with a very offended orange-beaked face wears a simple burgundy Roman sash and clutches one small unmarked bronze coin purse like a precious secret. Upper-body portrait at human head scale, long neck forms a funny clean S curve, one wing clearly grips the purse. Quiet coral market awning behind it. No honking text, money shower, charts, copied meme layout or complex costume.
+Output asset name: 40-liquidity-goose.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 41/50 — Bagholder Donkey / Осёл тяжёлых бэгов
+Stable character ID: bagholder-donkey
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: An original anthropomorphic grey donkey legionary with drooping long ears and a resigned side-eye hugs one absurdly large plain burgundy cloth bag. Simple ivory tunic and one broad bronze shoulder strap. Close mid-thigh portrait, bag below his face, ears complete in frame. Quiet dusty rose arena wall. The bag is the joke; no slogans, coin symbols, multiple sacks, charts, misery text or ornate armour.
+Output asset name: 41-bagholder-donkey.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 42/50 — GM Rooster / Петух GM
+Stable character ID: gm-rooster
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: An original proud anthropomorphic rooster with a big red comb, cream-and-copper feathers and a dramatically raised eyebrow poses in a plain ivory toga with a burgundy shoulder fold. He holds one small bronze sunrise bell at chest height. Waist-up portrait, the comb and beak large and clear. Soft warm dawn sky with a faint column at one edge. No letters GM, alarm-clock face, musical notes or crowd of birds.
+Output asset name: 42-gm-rooster.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 43/50 — Paperhand Merchant / Торговец бумажных рук
+Stable character ID: paperhand-merchant
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: common — metadata only; never render it.
+Required character and scene: An adult male market merchant with a bald crown, a pencil moustache and alarmed bulging eyes grips one crumpled blank parchment sheet with visibly oversized white cloth gloves. Simple burgundy vest over ivory tunic, shoulders hunched. Tight waist-up portrait. The blank sheet curls under his nervous grip but has no writing. Quiet rose-coloured market backdrop, no charts, scattered documents, logos or tiny jewellery.
+Output asset name: 43-paperhand-merchant.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 44/50 — FOMO Trumpeter / Трубач FOMO
+Stable character ID: fomo-trumpeter
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An adult woman herald with tan skin, a high black ponytail and excited wide eyes lifts one short bronze trumpet whose bell is comically oversized. Simple wine-red tunic with ivory sash, upper-body portrait. The trumpet points away from her face and is held with one natural grip. A single soft coral sound curl, without notation, leaves its bell. Quiet dusk sky, no parade, bubbles, lettering or multiple horns.
+Output asset name: 44-fomo-trumpeter.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 45/50 — Diamond Paw Mastiff / Мастиф алмазной лапы
+Stable character ID: diamond-paw-mastiff
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An original bulky charcoal-and-cream anthropomorphic mastiff with a stern protective face wears a plain burgundy shoulder cape. One forepaw rests on a single broad translucent rose-crystal buckler; the other paw stays relaxed at his waist. Close mid-thigh portrait, muzzle and eyes fully visible. Bronze trim is minimal, background a muted warm arena arch. No spiked armour, multiple gems, chains, slogans or copied dog-token branding.
+Output asset name: 45-diamond-paw-mastiff.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 46/50 — Hopium Augur / Авгур хопиума
+Stable character ID: hopium-augur
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An original cheerful cream-and-ginger anthropomorphic Shiba Inu oracle wears a simple burgundy Roman toga and a restrained bronze laurel circlet. A confident crooked grin and rounded substantial body. He cradles one rose-coloured crystal globe emitting one soft hopeful curl of light, no arrows or charts. Large mid-thigh portrait, face and globe distinct, calm rose dusk background. Use the matching supplied reference for shape hierarchy and charm, without adding ornaments.
+Output asset name: 46-hopium-augur.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 47/50 — Salt Miner Satyr / Сатир соляной шахты
+Stable character ID: salt-miner-satyr
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: rare — metadata only; never render it.
+Required character and scene: An adult satyr with tan skin, short dark curls, two short smooth horns and a comically offended pout lifts one huge pale-rose salt crystal at chest height. Simple ivory work tunic with wine-red waist sash, no pickaxe. Waist-up portrait, crystal formed from three broad facets, horns fully visible and not crowding the face. Soft dusty mauve mine wall. No readable tears, insults, rock piles or crystal swarm.
+Output asset name: 47-salt-miner-satyr.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 48/50 — Sir Rug of Velvet / Сэр Раг Бархатный
+Stable character ID: sir-rug-of-velvet
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: epic — metadata only; never render it.
+Required character and scene: An adult male aristocratic trickster with a neat dark moustache, sharp eyebrows and an innocent guilty smile carries one tightly rolled plain burgundy velvet rug over his shoulder. Simple ivory Roman tunic and one bronze clasp. Mid-thigh portrait, the rug forms one large diagonal shape behind the head without covering it. Quiet coral salon curtain. No carpet patterns, coins spilling out, suitcase, logos or villain particle effects.
+Output asset name: 48-sir-rug-of-velvet.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 49/50 — Sisyphus of the Pump / Сизиф вечного пампа
+Stable character ID: sisyphus-of-the-pump
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: epic — metadata only; never render it.
+Required character and scene: A muscular adult man with deep olive skin, tousled brown hair and a stubbornly cheerful grimace braces both palms against one giant smooth bronze sphere entering the lower edge of the image. Plain wine-red waist cloth and ivory shoulder wrap. Tight mid-thigh portrait, sphere low, face large and visibly strained. Soft warm hillside with one simple sloping horizon. No arrow, chart, inscriptions, repeated boulders or tiny background crowd.
+Output asset name: 49-sisyphus-of-the-pump.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+JOB 50/50 — Dionysus of the Last Pump / Дионис последнего пампа
+Stable character ID: dionysus-last-pump
+Faction: Meme. Hype, FOMO, copium, bagholding, diamond hands and rug humour, translated into expressive original people, animals and Greek figures; funny with premium craft, not low-effort joke clip art.
+Planned rarity: legendary — metadata only; never render it.
+Required character and scene: An adult joyful god with warm olive skin, long dark curls, a round expressive face and a mischievous broad grin raises one simple bronze goblet. A loose ivory toga with wine-red lining and just two large vine leaves in his hair. Mid-thigh portrait, goblet away from his face, a single soft coral ribbon of light curves above it. Quiet dusk vineyard blur, no feast crowd, grape jewellery, coin rain, numerous cups or unreadable symbols.
+Output asset name: 50-dionysus-last-pump.png
+Generate one separate portrait illustration for this job using the shared art direction. The name is an asset label, never image text. No frame or game UI.
+
+FINAL ACCEPTANCE CHECK
+- 50 numbered jobs accounted for; output count is 50 distinct character masters, or unfinished jobs are explicitly named.
+- 13 DeFi, 13 NFT, 12 DePIN, 12 Meme; no missing or duplicate IDs.
+- Names, costs, attack, health, rarity and ability text are NOT drawn into images.
+- No collage, card border, awkward blank bands or text-overlap risks baked into the art.
+- Human and animal faces are legible in a small portrait; neither atmosphere nor magic obscures the face.
+- Different silhouettes and expressions; palette alone is not enough to distinguish characters.
+- No invented certainty about gameplay, model selection, quality control or export functionality.
