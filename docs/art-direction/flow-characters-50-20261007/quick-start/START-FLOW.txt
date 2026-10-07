@@ -1,0 +1,217 @@
+Create 50 separate original CHARACTER ILLUSTRATIONS for IMPERIVM, a Greek/Roman crypto-fantasy card game. Execute image generation, not just a written plan.
+
+SETTINGS: Nano Banana 2.1; portrait 3:4; ONE image per job. Create fifty distinct images through separate jobs, not fifty variations of one character and not a collage. Use the selected model and report if it cannot be used. Generate images only, no videos.
+
+REFERENCES: I attached reference-01-signal-oracle.png and reference-02-hopium-augur.png. Use BOTH as shared style references: premium painterly fantasy, expressive readable characters, restrained classical costume, warm light and strong silhouette. For job 32, reference 01 also defines that character. For job 46, reference 02 also defines that character. Give all other characters their own identity. The two uploaded references do not count as generated outputs.
+
+STYLE: simplify detail further than the references. Broad painterly shapes, one large face, one clear action and one main identifying object. Frame from waist or mid-thigh upward, with the full head visible and hands naturally gripping objects. Keep the important face and prop inside the central 80% of the image. Soft atmospheric background, at most one blurred classical structure; no busy city or crowd. Fill the whole portrait with illustration, without blank margins. Make characters readable at card thumbnail size. Different faces, hair, species, builds and poses across the set.
+
+PALETTES: DeFi deep teal/emerald + bronze/amber; NFT indigo/lavender + ivory ceramic; DePIN jade/cyan + copper; Meme burgundy/coral/rose. Shared ivory cloth and antique bronze unify the world. Greek/Roman crypto themes are physical visual metaphors, not computer interfaces. Charming and colourful, not muddy, overly realistic, plastic 3D or flat clip art.
+
+NO card frames, borders, names, text, numbers, costs, attack/health badges, rarity dots, logos, charts, watermarks, excessive engraving or particle storms. These are art assets; the game will add its own UI.
+
+WORKFLOW: work consecutively in groups of at most ten distinct jobs (01-10, 11-20, 21-30, 31-40, 41-50), smaller if the platform requires it. Respect account confirmations and limits. One first-pass image per job; no extra variants or automatic repair loops. Name assets with the exact requested filename below; use the actual export extension if PNG is unavailable. Keep full native-quality individual images. Do not overwrite or delete unrelated project assets. If interrupted, list completed IDs and resume unfinished IDs without duplicates. At completion report the fifty actual assets and flag missing or visibly defective results. Do not invent completion, files or download links.
+
+THE 50 JOBS — one illustration for EACH:
+
+01. Collateral Squire (DeFi)
+Filename: 01-collateral-squire.png
+A young adult male legionary with a blunt dark fringe and a worried but determined face hugs one oversized bronze lock-shaped shield. Plain short teal tunic, one leather shoulder pad, no helmet. Three-quarter waist-up view with the shield angled across the lower body.
+
+02. Reserve Matron (DeFi)
+Filename: 02-reserve-matron.png
+A broad-shouldered middle-aged woman with silver-streaked black braids and a calm authoritative expression carries a single sealed terracotta reserve jar against her hip. Simple ivory tunic and emerald sash, one broad bronze clasp. Mid-thigh portrait, jar kept below the face.
+
+03. Interest Shepherd (DeFi)
+Filename: 03-interest-shepherd.png
+A lean elderly male shepherd-accountant with a short white beard and a knowing grin holds one simple crook with a tiny bronze bell hanging from its curved end. A plain sand-coloured cloak over muted turquoise cloth; weathered hands, no armour. Large upper-body portrait against a low-detail sunlit olive hillside.
+
+04. Spread Duelist (DeFi)
+Filename: 04-spread-duelist.png
+A wiry adult woman duelist with a sharp nose, short copper hair and a challenging half-smile wears a plain dark-teal chiton and one bronze forearm guard. She holds a single narrow leaf-shaped sword upright beside her face, its clean edge catching warm light. Torso twists in a readable fencing pose.
+
+05. Slippage Netter (DeFi)
+Filename: 05-slippage-netter.png
+A sturdy adult fisherman with tan skin, a square jaw and shaved head wears a rolled teal tunic and hoists one compact bronze-handled fishing net over his shoulder. The net contains a single smooth luminous blue pebble, not fish or coin symbols. Close mid-thigh portrait; big simple mesh shapes and a sly expression.
+
+06. Credit Lanternist (DeFi)
+Filename: 06-credit-lanternist.png
+A slender adult male night watchman with dark curly hair, a long nose and attentive eyes holds one squat bronze lantern at chest height. Simple ivory hood pushed back and teal sleeves. Inside the lantern is a warm amber light, no book, symbols or money.
+
+07. AMM Tidekeeper (DeFi)
+Filename: 07-amm-tidekeeper.png
+An adult male tide priest with deep brown skin, smooth bald head and a composed gaze cradles one shallow bronze bowl containing a sculpted curl of turquoise water. A simple ivory mantle forms a broad triangle over his shoulders. Upper-body view, the bowl below his face, blue water a small secondary focus.
+
+08. Margin Hoplite (DeFi)
+Filename: 08-margin-hoplite.png
+A stocky adult male hoplite with a broken nose and close brown beard braces one broad triangular bronze shield with a visible single repair seam. Plain teal shoulder cloak; simple helmet pushed high enough to show the face. Tight mid-thigh portrait, eyes focused upward, shield occupies the lower left.
+
+09. Mempool Usher (DeFi)
+Filename: 09-mempool-usher.png
+A tall thin adult woman court usher with a severe bob haircut raises one smooth bronze baton with a wax-seal tip, as if stopping an impatient visitor. Plain ivory robe with one dark jade lapel, arched eyebrow and dry humour. Waist-up portrait in front of one blurred burgundy curtain.
+
+10. Liquidation Bailiff (DeFi)
+Filename: 10-liquidation-bailiff.png
+An imposing older male bailiff with a shaved scalp, thick grey moustache and tired frown wears a simple bronze chestplate over teal cloth. He carries one short heavy hooked staff, hook safely away from his body. Mid-thigh three-quarter view with an unhurried stance.
+
+11. Delta Sphinx (DeFi)
+Filename: 11-delta-sphinx.png
+An original small lion-bodied sphinx with the face of an adult woman, charcoal curls and amber eyes sits upright. One compact teal wing folds behind a broad shoulder; a single bronze balance pan rests beneath a forepaw. Calm questioning smile.
+
+12. Oracle of Solvency (DeFi)
+Filename: 12-oracle-of-solvency.png
+An older adult woman oracle with a dark complexion, a shaved head and an amused knowing expression holds a single large smooth translucent amber cube between both palms. Simple turquoise shawl over ivory cloth. Waist-up portrait; face and cube separated clearly, fingers anatomically readable.
+
+13. Poseidon of Deep Liquidity (DeFi)
+Filename: 13-poseidon-deep-liquidity.png
+A powerful mature sea god with deep olive skin, flowing dark hair threaded with grey and a broad short beard holds one stout bronze trident upright. A simple ivory drape over a broad bare shoulder, not ornate armour. A single large turquoise wave curls behind his upper body without obscuring face or weapon.
+
+14. Clay Mint Apprentice (NFT)
+Filename: 14-clay-mint-apprentice.png
+An adult young male potter with soft round features, black unruly curls and dusty sleeves proudly lifts one small terracotta guardian figurine at chest height. Simple muted-violet tunic and ivory apron, a single clay smear on his cheek. Close waist-up view so the tiny sculpture remains readable as one chunky humanoid shape.
+
+15. Provenance Scribe (NFT)
+Filename: 15-provenance-scribe.png
+An adult woman scribe with warm brown skin, tightly gathered silver hair and curious eyes holds one closed violet wax tablet against her chest. Plain ivory wrap, slim bronze stylus tucked behind one ear as a minor accessory. Waist-up portrait, friendly slightly raised eyebrow.
+
+16. Mosaic Mender (NFT)
+Filename: 16-mosaic-mender.png
+A broad adult woman artisan with cropped dark hair, strong hands and a reassuring smile presses one large lavender mosaic tile into a cracked plain bronze shoulder plate she holds. A simple indigo work tunic and ivory scarf. Close waist-up view with tile and plate forming one clear action.
+
+17. Gallery Gatekeeper (NFT)
+Filename: 17-gallery-gatekeeper.png
+A tall adult male guard with a long solemn face and straight shoulder-length black hair grips one very broad violet oval shield with a single ivory mosaic inset. A simple bronze cap without a plume and one ivory shoulder sash. Mid-thigh portrait, shield low enough to show the full face.
+
+18. Patina Curator (NFT)
+Filename: 18-patina-curator.png
+An elderly adult man curator with deep-set eyes, a neat white beard and an affectionate crooked smile polishes one small bronze bust using a folded ivory cloth. Plain faded violet robe, no crown. Tight waist-up portrait, bust below the face and tilted toward the viewer.
+
+19. Blank Canvas Sentinel (NFT)
+Filename: 19-blank-canvas-sentinel.png
+An original squat clay construct with one friendly face carved into a single broad ivory ceramic head holds a plain violet shield-shaped ceramic slab. Rounded shoulders, two stout arms, only three large repaired seams. Upper-body portrait at human face scale, protective gentle posture.
+
+20. Reveal Diviner (NFT)
+Filename: 20-reveal-diviner.png
+An adult female diviner with long white curls, deep brown skin and an eager smile lifts one simple indigo cloth to reveal a glowing lavender pearl in her other palm. Plain ivory sleeves and a narrow bronze wristband. Waist-up portrait with the reveal action below her face and plenty of separation between both hands.
+
+21. Soulbound Companion (NFT)
+Filename: 21-soulbound-companion.png
+A calm adult male companion with curly auburn hair, freckles and earnest eyes holds one ivory half-mask at chest level. Simple violet traveller cloak. A single soft lavender ribbon of light curves from the mask around his own wrist, not toward another character.
+
+22. Royalty Chorister (NFT)
+Filename: 22-royalty-chorister.png
+An adult woman singer with a broad smile, short dark bob and olive skin holds one compact five-string bronze lyre. Simple ivory tunic with an indigo waist sash, shoulders relaxed, one hand clearly plucks a string. Waist-up portrait, instrument below her chin.
+
+23. Unbroken Marble Warden (NFT)
+Filename: 23-unbroken-marble-warden.png
+A massive living marble guardian with a broad human face, a single repaired crack across its brow and kind heavy-lidded eyes wears one plain bronze shoulder band. It braces one large ivory shield against its torso. Tight mid-thigh view, matte stone with broad violet shadow planes, face warmly lit.
+
+24. Medusa of Missing Mints (NFT)
+Filename: 24-medusa-of-missing-mints.png
+An original adult gorgon with olive skin, an expressive annoyed face and only five broad dark-violet snake locks flowing behind her shoulders raises one palm in refusal. Plain ivory drape and one bronze clasp. Waist-up portrait; both eyes fully visible, serpents framing rather than covering the face.
+
+25. Palimpsest Guardian (NFT)
+Filename: 25-palimpsest-guardian.png
+An adult woman guardian with a shaved side haircut, dark blue-black curls and steady eyes carries one round bronze shield whose surface has a single broad translucent lavender layer peeling upward like a second skin. Simple ivory breast wrap and purple cloak. Mid-thigh portrait, one obvious layered-shield motif, no lettering on either layer.
+
+26. Persephone of the Second Mint (NFT)
+Filename: 26-persephone-second-mint.png
+An adult spring-and-underworld goddess with deep brown skin, long dark wavy hair and a serene determined gaze holds one split pomegranate made of matte ivory ceramic, revealing a restrained violet glow inside. Simple ivory gown with one indigo sash and a tiny single blossom by her ear. Mid-thigh portrait, face and fruit large and distinct.
+
+27. Relay Page (DePIN)
+Filename: 27-relay-page.png
+A young adult male messenger with tan skin, closely cropped black hair and an excited grin holds one small bronze relay baton topped by a cyan bead. Plain jade short tunic and ivory shoulder strap, no winged helmet. Dynamic waist-up portrait leaning slightly forward; baton remains near the torso rather than crossing the face.
+
+28. Copper Lineworker (DePIN)
+Filename: 28-copper-lineworker.png
+An adult woman technician with auburn hair in a short braid, freckles and a practical half-smile holds one thick copper loop at chest level with a visible clean repaired join. Plain jade work tunic, rolled sleeves and one bronze glove. Waist-up portrait, the copper loop forming a strong oval below her face.
+
+29. Beacon Scout (DePIN)
+Filename: 29-beacon-scout.png
+An adult female scout with dark skin, short coiled hair and alert eyes raises one compact bronze signal lantern at shoulder height. Simple ivory cape over jade leather vest, a low crouching upper-body pose, face unobstructed. The lantern emits one narrow soft cyan beam pointing diagonally away from the face.
+
+30. Ceramic Cachekeeper (DePIN)
+Filename: 30-ceramic-cachekeeper.png
+A stout adult male keeper with a warm brown complexion, round bald head and a cheerful patient face hugs one large jade-glazed ceramic amphora with a bronze stopper. Plain ivory apron and rolled sleeves, hands visible on either side of the pot. Close mid-thigh portrait; the amphora has one broad cyan stripe and no writing.
+
+31. Bridge Riveter (DePIN)
+Filename: 31-bridge-riveter.png
+A muscular adult woman builder with deep olive skin, shaved hair and a confident grin rests one short square-headed bronze riveting hammer against her shoulder. Simple jade tunic and ivory work scarf, no heavy ornate armour. Mid-thigh portrait, hammer and face separated.
+
+32. Signal Oracle (DePIN)
+Filename: 32-signal-oracle.png
+A confident adult woman engineer-priestess with warm olive skin, cropped dark curls and an ivory shoulder cape over a simple jade tunic holds one bronze tuning-fork staff with a floating cyan crystal between its two tines. Intelligent playful expression, one bronze work glove. Large mid-thigh portrait, staff tip and face clear, muted turquoise sky with one distant aqueduct curve.
+
+33. Mesh Shieldbearer (DePIN)
+Filename: 33-mesh-shieldbearer.png
+An adult male defender with dark brown skin, a short angular beard and vigilant eyes holds one broad translucent cyan shield braced by a simple bronze rim. Only three large hexagonal cells are visible in the shield. Plain jade cloak and simple bronze chestplate.
+
+34. Agora Sitewarden (DePIN)
+Filename: 34-agora-sitewarden.png
+A mature adult woman forewoman with grey curls tied high, strong cheekbones and a stern amused gaze plants one oversized bronze measuring compass against her hip. Simple ivory shirt with jade belt and one leather shoulder guard. Mid-thigh portrait, broad compass legs form a readable triangle without numbers or scale marks.
+
+35. Packet Ferryman (DePIN)
+Filename: 35-packet-ferryman.png
+An older adult male ferryman with a narrow white beard, weathered tan skin and a dry smile holds one short bronze ferry pole ending in a smooth cyan capsule. Plain ivory hood pushed back, jade vest, close waist-up portrait. One quiet horizontal water reflection behind him; no visible boat passengers.
+
+36. Atlas the Nodebearer (DePIN)
+Filename: 36-atlas-nodebearer.png
+A gigantic adult male titan with deep bronze skin, close curly dark hair and a focused tired face supports one large simple bronze ring on his shoulders. Three cyan beads sit around the ring, well separated and not resembling a UI diagram. Simple jade waist drape, mid-thigh portrait so the head stays large.
+
+37. Daedalus the Protocolwright (DePIN)
+Filename: 37-daedalus-protocolwright.png
+An elderly adult male inventor with unruly white hair, thick eyebrows and a delighted frown adjusts one compact folded bronze mechanical wing held at chest level. Simple jade work robe and ivory scarf, only three large feather-shaped wing plates. Close waist-up portrait against one blurred sunlit workshop arch.
+
+38. Hephaestus of Public Nodes (DePIN)
+Filename: 38-hephaestus-public-nodes.png
+A powerful adult forge god with warm dark skin, dense short black curls, a trimmed beard and a proud crooked smile raises one enormous simple bronze smith hammer. Ivory work drape and a jade leather apron. One cyan molten seam glows along the hammer head.
+
+39. Copium Jester (Meme)
+Filename: 39-copium-jester.png
+An adult human jester with olive skin, a long expressive face, tousled auburn curls and an overly optimistic grin holds one small smooth coral-coloured ceramic inhaler shaped like an ancient incense cup. Plain wine-red short toga and a single crooked bronze laurel leaf tucked behind his ear. Waist-up portrait with cup below the face.
+
+40. Exit Liquidity Goose (Meme)
+Filename: 40-liquidity-goose.png
+An original anthropomorphic white goose with a very offended orange-beaked face wears a simple burgundy Roman sash and clutches one small unmarked bronze coin purse like a precious secret. Upper-body portrait at human head scale, long neck forms a funny clean S curve, one wing clearly grips the purse. Quiet coral market awning behind it.
+
+41. Bagholder Donkey (Meme)
+Filename: 41-bagholder-donkey.png
+An original anthropomorphic grey donkey legionary with drooping long ears and a resigned side-eye hugs one absurdly large plain burgundy cloth bag. Simple ivory tunic and one broad bronze shoulder strap. Close mid-thigh portrait, bag below his face, ears complete in frame.
+
+42. GM Rooster (Meme)
+Filename: 42-gm-rooster.png
+An original proud anthropomorphic rooster with a big red comb, cream-and-copper feathers and a dramatically raised eyebrow poses in a plain ivory toga with a burgundy shoulder fold. He holds one small bronze sunrise bell at chest height. Waist-up portrait, the comb and beak large and clear.
+
+43. Paperhand Merchant (Meme)
+Filename: 43-paperhand-merchant.png
+An adult male market merchant with a bald crown, a pencil moustache and alarmed bulging eyes grips one crumpled blank parchment sheet with visibly oversized white cloth gloves. Simple burgundy vest over ivory tunic, shoulders hunched. Tight waist-up portrait.
+
+44. FOMO Trumpeter (Meme)
+Filename: 44-fomo-trumpeter.png
+An adult woman herald with tan skin, a high black ponytail and excited wide eyes lifts one short bronze trumpet whose bell is comically oversized. Simple wine-red tunic with ivory sash, upper-body portrait. The trumpet points away from her face and is held with one natural grip.
+
+45. Diamond Paw Mastiff (Meme)
+Filename: 45-diamond-paw-mastiff.png
+An original bulky charcoal-and-cream anthropomorphic mastiff with a stern protective face wears a plain burgundy shoulder cape. One forepaw rests on a single broad translucent rose-crystal buckler; the other paw stays relaxed at his waist. Close mid-thigh portrait, muzzle and eyes fully visible.
+
+46. Hopium Augur (Meme)
+Filename: 46-hopium-augur.png
+An original cheerful cream-and-ginger anthropomorphic Shiba Inu oracle wears a simple burgundy Roman toga and a restrained bronze laurel circlet. A confident crooked grin and rounded substantial body. He cradles one rose-coloured crystal globe emitting one soft hopeful curl of light, no arrows or charts.
+
+47. Salt Miner Satyr (Meme)
+Filename: 47-salt-miner-satyr.png
+An adult satyr with tan skin, short dark curls, two short smooth horns and a comically offended pout lifts one huge pale-rose salt crystal at chest height. Simple ivory work tunic with wine-red waist sash, no pickaxe. Waist-up portrait, crystal formed from three broad facets, horns fully visible and not crowding the face.
+
+48. Sir Rug of Velvet (Meme)
+Filename: 48-sir-rug-of-velvet.png
+An adult male aristocratic trickster with a neat dark moustache, sharp eyebrows and an innocent guilty smile carries one tightly rolled plain burgundy velvet rug over his shoulder. Simple ivory Roman tunic and one bronze clasp. Mid-thigh portrait, the rug forms one large diagonal shape behind the head without covering it.
+
+49. Sisyphus of the Pump (Meme)
+Filename: 49-sisyphus-of-the-pump.png
+A muscular adult man with deep olive skin, tousled brown hair and a stubbornly cheerful grimace braces both palms against one giant smooth bronze sphere entering the lower edge of the image. Plain wine-red waist cloth and ivory shoulder wrap. Tight mid-thigh portrait, sphere low, face large and visibly strained.
+
+50. Dionysus of the Last Pump (Meme)
+Filename: 50-dionysus-last-pump.png
+An adult joyful god with warm olive skin, long dark curls, a round expressive face and a mischievous broad grin raises one simple bronze goblet. A loose ivory toga with wine-red lining and just two large vine leaves in his hair. Mid-thigh portrait, goblet away from his face, a single soft coral ribbon of light curves above it.
+
+Generate all 50 separate images. No collage, no baked UI, no duplicate characters.
