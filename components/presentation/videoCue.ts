@@ -5,6 +5,7 @@ import {cardIdentity} from './cardIdentity';
 import {directEffect,playedFighter} from './directPlay';
 import {rulesetOf} from '../../lib/engine/ruleset';
 import {validatorPayout} from './validatorInvestment';
+import {combatStyle} from './combatStyle';
 
 export const VIDEO_IDS = ['01-impact','02-builder-heal','03-whale-impact','04-degen-draw','05-validator-gas','06-victory','07-spell-impact','08-spell-buff','09-spell-counter','10-deploy-legionary','11-deploy-guard','12-deploy-commander','13-deploy-minister','14-deploy-priest','15-deploy-engineer','16-edict-weaken','17-edict-heal'] as const;
 export type VideoId = typeof VIDEO_IDS[number];
@@ -21,7 +22,10 @@ export function videoCues(batch: PresentationBatch): VideoCue[] {
   // Direct Priority gets the second sprite slot: damage already has its exact
   // number and native contact glyph, while a removed edict has no stat number.
   if(played||action.type==='cast-spell')cues.push(...cancellations);
-  if(action.type==='attack')return [{id:'01-impact',anchor:action.target==='hero'?`hero-${1-owner}`:action.target,width:4}];
+  if(action.type==='attack'){
+    const fighter=batch.before.players[owner].board.find(m=>m.uid===action.attackerUid);
+    return [{id:combatStyle(fighter?.cardId).delivery==='arcane'?'07-spell-impact':'01-impact',anchor:action.target==='hero'?`hero-${1-owner}`:action.target,width:4}];
+  }
   if(action.type==='hero-power'){
     switch(HEROES[batch.before.players[owner].heroId].power){
       case 'heal-treasury':return batch.after.players[owner].treasury>batch.before.players[owner].treasury?[{id:'02-builder-heal',anchor:hero,width:5}]:[];

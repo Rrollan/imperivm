@@ -1,4 +1,6 @@
 'use client';
+import {ArenaFeedbackSettings} from './ArenaFeedbackSettings';
+import {ArenaOrientationHint} from './ArenaOrientationHint';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -226,6 +228,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
   };
 
   return <main className={styles.shell}>
+    <ArenaOrientationHint/>
     {rulesetOf(shown)==='validator-investment-v1'&&<div className={styles.rulesetBadge}>{locale.t('Эксперимент · Инвестиция Валидатора','Experiment · Validator investment')}</div>}
     <canvas ref={canvas} className={styles.canvas} aria-label={locale.t('Объёмный игровой стол IMPERIVM. Клавиатурное управление: меню игры, затем «Доступные действия».', 'IMPERIVM game table. Keyboard controls: open the game menu, then Available actions.')} />
     <header className={styles.header}><button className={styles.settingsButton} onClick={() => { select(null); setInspect(null); setHelp(true); }} aria-label={locale.t('Меню игры', 'Game menu')}><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M13 3h6l1 4 3 2 4-1 3 5-3 3v3l3 3-3 5-4-1-3 2-1 4h-6l-1-4-3-2-4 1-3-5 3-3v-3l-3-3 3-5 4 1 3-2z"/><circle cx="16" cy="17" r="5"/></svg></button></header>
@@ -287,6 +290,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
       <div className={styles.helpBody}><div className={styles.menuActions}>
         <button className={styles.primary} onClick={() => setHelp(false)}>{locale.t('Продолжить', 'Resume')}</button>
         <button onClick={()=>{setHelp(false);setHistoryOpen(true);}}>{locale.t('История боя','Battle history')}</button>
+        <ArenaFeedbackSettings/>
         <button onClick={() => { void unlockAudio(); setMuted(!muted); }}>{muted ? locale.t('Звук: выключен', 'Sound: off') : locale.t('Звук: включён', 'Sound: on')}</button>
         <button onClick={() => locale.setLocale(locale.locale === 'ru' ? 'en' : 'ru')}>{locale.locale === 'ru' ? 'Язык: Русский' : 'Language: English'}</button>
         <button onClick={() => {const next=quality==='auto'?'sharp':quality==='sharp'?'fast':'auto';setQuality(next);try{localStorage.setItem('imperivm-arena-quality',next);}catch{}}}>{locale.t('Изображение: ', 'Image: ')}{quality==='auto'?locale.t('авто','auto'):quality==='sharp'?locale.t('чётче','sharper'):locale.t('быстрее','faster')}</button>

@@ -35,9 +35,12 @@ import {effectTimeline,effectFrame,deathWindow} from './effectTimeline';
 import {queueSlot,queueAnchor,QUEUED_CARD} from './queueLayout';
 import {CARD_FACE} from './cardFace';
 import {ordersLayout} from './ordersView';
-import {rulerSocket,turnSocket,edictRegister} from './boardSockets';
+import {rulerSocket,turnSocket,powerSocket,edictRegister} from './boardSockets';
 import {targetingEdge,targetingInsets} from './targetingGeometry';
 import {validatorPayout} from './validatorInvestment';
+import {combatStyle} from './combatStyle';
+import {ArenaAttackEffects} from './ArenaAttackEffects';
+import {hapticContact} from '../../lib/haptics';
 
 export type ArenaTarget = { kind: 'hand' | 'minion' | 'hero' | 'power' | 'command' | 'gas' | 'block' | 'deck' | 'scroll' | 'queue'; uid: string; owner: 0 | 1; cardId?: string };
 export interface ArenaMetrics { meshes: number; triangles: number; drawCalls: number; renderScale: number; renderWidth: number; renderHeight: number; models: number; failedModels: number; frames: number; frameMedianMs: number; frameP95Ms: number; renderP95Ms: number; gpu: string; pending: string[] }
@@ -73,6 +76,7 @@ type Entity = {
   hoverLift: number;
   hoverTarget: number;
   fanAngle: number;
+  hitArea: Mesh | null;
 };
 
 // One artwork coordinate system for the board, every socket, piece and hit target.
@@ -125,6 +129,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   };
   const textures = new ArenaTextures(scene, options.locale, request);
   const effects = new ArenaEffects(scene,request);
+  const projectiles = new ArenaAttackEffects(scene,request);
   const abilities = new ArenaAbilityEffects(scene,request);
   const deployments=new ArenaDeploymentEffects(scene,request);
   const videoEffects = new ArenaSpriteEffects(scene,request);
@@ -202,7 +207,10 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     if (oval) { halo.rotation.x = Math.PI / 2; halo.scaling.set(width * .89, 1, height * .89); }
     const haloMat = new StandardMaterial(`${keyId}-halo-material`, scene); haloMat.diffuseColor = Color3.Black(); haloMat.emissiveColor = Color3.FromHexString('#427650'); haloMat.alpha = oval ? .9 : .22; haloMat.disableLighting = true;
     halo.parent = root; halo.position.z = -.03; halo.material = haloMat; halo.isPickable = false; halo.setEnabled(false);
-    const entry: Entity = { root, face: faceMesh, halo, material: mat, haloMaterial: haloMat, texture, data, base: Vector3.Zero(), signature: '', width, height, backing, modelReady: false, painted: face,hoverLift:0,hoverTarget:0,fanAngle:0 };
+    const hitArea=['command','power','gas','block','deck','scroll'].includes(data.kind)
+      ? MeshBuilder.CreatePlane(`${keyId}-touch-target`,{size:1,sideOrientation:Mesh.DOUBLESIDE},scene) : null;
+    if(hitArea){hitArea.parent=root;hitArea.position.z=-.02;hitArea.visibility=0;hitArea.metadata=data;}
+    const entry: Entity = { root, face: faceMesh, halo, material: mat, haloMaterial: haloMat, texture, data, base: Vector3.Zero(), signature: '', width, height, backing, modelReady: false, painted: face,hoverLift:0,hoverTarget:0,fanAngle:0,hitArea };
     entities.set(keyId, entry); return entry;
   }
 
@@ -236,6 +244,11 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const keep = (id: string, data: ArenaTarget, face: Face, w: number, h: number, x: number, y: number, z = 0) => {
       used.add(id);const old=entities.get(id),previous=old?.root.position.clone(),previousScale=old?.root.scaling.clone(),oldWidth=old?.width,oldHeight=old?.height; const entry = entity(id,data,face,w/50,h/50);
       entry.data=data;entry.face.metadata=data;entry.root.setEnabled(true);
+      if(entry.hitArea){
+        const minimum=44*(camera.orthoTop!-camera.orthoBottom!)/Math.max(1,canvas.clientHeight);
+        entry.hitArea.scaling.set(Math.max(entry.width,minimum),Math.max(entry.height,minimum),1);
+        entry.hitArea.metadata=data;
+      }
       paint(entry,face);
       entry.base.copyFrom(point(x,y,z)); entry.root.position.copyFrom(entry.base); entry.root.scaling.setAll(1);
       const resized=oldWidth!==undefined&&(oldWidth!==entry.width||oldHeight!==entry.height);
@@ -271,7 +284,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const me=state.players[0];
     const turn=turnSocket(portrait);
     native('turn-command','command',{kind:'command',state:activeBatch?'busy':battleCommand(state,stateActions),engraved:true},turn.width,turn.height,turn.x,turn.y);
-    native('hero-power','power',{kind:'power',heroId:me.heroId,cost:effectivePowerCost(state,0),available:state.turn===0&&legalActions(state).some(a=>a.type==='hero-power')},101,101,portrait?960:975,portrait?792:703);
+    const power=powerSocket(portrait);
+    native('hero-power','power',{kind:'power',heroId:me.heroId,cost:effectivePowerCost(state,0),available:state.turn===0&&legalActions(state).some(a=>a.type==='hero-power'),aspect:power.width/power.height},power.width*384/322,power.height*384/322,power.x,power.y);
     const orders=ordersLayout(portrait);
     native('gas-counter','gas',ordersFace(state),orders.width,orders.height,orders.x,orders.y);
     native('block-counter','block',{kind:'block',block:state.block},60,78,portrait?446:234,portrait?70:220);
@@ -452,13 +466,14 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   function releaseArrival(){if(heldArrival){destroy(heldArrival);heldArrival=null;}}
   function releaseDraws(){drawFlights.forEach(f=>{if(f.temporary){entities.delete(f.entry.data.uid);destroy(f.entry);}else if(!f.entry.root.isDisposed()){f.entry.root.rotation.y=0;paint(f.entry,f.face);}});drawFlights=[];}
   function resetClock(){sandStream.setEnabled(false);}
-  function cancel() { scheduler.cancel(); releaseArrival(); releaseDraws();layoutMoves=[];effects.clear();abilities.clear();deployments.clear(); videoEffects.cancel(); activeBatch = null; released=null; entities.forEach(entry=>{entry.material.alpha=1;entry.backing.visibility=1;entry.hoverLift=0;}); resetClock(); clearPress(); if (shown) sync(shown); }
+  function cancel() { scheduler.cancel(); releaseArrival(); releaseDraws();layoutMoves=[];effects.clear();projectiles.clear();abilities.clear();deployments.clear(); videoEffects.cancel(); activeBatch = null; released=null; entities.forEach(entry=>{entry.material.alpha=1;entry.backing.visibility=1;entry.hoverLift=0;}); resetClock(); clearPress(); if (shown) sync(shown); }
 
   async function present(batch: PresentationBatch, impact: () => void) {
     scheduler.cancel(); releaseArrival();releaseDraws();layoutMoves=[]; activeBatch = batch; options.onHover(null); hovered = null; selected = null; highlights();
     const command = entities.get('turn-command'); if (command) paint(command, { kind: 'command', state: 'busy', engraved: true });
     const attack = batch.action.type === 'attack' ? batch.action : null;
     const attacker = attack ? entities.get(attack.attackerUid) : null;
+    const combat = combatStyle(attacker?.data.cardId);
     const defender = attack ? entities.get(attack.target === 'hero' ? `hero-${batch.before.turn === 0 ? 1 : 0}` : attack.target) : null;
     const handUid = batch.action.type === 'play-minion' || batch.action.type === 'cast-spell' ? batch.action.uid : null;
     const rejected=batch.action.type==='mulligan'?batch.action.uids.flatMap(uid=>{
@@ -546,6 +561,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     };
     const cuePositions=new Map(cues.map(cue=>[cue.anchor,locate(cue.anchor)]));
     effects.begin(batch,locate,timeline);
+    projectiles.begin(combat,attack?attacker?.base:undefined,attack?defender?.base:undefined);
     abilities.begin(batch,locate,timeline);
     const resolving=(batch.events?.spellResolved??[]).flatMap((s,i)=>{const entry=entities.get(`queued-${s.mempoolUid}`);return entry?[{entry,start:entry.base.clone(),delay:i*.075}]:[];});
     await scheduler.play(duration, impactAt, progress => {
@@ -566,11 +582,12 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
           moving.root.scaling.copyFrom(Vector3.Lerp(Vector3.Lerp(startScale,revealScale,phase.approach),landingScale,phase.landing));
           moving.root.rotation.z=startRotation*(1-phase.approach);
         }else{
-          moving.root.position.copyFrom(Vector3.Lerp(start, target, handUid ? eased : options.reducedMotion ? 0 : eased * .84));
+          const recoil=combat.delivery==='melee'?combat.recoil:combat.recoil*Math.min(1,2/Math.max(.001,Vector3.Distance(start,target)));
+          moving.root.position.copyFrom(Vector3.Lerp(start, target, handUid ? eased : options.reducedMotion ? 0 : eased * recoil));
           moving.root.position.z -= Math.sin(Math.max(0,eased) * Math.PI) * (options.reducedMotion ? 0 : .35);
           if(heldArrival===moving)moving.root.position.z-=.65;
           if(handUid){moving.root.scaling.copyFrom(Vector3.Lerp(startScale,landingScale,eased));moving.root.rotation.z=startRotation*(1-eased);}
-          else moving.root.scaling.setAll(1 + Math.sin(progress * Math.PI) * .04);
+          else moving.root.scaling.setAll(options.reducedMotion?1:1 + Math.sin(progress * Math.PI) * .04);
         }
       }
       if(handUid){const t=Math.min(1,progress/impactAt),ease=t*t*(3-2*t);settling.forEach(({entry,start,target})=>{if(!entry.root.isDisposed())entry.root.position.copyFrom(Vector3.Lerp(start,target,ease));});}
@@ -601,6 +618,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         if(progress>=impactAt)return;const t=smooth((progress*duration/1000-delay)/Math.max(.12,contactMs/1000-delay));entry.root.position.copyFrom(start);entry.root.position.y+=.8*t;entry.root.scaling.setAll(1+.55*t);entry.material.alpha=1-.65*t;
       });
       effects.tick(progress,impactAt,options.reducedMotion,duration);
+      projectiles.tick(progress,impactAt,options.reducedMotion);
       deployments.tick(progress,impactAt,options.reducedMotion);
       abilities.tick(progress,impactAt,options.reducedMotion,duration);
       if(timeline)for(const window of timeline.windows){
@@ -621,6 +639,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       }
     }, () => {
       if (activeBatch?.id !== batch.id) return;
+      hapticContact(batch.action.type);
       videoEffects.trigger(timeline?cues.filter(c=>!c.wave):cues,uid=>cuePositions.get(uid),options.reducedMotion);
       if(batch.events?.play)deployments.begin(batch.events.play.cardId,target);
       if(handUid){
@@ -670,7 +689,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       releaseArrival();releaseDraws();if(landed&&!landed.root.isDisposed()){landed.material.alpha=1;landed.backing.visibility=1;}
       entities.forEach(entry=>{entry.material.alpha=1;entry.face.isPickable=entry.data.owner===0||entry.data.kind!=='hand';entry.root.rotation.y=0;});
       activeBatch = null; sync(batch.after);
-      effects.clear();abilities.clear();deployments.clear();
+      effects.clear();projectiles.clear();abilities.clear();deployments.clear();
       resetClock();
     });
     request();
@@ -689,7 +708,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     dispose: () => {
       disposed = true; scheduler.cancel(); releaseArrival();releaseDraws(); resizeObserver.disconnect(); document.removeEventListener('visibilitychange', visibility); canvas.removeEventListener('pointercancel', cancelPointer);
       canvas.removeEventListener('pointerleave', leavePointer);
-      engine.stopRenderLoop(render); videoEffects.dispose(); effects.dispose();abilities.dispose();deployments.dispose(); textures.dispose(); instrument.dispose(); scene.dispose(); engine.dispose(); entities.clear();
+      engine.stopRenderLoop(render); videoEffects.dispose(); effects.dispose();projectiles.dispose();abilities.dispose();deployments.dispose(); textures.dispose(); instrument.dispose(); scene.dispose(); engine.dispose(); entities.clear();
     },
   };
 }

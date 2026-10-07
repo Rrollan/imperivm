@@ -18,6 +18,7 @@ import type { SfxName } from './sfx';
 import type { BattleEvents } from '../events';
 import type { Action, GameState } from '../engine/types';
 import { CARDS } from '../cards';
+import {combatStyle} from '../../components/presentation/combatStyle';
 
 type SoundContext = { action: Action; before: GameState; after: GameState };
 
@@ -61,7 +62,7 @@ export function soundsForEvents(events: BattleEvents, context?: SoundContext): S
       const before = context.before.players[owner].treasury;
       const after = context.after.players[owner].treasury;
       if (after > before) add('heal');
-      if (after < before) add('damage');
+      if (after < before && !events.attack) add('damage');
     }
   }
   // Plays (cards entering our board)
@@ -81,7 +82,10 @@ export function soundsForEvents(events: BattleEvents, context?: SoundContext): S
   if (events.rugPull) add('rug-pull');
 
   // Combat: attack lunge + per-minion damage/heal floats
-  if (events.attack) add('attack');
+  if (events.attack) {
+    const attacker=context?.before.players.flatMap(p=>p.board).find(m=>m.uid===events.attack?.attackerUid);
+    add(combatStyle(attacker?.cardId).sound);
+  }
   const covered = new Set<string>();
   for (const result of events.effectResults ?? []) {
     for (const target of result.targets) {
@@ -94,7 +98,7 @@ export function soundsForEvents(events: BattleEvents, context?: SoundContext): S
     for (const d of events.damages) {
       if (covered.has(d.uid) || events.halvings?.some(h => h.uid === d.uid)) continue;
       if (d.health > d.prevHealth && CARDS[events.play?.cardId ?? '']?.battlecry?.kind !== 'buff-own') add('heal');
-      else if (d.health < d.prevHealth) add('damage');
+      else if (d.health < d.prevHealth && !events.attack) add('damage');
     }
   }
   if (events.deaths && events.deaths.length > 0) add('death');

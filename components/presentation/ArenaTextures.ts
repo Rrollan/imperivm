@@ -15,7 +15,7 @@ export type Face =
   | { kind: 'card'; cardId: string; playable?:boolean }
   | { kind: 'minion'; minion: Minion; ready?: boolean;readiness?:FighterReadiness }
   | { kind: 'hero'; heroId: string; treasury: number; aspect?:number; model?: boolean }
-  | { kind: 'power'; heroId: string; cost: number; available: boolean; model?: boolean }
+  | { kind: 'power'; heroId: string; cost: number; available: boolean; aspect?: number; model?: boolean }
   | { kind: 'command'; state: BattleCommand; engraved?: boolean }
   | { kind: 'gas'; gas: number; max: number; engraved?: boolean }
   | { kind: 'orders'; gas: number; max: number; portrait: boolean }
@@ -205,7 +205,8 @@ export class ArenaTextures {
       ctx.strokeStyle = '#e5c08b'; ctx.lineWidth = 18;
       ctx.beginPath(); ctx.moveTo(127,242); ctx.lineTo(243,117); ctx.moveTo(188,105); ctx.lineTo(264,174); ctx.stroke();
     }
-    ctx.restore(); this.badge(ctx, `${face.cost}`, 295, 295, '#246784', 48);
+    ctx.restore();ctx.save();ctx.translate(295,295);ctx.scale(1,face.aspect??1);
+    this.badge(ctx, `${face.cost}`, 0, 0, '#246784', 48);ctx.restore();
   }
 
   private drawCommand(ctx: CanvasRenderingContext2D, state: Extract<Face, { kind: 'command' }>['state'], engraved = false) {

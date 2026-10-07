@@ -1,10 +1,17 @@
-/** Native artwork apertures, in the same 1600×1000 scene coordinates as the board. */
+/** Measured inner velvet apertures. The landscape bitmap is 1586×992,
+ * stretched onto a 1600×1000 plane; use that same projection for every inlay. */
+const landscape = (x:number,y:number,width:number,height:number) => ({
+  x:x*1600/1586,y:y*1000/992,width:width*1600/1586,height:height*1000/992,
+});
 export function rulerSocket(owner:number,portrait:boolean){
   if(portrait)return owner===0?{x:796,y:774,width:137,height:136}:{x:794,y:25,width:130,height:127};
-  return owner===0?{x:801,y:687,width:137,height:133}:{x:800,y:147,width:122,height:119};
+  return owner===0?landscape(794,683,142,122):landscape(792,143,126,98);
 }
 export function turnSocket(portrait:boolean){
-  return portrait?{x:1138,y:631,width:177,height:70}:{x:1442,y:463,width:171,height:68};
+  return portrait?{x:1138,y:631,width:177,height:70}:landscape(1424,456,168,68);
+}
+export function powerSocket(portrait:boolean){
+  return portrait?{x:960,y:792,width:84,height:84}:landscape(970,698,79,73);
 }
 export function edictRegister(portrait:boolean){
   return portrait?{x:423,y:175,width:140,height:70}:{x:230,y:313,width:154,height:77};

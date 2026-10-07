@@ -5,7 +5,7 @@ import './scene.css';
 import './design-polish.css';
 import Providers from '../components/Providers';
 import SceneTextures from '../components/SceneTextures';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Cinzel, Cormorant_Garamond, Manrope, JetBrains_Mono } from 'next/font/google';
 
 const display = Cinzel({ subsets: ['latin'], weight: ['500', '600', '700', '800'], variable: '--font-cinzel', display: 'swap', adjustFontFallback: false, fallback: [] });
@@ -23,6 +23,10 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: 'IMPERIVM — Veni. Vidi. Rugi.',
   description: 'IMPERIVM — карточные сражения, где блокчейн-механики становятся правилами игры. Создано для Crypto World’s Fair Hackathon.',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#171210',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

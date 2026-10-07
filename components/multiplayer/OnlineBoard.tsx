@@ -1,4 +1,6 @@
 'use client';
+import {ArenaFeedbackSettings} from '../presentation/ArenaFeedbackSettings';
+import {ArenaOrientationHint} from '../presentation/ArenaOrientationHint';
 
 import {useRouter} from 'next/navigation';
 import {useCallback, useEffect, useMemo, useRef, useState, type RefObject} from 'react';
@@ -245,6 +247,7 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
   const leave = () => void send({type: 'cancel'}).then(() => router.replace(`/play?mode=${room.mode}&hero=${me.heroId}`));
 
   return <main className={arenaStyles.shell}>
+    <ArenaOrientationHint status={game.winner===null?`${status} · ${seconds} ${t('сек. до конца хода','sec. until turn end')}`:result}/>
     <canvas ref={canvas} className={arenaStyles.canvas} aria-label={t('Онлайн-арена IMPERIVM. Управление с клавиатуры доступно в меню игры.', 'IMPERIVM online arena. Keyboard controls are available in the game menu.')}/>
     <div className={styles.netHud} data-online={connected}><span>{roomCode || 'PvP'}</span><strong role="status">{status}</strong>{game.winner === null && <span className={styles.netClock} data-urgent={seconds <= 15} aria-label={`${seconds} ${t('секунд до конца хода', 'seconds until turn end')}`}><RomanIcon name="hourglass"/>{seconds}</span>}</div>
     <header className={arenaStyles.header}><button className={arenaStyles.settingsButton} onClick={() => {select(null); setInspect(null); setHelp(true);}} aria-label={t('Меню игры', 'Game menu')}><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M13 3h6l1 4 3 2 4-1 3 5-3 3v3l3 3-3 5-4-1-3 2-1 4h-6l-1-4-3-2-4 1-3-5 3-3v-3l-3-3 3-5 4 1 3-2z"/><circle cx="16" cy="17" r="5"/></svg></button></header>
@@ -284,6 +287,7 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
     {help && <div className={arenaStyles.modalBackdrop}><section ref={helpPanel} className={arenaStyles.help} role="dialog" aria-modal="true" aria-label={t('Меню игры', 'Game menu')}><button className={arenaStyles.close} onClick={() => setHelp(false)} aria-label={t('Закрыть меню', 'Close menu')}><RomanIcon name="close"/></button><h2>{t('Меню игры', 'Game menu')}</h2><div className={arenaStyles.helpBody}>
       <p>{roomCode || 'PvP'} · {playerNames?.[room.seat] || heroName(me.heroId)} / {playerNames?.[(1 - room.seat) as 0 | 1] || heroName(foe.heroId)}</p><p>{t('Онлайн-бой продолжается, пока меню открыто.', 'The online battle continues while this menu is open.')}</p>
       <div className={arenaStyles.menuActions}><button onClick={() => setHelp(false)}>{t('Продолжить', 'Resume')}</button><button onClick={() => {setHelp(false); setHistory(true);}}>{t('История боя', 'Battle history')}</button><button onClick={() => {setHelp(false); setKeyboard(true);}}>{t('Доступные действия', 'Available actions')}</button>
+        <ArenaFeedbackSettings/>
         <button onClick={() => {void unlockAudio(); setMuted(!muted);}}>{muted ? t('Звук: выключен', 'Sound: off') : t('Звук: включён', 'Sound: on')}</button><button onClick={() => setLocale(locale === 'ru' ? 'en' : 'ru')}>{locale === 'ru' ? 'Язык: Русский' : 'Language: English'}</button>
         <button onClick={() => {const next = quality === 'auto' ? 'sharp' : quality === 'sharp' ? 'fast' : 'auto'; setQuality(next); try {localStorage.setItem('imperivm-arena-quality', next);} catch {}}}>{t('Изображение:', 'Image:')} {quality === 'auto' ? t('авто', 'auto') : quality === 'sharp' ? t('чётче', 'sharper') : t('быстрее', 'faster')}</button>
         {game.winner === null && <button disabled={!connected || pending} onClick={() => setConcede(true)}>{t('Сдаться', 'Concede')}</button>}

@@ -12,6 +12,7 @@ export function SiteHeader({ active = 'home' }: { active?: 'home' | 'library' | 
       <Link href="/" aria-current={active === 'home' ? 'page' : undefined}>{t('Главная', 'Home')}</Link>
       <Link href="/library" aria-current={active === 'library' ? 'page' : undefined}>{t('Библиотека', 'Library')}</Link>
       <Link href="/packs" aria-current={active === 'packs' ? 'page' : undefined}>{t('Паки', 'Packs')}</Link>
+      <Link href="/arena" className={styles.navPlay} aria-current={active === 'play' ? 'page' : undefined}>{t('Играть', 'Play')}</Link>
       <button type="button" onClick={() => setLocale(locale === 'ru' ? 'en' : 'ru')} aria-label={t('Переключить язык на английский', 'Switch language to Russian')} className={styles.language}>{locale.toUpperCase()} <span aria-hidden="true">/ {locale === 'ru' ? 'EN' : 'RU'}</span></button>
     </nav>
   </header>;
