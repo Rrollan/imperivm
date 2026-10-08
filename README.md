@@ -50,6 +50,8 @@ Deck **30** · hand **10** · board **5**, expandable to **7** with Agora Expans
 
 Olympus adds six cards with public preparation and conditional arrival effects. All previous cards remain available. See [design, research and validation](docs/research/olympus-design-20261007.md) and [Omni Flash pack 18–25](docs/olympus-vfx/00-START-HERE.md).
 
+All eight Olympus effects are installed; see the [import and validation report](docs/olympus-vfx/IMPORT-20261008.md). A separate [set of 50 character illustrations](docs/art-direction/generated-characters-50-20261008/README.md) is prepared for a future expansion; its proposed mechanics are not yet playable. Preview the art at `/ui/arena-lab/character-art-50/index.html`.
+
 
 Hearthstone-grade card anatomy: blue mana crystal, oval art portrait, gold name ribbon, parchment rules text, gold attack orb, red health drop. Rarity frames from silver to dragon-claw legendary.
 
