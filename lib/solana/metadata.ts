@@ -1,5 +1,16 @@
 import { CARDS } from '../cards';
-export const GENESIS_IDS = Object.keys(CARDS).filter(id => id !== 'audit');
+// Freeze the original 40-item Candy Machine manifest. New gameplay cards must
+// not shift existing config-line indices or expand an immutable deployed machine.
+export const GENESIS_IDS = [
+  'lending-legionnaire', 'amm-centurion', 'liquidation-officer', 'frontrun-bot', 'priority-fee',
+  'yield-farmer', 'staking-pool', 'flash-loan', 'impermanent-guard', 'imperator-liquidus',
+  'pixel-squire', 'whitelist-scout', 'profile-pic-phalanx', 'trait-reroll', 'floor-sweeper',
+  'ape-praetorian', 'minting-press', 'reveal-ceremony', 'blue-chip-basilisk', 'genesis-pfp',
+  'antenna-auxilia', 'mesh-messenger', 'relay-runner', 'node-sentinel', 'bandwidth-barbarian',
+  'hotspot-hoplite', 'gps-gladiator', 'solar-sapper', 'firmware-phalanx', 'the-grand-cartographer',
+  'jeet-legion', 'gm-greeter', 'dogen', 'sandwich-attacker', 'pepito', 'pump-chaser',
+  'diamond-hoarder', 'fud-hydra', 'to-the-moon-militia', 'rug-pull',
+];
 export function metadataBase(raw = process.env.NEXT_PUBLIC_NFT_METADATA_BASE_URL): string | null {
   try {
     if (!raw) return null;

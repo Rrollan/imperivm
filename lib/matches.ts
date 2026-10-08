@@ -1,7 +1,8 @@
 import { HEROES } from './heroes';
 import type { MatchStats } from './ui/matchStats';
+import { validPlayProof, type PlayProof } from './solana/proof';
 export const MATCHES_KEY = 'imperivm.matches.v1';
-export interface MatchRecord { id: string; owner: string; heroId: string; won: boolean; draw: boolean; blocks: number; playedAt: string; stats: MatchStats; exhibition: boolean; proofSignature?: string; }
+export interface MatchRecord { id: string; owner: string; heroId: string; won: boolean; draw: boolean; blocks: number; playedAt: string; stats: MatchStats; exhibition: boolean; proofSignature?: string; proof?: PlayProof; }
 let memory: MatchRecord[] = [];
 export function readMatches(): MatchRecord[] {
   try {
@@ -20,7 +21,7 @@ export function saveMatch(record: MatchRecord): void {
   try { localStorage.setItem(MATCHES_KEY, JSON.stringify(memory)); } catch { /* memory fallback */ }
   if (typeof window !== 'undefined') window.dispatchEvent(new Event('imperivm:matches'));
 }
-export function winsFor(owner: string) { return readMatches().filter(m => m.owner === owner && m.won && !m.exhibition).length; }
+export function winsFor(owner: string) { return readMatches().filter(m => m.owner === owner && m.won && !m.exhibition && validPlayProof(m.proof, m)).length; }
 export function localLeaderboard() {
   const rows = new Map<string, { owner: string; wins: number; games: number }>();
   for (const match of readMatches().filter(m => !m.exhibition)) {

@@ -10,7 +10,8 @@ import { bytesToBase64, proofMessage, verifyPlaySignature, type PlayProof } from
 type Phantom = Omit<Wallet, 'features'> & { features: Wallet['features'] & StandardConnectFeature & StandardEventsFeature & Partial<StandardDisconnectFeature> & Partial<SolanaSignMessageFeature> & Partial<SolanaSignTransactionFeature> };
 type WalletState = {
   owner: string | null; balance: number | null; installed: boolean; busy: boolean; error: string | null;
-  connect: () => Promise<void>; disconnect: () => Promise<void>; refresh: () => Promise<void>;
+  connect: () => Promise<string | null>; disconnect: () => Promise<void>; refresh: () => Promise<void>;
+  signMessage: (message: Uint8Array, expectedOwner: string) => Promise<Uint8Array>;
   signPlay: (matchId: string, heroId: string) => Promise<PlayProof>;
   signTransaction: (bytes: Uint8Array, expectedOwner: string) => Promise<Uint8Array>;
 };
@@ -28,6 +29,7 @@ export default function WalletContext({ children }: { children: React.ReactNode 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const lock = useRef(false);
+  const liveWallet = useRef<Phantom | null>(null);
   const liveAccount = useRef(account); liveAccount.current = account;
   useEffect(() => {
     const registry = getWallets();
@@ -39,7 +41,7 @@ export default function WalletContext({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (!wallet) return;
     return wallet.features['standard:events'].on('change', change => {
-      if (change.accounts) { setAccount(change.accounts.find(a => a.chains.includes(DEVNET_CHAIN)) ?? null); setBalance(null); setError(null); }
+      if (change.accounts) { const next = change.accounts.find(a => a.chains.includes(DEVNET_CHAIN)) ?? null; liveAccount.current = next; setAccount(next); setBalance(null); setError(null); }
     });
   }, [wallet]);
   const owner = account?.address ?? null;
@@ -53,7 +55,7 @@ export default function WalletContext({ children }: { children: React.ReactNode 
   }, []);
   useEffect(() => { setBalance(null); if (owner) void refresh(); }, [owner, refresh]);
   async function connect() {
-    if (lock.current) return;
+    if (lock.current) return null;
     lock.current = true; setBusy(true); setError(null);
     try {
       const candidate = getWallets().get().find(w => w.name.toLowerCase() === 'phantom' && 'standard:connect' in w.features && 'standard:events' in w.features) as Phantom | undefined;
@@ -61,15 +63,28 @@ export default function WalletContext({ children }: { children: React.ReactNode 
       const result = await candidate.features['standard:connect'].connect();
       const selected = result.accounts.find(a => a.chains.includes(DEVNET_CHAIN));
       if (!selected) throw new Error('This wallet account does not support Solana devnet.');
-      setWallet(candidate); setAccount(selected);
-    } catch (e) { setError(e instanceof Error ? e.message : 'Connection declined. Continue in demo mode.'); }
+      liveWallet.current = candidate; liveAccount.current = selected; setWallet(candidate); setAccount(selected);
+      return selected.address;
+    } catch (e) { setError(e instanceof Error ? e.message : 'Connection declined. Continue in demo mode.'); return null; }
     finally { lock.current = false; setBusy(false); }
   }
   async function disconnect() {
     // Clear local state even if the extension no longer responds.
     const previous = wallet;
-    liveAccount.current = null; setAccount(null); setWallet(null); setBalance(null); setError(null);
+    liveAccount.current = null; liveWallet.current = null; setAccount(null); setWallet(null); setBalance(null); setError(null);
     try { await previous?.features['standard:disconnect']?.disconnect(); } catch { /* already disconnected locally */ }
+  }
+  async function signMessage(bytes: Uint8Array, expectedOwner: string): Promise<Uint8Array> {
+    const selected = liveAccount.current, feature = liveWallet.current?.features['solana:signMessage'];
+    if (!selected || selected.address !== expectedOwner || !feature) throw new Error('Connect the same Phantom account to sign in.');
+    if (lock.current) throw new Error('A wallet request is already open.');
+    lock.current = true; setBusy(true);
+    try {
+      const [result] = await feature.signMessage({ account: selected, message: bytes });
+      if (liveAccount.current?.address !== expectedOwner) throw new Error('Wallet changed. Please sign in again.');
+      if (!result || !verifyPlaySignature(bytes, result.signedMessage, result.signature, Uint8Array.from(selected.publicKey))) throw new Error('The wallet signature did not verify.');
+      return result.signature;
+    } finally { lock.current = false; setBusy(false); }
   }
   async function signPlay(matchId: string, heroId: string): Promise<PlayProof> {
     const selected = liveAccount.current;
@@ -101,5 +116,5 @@ export default function WalletContext({ children }: { children: React.ReactNode 
       return result.signedTransaction;
     } finally { lock.current = false; setBusy(false); }
   }
-  return <Context.Provider value={{ owner, balance, installed, busy, error, connect, disconnect, refresh, signPlay, signTransaction }}>{children}</Context.Provider>;
+  return <Context.Provider value={{ owner, balance, installed, busy, error, connect, disconnect, refresh, signPlay, signMessage, signTransaction }}>{children}</Context.Provider>;
 }

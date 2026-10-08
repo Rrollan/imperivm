@@ -71,4 +71,5 @@ export const IDOS_CONFIG = {
   currency: process.env.NEXT_PUBLIC_IDOS_CURRENCY_ID || 'RUG',
   payment: process.env.NEXT_PUBLIC_IDOS_PRICE_OPTION_ID || 'RUG',
   leaderboard: process.env.NEXT_PUBLIC_IDOS_LEADERBOARD_ID || '',
+  network: process.env.NEXT_PUBLIC_IDOS_SOLANA_NETWORK_ID || 'SOLANA_DEVNET',
 };

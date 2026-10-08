@@ -447,7 +447,7 @@ function GameBoard() {
   const legal = useMemo<Action[]>(() => (state ? legalActions(state) : []), [state]);
   useEffect(() => {
     if (!state || state.winner === null || proofPending || !match.current.id) return;
-    saveMatch({ id: match.current.id, owner: proof?.owner ?? 'demo', heroId, won: state.winner === ME, draw: state.winner === 'draw', blocks: state.block, playedAt: match.current.startedAt, stats, exhibition: match.current.exhibition, proofSignature: proof?.signature });
+    saveMatch({ id: match.current.id, owner: proof?.owner ?? 'demo', heroId, won: state.winner === ME, draw: state.winner === 'draw', blocks: state.block, playedAt: match.current.startedAt, stats, exhibition: match.current.exhibition, proofSignature: proof?.signature, proof: proof ?? undefined });
   }, [state?.winner, state?.block, stats, proof, proofPending, heroId]);
   async function approvePlayProof() {
     const captured = match.current.id;

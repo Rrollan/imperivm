@@ -23,6 +23,21 @@
 .nativeCollectionGrid { display: grid; grid-template-columns: repeat(auto-fill,minmax(215px,1fr)); gap: 24px; align-items: stretch; }
 .nativeCollectionCard { display: flex; flex-direction: column; align-items: center; padding: 18px; border: 1px solid #9b794957; border-radius: 8px; background: #2b211b; box-shadow: inset 0 1px #e9bc6b16,0 12px 24px #0003; }
 .nativeCollectionCard > div:last-child { margin-top: auto; padding-top: 14px; max-width: none; color: #d5bea0; }
+.expansionNotice { margin-bottom: 24px; padding: 20px; border: 1px solid #c79c5945; border-radius: 8px; background: #30201b; }
+.expansionNotice strong { color: #efcd8f; font-size: 18px; }
+.expansionNotice p { max-width: 720px; margin: 8px 0; color: #e2cfb0; font-size: 14px; line-height: 1.65; }
+.expansionNotice > span { color: #d5bea0; font-size: 12px; }
+.characterGrid { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 22px; }
+.characterTile { display: flex; flex-direction: column; align-items: start; gap: 10px; min-width: 0; padding: 12px 12px 18px; border: 1px solid #9b794957; border-radius: 8px; background: #2b211b; text-align: left; transition: transform 150ms ease; }
+.characterTile:hover { transform: translateY(-3px); border-color: #c79c59; }
+.characterTile img { display: block; width: 100%; height: auto; aspect-ratio: 2/3; border-radius: 4px; object-fit: contain; }
+.characterTile strong { color: #f6e8cc; font: 700 23px/1.18 var(--font-roman),Georgia,serif; overflow-wrap: anywhere; }
+.characterStatus { color: #dbbf92; font-size: 12px; line-height: 1.5; }
+.characterTile .characterStatus { margin-top: auto; }
+.characterDialogArt { display: block; width: 100%; max-width: 280px; height: auto; aspect-ratio: 2/3; justify-self: center; border: 1px solid #a4824e; border-radius: 6px; }
+.characterRole { color: #edcf9d; font-size: 17px; margin: 24px 0 8px; }
+@media (max-width:700px) { .characterDialogArt { max-width: 220px; } }
+@media (max-width:480px) { .characterGrid { grid-template-columns: 1fr; gap: 18px; } .characterTile { max-width: 340px; width: 100%; margin-inline: auto; } }
 .cardFacts { display: flex; flex-direction: column; gap: 10px; width: 100%; text-align: left; margin-top: 14px; color: #f6e8cc; }
 .factName { font: 700 23px/1.15 var(--font-roman),Georgia,serif; overflow-wrap: anywhere; }
 .factRole { font: 600 12px/1.6 var(--font-sans); color: #d8b77a; }
@@ -74,6 +89,7 @@
 .navigation a:hover, .navigation a[aria-current='page'] { color: var(--wine); border-bottom-color: var(--wine); }
 .language { min-height: 44px; padding: 0 0 0 20px; border-left: 1px solid var(--line); font-size: 12px; }
 .language span { color: var(--muted); font-weight: 500; }
+.accountButton { min-height: 44px; padding: 8px 12px; border: 1px solid #9a7749; border-radius: 5px; color: #f6dfaa; background: #32221b; font-size: 12px; white-space: nowrap; }
 .main { padding: 0 36px 72px; }
 .introduction { display: grid; grid-template-columns: 1.05fr 1fr; gap: 24px; align-items: center; padding: 54px 0 32px; }
 .introCopy { position: relative; z-index: 2; }
