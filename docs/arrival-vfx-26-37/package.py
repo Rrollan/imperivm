@@ -11,6 +11,9 @@ DOC = Path(__file__).resolve().parent
 OUT = ROOT / 'public/ui/arena-lab/imperivm-arrival-vfx-26-37'
 jobs = json.loads((DOC / 'jobs.json').read_text())
 ledger = json.loads((DOC / 'generation-ledger.json').read_text())
+registry = json.loads((ROOT / 'public/ui/arena-lab/fx/manifest.json').read_text())['clips']
+review = json.loads((DOC / 'imported-20261008.json').read_text()) if (DOC / 'imported-20261008.json').exists() else {'clips': []}
+statuses = {clip['id']: clip['status'] for clip in review['clips']}
 assert len(jobs) == len(ledger) == 12, 'Finish all twelve individual generations first'
 OUT.mkdir(parents=True, exist_ok=True)
 for job, record in zip(jobs, ledger):
@@ -38,7 +41,10 @@ for job, record in zip(jobs, ledger):
     )
     (folder / (number + '-PROMPT.txt')).write_text(prompt)
     job['prompt'] = prompt
-    job['installed'] = False
+    job['installed'] = job['id'] in registry
+    job['status'] = statuses.get(job['id'], 'pending') if job['installed'] else 'pending'
+    if job['installed']:
+        job['runtime'] = {'preview': '/ui/arena-lab/fx/previews/' + job['id'] + '.mp4', 'seconds': registry[job['id']]['maxMs'] / 1000}
     job['pivot'] = {'x': .5, 'y': .8 if job['kind'] == 'apparition' else .5}
     job['plane'] = 'standing-billboard' if job['kind'] == 'apparition' else 'board-xy'
     job['sha256'] = hashlib.sha256((folder / (number + '-START.png')).read_bytes()).hexdigest()
@@ -62,16 +68,30 @@ for label, batch in [('A', jobs[:6]), ('B', jobs[6:])]:
 cards = []
 for job in jobs:
     title, hook = html.escape(job['title']), html.escape(job['hook'])
-    cards.append(f'''<article><a href="{job['id']}/{job['n']}-START.png"><img src="{job['id']}/{job['n']}-START.png" alt="{title}" loading="lazy"></a><div class="copy"><small>{job['id']} · {job['active']:.2f} с · видео ещё не подключено</small><h2>{title}</h2><p>{hook}</p><nav><a href="{job['id']}/{job['n']}-START.png" download>START</a><a href="{job['id']}/{job['n']}-END.png" download>END</a><a href="{job['id']}/{job['n']}-PROMPT.txt" download>PROMPT</a></nav></div></article>''')
+    accepted = f'''<video controls playsinline muted preload="none" poster="{job['id']}/{job['n']}-START.png" aria-label="{title} — принятый ролик"><source src="{job['runtime']['preview']}" type="video/mp4"></video>''' if job['installed'] else f'''<a href="{job['id']}/{job['n']}-START.png"><img src="{job['id']}/{job['n']}-START.png" alt="{title}" loading="lazy"></a>'''
+    status = 'В игре' if job['status'] == 'in-game' else 'Сохранено для будущей карты' if job['status'] == 'reserved' else 'Ожидает генерации'
+    seconds = job['runtime']['seconds'] if job['installed'] else job['active']
+    cards.append(f'''<article>{accepted}<div class="copy"><small>{job['id']} · {seconds:.2f} с · {status}</small><h2>{title}</h2><p>{hook}</p><nav><a href="{job['id']}/{job['n']}-START.png" download>START</a><a href="{job['id']}/{job['n']}-END.png" download>END</a><a href="{job['id']}/{job['n']}-PROMPT.txt" download>PROMPT</a></nav></div></article>''')
 page = '''<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>IMPERIVM — анимации 26–37</title><style>
 *{box-sizing:border-box}body{margin:0;background:#171d19;color:#eee7d2;font:17px/1.55 system-ui,sans-serif}main{max-width:1280px;margin:auto;padding:36px 24px}header{max-width:920px;margin-bottom:30px}h1{font:600 clamp(30px,5vw,52px)/1.1 Georgia,serif;margin:12px 0}h2{font:600 24px/1.2 Georgia,serif;margin:10px 0}p{color:#cdd1c5}small{color:#b9c0af}nav{display:flex;flex-wrap:wrap;gap:10px}a{color:#f1d394;text-underline-offset:3px}nav a,.zip{display:inline-block;background:#cfb273;color:#19221a;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:650;min-height:44px}.zip{margin:12px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr));gap:22px}article{background:#252c24;border:1px solid #455044;border-radius:14px;overflow:hidden}article img{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;background:#000}.copy{padding:20px}@media(max-width:500px){main{padding:24px 16px}.copy{padding:16px}}
 </style><main><header><small>IMPERIVM / ПОЯВЛЕНИЕ · КОНТАКТ · ПОПАДАНИЕ</small><h1>12 новых анимаций</h1><p>Семь приземлений, три появления персонажей и два попадания. Готовые кадры и промпты; видео сгенерируйте в Omni Flash.</p><a class="zip" href="imperivm-arrival-vfx-26-37.zip" download>Скачать весь пак</a><p><strong>16:9 · 720p · 4 секунды · 1 результат.</strong><br>Прикрепите START и END одного номера, вставьте его PROMPT. Сначала 26, 32 и 36.</p><p>Контакт расходится по плоскости карты. У стоящих персонажей стопы закреплены на одной точке. Посейдон, Гефест и Дионис — арт для будущего расширения, способности ещё не реализованы.</p><nav><a href="AGENT-BATCH-A.txt">Агент: 26–31</a><a href="AGENT-BATCH-B.txt">Агент: 32–37</a><a href="00-START-HERE.txt">Инструкция</a></nav></header><div class="grid">''' + ''.join(cards) + '</div></main></html>'
 (OUT / 'index.html').write_text(page)
+if len(statuses) == 12:
+    page = page.replace('12 новых анимаций', '12 полученных анимаций')
+    page = page.replace('Семь приземлений, три появления персонажей и два попадания. Готовые кадры и промпты; видео сгенерируйте в Omni Flash.', '9 эффектов подключены к бою: семь приземлений и два попадания. Три появления сохранены для будущих персонажей. Ниже — принятые короткие ролики без встроенного звука.')
+    page = page.replace('article img{', 'article video,article img{')
+    page = page.replace('Скачать весь пак', 'Исходный пак START / END / PROMPT')
+    page = page.replace('Прикрепите START и END одного номера, вставьте его PROMPT. Сначала 26, 32 и 36.', 'Исходные кадры и промпты сохранены для новых вариантов. В игре контакты укорочены до 0,50–0,80 с.')
+    (OUT / 'index.html').write_text(page)
 archive = OUT / 'imperivm-arrival-vfx-26-37.zip'
 with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as package:
-    for file in sorted(OUT.rglob('*')):
-        if file.is_file() and file != archive:
-            package.write(file, file.relative_to(OUT))
+    # Only our twelve job folders and known briefing files belong in this ZIP.
+    # A user may unpack their own archive alongside them; preserve that folder.
+    files = [OUT / name for name in ['00-START-HERE.txt', 'manifest.json', 'index.html', 'AGENT-BATCH-A.txt', 'AGENT-BATCH-B.txt']]
+    for job in jobs:
+        files.extend(file for file in (OUT / job['id']).iterdir() if file.is_file())
+    for file in sorted(files):
+        package.write(file, file.relative_to(OUT))
 with zipfile.ZipFile(archive) as package:
     assert package.testzip() is None
     assert sum(name.endswith('-START.png') for name in package.namelist()) == 12

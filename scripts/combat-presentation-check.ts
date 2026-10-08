@@ -29,7 +29,7 @@ for(const hero of Object.keys(HEROES))for(const seed of [21,375,2718]){
       assert.equal(sounds.filter(s=>['attack','arcane-impact','bolt-impact','lightning-impact','shield-impact','rift-impact'].includes(s)).length,1,'One contact, one weapon sound');
       assert.ok(!sounds.includes('damage'),'A weapon contact must not stack a generic thud');
       const fallback=style.delivery==='arcane'?'07-spell-impact':'01-impact';
-      const accent=style.shape==='lightning'?'18-olympian-lightning':style.shape==='rift'?'20-underworld-rift':style.shape==='shield'?'19-diamond-phalanx':style.delivery==='melee'?'22-titan-cleave':fallback;
+      const accent=style.shape==='lightning'?'18-olympian-lightning':style.shape==='rift'?'20-underworld-rift':style.shape==='shield'?'19-diamond-phalanx':style.delivery==='melee'?'22-titan-cleave':style.delivery==='bolt'?'36-relay-impact':'37-oracle-impact';
       const expected=Object.prototype.hasOwnProperty.call(registry.clips,accent)?accent:fallback;
       assert.equal(videoCues(batch)[0].id,expected,'Installed material accent must match the real attack; absent clips retain the native fallback');
     }

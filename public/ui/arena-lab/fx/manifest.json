@@ -322,6 +322,174 @@
         0,
         1.499
       ]
+    },
+    "26-firmware-landing": {
+      "src": "/ui/arena-lab/fx/26-firmware-landing.atlas.webp",
+      "maxMs": 633,
+      "columns": 4,
+      "rows": 5,
+      "frameCount": 19,
+      "fps": 30,
+      "bytes": 79266,
+      "sourceRange": [
+        0,
+        0.649
+      ],
+      "composite": "luma-alpha"
+    },
+    "27-hoplite-landing": {
+      "src": "/ui/arena-lab/fx/27-hoplite-landing.atlas.webp",
+      "maxMs": 533,
+      "columns": 4,
+      "rows": 4,
+      "frameCount": 16,
+      "fps": 30,
+      "bytes": 79660,
+      "sourceRange": [
+        0,
+        0.549
+      ],
+      "composite": "luma-alpha"
+    },
+    "28-priest-landing": {
+      "src": "/ui/arena-lab/fx/28-priest-landing.atlas.webp",
+      "maxMs": 633,
+      "columns": 4,
+      "rows": 5,
+      "frameCount": 19,
+      "fps": 30,
+      "bytes": 60932,
+      "sourceRange": [
+        0,
+        0.649
+      ],
+      "composite": "luma-alpha"
+    },
+    "29-commander-landing": {
+      "src": "/ui/arena-lab/fx/29-commander-landing.atlas.webp",
+      "maxMs": 600,
+      "columns": 4,
+      "rows": 5,
+      "frameCount": 18,
+      "fps": 30,
+      "bytes": 61316,
+      "sourceRange": [
+        0,
+        0.599
+      ],
+      "composite": "luma-alpha"
+    },
+    "30-mosaic-landing": {
+      "src": "/ui/arena-lab/fx/30-mosaic-landing.atlas.webp",
+      "maxMs": 633,
+      "columns": 4,
+      "rows": 5,
+      "frameCount": 19,
+      "fps": 30,
+      "bytes": 87528,
+      "sourceRange": [
+        0,
+        0.649
+      ],
+      "composite": "luma-alpha"
+    },
+    "31-meme-landing": {
+      "src": "/ui/arena-lab/fx/31-meme-landing.atlas.webp",
+      "maxMs": 533,
+      "columns": 4,
+      "rows": 4,
+      "frameCount": 16,
+      "fps": 30,
+      "bytes": 70260,
+      "sourceRange": [
+        0,
+        0.549
+      ],
+      "composite": "luma-alpha"
+    },
+    "32-colossus-landing": {
+      "src": "/ui/arena-lab/fx/32-colossus-landing.atlas.webp",
+      "maxMs": 800,
+      "columns": 4,
+      "rows": 6,
+      "frameCount": 24,
+      "fps": 30,
+      "bytes": 146192,
+      "sourceRange": [
+        0,
+        0.799
+      ],
+      "composite": "luma-alpha"
+    },
+    "33-poseidon-apparition": {
+      "src": "/ui/arena-lab/fx/33-poseidon-apparition.atlas.webp",
+      "maxMs": 1400,
+      "columns": 4,
+      "rows": 11,
+      "frameCount": 42,
+      "fps": 30,
+      "bytes": 135236,
+      "sourceRange": [
+        0,
+        1.399
+      ],
+      "composite": "luma-alpha"
+    },
+    "34-hephaestus-apparition": {
+      "src": "/ui/arena-lab/fx/34-hephaestus-apparition.atlas.webp",
+      "maxMs": 1400,
+      "columns": 4,
+      "rows": 11,
+      "frameCount": 42,
+      "fps": 30,
+      "bytes": 110394,
+      "sourceRange": [
+        0,
+        1.399
+      ],
+      "composite": "luma-alpha"
+    },
+    "35-dionysus-apparition": {
+      "src": "/ui/arena-lab/fx/35-dionysus-apparition.atlas.webp",
+      "maxMs": 1333,
+      "columns": 4,
+      "rows": 10,
+      "frameCount": 40,
+      "fps": 30,
+      "bytes": 89658,
+      "sourceRange": [
+        0,
+        1.3490000000000002
+      ],
+      "composite": "luma-alpha"
+    },
+    "36-relay-impact": {
+      "src": "/ui/arena-lab/fx/36-relay-impact.atlas.webp",
+      "maxMs": 500,
+      "columns": 4,
+      "rows": 4,
+      "frameCount": 15,
+      "fps": 30,
+      "bytes": 61204,
+      "sourceRange": [
+        0,
+        0.499
+      ],
+      "composite": "luma-alpha"
+    },
+    "37-oracle-impact": {
+      "src": "/ui/arena-lab/fx/37-oracle-impact.atlas.webp",
+      "maxMs": 600,
+      "columns": 4,
+      "rows": 5,
+      "frameCount": 18,
+      "fps": 30,
+      "bytes": 52266,
+      "sourceRange": [
+        0,
+        0.599
+      ],
+      "composite": "luma-alpha"
     }
   }
 }

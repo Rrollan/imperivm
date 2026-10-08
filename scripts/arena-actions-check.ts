@@ -99,7 +99,7 @@ function passTurn(game:GameSession,label:string){
   assert.ok(played,'The minion must enter its owner board');
   assert.equal(batch.events?.play?.cardId,'liquidation-officer');
   assert.equal(batch.events?.damages?.find(d=>d.uid==='battlecry-target')?.health,3,'Battlecry damage must appear in the real event diff');
-  assert.deepEqual(cueIds(batch),[{id:'13-deploy-minister',anchor:played.uid},{id:'07-spell-impact',anchor:'battlecry-target'}]);
+  assert.deepEqual(cueIds(batch),[{id:'30-mosaic-landing',anchor:played.uid},{id:'07-spell-impact',anchor:'battlecry-target'}]);
   assert.deepEqual(abilityCues(batch).map(c=>[c.kind,c.from,c.to]),[['steel',played.uid,'battlecry-target']]);
   assert.equal(abilityCues(batch)[0].phase,'after','The source must land before its Battlecry feedback');
   assert.equal(abilityCues(batch).some(c=>c.kind==='heal'),false,'A non-healing battlecry must not emit a heal cue');

@@ -11,7 +11,12 @@ const apparitions: Record<string, { footY: number; visibleWidth: number; visible
   '23-zeus-apparition': { footY: .94, visibleWidth: .64, visibleHeight: .94 },
   '24-athena-apparition': { footY: .97, visibleWidth: .72, visibleHeight: .97 },
   '25-hades-apparition': { footY: .94, visibleWidth: .68, visibleHeight: .94 },
+  '33-poseidon-apparition': { footY: .845, visibleWidth: .75, visibleHeight: .85 },
+  '34-hephaestus-apparition': { footY: .90, visibleWidth: .67, visibleHeight: .85 },
+  '35-dionysus-apparition': { footY: .82, visibleWidth: .62, visibleHeight: .77 },
 };
+
+export const isSurfaceLanding=(id:string)=>/^(2[6-9]|3[0-2])-/.test(id);
 
 /** Size authored content, including its black padding, against the real row. */
 export function spritePlacement(id: string, fallbackWidth: number, bounds?: FighterBounds): SpritePlacement {
@@ -25,6 +30,14 @@ export function spritePlacement(id: string, fallbackWidth: number, bounds?: Figh
     // Source feet attach to the card's centre. Black padding must not shift
     // the character's ground point as its shield/robe changes shape.
     return { width, height, offsetY: height * (appearance.footY - .5), depth: -.9, group: 1, alpha: .6 };
+  }
+  if (isSurfaceLanding(id) && bounds) {
+    const height=landingDiameter(bounds,id==='32-colossus-landing');
+    return {width:height*16/9,height,offsetY:0,depth:.35,group:0,alpha:.72};
+  }
+  if ((id==='36-relay-impact'||id==='37-oracle-impact') && bounds) {
+    const height=Math.min(bounds.height*1.1,bounds.spacing*1.3);
+    return {width:height*16/9,height,offsetY:0,depth:-.9,group:1,alpha:.65};
   }
   if (/^1[0-5]-deploy/.test(id) && bounds) {
     const width = Math.min(bounds.width * 1.45, bounds.spacing * .98) / .46;

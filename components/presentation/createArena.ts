@@ -24,6 +24,7 @@ import { PresentationScheduler } from './PresentationScheduler';
 import { ArenaEffects } from './ArenaEffects';
 import { ArenaSpriteEffects } from './ArenaSpriteEffects';
 import { videoCues, VIDEO_IDS } from './videoCue';
+import {isSurfaceLanding} from './deploymentGeometry';
 import type { PresentationBatch } from './GameSession';
 import {MOTION, smooth, settle, attackTravel,deathProgress,publicPlayPhase,drawPhase} from './motionSpec';
 import {battleCommand,fighterReadiness} from './battleReadability';
@@ -134,7 +135,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   const deployments=new ArenaDeploymentEffects(scene,request);
   const videoEffects = new ArenaSpriteEffects(scene,request);
   // Warm every small combat atlas during loading, before its first contact.
-  if(!options.reducedMotion)videoEffects.prepare(VIDEO_IDS.filter(id=>id!=='06-victory').map(id=>({id,anchor:'arena-center',width:4})));
+  if(!options.reducedMotion)videoEffects.prepare(VIDEO_IDS.filter(id=>id!=='06-victory'&&!['33-poseidon-apparition','34-hephaestus-apparition','35-dionysus-apparition'].includes(id)).map(id=>({id,anchor:'arena-center',width:4})));
 
   function material(name: string, color: string, specular = .2) {
     const known = materials.get(name); if (known) return known;
@@ -663,7 +664,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       if (activeBatch?.id !== batch.id) return;
       hapticContact(batch.action.type);
       videoEffects.trigger(timeline?cues.filter(c=>!c.wave):cues,locateSprite,options.reducedMotion,undefined,cueBounds);
-      if(batch.events?.play)deployments.begin(batch.events.play.cardId,target,{width:boardRow.width/50,height:boardRow.height/50,spacing:boardRow.spacing/50},options.reducedMotion,added?()=>entities.get(added.uid)?.root.position:undefined);
+      const authoredLanding=cues.find(cue=>isSurfaceLanding(cue.id)&&cue.anchor===added?.uid);
+      if(batch.events?.play&&!(authoredLanding&&videoEffects.ready(authoredLanding.id)))deployments.begin(batch.events.play.cardId,target,{width:boardRow.width/50,height:boardRow.height/50,spacing:boardRow.spacing/50},options.reducedMotion,added?()=>entities.get(added.uid)?.root.position:undefined);
       if(handUid){
         // Replace the arriving card with its battlefield/queue form at the same position,
         // at contact rather than after a return to the hand or a blank frame.

@@ -11,7 +11,7 @@ import registry from '../../public/ui/arena-lab/fx/manifest.json';
 import {VIDEO_IDS,type VideoCue,type VideoId} from './videoCue';
 import {spritePlacement,type FighterBounds} from './deploymentGeometry';
 
-type Source={src:string;maxMs:number;columns:number;rows:number;frameCount:number;fps:number};
+type Source={src:string;maxMs:number;columns:number;rows:number;frameCount:number;fps:number;composite?:'luma-alpha'};
 type Clip={texture:Texture;material:StandardMaterial;mesh:Mesh;source:Source};
 type Live={clip:Clip;elapsed:number;durationMs:number;follow?:()=>Vector3|undefined;offsetY:number};
 
@@ -23,6 +23,7 @@ export class ArenaSpriteEffects {
   private sources:Partial<Record<Exclude<VideoId,'06-victory'>,Source>>=registry.clips as Partial<Record<Exclude<VideoId,'06-victory'>,Source>>;
   constructor(private scene:Scene,private invalidate:()=>void){}
   get active(){return this.live.length>0;}
+  ready(id:VideoId){return this.load(id)?.some(clip=>clip.texture.isReady())??false;}
   prepare(cues:VideoCue[]){cues.forEach(c=>this.load(c.id));}
   private load(id:VideoId){
     if(id==='06-victory')return;
@@ -39,6 +40,11 @@ export class ArenaSpriteEffects {
     material.diffuseColor=Color3.Black();material.emissiveColor=Color3.Black();material.emissiveTexture=ink;
     material.disableLighting=true;material.useEmissiveAsIllumination=true;material.specularColor=Color3.Black();
     material.alphaMode=Engine.ALPHA_ADD;material.transparencyMode=Material.MATERIAL_ALPHABLEND;
+    // On pale marble, additive RGB saturates cyan/violet into white. These
+    // authored black-background clips use luminance as opacity, preserving ink.
+    if(source.composite==='luma-alpha'){
+      ink.getAlphaFromRGB=true;material.opacityTexture=ink;material.alphaMode=Engine.ALPHA_COMBINE;
+    }
     const mesh=MeshBuilder.CreatePlane(`sprite:${id}:${index}`,{width:1,height:9/16},this.scene);
     mesh.material=material;mesh.isPickable=false;mesh.renderingGroupId=2;mesh.setEnabled(false);
     const clip={texture:ink,material,mesh,source};

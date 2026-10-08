@@ -9,10 +9,25 @@ import {combatStyle} from './combatStyle';
 import {ultimateReady} from '../../lib/engine/tactics';
 import registry from '../../public/ui/arena-lab/fx/manifest.json';
 
-export const VIDEO_IDS = ['01-impact','02-builder-heal','03-whale-impact','04-degen-draw','05-validator-gas','06-victory','07-spell-impact','08-spell-buff','09-spell-counter','10-deploy-legionary','11-deploy-guard','12-deploy-commander','13-deploy-minister','14-deploy-priest','15-deploy-engineer','16-edict-weaken','17-edict-heal','18-olympian-lightning','19-diamond-phalanx','20-underworld-rift','21-legendary-descent','22-titan-cleave','23-zeus-apparition','24-athena-apparition','25-hades-apparition'] as const;
+export const VIDEO_IDS = ['01-impact','02-builder-heal','03-whale-impact','04-degen-draw','05-validator-gas','06-victory','07-spell-impact','08-spell-buff','09-spell-counter','10-deploy-legionary','11-deploy-guard','12-deploy-commander','13-deploy-minister','14-deploy-priest','15-deploy-engineer','16-edict-weaken','17-edict-heal','18-olympian-lightning','19-diamond-phalanx','20-underworld-rift','21-legendary-descent','22-titan-cleave','23-zeus-apparition','24-athena-apparition','25-hades-apparition','26-firmware-landing','27-hoplite-landing','28-priest-landing','29-commander-landing','30-mosaic-landing','31-meme-landing','32-colossus-landing','33-poseidon-apparition','34-hephaestus-apparition','35-dionysus-apparition','36-relay-impact','37-oracle-impact'] as const;
 export type VideoId = typeof VIDEO_IDS[number];
 const installed=(id:VideoId,fallback:VideoId):VideoId=>Object.prototype.hasOwnProperty.call(registry.clips,id)?id:fallback;
 export type VideoCue = { id: VideoId; anchor: string; width: number;wave?:string };
+
+/** Select presentation by printed identity; arrival never changes card rules. */
+export function deploymentVideo(cardId:string):VideoId {
+  const card=CARDS[cardId],role=cardIdentity(cardId).role;
+  const fallback:VideoId={legionary:'10-deploy-legionary',guard:'11-deploy-guard',commander:'12-deploy-commander',minister:'13-deploy-minister',priest:'14-deploy-priest',engineer:'15-deploy-engineer',edict:'10-deploy-legionary'}[role] as VideoId;
+  const apparition:Partial<Record<string,VideoId>>={'zeus-liquidator':'23-zeus-apparition','athena-diamond-guard':'24-athena-apparition','hades-rugkeeper':'25-hades-apparition'};
+  if(apparition[cardId])return installed(apparition[cardId]!,fallback);
+  const preferred:VideoId=cardId==='firmware-phalanx'?'26-firmware-landing'
+    :role==='commander'?'29-commander-landing'
+    :card.cost>=7||card.rarity==='legendary'?'32-colossus-landing'
+    :role==='priest'?'28-priest-landing'
+    :role==='engineer'?'26-firmware-landing':role==='minister'?'30-mosaic-landing'
+    :card.faction==='Meme'?'31-meme-landing':card.faction==='NFT'?'30-mosaic-landing':'27-hoplite-landing';
+  return installed(preferred,fallback);
+}
 
 /** Bind visual effects to the actual action/target, never infer rules from the animation. */
 export function videoCues(batch: PresentationBatch): VideoCue[] {
@@ -21,14 +36,14 @@ export function videoCues(batch: PresentationBatch): VideoCue[] {
   const counters=batch.events?.spellCounters??(batch.events?.spellCountered?[batch.events.spellCountered]:[]);
   const cancellations:VideoCue[]=counters.map(c=>({id:'09-spell-counter',anchor:`queued-${c.mempoolUid}`,width:2}));
   // Victory is displayed by the result dialog. It must not swallow the final hit.
-  if(played){const role=cardIdentity(played.cardId).role;const id={legionary:'10-deploy-legionary',guard:'11-deploy-guard',commander:'12-deploy-commander',minister:'13-deploy-minister',priest:'14-deploy-priest',engineer:'15-deploy-engineer',edict:'10-deploy-legionary'}[role] as VideoId;const apparition:Partial<Record<string,VideoId>>={'zeus-liquidator':'23-zeus-apparition','athena-diamond-guard':'24-athena-apparition','hades-rugkeeper':'25-hades-apparition'};const card=CARDS[played.cardId];cues.push({id:installed(apparition[played.cardId]??id,id),anchor:played.uid,width:card.cost>=6?5.8:4});}
+  if(played)cues.push({id:deploymentVideo(played.cardId),anchor:played.uid,width:CARDS[played.cardId].cost>=6?5.8:4});
   // Direct Priority gets the second sprite slot: damage already has its exact
   // number and native contact glyph, while a removed edict has no stat number.
   if(played||action.type==='cast-spell')cues.push(...cancellations);
   if(action.type==='attack'){
     const fighter=batch.before.players[owner].board.find(m=>m.uid===action.attackerUid);
     const style=combatStyle(fighter?.cardId),fallback:VideoId=style.delivery==='arcane'?'07-spell-impact':'01-impact';
-    const accent:VideoId=style.shape==='lightning'?'18-olympian-lightning':style.shape==='rift'?'20-underworld-rift':style.shape==='shield'?'19-diamond-phalanx':style.delivery==='melee'?'22-titan-cleave':fallback;
+    const accent:VideoId=style.shape==='lightning'?'18-olympian-lightning':style.shape==='rift'?'20-underworld-rift':style.shape==='shield'?'19-diamond-phalanx':style.delivery==='melee'?'22-titan-cleave':style.delivery==='bolt'?'36-relay-impact':'37-oracle-impact';
     return [{id:installed(accent,fallback),anchor:action.target==='hero'?`hero-${1-owner}`:action.target,width:4}];
   }
   if(action.type==='hero-power'){

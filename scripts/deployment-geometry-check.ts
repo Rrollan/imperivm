@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {fighterRow} from '../components/presentation/battleLayout';
-import {landingDiameter,spritePlacement} from '../components/presentation/deploymentGeometry';
+import {landingDiameter,spritePlacement,isSurfaceLanding} from '../components/presentation/deploymentGeometry';
 
 let layouts=0;
 for(const portrait of [false,true])for(const owner of [0,1])for(const count of [1,3,5,7,9]){
@@ -18,6 +18,19 @@ for(const portrait of [false,true])for(const owner of [0,1])for(const count of [
   const ordinary=spritePlacement('15-deploy-engineer',4,bounds);
   assert.equal(ordinary.offsetY,0,'Ordinary contact stays at the card centre');
   assert.ok(ordinary.depth>-.15&&ordinary.depth<1.7,'Surface contact is behind the card and in front of the table');
+  for(const id of ['26-firmware-landing','27-hoplite-landing','28-priest-landing','29-commander-landing','30-mosaic-landing','31-meme-landing','32-colossus-landing']){
+    const contact=spritePlacement(id,5.8,bounds);
+    assert.ok(isSurfaceLanding(id));
+    assert.equal(contact.group,0,'A landing belongs beneath the played card');
+    assert.equal(contact.offsetY,0,'The contact origin remains on the real socket');
+    assert.ok(Math.abs(contact.width/contact.height-16/9)<1e-8,'The authored circle keeps equal pixel scale in X and Y');
+    assert.ok(contact.height/2<bounds.spacing,'A radial contact cannot reach the next socket centre');
+  }
+  for(const id of ['36-relay-impact','37-oracle-impact']){
+    const impact=spritePlacement(id,4,bounds);
+    assert.equal(impact.group,1,'An impact appears on the real target');
+    assert.ok(impact.height<=bounds.spacing*1.3+1e-8,'A ranged impact respects crowded rows');
+  }
   layouts++;
 }
 const impact=spritePlacement('18-olympian-lightning',4);

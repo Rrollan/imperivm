@@ -23,7 +23,6 @@ import {installDelayedSpellFixtures} from './delayed-spell-fixtures';
 const cardIds=Object.keys(CARDS).sort();
 const restoreDelayedFixtures=installDelayedSpellFixtures(['flash-loan']);
 const findings:string[]=[];
-const observedRoleAnimations=new Map<string,string>();
 const deployedRoles=new Set<string>();
 const deployedClips=new Set<string>();
 const covered:{cardId:string;phase:'play'|'queue'|'resolve';cueCount:number}[]=[];
@@ -308,13 +307,15 @@ minionCards.forEach((cardId,index)=>{
   const special:Record<string,string>={'zeus-liquidator':'23-zeus-apparition','athena-diamond-guard':'24-athena-apparition','hades-rugkeeper':'25-hades-apparition'};
   const arrival=special[cardId];
   const installedArrival=arrival&&Object.prototype.hasOwnProperty.call(registry.clips,arrival)?arrival:undefined;
-  assert.equal(deploy.filter(c=>/^1[0-5]-deploy/.test(c.id)||['23-zeus-apparition','24-athena-apparition','25-hades-apparition'].includes(c.id)).length,1,`${cardId}: played minion must get exactly one deployment clip`);
+  assert.equal(deploy.filter(c=>/^1[0-5]-deploy/.test(c.id)||/^(2[6-9]|3[0-2])-/.test(c.id)||['23-zeus-apparition','24-athena-apparition','25-hades-apparition'].includes(c.id)).length,1,`${cardId}: played minion must get exactly one deployment clip`);
   assert.ok(!deploy.some(c=>c.id==='21-legendary-descent'),`${cardId}: a tilted vertical portal cannot represent contact with the flat table`);
   assert.equal(deploy[0].anchor,played.uid,`${cardId}: deployment clip must follow the summoned fighter`);
   deployedRoles.add(identity.role);deployedClips.add(deploy[0].id);
   if(installedArrival)assert.equal(deploy[0].id,installedArrival,`${cardId}: installed legendary arrival replaces its role clip`);
-  else if(observedRoleAnimations.has(identity.role))assert.equal(observedRoleAnimations.get(identity.role),deploy[0].id,`${identity.role}: ordinary cards in a role share its deployment cue`);
-  else observedRoleAnimations.set(identity.role,deploy[0].id);
+  assert.ok(!deploy.some(c=>['33-poseidon-apparition','34-hephaestus-apparition','35-dionysus-apparition'].includes(c.id)),`${cardId}: future character artwork cannot replace a current card`);
+  if(cardId==='firmware-phalanx')assert.equal(deploy[0].id,'26-firmware-landing','Firmware Phalanx gets its own frontal circuit contact');
+  if(identity.role==='commander')assert.equal(deploy[0].id,'29-commander-landing','Commanders retain their scarlet identity');
+  if(!installedArrival&&cardId!=='firmware-phalanx'&&identity.role!=='commander'&&(card.cost>=7||card.rarity==='legendary'))assert.equal(deploy[0].id,'32-colossus-landing','Expensive fighters get the heavier frontal contact');
 
   if(card.halvingPeriod){
     const beforeTick={attack:played.attack,health:played.health,maxHealth:played.maxHealth};
@@ -381,7 +382,7 @@ spellCards.forEach((cardId,index)=>{
 const minionRoles=Array.from(new Set(minionCards.map(id=>cardIdentity(id).role)));
 assert.equal(minionRoles.length,6,'The catalog must exercise six distinct fighter roles');
 assert.equal(deployedRoles.size,6,'Every fighter role must have a deployment clip, including legendary arrivals');
-assert.equal(new Set(observedRoleAnimations.values()).size,observedRoleAnimations.size,'Ordinary fighter roles must retain distinct deployment clips');
+for(const id of ['26-firmware-landing','27-hoplite-landing','28-priest-landing','29-commander-landing','30-mosaic-landing','31-meme-landing','32-colossus-landing'])assert.ok(deployedClips.has(id),`${id}: every new landing is used by a real current card`);
 const deploymentCueIds=Array.from(deployedClips);
 assert.equal(spellCards.length+minionCards.length,cardIds.length);
 for(const id of cardIds){

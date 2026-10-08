@@ -1,0 +1,235 @@
+{
+  "archive": "Download (10).zip",
+  "sourceFormat": {
+    "width": 1280,
+    "height": 720,
+    "fps": 24,
+    "seconds": 4.01
+  },
+  "generatePreviews": true,
+  "clips": [
+    {
+      "id": "26-firmware-landing",
+      "sourceName": "Game_VFX_animation_effect_20261008104333.mp4",
+      "sourceIndex": 26,
+      "sha256": "ec5c90ff1d05ada6f2f6a64d122c465818c171bf0ca88fb8079bcd45ca7ad5da",
+      "sourceRange": [
+        0,
+        1.35
+      ],
+      "playbackSeconds": 0.65,
+      "preprocess": [
+        "setpts=0.481481481*PTS",
+        "lutrgb=r='if(lt(val,12),0,val)':g='if(lt(val,12),0,val)':b='if(lt(val,12),0,val)'",
+        "fps=30"
+      ],
+      "status": "in-game",
+      "review": "All twelve source contact sheets reviewed at 4 fps: correct theme and frontal contacts. Black/noise tails discarded, contact retimed, cropped expansion edges feathered, audio removed. Three future characters reserved, no new game rules."
+    },
+    {
+      "id": "27-hoplite-landing",
+      "sourceName": "Game_VFX_landing_effect_animation_20261008104333.mp4",
+      "sourceIndex": 27,
+      "sha256": "13bb03b298ed58c3b433cdb3d1c0f9068e92a78e359a9b7f6eae4bba7600417b",
+      "sourceRange": [
+        0,
+        0.95
+      ],
+      "playbackSeconds": 0.55,
+      "preprocess": [
+        "setpts=0.578947368*PTS",
+        "lutrgb=r='if(lt(val,12),0,val)':g='if(lt(val,12),0,val)':b='if(lt(val,12),0,val)'",
+        "fps=30",
+        "geq=r='r(X,Y)*min(1,min(min(X,W-1-X),min(Y,H-1-Y))/28)':g='g(X,Y)*min(1,min(min(X,W-1-X),min(Y,H-1-Y))/28)':b='b(X,Y)*min(1,min(min(X,W-1-X),min(Y,H-1-Y))/28)'"
+      ],
+      "status": "in-game",
+      "review": "All twelve source contact sheets reviewed at 4 fps: correct theme and frontal contacts. Black/noise tails discarded, contact retimed, cropped expansion edges feathered, audio removed. Three future characters reserved, no new game rules."
+    },
+    {
+      "id": "28-priest-landing",
+      "sourceName": "Game_VFX_arrival_effect_animation_20261008104333.mp4",
+      "sourceIndex": 28,
+      "sha256": "a24acda064e26de1f481df76e2354fb58d1d932961a71edc922d32a371e07078",
+      "sourceRange": [
+        0,
+        1.55
+      ],
+      "playbackSeconds": 0.65,
+      "preprocess": [
+        "setpts=0.419354839*PTS",
+        "lutrgb=r='if(lt(val,12),0,val)':g='if(lt(val,12),0,val)':b='if(lt(val,12),0,val)'",
+        "fps=30"
+      ],
+      "status": "in-game",
+      "review": "All twelve source contact sheets reviewed at 4 fps: correct theme and frontal contacts. Black/noise tails discarded, contact retimed, cropped expansion edges feathered, audio removed. Three future characters reserved, no new game rules."
+    },
+    {
+      "id": "29-commander-landing",
+      "sourceName": "Scarlet_ribbon_game_visual_effect_20261008104333.mp4",
+      "sourceIndex": 29,
+      "sha256": "c4d0cd312411ab2a4857ba8ae8187fab7fd7b853ba02239d8d139218232f34d9",
+      "sourceRange": [
+        0,
+        0.9
+      ],
+      "playbackSeconds": 0.6,
+      "preprocess": [
+        "setpts=0.666666667*PTS",
+        "lutrgb=r='if(lt(val,12),0,val)':g='if(lt(val,12),0,val)':b='if(lt(val,12),0,val)'",
+        "fps=30"
+      ],
+      "status": "in-game",
+      "review": "All twelve source contact sheets reviewed at 4 fps: correct theme and frontal contacts. Black/noise tails discarded, contact retimed, cropped expansion edges feathered, audio removed. Three future characters reserved, no new game rules."
+    },
+    {
+      "id": "30-mosaic-landing",
+      "sourceName": "Ceramic_corners_breaking_with_light_20261008104333.mp4",
+      "sourceIndex": 30,
+      "sha256": "33f88b0a2deb6452c44a9c5f0898cdfd14e977e70f57d37df5c0bf82e1686d7c",
+      "sourceRange": [
+        0,
+        0.95
+      ],
+      "playbackSeconds": 0.65,
+      "preprocess": [
+        "setpts=0.684210526*PTS",
+        "lutrgb=r='if(lt(val,12),0,val)':g='if(lt(val,12),0,val)':b='if(lt(val,12),0,val)'",
+        "fps=30",
+        "geq=r='r(X,Y)*min(1,min(min(X,W-1-X),min(Y,H-1-Y))/28)':g='g(X,Y)*min(1,min(min(X,W-1-X),min(Y,H-1-Y))/28)':b='b(X,Y)*min(1,min(min(X,W-1-X),min(Y,H-1-Y))/28)'"
+      ],
+      "status": "in-game",
+      "review": "All twelve source contact sheets reviewed at 4 fps: correct theme and frontal contacts. Black/noise tails discarded, contact retimed, cropped expansion edges feathered, audio removed. Three future characters reserved, no new game rules."
+    },
+    {
+      "id": "31-meme-landing",
+      "sourceName": "Game_VFX_coin_animation_20261008104333.mp4",
+      "sourceIndex": 31,
+      "sha256": "54a900ca972a8ecca3e8d9fc9915095f23ffa6c8724d2455a9621a9b4c073c53",
+      "sourceRange": [
+        0,
+        0.9
+      ],
+      "playbackSeconds": 0.55,
+      "preprocess": [
+        "setpts=0.611111111*PTS",
+        "lutrgb=r='if(lt(val,12),0,val)':g='if(lt(val,12),0,val)':b='if(lt(val,12),0,val)'",
+        "fps=30"
+      ],
+      "status": "in-game",
+      "review": "All twelve source contact sheets reviewed at 4 fps: correct theme and frontal contacts. Black/noise tails discarded, contact retimed, cropped expansion edges feathered, audio removed. Three future characters reserved, no new game rules."
+    },
+    {
+      "id": "32-colossus-landing",
+      "sourceName": "Game_VFX_expanding_ring_effect_20261008104333.mp4",
+      "sourceIndex": 32,
+      "sha256": "14345ea2aba08a5d12b88fd7112d4fdb89ffeeaf0f38a5d26068162842de2bd6",
+      "sourceRange": [
+        0,
+        0.95
+      ],
+      "playbackSeconds": 0.8,
+      "preprocess": [
+        "setpts=0.842105263*PTS",
+        "lutrgb=r='if(lt(val,12),0,val)':g='if(lt(val,12),0,val)':b='if(lt(val,12),0,val)'",
+        "fps=30",
+        "geq=r='r(X,Y)*min(1,min(min(X,W-1-X),min(Y,H-1-Y))/28)':g='g(X,Y)*min(1,min(min(X,W-1-X),min(Y,H-1-Y))/28)':b='b(X,Y)*min(1,min(min(X,W-1-X),min(Y,H-1-Y))/28)'"
+      ],
+      "status": "in-game",
+      "review": "All twelve source contact sheets reviewed at 4 fps: correct theme and frontal contacts. Black/noise tails discarded, contact retimed, cropped expansion edges feathered, audio removed. Three future characters reserved, no new game rules."
+    },
+    {
+      "id": "33-poseidon-apparition",
+      "sourceName": "Poseidon_dissolves_into_blue_dro…_20261008104333.mp4",
+      "sourceIndex": 33,
+      "sha256": "a9f3158d25f49f863d7ac06a049d25c9bbba7aa836796c8c8fae379bcb2eb266",
+      "sourceRange": [
+        0,
+        1.75
+      ],
+      "playbackSeconds": 1.4,
+      "preprocess": [
+        "setpts=0.800000000*PTS",
+        "lutrgb=r='if(lt(val,12),0,val)':g='if(lt(val,12),0,val)':b='if(lt(val,12),0,val)'",
+        "fps=30",
+        "fade=t=in:st=0:d=0.08"
+      ],
+      "status": "reserved",
+      "review": "All twelve source contact sheets reviewed at 4 fps: correct theme and frontal contacts. Black/noise tails discarded, contact retimed, cropped expansion edges feathered, audio removed. Three future characters reserved, no new game rules."
+    },
+    {
+      "id": "34-hephaestus-apparition",
+      "sourceName": "Figure_dissolving_into_amber_embers_20261008104333.mp4",
+      "sourceIndex": 34,
+      "sha256": "9eae3717638dd9c63a6244fb94be66981a86263a38045f152f4fe43c00b11b0c",
+      "sourceRange": [
+        0,
+        1.85
+      ],
+      "playbackSeconds": 1.4,
+      "preprocess": [
+        "setpts=0.756756757*PTS",
+        "lutrgb=r='if(lt(val,12),0,val)':g='if(lt(val,12),0,val)':b='if(lt(val,12),0,val)'",
+        "fps=30",
+        "fade=t=in:st=0:d=0.08"
+      ],
+      "status": "reserved",
+      "review": "All twelve source contact sheets reviewed at 4 fps: correct theme and frontal contacts. Black/noise tails discarded, contact retimed, cropped expansion edges feathered, audio removed. Three future characters reserved, no new game rules."
+    },
+    {
+      "id": "35-dionysus-apparition",
+      "sourceName": "Dionysus_raises_goblet_dissolves_20261008104333.mp4",
+      "sourceIndex": 35,
+      "sha256": "86874c866853d8053941dddf432530f7d2505cb73c3752c8806aea354aa63f43",
+      "sourceRange": [
+        0,
+        1.7
+      ],
+      "playbackSeconds": 1.35,
+      "preprocess": [
+        "setpts=0.794117647*PTS",
+        "lutrgb=r='if(lt(val,12),0,val)':g='if(lt(val,12),0,val)':b='if(lt(val,12),0,val)'",
+        "fps=30",
+        "fade=t=in:st=0:d=0.08"
+      ],
+      "status": "reserved",
+      "review": "All twelve source contact sheets reviewed at 4 fps: correct theme and frontal contacts. Black/noise tails discarded, contact retimed, cropped expansion edges feathered, audio removed. Three future characters reserved, no new game rules."
+    },
+    {
+      "id": "36-relay-impact",
+      "sourceName": "Game_VFX_impact_animation_20261008104333.mp4",
+      "sourceIndex": 36,
+      "sha256": "9c7c5318b22fda8adb41fe7cf7768404ecbbfd20cce7fb7c5a4a8305c590df0d",
+      "sourceRange": [
+        0,
+        0.7
+      ],
+      "playbackSeconds": 0.5,
+      "preprocess": [
+        "setpts=0.714285714*PTS",
+        "lutrgb=r='if(lt(val,12),0,val)':g='if(lt(val,12),0,val)':b='if(lt(val,12),0,val)'",
+        "fps=30",
+        "geq=r='r(X,Y)*min(1,min(min(X,W-1-X),min(Y,H-1-Y))/28)':g='g(X,Y)*min(1,min(min(X,W-1-X),min(Y,H-1-Y))/28)':b='b(X,Y)*min(1,min(min(X,W-1-X),min(Y,H-1-Y))/28)'"
+      ],
+      "status": "in-game",
+      "review": "All twelve source contact sheets reviewed at 4 fps: correct theme and frontal contacts. Black/noise tails discarded, contact retimed, cropped expansion edges feathered, audio removed. Three future characters reserved, no new game rules."
+    },
+    {
+      "id": "37-oracle-impact",
+      "sourceName": "Game_VFX_particle_impact_effect_20261008104333.mp4",
+      "sourceIndex": 37,
+      "sha256": "250274ff99ab7485813e2ed97dc7b59ff8ce445ac2a5b07e8645074021c02118",
+      "sourceRange": [
+        0,
+        1.1
+      ],
+      "playbackSeconds": 0.6,
+      "preprocess": [
+        "setpts=0.545454545*PTS",
+        "lutrgb=r='if(lt(val,12),0,val)':g='if(lt(val,12),0,val)':b='if(lt(val,12),0,val)'",
+        "fps=30"
+      ],
+      "status": "in-game",
+      "review": "All twelve source contact sheets reviewed at 4 fps: correct theme and frontal contacts. Black/noise tails discarded, contact retimed, cropped expansion edges feathered, audio removed. Three future characters reserved, no new game rules."
+    }
+  ]
+}
