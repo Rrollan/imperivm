@@ -23,7 +23,7 @@ import {ArenaCardPreview} from '../presentation/ArenaCardPreview';
 import {OpeningHand} from '../presentation/OpeningHand';
 import {RomanIcon} from '../presentation/RomanIcon';
 import {heroPortraitPath} from '../presentation/heroPortrait';
-import {cardKeywords, cardRules, powerRules} from '../presentation/rulesText';
+import {cardKeywords, cardRules,retaliationRules, powerRules} from '../presentation/rulesText';
 import {ultimateProgress,ultimateReady} from '../../lib/engine/tactics';
 import {rankName, roleName} from '../presentation/cardIdentity';
 import {fighterReadiness, readinessText, unavailableCardText} from '../presentation/battleReadability';
@@ -38,6 +38,7 @@ type ArenaView = GameState & {
   enableMulligan: boolean;
   mulliganPhase: [boolean, boolean];
   mulliganCount: [number, number];
+  presentationActions: Action[];
 };
 function arenaView(game: OnlineGame, seat: 0 | 1): ArenaView {
   const player = (owner: 0 | 1) => {
@@ -45,7 +46,7 @@ function arenaView(game: OnlineGame, seat: 0 | 1): ArenaView {
     const hand = owner === 0 ? [...(source.hand ?? [])] : Array.from({length: source.handCount}, (_, i) => ({uid: `hidden-${i}`, cardId: ''}));
     if (owner === 1) Object.defineProperty(hand, Symbol.iterator, {value: function* (): Generator<HandCard> {}});
     return {id: owner, heroId: source.heroId, treasury: source.treasury,
-      gas: source.gas, maxGas: source.maxGas, heroPowerUsed: source.heroPowerUsed, fatigue: source.fatigue,
+      gas: source.gas, maxGas: source.maxGas, heroPowerUsed: source.heroPowerUsed, reinforcementUsed: source.reinforcementUsed, fatigue: source.fatigue,
       boardCapacity: source.boardCapacity, factionPlaysThisTurn: {...source.factionPlaysThisTurn}, pavilionBonuses: [...(source.pavilionBonuses??[])],
       deck: Array<string>(source.deckCount).fill(''), hand, board: source.board.map(m => ({...m})),
       mempool: source.edicts.map(e => ({...e, owner}))};
@@ -54,6 +55,7 @@ function arenaView(game: OnlineGame, seat: 0 | 1): ArenaView {
     winner: game.winner === null || game.winner === 'draw' ? game.winner : game.winner === seat ? 0 : 1,
     players: [player(0), player(1)], log: [], rng: 0,
     enableMulligan: game.mulliganOpen, mulliganPhase: [game.mulliganOpen, false],
+    presentationActions: game.actions,
     mulliganCount: [game.players[seat].handCount, game.players[(1 - seat) as 0 | 1].handCount]};
 }
 
@@ -242,6 +244,7 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
   const actionLabel = (action: Action) => {
     if (action.type === 'end-turn') return t('Завершить ход', 'End turn');
     if (action.type === 'hero-power') return powerName(me.heroId);
+    if (action.type === 'buy-card') return t('Купить подкрепление · 2 приказа', 'Buy reinforcement · 2 orders');
     if (action.type === 'mulligan') return action.uids.length ? t('Заменить выбранные карты', 'Replace selected cards') : t('Оставить все', 'Keep all');
     if (action.type === 'attack') {const attacker = me.board.find(m => m.uid === action.attackerUid), target = foe.board.find(m => m.uid === action.target); return `${attacker ? cardName(attacker.cardId) : ''} → ${action.target === 'hero' ? heroName(foe.heroId) : target ? cardName(target.cardId) : ''}`;}
     const source = [...(me.hand ?? []), ...me.board].find(c => c.uid === action.uid);
@@ -270,6 +273,7 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
       </> : undefined}>
       {minion && <p className={arenaStyles.fighterStatus}>{readinessText(fighterReadiness(view, inspect.owner, minion, game.actions), locale)}</p>}
       <p className={arenaStyles.inspectionRules}>{cardRules(card.id, locale, false)}</p>
+      {card.type==='minion'&&<p>{retaliationRules(minion?.attack??card.attack??0,locale)}</p>}
       {card.ultimate&&inspect.kind==='hand'&&<p className={arenaStyles.fighterStatus}>{ultimateReady(view,inspect.owner,card)?t('Ультимейт готов','Ultimate ready'):`${t('Подготовка','Preparation')}: ${Math.min(card.ultimate.count,ultimateProgress(view,inspect.owner,card))}/${card.ultimate.count}`}</p>}
       <div className={arenaStyles.keywords}>{cardKeywords(card.id, locale).map(keyword => <details key={keyword.name}><summary>{keyword.name}</summary><p>{keyword.description}</p></details>)}</div>
       {card.type === 'spell' && <div className={arenaStyles.edictTiming}><strong>{isInstantSpell(card) ? t('Мгновенно · в этом ходу', 'Instant · this turn') : t('Указ · в начале следующего своего хода', 'Edict · at the start of your next turn')}</strong></div>}
@@ -281,10 +285,10 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
       <h3>{powerName(inspectedHero.heroId)}</h3><p className={arenaStyles.inspectionRules}>{powerRules(inspectedHero.heroId, locale)}</p><p>{t('Один раз за ход.', 'Once per turn.')}</p>
     </ArenaInspection>}
     {inspect && ['gas', 'block', 'deck', 'scroll'].includes(inspect.kind) && <ArenaInspection key={inspect.kind} {...inspectionProps} title={inspect.kind === 'gas' ? t('Приказы', 'Orders') : inspect.kind === 'block' ? t('Ход', 'Turn') : inspect.kind === 'deck' ? t('Колода', 'Deck') : t('Очередь указов', 'Edict queue')} eyebrow="IMPERIVM"
-      actions={inspect.kind === 'scroll' ? <button onClick={() => {close(); setHistory(true);}}>{t('История боя', 'Battle history')}</button> : undefined}>
+      actions={inspect.kind === 'scroll' ? <button onClick={() => {close(); setHistory(true);}}>{t('История боя', 'Battle history')}</button> : inspect.kind === 'deck' && me.deckCount === 0 ? <button className={arenaStyles.primary} disabled={!actions.some(a => a.type === 'buy-card')} onClick={() => act({type:'buy-card'})}><span className={arenaStyles.costChip}>2</span>{t('Купить подкрепление', 'Buy reinforcement')}</button> : undefined}>
       {inspect.kind === 'gas' && <dl className={arenaStyles.inspectionStats}><div><dt>{t('Доступно', 'Available')}</dt><dd>{me.gas}</dd></div><div><dt>{t('Вместимость', 'Capacity')}</dt><dd>{me.maxGas}</dd></div></dl>}
       {inspect.kind === 'block' && <><p className={arenaStyles.inspectionRules}>{t('Блок', 'Block')} {game.block} · {seconds} {t('сек.', 'sec.')}</p><p>{t('По истечении таймера сервер завершит ход.', 'The server ends the turn when the timer expires.')}</p></>}
-      {inspect.kind === 'deck' && <p className={arenaStyles.inspectionRules}>{t('Карт осталось:', 'Cards remaining:')} {me.deckCount}</p>}
+      {inspect.kind === 'deck' && <><p className={arenaStyles.inspectionRules}>{t('Карт осталось:', 'Cards remaining:')} {me.deckCount}</p><p>{t('Когда колода пуста, купите случайную карту из её исходного состава за 2 приказа. Один раз за свой ход, если в руке меньше 10 карт. Усталость сохраняется.', 'When the deck is empty, buy a random card from its original list for 2 orders. Once per own turn, with room in your hand. Fatigue still applies.')}</p>{me.deckCount === 0 && <p className={arenaStyles.fighterStatus}>{me.reinforcementUsed ? t('Подкрепление уже куплено в этом ходу.', 'Reinforcement already purchased this turn.') : (me.handCount >= 10 ? t('Рука заполнена.', 'Your hand is full.') : me.gas < 2 ? t('Нужно 2 приказа.', 'Requires 2 orders.') : status)}</p>}</>}
       {inspect.kind === 'scroll' && <><p className={arenaStyles.inspectionRules}>{t('В начале следующего хода владельца, по порядку.', 'At the start of the owner’s next turn, in cast order.')}</p>{([0, 1] as const).map(owner => <section key={owner} className={arenaStyles.queueGroup}><h3>{owner === 0 ? t('Ваши указы', 'Your edicts') : t('Указы соперника', 'Enemy edicts')}</h3>{view.players[owner].mempool.length ? view.players[owner].mempool.map((e, i) => <button className={arenaStyles.queueEntry} key={e.uid} onClick={() => setInspect({kind: 'queue', uid: `queued-${e.uid}`, owner, cardId: e.cardId})}><span>{i + 1}</span><img src={cardArtPath(e.cardId)} alt=""/><strong>{cardName(e.cardId)}</strong></button>) : <p className={arenaStyles.queueEmpty}>{t('Очередь пуста.', 'No pending edicts.')}</p>}</section>)}</>}
     </ArenaInspection>}
     {keyboard && <section ref={actionPanel} className={arenaStyles.actionsPanel} role="dialog" aria-modal="true" aria-label={t('Доступные действия', 'Available actions')}><button className={arenaStyles.close} onClick={() => setKeyboard(false)} aria-label={t('Закрыть действия', 'Close actions')}><RomanIcon name="close"/></button><h2>{t('Доступные действия', 'Available actions')}</h2><p>{t('Tab, Enter — выбрать действие. Esc — закрыть.', 'Tab, Enter to choose an action. Esc to close.')}</p>{actions.filter(a => a.type !== 'mulligan').map((a, i) => <button key={i} onClick={() => act(a)}>{actionLabel(a)}</button>)}{!actions.length && <p>{status}</p>}</section>}

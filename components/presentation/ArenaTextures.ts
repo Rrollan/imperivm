@@ -10,19 +10,20 @@ import {cardArtPath} from '../../lib/cardArt';
 import {ordersLayout,ordersView} from './ordersView';
 import type {BattleCommand,FighterReadiness} from './battleReadability';
 import {drawRomanSymbol,type RomanSymbol} from './romanSymbols';
+import {TURN_INLAY_OUTLINE,PORTRAIT_TURN_INLAY_OUTLINE} from './boardSockets';
 
 export type Face =
   | { kind: 'card'; cardId: string; playable?:boolean }
   | { kind: 'minion'; minion: Minion; ready?: boolean;readiness?:FighterReadiness }
   | { kind: 'hero'; heroId: string; treasury: number; aspect?:number; model?: boolean }
   | { kind: 'power'; heroId: string; cost: number; available: boolean; aspect?: number; model?: boolean }
-  | { kind: 'command'; state: BattleCommand; engraved?: boolean }
+  | { kind: 'command'; state: BattleCommand; engraved?: boolean; portrait?: boolean }
   | { kind: 'gas'; gas: number; max: number; engraved?: boolean }
   | { kind: 'orders'; gas: number; max: number; portrait: boolean }
   | { kind: 'queued'; cardId:string; owner:0|1; count:number; ordinal:number }
   | { kind: 'queueTitle'; own:number; enemy:number }
   | { kind: 'block'; block: number }
-  | { kind: 'deck'; count: number; model?: boolean }
+  | { kind: 'deck'; count: number; model?: boolean; reinforcement?: boolean }
   | { kind: 'scroll' }
   | { kind: 'back' };
 
@@ -88,13 +89,22 @@ export class ArenaTextures {
       else if (face.kind === 'minion') this.drawMinion(ctx, face.minion, face.ready,face.readiness);
       else if (face.kind === 'hero') this.drawHero(ctx, face.heroId, face.treasury,face.aspect??1);
       else if (face.kind === 'power') this.drawPower(ctx, face);
-      else if (face.kind === 'command') this.drawCommand(ctx, face.state, face.engraved);
+      else if (face.kind === 'command') this.drawCommand(ctx, face.state, face.engraved, face.portrait);
       else if (face.kind === 'gas') this.drawGas(ctx, face.gas, face.max, face.engraved);
       else if(face.kind==='orders')this.drawOrders(ctx,face);
       else if(face.kind==='queued')this.drawQueued(ctx,face);
       else if(face.kind==='queueTitle')this.drawQueueTitle(ctx,face);
       else if (face.kind === 'block') this.drawBlock(ctx, face.block);
-      else if (face.kind === 'deck') { if (!face.model) this.drawBack(ctx); this.badge(ctx, String(face.count), 192, 350, '#544026', 70); }
+      else if (face.kind === 'deck') {
+        if (!face.model) this.drawBack(ctx);
+        this.badge(ctx, face.reinforcement ? '2' : String(face.count), 192, 350, face.reinforcement ? '#246784' : '#544026', 70);
+        if (face.count === 0) {
+          ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`700 32px ${this.font}`;
+          ctx.strokeStyle='#24100b';ctx.lineWidth=7;ctx.fillStyle=face.reinforcement?'#ffebb0':'#d3c6ae';
+          const label=this.locale==='ru'?'ПОДКРЕПЛЕНИЕ':'REINFORCEMENT';
+          ctx.strokeText(label,192,452,370);ctx.fillText(label,192,452,370);
+        }
+      }
       else this.drawScroll(ctx);
       this.painting=null;
       texture.update(true);
@@ -209,19 +219,23 @@ export class ArenaTextures {
     this.badge(ctx, `${face.cost}`, 0, 0, '#246784', 48);ctx.restore();
   }
 
-  private drawCommand(ctx: CanvasRenderingContext2D, state: Extract<Face, { kind: 'command' }>['state'], engraved = false) {
+  private drawCommand(ctx: CanvasRenderingContext2D, state: Extract<Face, { kind: 'command' }>['state'], engraved = false, portrait = false) {
     const available=state==='own'||state==='done';
-    // The board owns the carved frame. This leather face fills its aperture;
-    // no second decorative frame or generated-image transparent padding.
-    ctx.beginPath();ctx.moveTo(45,0);ctx.lineTo(723,0);ctx.lineTo(768,47);ctx.lineTo(768,289);ctx.lineTo(723,336);ctx.lineTo(45,336);ctx.lineTo(0,289);ctx.lineTo(0,47);ctx.closePath();
+    // Clip the generated material to the measured opening, including its perspective skew.
+    // The board artwork continues to own the entire outer bronze frame.
+    ctx.save();ctx.beginPath();(portrait?PORTRAIT_TURN_INLAY_OUTLINE:TURN_INLAY_OUTLINE).forEach(([x,y],i)=>{if(i)ctx.lineTo(x*768,y*336);else ctx.moveTo(x*768,y*336);});ctx.closePath();ctx.clip();
     const leather=ctx.createLinearGradient(0,0,0,336);leather.addColorStop(0,available?'#862d20':'#4c241e');leather.addColorStop(.5,available?'#662119':'#361a16');leather.addColorStop(1,'#29130f');
-    ctx.fillStyle=leather;ctx.fill();ctx.strokeStyle=state==='done'?'#f1d492':'#b69157';ctx.lineWidth=10;ctx.stroke();
-    // Two restrained laurel branches preserve the imperial style without crowding the label.
-    for(const side of [-1,1]){ctx.save();ctx.translate(side===-1?72:696,168);ctx.scale(side,1);ctx.strokeStyle='#b89959';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(5,100);ctx.quadraticCurveTo(-34,0,5,-100);ctx.stroke();ctx.fillStyle='#c2a369';for(let i=0;i<5;i++){ctx.beginPath();ctx.ellipse(-13,80-i*40,19,6,-.7,0,Math.PI*2);ctx.fill();}ctx.restore();}
+    ctx.fillStyle=leather;ctx.fillRect(0,0,768,336);
+    const insert=this.image('/ui/arena-lab/native/turn-insert-v3.webp');
+    if(insert)ctx.drawImage(insert,0,0,768,336);
+    if(!available){ctx.fillStyle='#170f0bcc';ctx.fillRect(0,0,768,336);}
+    // Inset shading seats the material under the existing rim instead of drawing another rim.
+    ctx.strokeStyle=state==='done'?'#eec77f80':'#1c0a08a6';ctx.lineWidth=16;ctx.stroke();
     const labels=available?(this.locale==='ru'?['КОНЕЦ','ХОДА']:['END','TURN']):state==='enemy'?(this.locale==='ru'?['ХОД','СОПЕРНИКА']:['OPPONENT',"TURN"]):state==='busy'?(this.locale==='ru'?['ИДЁТ','БОЙ']:['RESOLVING']):(this.locale==='ru'?['БОЙ','ОКОНЧЕН']:['BATTLE','OVER']);
     const roman=getComputedStyle(document.body).getPropertyValue('--font-roman').trim()||this.font;
     ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle='#25100b';ctx.lineWidth=6;ctx.fillStyle=state==='done'?'#fff5c5':available?'#f8e5b8':'#cbbda3';
-    labels.forEach((label,i)=>{ctx.font=`800 103px ${roman}`;const size=Math.min(103,103*470/Math.max(1,ctx.measureText(label).width));ctx.font=`800 ${size}px ${roman}`;const y=labels.length===1?168:122+i*92;ctx.strokeText(label,384,y);ctx.fillText(label,384,y);});
+    labels.forEach((label,i)=>{ctx.font=`800 92px ${roman}`;const size=Math.min(92,92*492/Math.max(1,ctx.measureText(label).width));ctx.font=`800 ${size}px ${roman}`;const y=labels.length===1?166:119+i*94,x=portrait?384:395;ctx.strokeText(label,x,y);ctx.fillText(label,x,y);});
+    ctx.restore();
   }
 
   private drawGas(ctx: CanvasRenderingContext2D, gas: number, max: number, engraved = false) {

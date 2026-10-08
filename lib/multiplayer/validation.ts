@@ -19,7 +19,7 @@ export function parseAction(input: unknown): Action {
     case 'play-minion': case 'cast-spell': case 'stake': case 'unstake':
       keys(value, ['type', 'uid']); return {type: value.type, uid: uid(value.uid)};
     case 'attack': keys(value, ['type', 'attackerUid', 'target']); return {type: 'attack', attackerUid: uid(value.attackerUid), target: uid(value.target)};
-    case 'hero-power': case 'end-turn': keys(value, ['type']); return {type: value.type};
+    case 'hero-power': case 'end-turn': case 'buy-card': keys(value, ['type']); return {type: value.type};
     case 'mulligan':
       keys(value, ['type', 'uids']);
       if (!Array.isArray(value.uids) || value.uids.length > 4) return invalid();

@@ -12,7 +12,7 @@ function object(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 function string(value: unknown, max = 80): string {
-  if (typeof value !== 'string' || !value.length || value.length > max || /[\u0000-\u001f\u007f]/u.test(value)) fail();
+  if (typeof value !== 'string' || !value.length || value.length > max || /[\u0000-\u001f\u007f]/.test(value)) fail();
   return value;
 }
 function registration(value: Record<string, unknown>): PlayerRegistration {
@@ -31,7 +31,7 @@ function intent(value: unknown): GameIntent {
   switch (data.type) {
     case 'playCard': return {type: 'playCard', cardId: string(data.cardId)};
     case 'attack': return {type: 'attack', cardId: string(data.cardId), targetId: string(data.targetId)};
-    case 'endTurn': case 'heroPower': case 'concede': return {type: data.type};
+    case 'endTurn': case 'heroPower': case 'buyCard': case 'concede': return {type: data.type};
     case 'stake': case 'unstake': return {type: data.type, cardId: string(data.cardId)};
     case 'mulligan': {
       if (!Array.isArray(data.cardIds) || data.cardIds.length > 4) fail();

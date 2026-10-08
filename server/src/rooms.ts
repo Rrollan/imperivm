@@ -123,6 +123,7 @@ export class RoomAuthority {
     const descriptions: Record<GameIntent['type'], [string, string]> = {
       playCard: ['разыграна карта', 'card played'], attack: ['атака', 'attack'], endTurn: ['ход завершён', 'turn ended'],
       heroPower: ['применена сила предводителя', 'ruler power used'], mulligan: ['выбрана стартовая рука', 'opening hand chosen'],
+      buyCard: ['куплена карта подкрепления за 2 приказа', 'reserve card bought for 2 orders'],
       stake: ['боец отправлен в стейкинг', 'fighter staked'], unstake: ['боец возвращён', 'fighter unstaked'], concede: ['сдаётся', 'concedes'],
     };
     const description = descriptions[message.intent.type];

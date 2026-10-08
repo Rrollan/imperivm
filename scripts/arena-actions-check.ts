@@ -302,7 +302,18 @@ function mulliganGame(seed:number){
   noCues(swap,'P1 mulligan swap');
 }
 
-const required:Action['type'][]=['play-minion','cast-spell','attack','hero-power','stake','unstake','end-turn','mulligan'];
+// Paid reinforcement shares the normal hand-diff draw flight; the private
+// starting-deck distribution must never become a public spell/attack cue.
+{
+  const state=fixture(); state.players[0].deck=[];
+  const batch=dispatch(session(state),'buy reserve card from empty deck',actionType('buy-card'));
+  assert.equal(batch.after.players[0].hand.length,batch.before.players[0].hand.length+1);
+  assert.equal(batch.after.players[0].gas,batch.before.players[0].gas-2);
+  assert.equal(batch.after.players[0].reinforcementUsed,true);
+  noCues(batch,'Reserve draw');
+}
+
+const required:Action['type'][]=['play-minion','cast-spell','attack','hero-power','buy-card','stake','unstake','end-turn','mulligan'];
 const coveredTypes=Array.from(new Set(coverage.map(item=>item.type)));
 assert.deepEqual(new Set(coveredTypes),new Set(required),'Every Action variant must be exercised through a legal GameSession dispatch');
 assert.equal(coverage.filter(item=>item.type==='hero-power').length,5,'The four powers plus the capped-heal no-op probe must run');

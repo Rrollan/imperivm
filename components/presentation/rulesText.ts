@@ -2,7 +2,8 @@ import { CARDS } from '../../lib/cards';
 import { HEROES } from '../../lib/heroes';
 import {isInstantSpell} from '../../lib/engine/spellTiming';
 import type { EffectDef } from '../../lib/engine/types';
-import type { Locale } from '../../lib/locale';
+import {cardName, type Locale} from '../../lib/locale';
+import {retaliationDamage} from '../../lib/engine/combat';
 import type {RulesetId} from '../../lib/engine/ruleset';
 
 /** UI rules come from the engine fields, keeping flavour text out of the action description. */
@@ -20,7 +21,12 @@ export function effectText(effect: EffectDef, locale: Locale): string {
     case 'gain-gas': return ru ? `Даёт ${n} ${n % 100 >= 11 && n % 100 <= 14 ? 'приказов' : n % 10 === 1 ? 'приказ' : n % 10 >= 2 && n % 10 <= 4 ? 'приказа' : 'приказов'}.` : `Gain ${n} ${n === 1 ? 'order' : 'orders'}.`;
     case 'counter-mempool': return ru ? 'Отменяет самое дорогое ожидающее заклинание противника.' : 'Counter the most expensive pending enemy spell.';
     case 'rugpull': return ru ? 'Уничтожает всех бойцов на поле.' : 'Destroy every fighter on the court.';
-    case 'summon': return ru ? 'Призывает дополнительного бойца.' : 'Summon an additional fighter.';
+    case 'summon': {
+      const summoned=CARDS[effect.cardId??''];
+      if(!summoned)return ru?'Призывает дополнительного бойца при наличии свободного места.':'Summon an additional fighter if there is an empty slot.';
+      const keywords=[summoned.taunt?(ru?'Провокация':'Taunt'):null,summoned.rush?(ru?'Натиск':'Rush'):null,summoned.lifesteal?(ru?'Похищение жизни':'Lifesteal'):null].filter(Boolean).join(', ');
+      return `${ru?'Призывает':'Summon'} «${cardName(summoned.id,locale)}» ${summoned.attack}/${summoned.health}${keywords?` (${keywords})`:''}. ${ru?'Нужно свободное место; эффект выхода помощника не повторяется.':'Requires an empty slot; the helper’s arrival effect is not repeated.'}`;
+    }
     case 'expand-board': return ru ? `Навсегда добавляет ${n} место в строю, максимум до 7.` : `Permanently add ${n} court slot, up to 7.`;
   }
 }
@@ -46,12 +52,17 @@ export function cardRules(id: string, locale: Locale,includeKeywords=true) {
   if (card.battlecry) rules.push(`${ru ? 'При выходе:' : 'On arrival:'} ${effectText(card.battlecry, locale)}`);
   if (card.ultimate) {
     const u=card.ultimate;
-    const condition=u.condition==='staked'?(ru?`${u.count} ваших бойца пережили ход соперника и находятся в стейкинге`:`${u.count} established friendly fighters are staked`):u.condition==='faction-allies'?(ru?`${u.count} других бойца ${u.faction??card.faction} пережили ход соперника`:`${u.count} other ${u.faction??card.faction} fighters survived the opponent’s turn`):(ru?`ранее в этом ходу разыграно ${u.count} карт ${u.faction??card.faction}`:`you already played ${u.count} ${u.faction??card.faction} cards this turn`);
+    const condition=u.condition==='staked'?(ru?u.count===1?'хотя бы один ваш боец пережил ход соперника и находится в стейкинге':`хотя бы ${u.count} ваших бойца пережили ход соперника и находятся в стейкинге`:`at least ${u.count} established friendly fighter${u.count===1?'':'s'} ${u.count===1?'is':'are'} staked`):u.condition==='faction-allies'?(ru?u.count===1?`хотя бы один другой боец ${u.faction??card.faction} пережил ход соперника`:`хотя бы ${u.count} других бойца ${u.faction??card.faction} пережили ход соперника`:`at least ${u.count} other ${u.faction??card.faction} fighter${u.count===1?'':'s'} survived the opponent’s turn`):(ru?u.count===1?`ранее в этом ходу разыграна хотя бы одна карта ${u.faction??card.faction}`:`ранее в этом ходу разыграны хотя бы ${u.count} карты ${u.faction??card.faction}`:`you already played at least ${u.count} ${u.faction??card.faction} card${u.count===1?'':'s'} this turn`);
     rules.push(`${ru?'Ультимейт':'Ultimate'} «${ru?u.nameRu:u.name}»: ${ru?'если':'if'} ${condition}, ${card.battlecry?(ru?'вместо обычного эффекта:':'replace the ordinary effect:'):''} ${effectText(u.effect,locale)}`);
   }
   if (card.spell) rules.push(`${isInstantSpell(card)?(ru?'Мгновенно:':'Instant:'):(ru?'В начале следующего своего хода:':'At the start of your next turn:')} ${effectText(card.spell, locale)}`);
   if (card.halvingPeriod) rules.push(ru ? `Каждые ${card.halvingPeriod} блока: +1/+1.` : `Every ${card.halvingPeriod} blocks: +1/+1.`);
   return rules.join(' ') || (!includeKeywords&&cardKeywords(id,locale).length?'':ru ? 'Боец без дополнительных способностей.' : 'A fighter with no additional abilities.');
+}
+
+export function retaliationRules(attack:number,locale:Locale){
+  const damage=retaliationDamage(attack);
+  return locale==='ru'?`При атаке наносит полный урон. Защищаясь, отвечает половиной текущей атаки с округлением вверх: ${damage}. Оба удара происходят одновременно.`:`Deals full damage when attacking. When defending, retaliates for half its current attack rounded up: ${damage}. Both strikes are simultaneous.`;
 }
 
 export function powerRules(id: string, locale: Locale,ruleset:RulesetId='classic-v1') {

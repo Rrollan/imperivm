@@ -1,4 +1,5 @@
 import {boardCapacity,MAX_BOARD_CAPACITY} from './engine/tactics';
+import {retaliationDamage} from './engine/combat';
 /**
  * IMPERIVM — greedy AI (lib/ai.ts).
  *
@@ -134,8 +135,9 @@ export function chooseAiAction(state: GameState): Action {
       const tgt = foe.board.find(m => m.uid === a.target);
       if (atk === undefined || tgt === undefined) continue;
       if (tgt.health > atk.attack) continue; // can't kill it
-      const survives = atk.health > tgt.attack;
-      const evenTrade = atk.health <= tgt.attack; // both die
+      const retaliation = retaliationDamage(tgt.attack);
+      const survives = atk.health > retaliation;
+      const evenTrade = atk.health <= retaliation; // both die
       if (!survives && !evenTrade) continue;
       const score = tgt.attack * 100 + tgt.health + (survives ? 1000 : 0);
       if (score > bestScore) {
@@ -163,12 +165,16 @@ export function chooseAiAction(state: GameState): Action {
       const score = (a: Extract<Action, { type: 'attack' }>) => {
         const attacker = me.board.find(m => m.uid === a.attackerUid), target = foe.board.find(m => m.uid === a.target);
         if (!attacker || !target) return -Infinity;
-        return Math.min(attacker.attack, target.health) * 10 - Math.min(attacker.health, target.attack) + (attacker.health > target.attack ? 20 : 0);
+        const retaliation = retaliationDamage(target.attack);
+        return Math.min(attacker.attack, target.health) * 10 - Math.min(attacker.health, retaliation) + (attacker.health > retaliation ? 20 : 0);
       };
       return score(y) - score(x);
     });
     if (pressure[0]) return pressure[0];
   }
+
+  const reserve = acts.find(a => a.type === 'buy-card');
+  if (reserve) return reserve;
 
   // 4. Hero power when there is nothing left to play. Use the comeback-
   //    discounted cost so we don't attempt a power we can't afford, and

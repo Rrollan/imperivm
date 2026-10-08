@@ -17,6 +17,7 @@ export function actionForIntent(state: GameState, intent: Exclude<GameIntent, {t
     case 'attack': return {type: 'attack', attackerUid: intent.cardId, target: intent.targetId};
     case 'endTurn': return {type: 'end-turn'};
     case 'heroPower': return {type: 'hero-power'};
+    case 'buyCard': return {type: 'buy-card'};
     case 'mulligan': return {type: 'mulligan', uids: intent.cardIds};
     case 'stake': case 'unstake': return {type: intent.type, uid: intent.cardId};
   }
@@ -40,6 +41,7 @@ export function gameSnapshot(state: GameState, seat: PlayerId, turnDeadline: num
   const players = state.players.map((p, index): OnlinePlayer => ({
     id: p.id, heroId: p.heroId, treasury: p.treasury, gas: p.gas, maxGas: p.maxGas,
     fatigue: p.fatigue, heroPowerUsed: p.heroPowerUsed, powerCost: effectivePowerCost(state, index as PlayerId),
+    reinforcementUsed: !!p.reinforcementUsed,
     handCount: p.hand.length, deckCount: p.deck.length,
     boardCapacity: boardCapacity(p), factionPlaysThisTurn: {...p.factionPlaysThisTurn}, pavilionBonuses: [...(p.pavilionBonuses??[])],
     board: p.board.map(m => ({uid: m.uid, cardId: m.cardId, name: m.name, attack: m.attack, health: m.health,

@@ -1,88 +1,88 @@
 {
   "scope": "64 deterministic greedy-AI matches; not human PvP balance or wall-clock duration",
-  "medianBlocks": 27,
-  "minBlocks": 13,
-  "maxBlocks": 60,
+  "medianBlocks": 26,
+  "minBlocks": 15,
+  "maxBlocks": 51,
   "matches": [
     {
       "a": "whale",
       "b": "whale",
       "seed": 21,
-      "winner": 0,
-      "blocks": 37,
-      "actions": 134,
-      "casts": 15,
-      "counters": 4,
-      "powers": [
-        14,
-        9
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 3,
-      "factionRefunds": 5
-    },
-    {
-      "a": "whale",
-      "b": "whale",
-      "seed": 375,
       "winner": 1,
-      "blocks": 34,
-      "actions": 114,
-      "casts": 14,
+      "blocks": 24,
+      "actions": 106,
+      "casts": 9,
       "counters": 2,
       "powers": [
-        9,
-        7
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 1,
-      "factionRefunds": 4
-    },
-    {
-      "a": "whale",
-      "b": "whale",
-      "seed": 2718,
-      "winner": 0,
-      "blocks": 17,
-      "actions": 55,
-      "casts": 3,
-      "counters": 0,
-      "powers": [
-        1,
-        1
+        8,
+        4
       ],
       "neutralPowers": [
         0,
         0
       ],
       "stakes": 2,
-      "factionRefunds": 0
+      "factionRefunds": 8
     },
     {
       "a": "whale",
       "b": "whale",
-      "seed": 104729,
+      "seed": 375,
       "winner": 0,
-      "blocks": 39,
-      "actions": 137,
-      "casts": 15,
-      "counters": 2,
+      "blocks": 27,
+      "actions": 116,
+      "casts": 7,
+      "counters": 0,
       "powers": [
-        13,
-        10
+        7,
+        4
       ],
       "neutralPowers": [
         0,
         0
       ],
-      "stakes": 1,
-      "factionRefunds": 7
+      "stakes": 2,
+      "factionRefunds": 9
+    },
+    {
+      "a": "whale",
+      "b": "whale",
+      "seed": 2718,
+      "winner": 0,
+      "blocks": 51,
+      "actions": 223,
+      "casts": 15,
+      "counters": 2,
+      "powers": [
+        19,
+        15
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 3,
+      "factionRefunds": 10
+    },
+    {
+      "a": "whale",
+      "b": "whale",
+      "seed": 104729,
+      "winner": 1,
+      "blocks": 34,
+      "actions": 149,
+      "casts": 12,
+      "counters": 2,
+      "powers": [
+        8,
+        6
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 2,
+      "factionRefunds": 11
     },
     {
       "a": "whale",
@@ -90,8 +90,28 @@
       "seed": 21,
       "winner": 0,
       "blocks": 35,
-      "actions": 161,
-      "casts": 8,
+      "actions": 162,
+      "casts": 11,
+      "counters": 0,
+      "powers": [
+        13,
+        5
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 2,
+      "factionRefunds": 10
+    },
+    {
+      "a": "whale",
+      "b": "builder",
+      "seed": 375,
+      "winner": 0,
+      "blocks": 41,
+      "actions": 201,
+      "casts": 14,
       "counters": 0,
       "powers": [
         12,
@@ -101,21 +121,341 @@
         0,
         0
       ],
+      "stakes": 3,
+      "factionRefunds": 14
+    },
+    {
+      "a": "whale",
+      "b": "builder",
+      "seed": 2718,
+      "winner": 0,
+      "blocks": 41,
+      "actions": 199,
+      "casts": 11,
+      "counters": 0,
+      "powers": [
+        14,
+        10
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 4,
+      "factionRefunds": 11
+    },
+    {
+      "a": "whale",
+      "b": "builder",
+      "seed": 104729,
+      "winner": 0,
+      "blocks": 31,
+      "actions": 139,
+      "casts": 11,
+      "counters": 0,
+      "powers": [
+        7,
+        7
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 1,
+      "factionRefunds": 11
+    },
+    {
+      "a": "whale",
+      "b": "degen",
+      "seed": 21,
+      "winner": 0,
+      "blocks": 33,
+      "actions": 150,
+      "casts": 13,
+      "counters": 1,
+      "powers": [
+        12,
+        6
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 3,
+      "factionRefunds": 11
+    },
+    {
+      "a": "whale",
+      "b": "degen",
+      "seed": 375,
+      "winner": 1,
+      "blocks": 30,
+      "actions": 131,
+      "casts": 12,
+      "counters": 2,
+      "powers": [
+        6,
+        4
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 1,
+      "factionRefunds": 12
+    },
+    {
+      "a": "whale",
+      "b": "degen",
+      "seed": 2718,
+      "winner": 1,
+      "blocks": 30,
+      "actions": 133,
+      "casts": 9,
+      "counters": 3,
+      "powers": [
+        8,
+        6
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 4,
+      "factionRefunds": 8
+    },
+    {
+      "a": "whale",
+      "b": "degen",
+      "seed": 104729,
+      "winner": 0,
+      "blocks": 25,
+      "actions": 114,
+      "casts": 9,
+      "counters": 2,
+      "powers": [
+        4,
+        5
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 2,
+      "factionRefunds": 12
+    },
+    {
+      "a": "whale",
+      "b": "validator",
+      "seed": 21,
+      "winner": 1,
+      "blocks": 18,
+      "actions": 78,
+      "casts": 7,
+      "counters": 0,
+      "powers": [
+        5,
+        1
+      ],
+      "neutralPowers": [
+        0,
+        1
+      ],
       "stakes": 2,
       "factionRefunds": 6
     },
     {
       "a": "whale",
-      "b": "builder",
+      "b": "validator",
       "seed": 375,
       "winner": 0,
-      "blocks": 35,
-      "actions": 148,
+      "blocks": 23,
+      "actions": 94,
+      "casts": 7,
+      "counters": 2,
+      "powers": [
+        3,
+        5
+      ],
+      "neutralPowers": [
+        0,
+        4
+      ],
+      "stakes": 3,
+      "factionRefunds": 6
+    },
+    {
+      "a": "whale",
+      "b": "validator",
+      "seed": 2718,
+      "winner": 1,
+      "blocks": 30,
+      "actions": 152,
+      "casts": 9,
+      "counters": 2,
+      "powers": [
+        9,
+        7
+      ],
+      "neutralPowers": [
+        0,
+        2
+      ],
+      "stakes": 4,
+      "factionRefunds": 10
+    },
+    {
+      "a": "whale",
+      "b": "validator",
+      "seed": 104729,
+      "winner": 0,
+      "blocks": 27,
+      "actions": 125,
+      "casts": 11,
+      "counters": 2,
+      "powers": [
+        5,
+        7
+      ],
+      "neutralPowers": [
+        0,
+        7
+      ],
+      "stakes": 2,
+      "factionRefunds": 9
+    },
+    {
+      "a": "builder",
+      "b": "whale",
+      "seed": 21,
+      "winner": 1,
+      "blocks": 28,
+      "actions": 133,
+      "casts": 7,
+      "counters": 0,
+      "powers": [
+        6,
+        7
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 1,
+      "factionRefunds": 7
+    },
+    {
+      "a": "builder",
+      "b": "whale",
+      "seed": 375,
+      "winner": 0,
+      "blocks": 21,
+      "actions": 101,
       "casts": 10,
       "counters": 0,
       "powers": [
-        10,
-        7
+        0,
+        1
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 3,
+      "factionRefunds": 7
+    },
+    {
+      "a": "builder",
+      "b": "whale",
+      "seed": 2718,
+      "winner": 0,
+      "blocks": 35,
+      "actions": 159,
+      "casts": 11,
+      "counters": 0,
+      "powers": [
+        2,
+        8
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 3,
+      "factionRefunds": 10
+    },
+    {
+      "a": "builder",
+      "b": "whale",
+      "seed": 104729,
+      "winner": 1,
+      "blocks": 32,
+      "actions": 153,
+      "casts": 10,
+      "counters": 0,
+      "powers": [
+        8,
+        8
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 3,
+      "factionRefunds": 9
+    },
+    {
+      "a": "builder",
+      "b": "builder",
+      "seed": 21,
+      "winner": 1,
+      "blocks": 24,
+      "actions": 108,
+      "casts": 7,
+      "counters": 0,
+      "powers": [
+        5,
+        2
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 2,
+      "factionRefunds": 7
+    },
+    {
+      "a": "builder",
+      "b": "builder",
+      "seed": 375,
+      "winner": 0,
+      "blocks": 19,
+      "actions": 82,
+      "casts": 8,
+      "counters": 0,
+      "powers": [
+        0,
+        1
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 3,
+      "factionRefunds": 4
+    },
+    {
+      "a": "builder",
+      "b": "builder",
+      "seed": 2718,
+      "winner": 0,
+      "blocks": 21,
+      "actions": 94,
+      "casts": 3,
+      "counters": 0,
+      "powers": [
+        0,
+        1
       ],
       "neutralPowers": [
         0,
@@ -125,16 +465,16 @@
       "factionRefunds": 5
     },
     {
-      "a": "whale",
+      "a": "builder",
       "b": "builder",
-      "seed": 2718,
+      "seed": 104729,
       "winner": 0,
-      "blocks": 17,
-      "actions": 62,
-      "casts": 5,
+      "blocks": 19,
+      "actions": 76,
+      "casts": 7,
       "counters": 0,
       "powers": [
-        2,
+        0,
         2
       ],
       "neutralPowers": [
@@ -142,517 +482,357 @@
         0
       ],
       "stakes": 2,
-      "factionRefunds": 0
+      "factionRefunds": 6
     },
     {
-      "a": "whale",
-      "b": "builder",
-      "seed": 104729,
-      "winner": 0,
-      "blocks": 23,
-      "actions": 96,
-      "casts": 6,
+      "a": "builder",
+      "b": "degen",
+      "seed": 21,
+      "winner": 1,
+      "blocks": 28,
+      "actions": 129,
+      "casts": 10,
       "counters": 0,
       "powers": [
         6,
-        5
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 4
-    },
-    {
-      "a": "whale",
-      "b": "degen",
-      "seed": 21,
-      "winner": 0,
-      "blocks": 39,
-      "actions": 141,
-      "casts": 12,
-      "counters": 2,
-      "powers": [
-        14,
-        7
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 7
-    },
-    {
-      "a": "whale",
-      "b": "degen",
-      "seed": 375,
-      "winner": 1,
-      "blocks": 30,
-      "actions": 116,
-      "casts": 12,
-      "counters": 1,
-      "powers": [
-        7,
-        5
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 7
-    },
-    {
-      "a": "whale",
-      "b": "degen",
-      "seed": 2718,
-      "winner": 0,
-      "blocks": 27,
-      "actions": 103,
-      "casts": 9,
-      "counters": 0,
-      "powers": [
-        4,
-        4
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 4
-    },
-    {
-      "a": "whale",
-      "b": "degen",
-      "seed": 104729,
-      "winner": 0,
-      "blocks": 29,
-      "actions": 119,
-      "casts": 12,
-      "counters": 2,
-      "powers": [
-        9,
-        5
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 3,
-      "factionRefunds": 8
-    },
-    {
-      "a": "whale",
-      "b": "validator",
-      "seed": 21,
-      "winner": 0,
-      "blocks": 31,
-      "actions": 125,
-      "casts": 10,
-      "counters": 1,
-      "powers": [
-        10,
         6
       ],
       "neutralPowers": [
         0,
-        2
-      ],
-      "stakes": 3,
-      "factionRefunds": 6
-    },
-    {
-      "a": "whale",
-      "b": "validator",
-      "seed": 375,
-      "winner": 0,
-      "blocks": 45,
-      "actions": 169,
-      "casts": 13,
-      "counters": 3,
-      "powers": [
-        15,
-        13
-      ],
-      "neutralPowers": [
-        0,
-        10
+        0
       ],
       "stakes": 1,
-      "factionRefunds": 6
+      "factionRefunds": 7
     },
     {
-      "a": "whale",
-      "b": "validator",
-      "seed": 2718,
+      "a": "builder",
+      "b": "degen",
+      "seed": 375,
       "winner": 0,
-      "blocks": 17,
-      "actions": 62,
-      "casts": 5,
+      "blocks": 19,
+      "actions": 81,
+      "casts": 8,
       "counters": 0,
       "powers": [
         1,
-        2
+        1
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 1,
+      "factionRefunds": 7
+    },
+    {
+      "a": "builder",
+      "b": "degen",
+      "seed": 2718,
+      "winner": 0,
+      "blocks": 23,
+      "actions": 114,
+      "casts": 7,
+      "counters": 0,
+      "powers": [
+        4,
+        5
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 3,
+      "factionRefunds": 9
+    },
+    {
+      "a": "builder",
+      "b": "degen",
+      "seed": 104729,
+      "winner": 0,
+      "blocks": 39,
+      "actions": 201,
+      "casts": 12,
+      "counters": 0,
+      "powers": [
+        4,
+        5
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 2,
+      "factionRefunds": 17
+    },
+    {
+      "a": "builder",
+      "b": "validator",
+      "seed": 21,
+      "winner": 1,
+      "blocks": 16,
+      "actions": 65,
+      "casts": 5,
+      "counters": 0,
+      "powers": [
+        3,
+        1
       ],
       "neutralPowers": [
         0,
         1
       ],
-      "stakes": 3,
-      "factionRefunds": 2
-    },
-    {
-      "a": "whale",
-      "b": "validator",
-      "seed": 104729,
-      "winner": 0,
-      "blocks": 37,
-      "actions": 145,
-      "casts": 12,
-      "counters": 2,
-      "powers": [
-        10,
-        11
-      ],
-      "neutralPowers": [
-        0,
-        7
-      ],
-      "stakes": 2,
-      "factionRefunds": 7
+      "stakes": 1,
+      "factionRefunds": 5
     },
     {
       "a": "builder",
-      "b": "whale",
-      "seed": 21,
-      "winner": 1,
-      "blocks": 36,
-      "actions": 138,
-      "casts": 10,
+      "b": "validator",
+      "seed": 375,
+      "winner": 0,
+      "blocks": 15,
+      "actions": 62,
+      "casts": 8,
       "counters": 0,
       "powers": [
-        6,
-        6
+        0,
+        1
       ],
       "neutralPowers": [
         0,
         0
       ],
-      "stakes": 1,
-      "factionRefunds": 4
+      "stakes": 3,
+      "factionRefunds": 2
     },
     {
       "a": "builder",
-      "b": "whale",
-      "seed": 375,
+      "b": "validator",
+      "seed": 2718,
       "winner": 1,
-      "blocks": 30,
-      "actions": 117,
+      "blocks": 26,
+      "actions": 119,
       "casts": 6,
+      "counters": 0,
+      "powers": [
+        3,
+        4
+      ],
+      "neutralPowers": [
+        0,
+        4
+      ],
+      "stakes": 3,
+      "factionRefunds": 8
+    },
+    {
+      "a": "builder",
+      "b": "validator",
+      "seed": 104729,
+      "winner": 1,
+      "blocks": 26,
+      "actions": 136,
+      "casts": 9,
       "counters": 0,
       "powers": [
         5,
         5
+      ],
+      "neutralPowers": [
+        0,
+        5
+      ],
+      "stakes": 3,
+      "factionRefunds": 9
+    },
+    {
+      "a": "degen",
+      "b": "whale",
+      "seed": 21,
+      "winner": 1,
+      "blocks": 42,
+      "actions": 186,
+      "casts": 14,
+      "counters": 0,
+      "powers": [
+        7,
+        12
       ],
       "neutralPowers": [
         0,
         0
       ],
       "stakes": 0,
-      "factionRefunds": 5
+      "factionRefunds": 14
     },
     {
-      "a": "builder",
+      "a": "degen",
       "b": "whale",
-      "seed": 2718,
+      "seed": 375,
       "winner": 1,
-      "blocks": 24,
-      "actions": 95,
-      "casts": 6,
-      "counters": 0,
-      "powers": [
-        2,
-        1
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 1
-    },
-    {
-      "a": "builder",
-      "b": "whale",
-      "seed": 104729,
-      "winner": 1,
-      "blocks": 20,
-      "actions": 68,
-      "casts": 3,
-      "counters": 0,
-      "powers": [
-        2,
-        1
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 2
-    },
-    {
-      "a": "builder",
-      "b": "builder",
-      "seed": 21,
-      "winner": 1,
-      "blocks": 30,
-      "actions": 129,
-      "casts": 4,
+      "blocks": 38,
+      "actions": 173,
+      "casts": 12,
       "counters": 0,
       "powers": [
         6,
-        0
+        9
       ],
       "neutralPowers": [
         0,
         0
       ],
-      "stakes": 3,
-      "factionRefunds": 3
+      "stakes": 4,
+      "factionRefunds": 9
     },
     {
-      "a": "builder",
-      "b": "builder",
-      "seed": 375,
-      "winner": 0,
-      "blocks": 60,
-      "actions": 217,
-      "casts": 5,
-      "counters": 0,
-      "powers": [
-        9,
-        17
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 1,
-      "factionRefunds": 6
-    },
-    {
-      "a": "builder",
-      "b": "builder",
+      "a": "degen",
+      "b": "whale",
       "seed": 2718,
       "winner": 0,
-      "blocks": 25,
-      "actions": 117,
-      "casts": 3,
-      "counters": 0,
-      "powers": [
-        0,
-        3
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 2
-    },
-    {
-      "a": "builder",
-      "b": "builder",
-      "seed": 104729,
-      "winner": 1,
-      "blocks": 22,
-      "actions": 96,
-      "casts": 2,
-      "counters": 0,
-      "powers": [
-        4,
-        0
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 3,
-      "factionRefunds": 3
-    },
-    {
-      "a": "builder",
-      "b": "degen",
-      "seed": 21,
-      "winner": 1,
-      "blocks": 32,
-      "actions": 140,
-      "casts": 7,
+      "blocks": 31,
+      "actions": 150,
+      "casts": 13,
       "counters": 0,
       "powers": [
         7,
-        5
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 3,
-      "factionRefunds": 8
-    },
-    {
-      "a": "builder",
-      "b": "degen",
-      "seed": 375,
-      "winner": 1,
-      "blocks": 32,
-      "actions": 136,
-      "casts": 4,
-      "counters": 0,
-      "powers": [
-        6,
         6
       ],
       "neutralPowers": [
         0,
         0
       ],
-      "stakes": 2,
-      "factionRefunds": 8
+      "stakes": 3,
+      "factionRefunds": 13
     },
     {
-      "a": "builder",
-      "b": "degen",
-      "seed": 2718,
+      "a": "degen",
+      "b": "whale",
+      "seed": 104729,
       "winner": 1,
-      "blocks": 22,
-      "actions": 87,
-      "casts": 3,
+      "blocks": 34,
+      "actions": 158,
+      "casts": 12,
+      "counters": 0,
+      "powers": [
+        7,
+        7
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 5,
+      "factionRefunds": 15
+    },
+    {
+      "a": "degen",
+      "b": "builder",
+      "seed": 21,
+      "winner": 1,
+      "blocks": 18,
+      "actions": 83,
+      "casts": 9,
       "counters": 0,
       "powers": [
         2,
-        2
+        0
       ],
       "neutralPowers": [
         0,
         0
-      ],
-      "stakes": 2,
-      "factionRefunds": 1
-    },
-    {
-      "a": "builder",
-      "b": "degen",
-      "seed": 104729,
-      "winner": 1,
-      "blocks": 24,
-      "actions": 97,
-      "casts": 4,
-      "counters": 0,
-      "powers": [
-        4,
-        4
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 3,
-      "factionRefunds": 5
-    },
-    {
-      "a": "builder",
-      "b": "validator",
-      "seed": 21,
-      "winner": 1,
-      "blocks": 30,
-      "actions": 133,
-      "casts": 5,
-      "counters": 0,
-      "powers": [
-        4,
-        4
-      ],
-      "neutralPowers": [
-        0,
-        4
-      ],
-      "stakes": 3,
-      "factionRefunds": 4
-    },
-    {
-      "a": "builder",
-      "b": "validator",
-      "seed": 375,
-      "winner": 1,
-      "blocks": 34,
-      "actions": 160,
-      "casts": 5,
-      "counters": 0,
-      "powers": [
-        8,
-        9
-      ],
-      "neutralPowers": [
-        0,
-        9
       ],
       "stakes": 1,
-      "factionRefunds": 8
+      "factionRefunds": 7
     },
     {
-      "a": "builder",
-      "b": "validator",
-      "seed": 2718,
+      "a": "degen",
+      "b": "builder",
+      "seed": 375,
       "winner": 0,
-      "blocks": 15,
-      "actions": 63,
-      "casts": 4,
+      "blocks": 35,
+      "actions": 179,
+      "casts": 12,
       "counters": 0,
       "powers": [
-        0,
-        2
-      ],
-      "neutralPowers": [
-        0,
-        1
-      ],
-      "stakes": 3,
-      "factionRefunds": 1
-    },
-    {
-      "a": "builder",
-      "b": "validator",
-      "seed": 104729,
-      "winner": 1,
-      "blocks": 30,
-      "actions": 131,
-      "casts": 4,
-      "counters": 0,
-      "powers": [
-        5,
+        7,
         8
       ],
       "neutralPowers": [
         0,
-        7
+        0
       ],
-      "stakes": 2,
-      "factionRefunds": 7
+      "stakes": 4,
+      "factionRefunds": 12
     },
     {
       "a": "degen",
-      "b": "whale",
-      "seed": 21,
+      "b": "builder",
+      "seed": 2718,
       "winner": 1,
       "blocks": 24,
-      "actions": 88,
-      "casts": 5,
+      "actions": 130,
+      "casts": 8,
       "counters": 0,
+      "powers": [
+        6,
+        3
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 3,
+      "factionRefunds": 11
+    },
+    {
+      "a": "degen",
+      "b": "builder",
+      "seed": 104729,
+      "winner": 1,
+      "blocks": 28,
+      "actions": 140,
+      "casts": 11,
+      "counters": 0,
+      "powers": [
+        6,
+        3
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 2,
+      "factionRefunds": 12
+    },
+    {
+      "a": "degen",
+      "b": "degen",
+      "seed": 21,
+      "winner": 0,
+      "blocks": 35,
+      "actions": 185,
+      "casts": 12,
+      "counters": 1,
+      "powers": [
+        7,
+        7
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 0,
+      "factionRefunds": 17
+    },
+    {
+      "a": "degen",
+      "b": "degen",
+      "seed": 375,
+      "winner": 0,
+      "blocks": 25,
+      "actions": 120,
+      "casts": 11,
+      "counters": 1,
       "powers": [
         5,
         3
@@ -661,41 +841,21 @@
         0,
         0
       ],
-      "stakes": 2,
+      "stakes": 3,
       "factionRefunds": 8
     },
     {
       "a": "degen",
-      "b": "whale",
-      "seed": 375,
-      "winner": 0,
-      "blocks": 33,
-      "actions": 131,
-      "casts": 10,
-      "counters": 2,
+      "b": "degen",
+      "seed": 2718,
+      "winner": 1,
+      "blocks": 22,
+      "actions": 103,
+      "casts": 7,
+      "counters": 1,
       "powers": [
         6,
-        7
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 9
-    },
-    {
-      "a": "degen",
-      "b": "whale",
-      "seed": 2718,
-      "winner": 0,
-      "blocks": 37,
-      "actions": 143,
-      "casts": 13,
-      "counters": 3,
-      "powers": [
-        7,
-        7
+        4
       ],
       "neutralPowers": [
         0,
@@ -706,95 +866,55 @@
     },
     {
       "a": "degen",
-      "b": "whale",
-      "seed": 104729,
-      "winner": 1,
-      "blocks": 16,
-      "actions": 54,
-      "casts": 3,
-      "counters": 0,
-      "powers": [
-        1,
-        0
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 1,
-      "factionRefunds": 1
-    },
-    {
-      "a": "degen",
-      "b": "builder",
-      "seed": 21,
-      "winner": 0,
-      "blocks": 27,
-      "actions": 123,
-      "casts": 4,
-      "counters": 0,
-      "powers": [
-        6,
-        5
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 5
-    },
-    {
-      "a": "degen",
-      "b": "builder",
-      "seed": 375,
-      "winner": 1,
-      "blocks": 22,
-      "actions": 92,
-      "casts": 4,
-      "counters": 0,
-      "powers": [
-        2,
-        2
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 3,
-      "factionRefunds": 6
-    },
-    {
-      "a": "degen",
-      "b": "builder",
-      "seed": 2718,
-      "winner": 0,
-      "blocks": 17,
-      "actions": 63,
-      "casts": 3,
-      "counters": 0,
-      "powers": [
-        2,
-        2
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 1
-    },
-    {
-      "a": "degen",
-      "b": "builder",
+      "b": "degen",
       "seed": 104729,
       "winner": 0,
-      "blocks": 27,
-      "actions": 108,
+      "blocks": 23,
+      "actions": 96,
       "casts": 7,
       "counters": 0,
       "powers": [
         3,
+        4
+      ],
+      "neutralPowers": [
+        0,
+        0
+      ],
+      "stakes": 3,
+      "factionRefunds": 9
+    },
+    {
+      "a": "degen",
+      "b": "validator",
+      "seed": 21,
+      "winner": 1,
+      "blocks": 24,
+      "actions": 125,
+      "casts": 9,
+      "counters": 1,
+      "powers": [
+        4,
+        2
+      ],
+      "neutralPowers": [
+        0,
+        2
+      ],
+      "stakes": 0,
+      "factionRefunds": 13
+    },
+    {
+      "a": "degen",
+      "b": "validator",
+      "seed": 375,
+      "winner": 0,
+      "blocks": 21,
+      "actions": 89,
+      "casts": 7,
+      "counters": 0,
+      "powers": [
+        5,
         3
       ],
       "neutralPowers": [
@@ -802,227 +922,107 @@
         0
       ],
       "stakes": 1,
-      "factionRefunds": 6
-    },
-    {
-      "a": "degen",
-      "b": "degen",
-      "seed": 21,
-      "winner": 0,
-      "blocks": 23,
-      "actions": 90,
-      "casts": 4,
-      "counters": 1,
-      "powers": [
-        4,
-        2
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 3,
-      "factionRefunds": 7
-    },
-    {
-      "a": "degen",
-      "b": "degen",
-      "seed": 375,
-      "winner": 0,
-      "blocks": 29,
-      "actions": 118,
-      "casts": 8,
-      "counters": 1,
-      "powers": [
-        4,
-        5
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 3,
-      "factionRefunds": 10
-    },
-    {
-      "a": "degen",
-      "b": "degen",
-      "seed": 2718,
-      "winner": 1,
-      "blocks": 20,
-      "actions": 69,
-      "casts": 3,
-      "counters": 0,
-      "powers": [
-        2,
-        1
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 2
-    },
-    {
-      "a": "degen",
-      "b": "degen",
-      "seed": 104729,
-      "winner": 0,
-      "blocks": 33,
-      "actions": 134,
-      "casts": 10,
-      "counters": 2,
-      "powers": [
-        6,
-        6
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 1,
-      "factionRefunds": 9
-    },
-    {
-      "a": "degen",
-      "b": "validator",
-      "seed": 21,
-      "winner": 0,
-      "blocks": 27,
-      "actions": 110,
-      "casts": 6,
-      "counters": 1,
-      "powers": [
-        5,
-        4
-      ],
-      "neutralPowers": [
-        0,
-        4
-      ],
-      "stakes": 2,
-      "factionRefunds": 7
-    },
-    {
-      "a": "degen",
-      "b": "validator",
-      "seed": 375,
-      "winner": 0,
-      "blocks": 27,
-      "actions": 120,
-      "casts": 8,
-      "counters": 1,
-      "powers": [
-        3,
-        6
-      ],
-      "neutralPowers": [
-        0,
-        5
-      ],
-      "stakes": 3,
-      "factionRefunds": 8
-    },
-    {
-      "a": "degen",
-      "b": "validator",
-      "seed": 2718,
-      "winner": 0,
-      "blocks": 29,
-      "actions": 128,
-      "casts": 6,
-      "counters": 1,
-      "powers": [
-        6,
-        6
-      ],
-      "neutralPowers": [
-        0,
-        5
-      ],
-      "stakes": 2,
-      "factionRefunds": 9
-    },
-    {
-      "a": "degen",
-      "b": "validator",
-      "seed": 104729,
-      "winner": 1,
-      "blocks": 14,
-      "actions": 47,
-      "casts": 2,
-      "counters": 0,
-      "powers": [
-        0,
-        0
-      ],
-      "neutralPowers": [
-        0,
-        0
-      ],
-      "stakes": 1,
-      "factionRefunds": 3
-    },
-    {
-      "a": "validator",
-      "b": "whale",
-      "seed": 21,
-      "winner": 1,
-      "blocks": 24,
-      "actions": 89,
-      "casts": 8,
-      "counters": 1,
-      "powers": [
-        3,
-        2
-      ],
-      "neutralPowers": [
-        2,
-        0
-      ],
-      "stakes": 1,
-      "factionRefunds": 8
-    },
-    {
-      "a": "validator",
-      "b": "whale",
-      "seed": 375,
-      "winner": 1,
-      "blocks": 32,
-      "actions": 123,
-      "casts": 9,
-      "counters": 1,
-      "powers": [
-        7,
-        7
-      ],
-      "neutralPowers": [
-        5,
-        0
-      ],
-      "stakes": 2,
       "factionRefunds": 4
     },
     {
-      "a": "validator",
-      "b": "whale",
+      "a": "degen",
+      "b": "validator",
       "seed": 2718,
       "winner": 0,
-      "blocks": 17,
-      "actions": 61,
+      "blocks": 33,
+      "actions": 163,
+      "casts": 10,
+      "counters": 0,
+      "powers": [
+        7,
+        9
+      ],
+      "neutralPowers": [
+        0,
+        7
+      ],
+      "stakes": 3,
+      "factionRefunds": 11
+    },
+    {
+      "a": "degen",
+      "b": "validator",
+      "seed": 104729,
+      "winner": 0,
+      "blocks": 35,
+      "actions": 180,
+      "casts": 11,
+      "counters": 1,
+      "powers": [
+        6,
+        9
+      ],
+      "neutralPowers": [
+        0,
+        6
+      ],
+      "stakes": 4,
+      "factionRefunds": 12
+    },
+    {
+      "a": "validator",
+      "b": "whale",
+      "seed": 21,
+      "winner": 1,
+      "blocks": 26,
+      "actions": 121,
       "casts": 4,
       "counters": 1,
       "powers": [
-        3,
-        1
+        8,
+        6
       ],
       "neutralPowers": [
-        3,
+        6,
         0
       ],
       "stakes": 1,
-      "factionRefunds": 0
+      "factionRefunds": 10
+    },
+    {
+      "a": "validator",
+      "b": "whale",
+      "seed": 375,
+      "winner": 0,
+      "blocks": 29,
+      "actions": 134,
+      "casts": 11,
+      "counters": 1,
+      "powers": [
+        5,
+        6
+      ],
+      "neutralPowers": [
+        5,
+        0
+      ],
+      "stakes": 2,
+      "factionRefunds": 9
+    },
+    {
+      "a": "validator",
+      "b": "whale",
+      "seed": 2718,
+      "winner": 1,
+      "blocks": 26,
+      "actions": 125,
+      "casts": 7,
+      "counters": 2,
+      "powers": [
+        6,
+        4
+      ],
+      "neutralPowers": [
+        5,
+        0
+      ],
+      "stakes": 3,
+      "factionRefunds": 7
     },
     {
       "a": "validator",
@@ -1030,135 +1030,15 @@
       "seed": 104729,
       "winner": 1,
       "blocks": 26,
-      "actions": 104,
-      "casts": 8,
-      "counters": 1,
-      "powers": [
-        5,
-        5
-      ],
-      "neutralPowers": [
-        5,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 7
-    },
-    {
-      "a": "validator",
-      "b": "builder",
-      "seed": 21,
-      "winner": 0,
-      "blocks": 25,
-      "actions": 107,
-      "casts": 5,
-      "counters": 0,
-      "powers": [
-        3,
-        4
-      ],
-      "neutralPowers": [
-        3,
-        0
-      ],
-      "stakes": 1,
-      "factionRefunds": 4
-    },
-    {
-      "a": "validator",
-      "b": "builder",
-      "seed": 375,
-      "winner": 1,
-      "blocks": 28,
-      "actions": 118,
-      "casts": 5,
-      "counters": 0,
-      "powers": [
-        5,
-        0
-      ],
-      "neutralPowers": [
-        4,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 6
-    },
-    {
-      "a": "validator",
-      "b": "builder",
-      "seed": 2718,
-      "winner": 0,
-      "blocks": 29,
-      "actions": 136,
-      "casts": 2,
-      "counters": 0,
-      "powers": [
-        9,
-        7
-      ],
-      "neutralPowers": [
-        9,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 2
-    },
-    {
-      "a": "validator",
-      "b": "builder",
-      "seed": 104729,
-      "winner": 0,
-      "blocks": 31,
-      "actions": 145,
-      "casts": 5,
-      "counters": 0,
-      "powers": [
-        8,
-        7
-      ],
-      "neutralPowers": [
-        8,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 4
-    },
-    {
-      "a": "validator",
-      "b": "degen",
-      "seed": 21,
-      "winner": 1,
-      "blocks": 28,
-      "actions": 115,
-      "casts": 7,
+      "actions": 120,
+      "casts": 11,
       "counters": 2,
       "powers": [
         5,
         4
       ],
       "neutralPowers": [
-        4,
-        0
-      ],
-      "stakes": 2,
-      "factionRefunds": 10
-    },
-    {
-      "a": "validator",
-      "b": "degen",
-      "seed": 375,
-      "winner": 1,
-      "blocks": 30,
-      "actions": 125,
-      "casts": 8,
-      "counters": 0,
-      "powers": [
-        6,
-        3
-      ],
-      "neutralPowers": [
-        5,
+        3,
         0
       ],
       "stakes": 3,
@@ -1166,123 +1046,243 @@
     },
     {
       "a": "validator",
-      "b": "degen",
-      "seed": 2718,
+      "b": "builder",
+      "seed": 21,
       "winner": 1,
-      "blocks": 20,
-      "actions": 72,
-      "casts": 4,
+      "blocks": 22,
+      "actions": 97,
+      "casts": 5,
       "counters": 0,
       "powers": [
-        5,
-        0
+        6,
+        2
       ],
       "neutralPowers": [
-        5,
+        4,
         0
       ],
-      "stakes": 1,
-      "factionRefunds": 2
+      "stakes": 2,
+      "factionRefunds": 4
     },
     {
       "a": "validator",
-      "b": "degen",
-      "seed": 104729,
+      "b": "builder",
+      "seed": 375,
       "winner": 1,
-      "blocks": 22,
-      "actions": 86,
-      "casts": 3,
+      "blocks": 34,
+      "actions": 183,
+      "casts": 12,
       "counters": 0,
       "powers": [
-        2,
+        8,
+        7
+      ],
+      "neutralPowers": [
+        7,
+        0
+      ],
+      "stakes": 2,
+      "factionRefunds": 11
+    },
+    {
+      "a": "validator",
+      "b": "builder",
+      "seed": 2718,
+      "winner": 1,
+      "blocks": 24,
+      "actions": 120,
+      "casts": 6,
+      "counters": 0,
+      "powers": [
+        4,
         3
+      ],
+      "neutralPowers": [
+        3,
+        0
+      ],
+      "stakes": 3,
+      "factionRefunds": 7
+    },
+    {
+      "a": "validator",
+      "b": "builder",
+      "seed": 104729,
+      "winner": 0,
+      "blocks": 17,
+      "actions": 65,
+      "casts": 7,
+      "counters": 0,
+      "powers": [
+        1,
+        1
       ],
       "neutralPowers": [
         1,
         0
       ],
-      "stakes": 4,
+      "stakes": 2,
+      "factionRefunds": 6
+    },
+    {
+      "a": "validator",
+      "b": "degen",
+      "seed": 21,
+      "winner": 1,
+      "blocks": 18,
+      "actions": 77,
+      "casts": 4,
+      "counters": 0,
+      "powers": [
+        4,
+        3
+      ],
+      "neutralPowers": [
+        3,
+        0
+      ],
+      "stakes": 1,
       "factionRefunds": 4
+    },
+    {
+      "a": "validator",
+      "b": "degen",
+      "seed": 375,
+      "winner": 0,
+      "blocks": 25,
+      "actions": 126,
+      "casts": 11,
+      "counters": 2,
+      "powers": [
+        3,
+        4
+      ],
+      "neutralPowers": [
+        3,
+        0
+      ],
+      "stakes": 1,
+      "factionRefunds": 11
+    },
+    {
+      "a": "validator",
+      "b": "degen",
+      "seed": 2718,
+      "winner": 0,
+      "blocks": 23,
+      "actions": 112,
+      "casts": 6,
+      "counters": 0,
+      "powers": [
+        3,
+        5
+      ],
+      "neutralPowers": [
+        3,
+        0
+      ],
+      "stakes": 3,
+      "factionRefunds": 9
+    },
+    {
+      "a": "validator",
+      "b": "degen",
+      "seed": 104729,
+      "winner": 0,
+      "blocks": 19,
+      "actions": 76,
+      "casts": 8,
+      "counters": 1,
+      "powers": [
+        2,
+        2
+      ],
+      "neutralPowers": [
+        2,
+        0
+      ],
+      "stakes": 2,
+      "factionRefunds": 7
     },
     {
       "a": "validator",
       "b": "validator",
       "seed": 21,
       "winner": 1,
-      "blocks": 24,
-      "actions": 102,
-      "casts": 8,
-      "counters": 1,
+      "blocks": 18,
+      "actions": 75,
+      "casts": 4,
+      "counters": 0,
       "powers": [
         4,
-        2
+        1
       ],
       "neutralPowers": [
         3,
-        2
-      ],
-      "stakes": 1,
-      "factionRefunds": 6
-    },
-    {
-      "a": "validator",
-      "b": "validator",
-      "seed": 375,
-      "winner": 0,
-      "blocks": 23,
-      "actions": 96,
-      "casts": 8,
-      "counters": 2,
-      "powers": [
-        2,
-        2
-      ],
-      "neutralPowers": [
-        2,
         1
       ],
-      "stakes": 3,
+      "stakes": 1,
       "factionRefunds": 5
     },
     {
       "a": "validator",
       "b": "validator",
-      "seed": 2718,
-      "winner": 0,
-      "blocks": 13,
-      "actions": 47,
-      "casts": 2,
-      "counters": 0,
+      "seed": 375,
+      "winner": 1,
+      "blocks": 26,
+      "actions": 119,
+      "casts": 9,
+      "counters": 2,
       "powers": [
-        1,
+        5,
+        3
+      ],
+      "neutralPowers": [
+        4,
+        3
+      ],
+      "stakes": 0,
+      "factionRefunds": 7
+    },
+    {
+      "a": "validator",
+      "b": "validator",
+      "seed": 2718,
+      "winner": 1,
+      "blocks": 20,
+      "actions": 97,
+      "casts": 5,
+      "counters": 1,
+      "powers": [
+        2,
         1
       ],
       "neutralPowers": [
-        1,
+        2,
         1
       ],
       "stakes": 3,
-      "factionRefunds": 0
+      "factionRefunds": 7
     },
     {
       "a": "validator",
       "b": "validator",
       "seed": 104729,
       "winner": 0,
-      "blocks": 17,
-      "actions": 62,
-      "casts": 2,
-      "counters": 0,
+      "blocks": 27,
+      "actions": 134,
+      "casts": 10,
+      "counters": 2,
       "powers": [
-        2,
-        3
+        4,
+        5
       ],
       "neutralPowers": [
-        2,
-        2
+        4,
+        5
       ],
-      "stakes": 1,
-      "factionRefunds": 2
+      "stakes": 4,
+      "factionRefunds": 10
     }
   ]
 }

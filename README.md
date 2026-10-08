@@ -14,7 +14,7 @@ A Hearthstone-style card battler set in imperial Rome — on Solana. Read the me
 ![License](https://img.shields.io/badge/License-MIT-2C784C)
 ![i18n](https://img.shields.io/badge/UI-RU_/_EN-D4A24C)
 
-**49 cards · 4 heroes · No wallet required**
+**99 cards · 4 heroes · No wallet required**
 
 </div>
 
@@ -50,7 +50,7 @@ Deck **30** · hand **10** · board **5**, expandable to **7** with Agora Expans
 
 Olympus adds six cards with public preparation and conditional arrival effects. All previous cards remain available. See [design, research and validation](docs/research/olympus-design-20261007.md) and [Omni Flash pack 18–25](docs/olympus-vfx/00-START-HERE.md).
 
-All eight Olympus effects are installed; see the [import and validation report](docs/olympus-vfx/IMPORT-20261008.md). A separate [set of 50 character illustrations](docs/art-direction/generated-characters-50-20261008/README.md) is prepared for a future expansion; its proposed mechanics are not yet playable. Preview the art at `/ui/arena-lab/character-art-50/index.html`.
+All eight Olympus effects are installed; see the [import and validation report](docs/olympus-vfx/IMPORT-20261008.md). The [Agora After Hours expansion](docs/character-expansion-20261008.md) adds 50 playable characters with immediate arrival abilities and conditional synergies to all four starter decks. Inspect their cards and build decks at `/collection` → **New characters**. Original 49 cards and the separate Genesis NFT manifest are preserved.
 
 Deployment contacts now match the card plane and battlefield spacing. All twelve videos from [VFX pack 26–37](docs/arrival-vfx-26-37/00-START-HERE.md) have been imported: seven landings and two ranged impacts are used in battle; three character appearances are reserved for future cards. See the [import report](docs/arrival-vfx-26-37/IMPORT-20261008.md). Preview/download at `/ui/arena-lab/imperivm-arrival-vfx-26-37/index.html`.
 

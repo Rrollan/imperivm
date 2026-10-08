@@ -11,6 +11,7 @@
 
 import { CARDS } from '../cards';
 import { HEROES } from '../heroes';
+import { retaliationDamage } from './combat';
 import {isInstantSpell} from './spellTiming';
 import {boardCapacity, battlecryFor, ultimateReady, MAX_BOARD_CAPACITY} from './tactics';
 import {rulesetOf,pendingValidatorOrders,type RulesetOptions,type RulesetId} from './ruleset';
@@ -42,6 +43,8 @@ import type {
 interface EnginePlayer extends PlayerState {
   mempool: MempoolEntry[];
   validatorIncome?:number;
+  /** Private reserve distribution from this match's original deck, including custom decks. */
+  reinforcementPool?: string[];
 }
 
 interface EngineGame extends GameState {
@@ -76,6 +79,14 @@ export function spellEffectsOf(state: GameState): SpellEffectResult[] {
 /** Comeback valve: hero power discounts to 1 gas when both hold. */
 const COMEBACK_HP_THRESHOLD = 12; // own treasury must be <= this
 const COMEBACK_GAP = 12; // enemy treasury must be >= this much higher
+export const REINFORCEMENT_COST = 2;
+
+export function canBuyCard(state: GameState): boolean {
+  const player = state.players[state.turn] as EnginePlayer;
+  return state.winner === null && !mulliganAvailable(state) && player.deck.length === 0 &&
+    player.hand.length < 10 && player.gas >= REINFORCEMENT_COST && !player.reinforcementUsed &&
+    !!player.reinforcementPool?.length;
+}
 
 /* ------------------------------------------------------------------ */
 /* Small helpers                                                       */
@@ -493,6 +504,7 @@ function completeTurnStart(s: EngineGame): void {
     pushLog(s,`P${s.turn} validator investment pays ${investment} gas`);
   }
   me.heroPowerUsed = false;
+  me.reinforcementUsed = false;
 
   // 3b. Pavilion reset for the new active player; additive stats above persist.
   resetPavilion(me);
@@ -597,6 +609,8 @@ function actionKey(a: Action): string {
       return `attack:${a.attackerUid}:${a.target}`;
     case 'hero-power':
       return 'hero-power';
+    case 'buy-card':
+      return 'buy-card';
     case 'stake':
       return `stake:${a.uid}`;
     case 'unstake':
@@ -636,11 +650,13 @@ export function createGame(
       heroId,
       treasury: 30,
       deck: [...deck],
+      reinforcementPool: [...deck],
       hand: [],
       board: [],
       gas: 0,
       maxGas: 0,
       heroPowerUsed: false,
+      reinforcementUsed: false,
       fatigue: 0,
       mempool: [],
       // package 4A additions (defaults; preserved on legacy callers):
@@ -735,6 +751,7 @@ export function legalActions(state: GameState): Action[] {
   // package 4A: hero power uses comeback-discounted cost.
   const pc = effectivePowerCost(s, s.turn);
   if (me.gas >= pc && !me.heroPowerUsed) acts.push({ type: 'hero-power' });
+  if (canBuyCard(state)) acts.push({ type: 'buy-card' });
 
   for (const m of me.board) {
     acts.push({ type: m.staked ? 'unstake' : 'stake', uid: m.uid });
@@ -911,7 +928,7 @@ export function applyAction(state: GameState, action: Action): GameState {
         const atkName = atk.name;
         const tgtName = tgt.name;
         const atkDmg = atk.attack;
-        const tgtDmg = tgt.attack;
+        const tgtDmg = retaliationDamage(tgt.attack);
         // package 4A: capture actual hp removed BEFORE simultaneous damage
         // for accurate lifesteal computation.
         const tgtActualRemoved = Math.max(0, Math.min(tgt.health, atkDmg));
@@ -919,6 +936,7 @@ export function applyAction(state: GameState, action: Action): GameState {
         tgt.health -= atkDmg;
         atk.health -= tgtDmg;
         pushLog(s, `${atkName} trades with ${tgtName}`);
+        pushLog(s, `${tgtName} retaliates for ${tgtDmg}`);
         const deadFoe = reapDead(s, foe.id);
         const deadMe = reapDead(s, me.id);
         for (const n of deadFoe) pushLog(s, `${n} dies`);
@@ -928,6 +946,16 @@ export function applyAction(state: GameState, action: Action): GameState {
         tryLifesteal(s, tgt, other(s.turn), atkActualRemoved);
       }
       checkWinner(s);
+      return s;
+    }
+
+    case 'buy-card': {
+      const pool = me.reinforcementPool!; // legality was checked before the immutable transition
+      const cardId = pool[Math.floor(rand(s) * pool.length)];
+      me.gas -= REINFORCEMENT_COST;
+      me.reinforcementUsed = true;
+      me.hand.push({ uid: nextUid(s), cardId });
+      pushLog(s, `P${s.turn} buys a reserve card for ${REINFORCEMENT_COST} gas`);
       return s;
     }
 

@@ -9,6 +9,7 @@ export type GameIntent =
   | {type: 'attack'; cardId: string; targetId: string}
   | {type: 'endTurn'}
   | {type: 'heroPower'}
+  | {type: 'buyCard'}
   | {type: 'mulligan'; cardIds: string[]}
   | {type: 'stake' | 'unstake'; cardId: string}
   | {type: 'concede'};

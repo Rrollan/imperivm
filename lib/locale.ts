@@ -1,4 +1,5 @@
 import { CARDS } from './cards';
+import { CHARACTER_CARD_RU } from './characterCards';
 import { HEROES } from './heroes';
 import {isInstantSpell} from './engine/spellTiming';
 import type { Rarity, CardDef } from './engine/types';
@@ -54,6 +55,7 @@ export const CARD_RU: Record<string, { name: string; text: string }> = {
   'to-the-moon-militia': { name: 'Ополчение «На Луну»', text: 'Боевой клич: наносит 3 урона вражеской казне. Маленький шаг для мемов.' },
   'rug-pull': { name: 'РАГПУЛ', text: 'Уничтожает ВСЕХ существ на обоих полях. Veni. Vidi. Rugi.' },
   audit: { name: 'Аудит', text: 'Приоритет. Сразу отменяет самое дорогое вражеское заклинание в очереди указов. При разрешении: все ваши существа получают +1/+1. Проверка завершится раньше рагпула.' },
+  ...CHARACTER_CARD_RU,
 };
 
 const HERO_RU: Record<string, { name: string; title: string; powerName: string; powerText: string }> = {
@@ -240,6 +242,8 @@ export function logLine(line: string, locale: Locale): string {
     [/^P([01]) weakening fizzles \(no enemy minions\)$/, p => `${player(p)}: ослабление не сработало — вражеских бойцов нет`],
     [/^P([01]) draws (\d+)$/, (p, n) => `${player(p)}: взято карт — ${n}`],
     [/^P([01]) minions \+(\d+)\/\+(\d+)$/, (p, a, h) => `${possessive(p)} получают +${a}/+${h}`],
+    [/^P([01]) buys a reserve card for (\d+) gas$/, (p,n) => `${player(p)}: подкрепление за ${n} приказа`],
+    [/^(.+) retaliates for (\d+)$/, (name,n) => `${name}: ответный урон ${n}`],
     [/^P([01]) gains (\d+) gas$/, (p, n) => `${player(p)}: приказы +${n}`],
     [/^P([01]) expands court to (\d+) slots$/, (p,n) => `Игрок ${Number(p)+1}: строй расширен до ${n} мест`],
     [/^P([01]) ultimate: (.+)$/, (p,n) => `Игрок ${Number(p)+1}: ультимейт — ${Object.values(CARDS).find(c=>c.ultimate?.name===n)?.ultimate?.nameRu??n}`],

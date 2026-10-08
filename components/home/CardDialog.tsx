@@ -7,7 +7,7 @@ import { useReducedMotion } from '../../lib/prefersReducedMotion';
 import { useLocale } from '../LocaleContext';
 import { ArenaCardPreview } from '../presentation/ArenaCardPreview';
 import { roleName } from '../presentation/cardIdentity';
-import { cardKeywords, cardRules } from '../presentation/rulesText';
+import { cardKeywords, cardRules, retaliationRules } from '../presentation/rulesText';
 import styles from './Home.module.css';
 
 export function CardDialog({ id, onClose }: { id: string; onClose: () => void }) {
@@ -32,6 +32,7 @@ export function CardDialog({ id, onClose }: { id: string; onClose: () => void })
         <dl className={styles.cardStats}><div><dt>{t('Приказы', 'Orders')}</dt><dd>{card.cost}</dd></div>{card.type === 'minion' && <><div><dt>{t('Атака', 'Attack')}</dt><dd>{card.attack}</dd></div><div><dt>{t('Здоровье', 'Health')}</dt><dd>{card.health}</dd></div></>}</dl>
         {card.type === 'spell' && <div className={styles.timingLabel} data-instant={isInstantSpell(card)}><strong>{isInstantSpell(card) ? t('Действует сразу', 'Resolves immediately') : t('Указ на следующий свой ход', 'Edict for your next turn')}</strong><p>{isInstantSpell(card) ? t('Эффект срабатывает при розыгрыше. Карта не попадает в очередь указов.', 'The effect resolves when you play it. This card does not enter the edict queue.') : card.priority ? t('Приоритет отменяет вражеский указ сразу. Основной эффект сработает в начале следующего вашего хода.', 'Priority counters an enemy edict immediately. The main effect resolves at the start of your next turn.') : t('Соперник получает ход, чтобы ответить. Затем указ исполняется в начале вашего следующего хода.', 'Your opponent gets a turn to respond. The edict then resolves at the start of your next turn.')}</p></div>}
         <p className={styles.cardRuleText}>{cardRules(id, locale)}</p>
+        {card.type === 'minion' && <p className={styles.libraryHint}>{retaliationRules(card.attack ?? 0,locale)}</p>}
         {!!keywords.length && <div className={styles.keywordList}>{keywords.map(keyword => <details key={keyword.name}><summary>{keyword.name}</summary><p>{keyword.description}</p></details>)}</div>}
         <p className={styles.libraryHint}>{t('Здесь полный каталог карт. Готовые колоды доступны сразу; коллекцию и свою колоду можно настроить отдельно.', 'This is the full card catalogue. Starter decks are ready to play; manage your collection and custom deck separately.')}</p>
       </div>

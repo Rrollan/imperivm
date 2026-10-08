@@ -590,6 +590,7 @@ function applyActionContext(
       break;
     }
     case 'hero-power':
+    case 'buy-card':
     case 'end-turn':
     case 'stake':
     case 'unstake':

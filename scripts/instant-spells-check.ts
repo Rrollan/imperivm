@@ -31,7 +31,7 @@ function run(game:GameSession,action:Action):PresentationBatch{
 }
 const instantIds=Object.values(CARDS).filter(isInstantSpell).map(c=>c.id);
 assert.deepEqual(instantIds.slice().sort(),['agora-expansion','diamond-aegis','flash-loan','restoration-rite','senate-censure','solar-sapper','trait-reroll']);
-assert.equal(Object.keys(CARDS).length,49,'Preserve the entire live catalogue');
+assert.equal(Object.keys(CARDS).length,99,'The catalogue includes all 49 originals and 50 Agora characters');
 for(const owner of [0,1] as const)for(const id of instantIds){
   const before=fixture(id,owner),original=JSON.stringify(before),game=new GameSession(before);
   const batch=run(game,{type:'cast-spell',uid:'instant-card'}),after=batch.after;

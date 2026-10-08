@@ -128,6 +128,7 @@ export interface PlayerState {
   gas: number;
   maxGas: number;
   heroPowerUsed: boolean;
+  reinforcementUsed?: boolean; // one paid reserve card per turn, only after the deck runs out
   fatigue: number; // increments each empty draw
   /* --- package 4A: optional additive bookkeeping (engine normalizes absent -> defaults) --- */
   mulliganUsed?: boolean;
@@ -151,6 +152,7 @@ export type Action =
   | { type: 'cast-spell'; uid: string }
   | { type: 'attack'; attackerUid: string; target: string }
   | { type: 'hero-power' }
+  | { type: 'buy-card' }
   | { type: 'stake'; uid: string }
   | { type: 'unstake'; uid: string }
   | { type: 'end-turn' }
@@ -220,7 +222,8 @@ export interface CreateGameOptions {
  *   canAttack = false (can't attack the same turn). Staked minions give +1 gas
  *   each at turn start (see above). Staked minions can still be attacked / die.
  * - attack: attacker must be own, canAttack, not staked. Target 'hero' -> enemy
- *   treasury -= attack. Target enemy minion -> both deal damage simultaneously,
+ *   treasury -= attack. Target enemy minion -> attacker deals full damage;
+ *   defender simultaneously retaliates for ceil(current attack / 2).
  *   remove dead (health <= 0). Attacker canAttack = false afterwards.
  * - Battlecries apply on play-minion (owner context). Spell effects apply on
  *   mempool resolution (caster context).
@@ -229,6 +232,9 @@ export interface CreateGameOptions {
  *     heal-treasury: +3 own treasury (cap 30)
  *     draw-burn: draw 1, own treasury -= 2
  *     gain-gas: gas += 2 (may exceed maxGas)
+ * - buy-card: only with an empty deck and fewer than ten hand cards; pay 2 gas,
+ *   receive one seeded random copy from this match's original deck, once per own
+ *   turn. This never refills the deck or resets fatigue. Original deck stays private.
  * - Winner: treasury <= 0 -> other player wins; both <= 0 -> 'draw'. Check after
  *   every damage/heal action, battlecry, spell resolution and turn start.
  * - Log every meaningful event as a short English string. Cap log at 120 entries.

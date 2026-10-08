@@ -37,7 +37,7 @@ export function battleCommand(state:GameState,actions:Action[]=legalActions(stat
   if(state.winner!==null)return 'over';
   if(state.turn!==0)return 'enemy';
   if(mulliganAvailable(state))return 'busy';
-  return actions.some(action=>['play-minion','cast-spell','attack','hero-power'].includes(action.type))?'own':'done';
+  return actions.some(action=>['play-minion','cast-spell','attack','hero-power','buy-card'].includes(action.type))?'own':'done';
 }
 
 export function unavailableCardText(state:GameState,cardId:string,locale:Locale,busy=false):string{

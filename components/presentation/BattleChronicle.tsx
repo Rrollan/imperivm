@@ -20,6 +20,7 @@ export function BattleChronicle({entries,locale,cardName,heroName,powerName,onCa
       case 'cast-spell':return entry.details.some(d=>d.kind==='immediate')?t('Мгновенное заклинание','Instant spell'):t('Указ в очереди','Edict queued');
       case 'attack':return t('Атака','Attack');
       case 'hero-power':return entry.source?.heroId?powerName(entry.source.heroId):t('Сила правителя','Ruler power');
+      case 'buy-card':return t('Подкрепление · 2 приказа','Reinforcement · 2 orders');
       case 'stake':return t('Отправлен в гарнизон','Sent to garrison');
       case 'unstake':return t('Возвращён в бой','Returned to battle');
       case 'end-turn':return entry.owner===0?t('Начало вашего хода','Your turn starts'):t('Начало хода соперника','Opponent’s turn starts');

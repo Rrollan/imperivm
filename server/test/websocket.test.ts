@@ -105,6 +105,7 @@ function intentFor(action: Action): GameIntent {
     case 'attack': return {type: 'attack', cardId: action.attackerUid, targetId: action.target};
     case 'end-turn': return {type: 'endTurn'};
     case 'hero-power': return {type: 'heroPower'};
+    case 'buy-card': return {type: 'buyCard'};
     case 'mulligan': return {type: 'mulligan', cardIds: action.uids};
     case 'stake': case 'unstake': return {type: action.type, cardId: action.uid};
   }
@@ -310,6 +311,54 @@ test('a full match accepts public legal card, spell, hero and attack intents thr
   assert.equal(firstOver.winner, secondOver.winner);
   first.send({type: 'intent', intent: {type: 'endTurn'}, revision: first.snapshot!.revision});
   assert.ok((await first.next('error')).reason);
+});
+
+test('empty-deck reinforcement is paid once over WS and never exposes the private deck', {timeout:30_000}, async t => {
+  const service=await launch({port:0,host:'127.0.0.1',origins:[ORIGIN],maxMessagesPerWindow:10_000});
+  t.after(()=>service.close());
+  const {first,second}=await room(portOf(service),'builder','builder');
+  // Reach exhaustion through ordinary public moves, without editing authority state.
+  // Treasury attacks are omitted so this exercises the actual late-game purchase.
+  for(let step=0;step<900;step++){
+    const actor=first.snapshot!.game!.turn===0?first:second;
+    const before=actor.snapshot!,game=before.game!,own=game.players[before.seat];
+    assert.equal(before.status,'playing','The defensive match must survive until reserve availability');
+    const purchase=game.actions.find(action=>action.type==='buy-card');
+    if(purchase){
+      assert.equal(own.deckCount,0);
+      const observer=actor===first?second:first;
+      const after=await move(first,second,actor,{type:'buyCard'});
+      const bought=after.game!.players[after.seat];
+      assert.equal(bought.gas,own.gas-2);
+      assert.equal(bought.handCount,own.handCount+1);
+      assert.equal(bought.deckCount,0);
+      assert.equal(bought.fatigue,own.fatigue);
+      assert.equal(bought.reinforcementUsed,true);
+      const added=bought.hand!.find(card=>!own.hand!.some(old=>old.uid===card.uid));
+      assert.ok(added&&DECKS.builder.includes(added.cardId));
+      const concealed=observer.snapshot!.game!.players[before.seat];
+      assert.equal(concealed.hand,undefined);
+      assert.equal(Object.hasOwn(concealed,'reinforcementPool'),false);
+      assert.equal(Object.hasOwn(concealed,'deck'),false);
+      assert.equal(after.game!.actions.some(action=>action.type==='buy-card'),false);
+      actor.send({type:'intent',intent:{type:'buyCard'},revision:after.revision});
+      assert.ok((await actor.next('error')).reason);
+      assert.equal(actor.snapshot!.revision,after.revision);
+      observer.send({type:'intent',intent:{type:'buyCard'},revision:after.revision});
+      assert.ok((await observer.next('error')).reason);
+      assert.equal(observer.snapshot!.revision,after.revision);
+      return;
+    }
+    const action=game.actions.find(a=>a.type==='mulligan'&&!a.uids.length)??
+      (own.treasury<=27?game.actions.find(a=>a.type==='hero-power'):undefined)??
+      game.actions.find(a=>a.type==='cast-spell')??
+      game.actions.find(a=>a.type==='play-minion')??
+      game.actions.find(a=>a.type==='attack'&&a.target!=='hero')??
+      game.actions.find(a=>a.type==='end-turn');
+    assert.ok(action);
+    await move(first,second,actor,intentFor(action));
+  }
+  assert.fail('A real empty-deck purchase should become reachable in the bounded defensive match');
 });
 
 test('default rate limit rejects the 101st message in a ten-second window', async t => {

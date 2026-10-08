@@ -24,6 +24,7 @@ function actionIntent(action: Action): GameIntent {
     case 'play-minion': case 'cast-spell': return {type: 'playCard', cardId: action.uid};
     case 'attack': return {type: 'attack', cardId: action.attackerUid, targetId: action.target};
     case 'end-turn': return {type: 'endTurn'};
+    case 'buy-card': return {type: 'buyCard'};
     case 'hero-power': return {type: 'heroPower'};
     case 'mulligan': return {type: 'mulligan', cardIds: action.uids};
     case 'stake': case 'unstake': return {type: action.type, cardId: action.uid};

@@ -9,6 +9,7 @@ export interface OnlinePlayer {
   maxGas: number;
   fatigue: number;
   heroPowerUsed: boolean;
+  reinforcementUsed?: boolean;
   powerCost: number;
   handCount: number;
   deckCount: number;

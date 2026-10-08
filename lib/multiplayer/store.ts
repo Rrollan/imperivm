@@ -123,7 +123,7 @@ export class MultiplayerStore {
     const opponentPresent = !!foeGuest && now - foeGuest.seenAt < 10_000;
     const game = room.game;
     const players = game?.players.map((p, index): OnlinePlayer => ({id: p.id, heroId: p.heroId, treasury: p.treasury, gas: p.gas,
-      maxGas: p.maxGas, fatigue: p.fatigue, heroPowerUsed: p.heroPowerUsed, powerCost: effectivePowerCost(game, index as PlayerId), handCount: p.hand.length, deckCount: p.deck.length,
+      maxGas: p.maxGas, fatigue: p.fatigue, heroPowerUsed: p.heroPowerUsed, reinforcementUsed: !!p.reinforcementUsed, powerCost: effectivePowerCost(game, index as PlayerId), handCount: p.hand.length, deckCount: p.deck.length,
       board: p.board.map(m => ({uid: m.uid, cardId: m.cardId, name: m.name, attack: m.attack, health: m.health, maxHealth: m.maxHealth,
         canAttack: m.canAttack, staked: m.staked, taunt: !!m.taunt, rush: !!m.rush, lifesteal: !!m.lifesteal, fresh: !!m.fresh})),
       edicts: mempoolOf(game, index as PlayerId).map(e => ({...e})), ...(index === seat ? {hand: p.hand.map(h => ({...h}))} : {})})) as [OnlinePlayer, OnlinePlayer] | undefined;
@@ -192,6 +192,7 @@ function describeAction(before: GameState, seat: PlayerId, action: Action, local
     }
     case 'attack': return `${label}: ${ru ? `атака ${action.target === 'hero' ? 'казны' : 'бойца'}` : `attacks the ${action.target === 'hero' ? 'treasury' : 'fighter'}`}.`;
     case 'hero-power': return `${label}: ${powerName(before.players[seat].heroId, locale)}.`;
+    case 'buy-card': return `${label}: ${ru ? 'куплена карта подкрепления за 2 приказа' : 'reserve card bought for 2 orders'}.`;
     case 'stake': return `${label}: ${ru ? 'боец поставлен в стейкинг' : 'fighter staked'}.`;
     case 'unstake': return `${label}: ${ru ? 'боец возвращён из стейкинга' : 'fighter unstaked'}.`;
     case 'mulligan': return `${label}: ${ru ? 'заменено стартовых карт' : 'opening cards replaced'} — ${action.uids.length}.`;

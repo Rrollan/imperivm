@@ -29,7 +29,7 @@ const covered:{cardId:string;phase:'play'|'queue'|'resolve';cueCount:number}[]=[
 const knownVideoIds=new Set<string>(VIDEO_IDS);
 const semanticAnchors=new Set(['arena-center','row-0','row-1','gas-counter','hero-power','hero-0','hero-1']);
 
-assert.equal(cardIds.length,49,'The catalog matrix expects all 49 current cards');
+assert.equal(cardIds.length,99,'The catalog matrix expects 49 original cards and all 50 Agora characters');
 
 function minion(uid:string,cardId:string,overrides:Partial<Minion>={}):Minion{
   const card=CARDS[cardId];
@@ -39,7 +39,7 @@ function minion(uid:string,cardId:string,overrides:Partial<Minion>={}):Minion{
     uid,cardId,name:card.name,attack:overrides.attack??card.attack??1,health,
     maxHealth:overrides.maxHealth??health,canAttack:false,staked:false,
     taunt:card.taunt??false,rush:card.rush??false,lifesteal:card.lifesteal??false,
-    fresh:false,...overrides,
+    fresh:false,arrivedBlock:1,...overrides,
   };
 }
 
@@ -141,6 +141,17 @@ function verifyBattlecry(card:CardDef,batch:PresentationBatch,newUid:string):voi
       break;
     case 'heal-treasury':
       assert.equal(after.treasury,Math.min(30,before.treasury+amount),`${card.id}: battlecry must heal its owner`);
+      break;
+    case 'heal-own-minions':
+      before.board.forEach(target=>assert.equal(after.board.find(minion=>minion.uid===target.uid)?.health,Math.min(target.maxHealth,target.health+amount),`${card.id}: healing is capped at the friendly fighter's maximum`));
+      assert.equal(after.board.find(minion=>minion.uid===newUid)?.health,card.health,`${card.id}: healing cannot inflate a newly arrived fighter`);
+      break;
+    case 'weaken-random-enemy':
+      assert.equal(enemyAfter.board[0]?.attack,Math.max(0,enemyBefore.board[0].attack-amount),`${card.id}: the only eligible enemy is weakened without changing health`);
+      assert.equal(enemyAfter.board[0]?.health,enemyBefore.board[0].health);
+      break;
+    case 'expand-board':
+      assert.equal(after.boardCapacity,Math.min(7,(before.boardCapacity??5)+amount),`${card.id}: expansion obeys the seven-place cap`);
       break;
     case 'draw':
       assert.equal(after.hand.length,before.hand.length-1+amount,`${card.id}: battlecry draw count`);
@@ -283,7 +294,7 @@ const minionCards=cardIds.filter(id=>CARDS[id].type==='minion');
 const spellCards=cardIds.filter(id=>CARDS[id].type==='spell');
 minionCards.forEach((cardId,index)=>{
   const card=CARDS[cardId];
-  const priorityCount=cardId==='frontrun-bot'?2:card.priority?1:0;
+  const priorityCount=(card.priority?1:0)+(card.battlecry?.kind==='counter-mempool'?1:0);
   const enemyCards=priorityCount===2?['rug-pull','delayed-fixture-flash-loan']:priorityCount===1?['rug-pull']:[];
   const game=createSession(cardId,enemyCards);
   if(priorityCount)seedEnemyQueue(game,cardId,priorityCount);

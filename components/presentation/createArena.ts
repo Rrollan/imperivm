@@ -17,7 +17,7 @@ import { DirectionalLight } from '@babylonjs/core/Lights/directionalLight';
 import { SceneInstrumentation } from '@babylonjs/core/Instrumentation/sceneInstrumentation';
 import { PointerEventTypes } from '@babylonjs/core/Events/pointerEvents';
 import { mempoolOf, legalActions, effectivePowerCost } from '../../lib/engine/engine';
-import type { GameState, Minion } from '../../lib/engine/types';
+import type { Action, GameState, Minion } from '../../lib/engine/types';
 import type { Locale } from '../../lib/locale';
 import { ArenaTextures, type Face } from './ArenaTextures';
 import { PresentationScheduler } from './PresentationScheduler';
@@ -238,7 +238,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   function sync(state: GameState) {
     const changed=shown!==null&&shown!==state;
     shown = state;
-    const stateActions=legalActions(state);
+    // Online rendering uses the server's allowed moves; it never infers hidden reserve cards.
+    const stateActions=(state as GameState & {presentationActions?: Action[]}).presentationActions ?? legalActions(state);
     const readyAttackers=new Set(!activeBatch&&state.turn===0?stateActions.flatMap(action=>action.type==='attack'?[action.attackerUid]:[]):[]);
     const playableCards=new Set(!activeBatch&&state.turn===0?stateActions.flatMap(action=>action.type==='play-minion'||action.type==='cast-spell'?[action.uid]:[]):[]);
     const used = new Set<string>();
@@ -284,13 +285,13 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const native = (id:string,kind:ArenaTarget['kind'],face:Face,w:number,h:number,x:number,y:number)=>keep(id,{kind,uid:id,owner:0},face,w,h,x,y,-.5);
     const me=state.players[0];
     const turn=turnSocket(portrait);
-    native('turn-command','command',{kind:'command',state:activeBatch?'busy':battleCommand(state,stateActions),engraved:true},turn.width,turn.height,turn.x,turn.y);
+    native('turn-command','command',{kind:'command',state:activeBatch?'busy':battleCommand(state,stateActions),engraved:true,portrait},turn.width,turn.height,turn.x,turn.y);
     const power=powerSocket(portrait);
-    native('hero-power','power',{kind:'power',heroId:me.heroId,cost:effectivePowerCost(state,0),available:state.turn===0&&legalActions(state).some(a=>a.type==='hero-power'),aspect:power.width/power.height},power.width*384/322,power.height*384/322,power.x,power.y);
+    native('hero-power','power',{kind:'power',heroId:me.heroId,cost:effectivePowerCost(state,0),available:state.turn===0&&stateActions.some(a=>a.type==='hero-power'),aspect:power.width/power.height},power.width*384/322,power.height*384/322,power.x,power.y);
     const orders=ordersLayout(portrait);
     native('gas-counter','gas',ordersFace(state),orders.width,orders.height,orders.x,orders.y);
     native('block-counter','block',{kind:'block',block:state.block},60,78,portrait?446:234,portrait?70:220);
-    const deck=native('own-deck','deck',{kind:'deck',count:me.deck.length},80,112,portrait?1163:1390,portrait?202:238);deck.modelReady=true;paint(deck,deck.painted);
+    const deck=native('own-deck','deck',{kind:'deck',count:me.deck.length,reinforcement:!activeBatch&&state.turn===0&&stateActions.some(a=>a.type==='buy-card')},80,112,portrait?1163:1390,portrait?202:238);deck.modelReady=true;paint(deck,deck.painted);
     const register=edictRegister(portrait);
     native('battle-scroll','scroll',{kind:'queueTitle',own:mempoolOf(state,0).length,enemy:mempoolOf(state,1).length},register.width,register.height,register.x,register.y);
     hourglass.position.copyFrom(point(portrait?1178:1442,portrait?514:352,-.5));
@@ -472,7 +473,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
 
   async function present(batch: PresentationBatch, impact: () => void) {
     scheduler.cancel(); releaseArrival();releaseDraws();layoutMoves=[]; activeBatch = batch; options.onHover(null); hovered = null; selected = null; highlights();
-    const command = entities.get('turn-command'); if (command) paint(command, { kind: 'command', state: 'busy', engraved: true });
+    const command = entities.get('turn-command'); if (command) paint(command, { kind: 'command', state: 'busy', engraved: true, portrait });
     const attack = batch.action.type === 'attack' ? batch.action : null;
     const attacker = attack ? entities.get(attack.attackerUid) : null;
     const combat = combatStyle(attacker?.data.cardId);

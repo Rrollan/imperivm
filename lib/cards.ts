@@ -7,6 +7,7 @@
  * Effect kinds used are exactly those from lib/engine/types.ts.
  */
 import type { CardDef } from './engine/types';
+import { CHARACTER_CARDS } from './characterCards';
 
 export const CARDS: Record<string, CardDef> = {
   'senate-censure': {
@@ -538,4 +539,7 @@ export const CARDS: Record<string, CardDef> = {
     spell: { kind: 'buff-own', attack: 1, health: 1 },
     text: 'Priority. Pull the highest-cost enemy mempool spell. On resolve: give your minions +1/+1. The ledger closes before the rug falls.',
   },
+
+  // Approved character expansion: append so legacy content order stays stable.
+  ...CHARACTER_CARDS,
 };
