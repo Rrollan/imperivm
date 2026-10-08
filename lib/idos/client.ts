@@ -3,6 +3,7 @@ import { BrowserPlatformAdapter } from '@idosgames/core/platform';
 import { IDOS_CONFIG } from '../collection/gateway';
 import { authenticateSolanaWallet, idosResult, SessionQueue } from './auth';
 import { DEVNET_RPC } from '../solana/devnet';
+import type {CollectionAuth} from '../collection/access';
 
 export type IDosSession = { status: 'demo' | 'connecting' | 'guest' | 'wallet' | 'restricted' | 'error'; owner: string | null; userId: string | null; error: string | null; revision: number };
 export type IDosStandings = { board: GetLeaderboardResponse; ownScore: number };
@@ -35,7 +36,7 @@ export class IDosRuntime {
         if (owner || this.embeddedOwner) {
           const defs = idosResult(await this.client.blockchain.getDefinitions());
           const network = defs.Blockchain?.Networks?.[IDOS_CONFIG.network];
-          if (network?.Type !== 'Solana' || network.RpcUrl?.replace(/\/$/, '') !== DEVNET_RPC) throw new Error('Configure the iDos wallet network with the Solana devnet RPC. Mainnet is disabled.');
+          if (network?.Type !== 'Solana' || network.RpcUrl?.replace(/\/$/, '') !== DEVNET_RPC) throw new Error('Configure the iDos login network with the Solana devnet RPC. The IMP shop has a separate mainnet configuration.');
         }
         const pass = this.client.auth.playAccess;
         const address = owner ?? this.embeddedOwner;
@@ -74,6 +75,13 @@ export class IDosRuntime {
     return this.queue.forAccount(async () => {
       if (!this.client.auth.isLoggedIn || !['guest', 'wallet'].includes(this.session.status)) throw new Error('Sign in to iDos or choose local demo.');
       return work(this.client);
+    });
+  }
+  collectionAuth(): Promise<CollectionAuth> {
+    return this.withAccount(async client => {
+      const auth = client.auth.context;
+      if (!auth) throw new Error('Sign in to iDos to use pack cards online.');
+      return {userId: auth.userID, sessionTicket: auth.clientSessionTicket};
     });
   }
   async standings(): Promise<IDosStandings> {

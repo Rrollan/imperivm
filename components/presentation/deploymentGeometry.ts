@@ -29,19 +29,19 @@ export function spritePlacement(id: string, fallbackWidth: number, bounds?: Figh
     const height = width * 9 / 16;
     // Source feet attach to the card's centre. Black padding must not shift
     // the character's ground point as its shield/robe changes shape.
-    return { width, height, offsetY: height * (appearance.footY - .5), depth: -.9, group: 1, alpha: .6 };
+    return { width, height, offsetY: height * (appearance.footY - .5), depth: -.9, group: 1, alpha: .92 };
   }
   if (isSurfaceLanding(id) && bounds) {
     const height=landingDiameter(bounds,id==='32-colossus-landing');
-    return {width:height*16/9,height,offsetY:0,depth:.35,group:0,alpha:.72};
+    return {width:height*16/9,height,offsetY:0,depth:.35,group:0,alpha:.94};
   }
   if ((id==='36-relay-impact'||id==='37-oracle-impact') && bounds) {
     const height=Math.min(bounds.height*1.1,bounds.spacing*1.3);
-    return {width:height*16/9,height,offsetY:0,depth:-.9,group:1,alpha:.65};
+    return {width:height*16/9,height,offsetY:0,depth:-.9,group:1,alpha:.92};
   }
   if (/^1[0-5]-deploy/.test(id) && bounds) {
     const width = Math.min(bounds.width * 1.45, bounds.spacing * .98) / .46;
-    return { width, height: width * 9 / 16, offsetY: 0, depth: .35, group: 0, alpha: .5 };
+    return { width, height: width * 9 / 16, offsetY: 0, depth: .35, group: 0, alpha: .86 };
   }
-  return { width: fallbackWidth, height: fallbackWidth * 9 / 16, offsetY: 0, depth: -9, group: 2, alpha: .48 };
+  return { width: fallbackWidth, height: fallbackWidth * 9 / 16, offsetY: 0, depth: -9, group: 2, alpha: .88 };
 }

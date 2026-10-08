@@ -1,6 +1,6 @@
 import {createHash, randomBytes, randomInt} from 'node:crypto';
 import {applyAction, createGame, effectivePowerCost, legalActions, mempoolOf, mulliganAvailable} from '../engine/engine';
-import {DECKS} from '../decks';
+import {FREE_DECKS as DECKS} from '../collection/starterDecks';
 import {HEROES} from '../heroes';
 import {cardName, heroName, powerName} from '../locale';
 import type {Action, GameState, PlayerId} from '../engine/types';

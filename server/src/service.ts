@@ -2,11 +2,14 @@ import {createServer} from 'node:http';
 import {WebSocketServer, WebSocket} from 'ws';
 import {RoomAuthority} from './rooms';
 import {parseMessage, ProtocolError} from './validation';
+import {authorizeCollectionDeck} from '../../lib/collection/authority';
+import type {PlayerRegistration} from '../../lib/net/protocol';
 
 export interface ServiceOptions {
   port?: number; host?: string; origins?: string[]; clock?: () => number;
   tickIntervalMs?: number; log?: (line: string) => void;
   maxMessagesPerWindow?: number;
+  authorizeDeck?: (registration: PlayerRegistration) => Promise<void>;
 }
 export function startServer(options: ServiceOptions = {}) {
   const origins = new Set(options.origins ?? ['http://localhost:3101', 'http://127.0.0.1:3101', 'http://localhost:3000', 'http://127.0.0.1:3000']);
@@ -29,18 +32,28 @@ export function startServer(options: ServiceOptions = {}) {
     wss.handleUpgrade(request, socket, head, ws => wss.emit('connection', ws, request));
   });
   const alive = new WeakMap<WebSocket, boolean>();
+  let checkingCollections = 0;
   wss.on('connection', socket => {
     alive.set(socket, true);
     let windowStart = Date.now(), messages = 0;
+    let registrationPending = false;
     socket.on('pong', () => alive.set(socket, true));
-    socket.on('message', (data, binary) => {
+    socket.on('message', async (data, binary) => {
       try {
         const now = Date.now();
         if (now - windowStart >= 10_000) {windowStart = now; messages = 0;}
         if (++messages > (options.maxMessagesPerWindow ?? 100)) throw new ProtocolError('rate-limit', 'Слишком много сообщений. Подождите несколько секунд.');
         if (binary) throw new ProtocolError('bad-message', 'Ожидается текстовый JSON.');
         const raw = data instanceof ArrayBuffer ? Buffer.from(data).toString('utf8') : Array.isArray(data) ? Buffer.concat(data).toString('utf8') : data.toString('utf8');
-        rooms.handle(socket, parseMessage(raw));
+        const message = parseMessage(raw);
+        if ((message.type === 'create' || message.type === 'join') && !(message.type === 'join' && message.resumeToken)) {
+          if (registrationPending || checkingCollections >= 32) throw new ProtocolError('collection-busy', 'Коллекция проверяется. Подождите несколько секунд.');
+          registrationPending = true; checkingCollections++;
+          try {await (options.authorizeDeck ? options.authorizeDeck(message) : authorizeCollectionDeck(message.deckList, message.collectionAuth));}
+          catch {throw new ProtocolError('collection-access', 'Не удалось подтвердить все карты колоды в iDos. Войдите в iDos или выберите бесплатную колоду.');}
+          finally {registrationPending = false; checkingCollections--;}
+        }
+        if (socket.readyState === WebSocket.OPEN) rooms.handle(socket, message);
       } catch (error: unknown) {rooms.rejected(socket, error);}
     });
     socket.on('close', code => {

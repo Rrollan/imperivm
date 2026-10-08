@@ -47,7 +47,7 @@ const DECOR: { model?: ModelKey; kind: string; ru: string; en: string }[] = [
   { model: 'column', kind: 'column', ru: 'Колонна форума', en: 'Forum column' },
   { model: 'bust', kind: 'bust', ru: 'Бюст императора', en: 'Imperator bust' },
   { kind: 'brazier', ru: 'Разжечь жаровню', en: 'Stoke the brazier' },
-  { model: 'coin-rug', kind: 'coins', ru: 'Звон монет $RUG', en: '$RUG coin chime' },
+  { model: 'coin-rug', kind: 'coins', ru: 'Звон монет $IMP', en: '$IMP coin chime' },
 ];
 
 /** One interactive 3D corner at a time; the battlefield remains a DOM surface. */

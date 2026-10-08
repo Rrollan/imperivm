@@ -9,6 +9,7 @@ import { ArenaCardPreview } from '../presentation/ArenaCardPreview';
 import { roleName } from '../presentation/cardIdentity';
 import { cardKeywords, cardRules, retaliationRules } from '../presentation/rulesText';
 import styles from './Home.module.css';
+import {isFreeCard} from '../../lib/collection/access';
 
 export function CardDialog({ id, onClose }: { id: string; onClose: () => void }) {
   const { t, locale, cardName, rarityName } = useLocale();
@@ -34,7 +35,7 @@ export function CardDialog({ id, onClose }: { id: string; onClose: () => void })
         <p className={styles.cardRuleText}>{cardRules(id, locale)}</p>
         {card.type === 'minion' && <p className={styles.libraryHint}>{retaliationRules(card.attack ?? 0,locale)}</p>}
         {!!keywords.length && <div className={styles.keywordList}>{keywords.map(keyword => <details key={keyword.name}><summary>{keyword.name}</summary><p>{keyword.description}</p></details>)}</div>}
-        <p className={styles.libraryHint}>{t('Здесь полный каталог карт. Готовые колоды доступны сразу; коллекцию и свою колоду можно настроить отдельно.', 'This is the full card catalogue. Starter decks are ready to play; manage your collection and custom deck separately.')}</p>
+        <p className={styles.libraryHint}>{isFreeCard(id) ? t('Бесплатный набор: карта уже доступна каждому игроку для сборки колоды.', 'Free set: this card is already available to every player for deckbuilding.') : t('Только из паков Agora. Получите карту в паке за IMP, чтобы добавить её в свою колоду.', 'Agora packs only. Obtain this card in a IMP pack to add it to your deck.')}</p>
       </div>
     </div>
   </dialog>;

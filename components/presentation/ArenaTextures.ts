@@ -4,7 +4,7 @@ import type { Scene } from '@babylonjs/core/scene';
 import { CARDS } from '../../lib/cards';
 import { type Locale } from '../../lib/locale';
 import type { Minion } from '../../lib/engine/types';
-import {CARD_FACE,CARD_FRAME_PATH,paintCardFace,paintBadge} from './cardFace';
+import {CARD_FACE,CARD_FRAME_LAYOUT,cardFramePath,paintCardFace,paintBadge} from './cardFace';
 import {heroPortraitPath} from './heroPortrait';
 import {cardArtPath} from '../../lib/cardArt';
 import {ordersLayout,ordersView} from './ordersView';
@@ -120,20 +120,20 @@ export class ArenaTextures {
 
   setLocale(locale: Locale) { this.locale = locale; this.redraws.forEach(draw => draw()); }
   isReady() { return Array.from(this.images.values()).every(image => image.complete); }
-  preloadCards(ids:string[]){ids.forEach(id=>this.image(cardArtPath(id)));}
+  preloadCards(ids:string[]){ids.forEach(id=>{this.image(cardArtPath(id));this.image(cardFramePath(CARDS[id].rarity));});}
 
   private badge(ctx: CanvasRenderingContext2D, value: string, x: number, y: number, color: string, radius = 43) {
     paintBadge(ctx,this.font,value,x,y,color,radius);
   }
 
   private drawCard(ctx:CanvasRenderingContext2D,id:string,playable?:boolean){
-    paintCardFace(ctx,id,this.locale,this.font,this.image(cardArtPath(id)),playable,undefined,this.image(CARD_FRAME_PATH));
+    paintCardFace(ctx,id,this.locale,this.font,this.image(cardArtPath(id)),playable,undefined,this.image(cardFramePath(CARDS[id].rarity)));
   }
 
   private drawQueued(ctx:CanvasRenderingContext2D,face:Extract<Face,{kind:'queued'}>){
-    paintCardFace(ctx,face.cardId,this.locale,this.font,this.image(cardArtPath(face.cardId)),undefined,undefined,this.image(CARD_FRAME_PATH),'queued');
+    paintCardFace(ctx,face.cardId,this.locale,this.font,this.image(cardArtPath(face.cardId)),undefined,undefined,this.image(cardFramePath(CARDS[face.cardId].rarity)),'queued');
     // The original face identifies the edict; wax identifies owner and order.
-    this.badge(ctx,String(face.ordinal),192,599,face.owner===0?'#315e59':'#713b32',36);
+    this.badge(ctx,String(face.ordinal),192,CARD_FRAME_LAYOUT[CARDS[face.cardId].rarity].statsY,face.owner===0?'#315e59':'#713b32',36);
     if(face.ordinal===1&&face.count>3)this.badge(ctx,`+${face.count-3}`,315,624,'#745631',33);
   }
 
@@ -174,12 +174,12 @@ export class ArenaTextures {
   }
 
   private drawMinion(ctx: CanvasRenderingContext2D, minion: Minion, ready=false,readiness?:FighterReadiness) {
-    paintCardFace(ctx,minion.cardId,this.locale,this.font,this.image(cardArtPath(minion.cardId)),ready,{attack:minion.attack,health:minion.health},this.image(CARD_FRAME_PATH),'battlefield');
+    paintCardFace(ctx,minion.cardId,this.locale,this.font,this.image(cardArtPath(minion.cardId)),ready,{attack:minion.attack,health:minion.health},this.image(cardFramePath(CARDS[minion.cardId].rarity)),'battlefield');
     const symbol:RomanSymbol=minion.staked?'lock':ready||readiness==='ready'||readiness==='rush'?'gladius':readiness==='fresh'?'hourglass':'spent';
     this.badge(ctx,'',323,61,minion.staked?'#315e59':ready?'#8b632d':'#514335',29);
     drawRomanSymbol(ctx,symbol,323,61,40,minion.staked?'#a8e2da':'#f4dda7');
     if(minion.taunt){
-      drawRomanSymbol(ctx,'shield',192,599,42,'#3e6665');
+      drawRomanSymbol(ctx,'shield',192,CARD_FRAME_LAYOUT[CARDS[minion.cardId].rarity].statsY,42,'#3e6665');
     }
     if(minion.lifesteal){
       this.badge(ctx,'',312,420,'#632d29',24);drawRomanSymbol(ctx,'drop',312,420,30,'#f0c8a9');

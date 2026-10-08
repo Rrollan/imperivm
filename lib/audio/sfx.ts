@@ -289,17 +289,19 @@ function makeAmbient(): AmbientController {
     if (!c || c.state !== 'running' || !isMusicEnabled()) return;
     isPlaying = true;
     const t0 = now();
-    // Drone: two detuned saws through a slow low-pass.
-    const drone1 = osc(c, 'sawtooth', 55, t0, t0 + 60);
-    const drone2 = osc(c, 'sawtooth', 55, t0, t0 + 60, +7);
-    const drone3 = osc(c, 'sine', 82.5, t0, t0 + 60);
+    // Quiet consonant bed; the previous detuned saws were harsh under the UI.
+    const drone1 = osc(c, 'sine', 110, t0, t0 + 60);
+    const drone2 = osc(c, 'sine', 165, t0, t0 + 60);
+    const drone3 = osc(c, 'sine', 220, t0, t0 + 60);
     const lp = c.createBiquadFilter();
     lp.type = 'lowpass';
     lp.frequency.value = 600;
     const droneG = c.createGain();
     droneG.gain.value = 0.0;
     droneG.gain.setValueAtTime(0.0, t0);
-    droneG.gain.linearRampToValueAtTime(0.02, t0 + 2.0);
+    droneG.gain.linearRampToValueAtTime(0.005, t0 + 2.0);
+    droneG.gain.setValueAtTime(0.005,t0+4.7);
+    droneG.gain.linearRampToValueAtTime(0,t0+6);
     drone1.connect(lp); drone2.connect(lp); drone3.connect(lp);
     lp.connect(droneG).connect(masterOut() as AudioNode);
 
@@ -310,9 +312,10 @@ function makeAmbient(): AmbientController {
       const o = osc(c, 'triangle', motif[i], start, start + 0.9);
       const og = c.createGain();
       og.gain.setValueAtTime(0.0, start);
-      og.gain.linearRampToValueAtTime(0.016, start + 0.05);
+      og.gain.linearRampToValueAtTime(0.004, start + 0.12);
       og.gain.linearRampToValueAtTime(0.0, start + 0.9);
       o.connect(og).connect(masterOut() as AudioNode);
+      nodes.push({stop:()=>{try{o.stop();}catch{}og.disconnect();}});
     }
 
     // Schedule the next loop iteration ~6s later (very simple loop).

@@ -9,3 +9,5 @@
 @media(max-width:850px){.heroes{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:18px 12px}.sectionHeading{flex-wrap:wrap}.waiting{padding:22px}.waitingTitle h2{font-size:28px}.lobby>form{padding:22px}}
 @media(max-width:520px){.intro{padding-top:24px}.fields{grid-template-columns:1fr}.hero img{width:88px;height:88px}.hero strong{font-size:24px}.tabs button{padding:12px 8px;font-size:13px}.power{padding:16px;align-items:flex-start}.share{flex-direction:column}.share .secondary{align-self:flex-start}.waiting{padding:20px}.roomCode{gap:8px}.deckChoice{gap:18px;padding:14px}.deckChoice>a{margin-left:0}.primary{width:100%;padding:14px 16px}.lobby>form{padding:18px}.otherModes{gap:12px}.page{padding-bottom:env(safe-area-inset-bottom)}}
 @media(prefers-reduced-motion:reduce){.hero{transition:none}.hero:hover{transform:none}}
+
+.page{background:linear-gradient(#171210a6,#171210bf),url('/ui/menu/imperivm-menu-courtyard-v1.png') center/cover fixed}

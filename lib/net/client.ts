@@ -5,7 +5,7 @@ import {normalizeRoomCode, validRoomCode} from './roomCode';
 import type {ClientMessage, GameIntent, NetSnapshot, PlayerRegistration, ServerMessage} from './protocol';
 
 export type NetStatus = 'idle' | 'connecting' | 'waiting' | 'playing' | 'reconnecting' | 'finished' | 'error';
-interface SavedSeat extends PlayerRegistration {roomCode: string; resumeToken: string}
+interface SavedSeat extends Omit<PlayerRegistration, 'collectionAuth'> {roomCode: string; resumeToken: string}
 const SESSION_KEY = 'imperivm.net-game.v1';
 const HEARTBEAT_MS = 10_000;
 const SILENCE_MS = 35_000;
@@ -15,7 +15,7 @@ function registration(value: unknown): value is PlayerRegistration {
 }
 function savedSeat(value: unknown): value is SavedSeat {return registration(value) && record(value) && typeof value.roomCode === 'string' && validRoomCode(value.roomCode) && typeof value.resumeToken === 'string' && value.resumeToken.length > 16;}
 function readSaved(roomCode?: string): SavedSeat | null {
-  try {const value: unknown = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'); return savedSeat(value) && (!roomCode || normalizeRoomCode(roomCode) === value.roomCode) ? value : null;} catch {return null;}
+  try {const value: unknown = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'); return savedSeat(value) && (!roomCode || normalizeRoomCode(roomCode) === value.roomCode) ? {playerName: value.playerName, heroId: value.heroId, deckList: value.deckList, roomCode: value.roomCode, resumeToken: value.resumeToken} : null;} catch {return null;}
 }
 function saveSeat(value: SavedSeat | null) {try {if (value) sessionStorage.setItem(SESSION_KEY, JSON.stringify(value)); else sessionStorage.removeItem(SESSION_KEY);} catch { /* Reconnect still works in this page when storage is unavailable. */ }}
 function isSnapshot(value: unknown): value is NetSnapshot {
@@ -95,8 +95,8 @@ export function useNetGame({roomCode: initialRoomCode}: {roomCode?: string} = {}
         case 'joined': {
           const details = activeRegistration.current;
           if (!details) return;
-          const value: SavedSeat = {...details, roomCode: incoming.roomCode, resumeToken: incoming.resumeToken};
-          seat.current = value; setIdentity(value); saveSeat(value); attempt.current = 0; setConnected(true); setStatus(current.current?.game ? current.current.status : 'waiting'); break;
+          const value: SavedSeat = {playerName: details.playerName, heroId: details.heroId, deckList: [...details.deckList], roomCode: incoming.roomCode, resumeToken: incoming.resumeToken};
+          activeRegistration.current = value; seat.current = value; setIdentity(value); saveSeat(value); attempt.current = 0; setConnected(true); setStatus(current.current?.game ? current.current.status : 'waiting'); break;
         }
         case 'state':
           if (current.current?.roomCode === incoming.snapshot.roomCode && current.current.revision > incoming.snapshot.revision) return;

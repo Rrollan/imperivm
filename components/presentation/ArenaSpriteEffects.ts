@@ -42,7 +42,7 @@ export class ArenaSpriteEffects {
     material.alphaMode=Engine.ALPHA_ADD;material.transparencyMode=Material.MATERIAL_ALPHABLEND;
     // On pale marble, additive RGB saturates cyan/violet into white. These
     // authored black-background clips use luminance as opacity, preserving ink.
-    if(source.composite==='luma-alpha'){
+    { // All shipped atlases have black backgrounds; alpha preserves colour on marble.
       ink.getAlphaFromRGB=true;material.opacityTexture=ink;material.alphaMode=Engine.ALPHA_COMBINE;
     }
     const mesh=MeshBuilder.CreatePlane(`sprite:${id}:${index}`,{width:1,height:9/16},this.scene);

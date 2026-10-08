@@ -1,0 +1,1 @@
+.icon{display:inline-block;flex-shrink:0;width:var(--icon-size,36px);height:var(--icon-size,36px);background-image:url('/ui/menu/imperivm-painted-icons-v1.png');background-repeat:no-repeat;background-size:400% 300%;background-position:var(--icon-x) var(--icon-y);filter:drop-shadow(0 2px 2px #0007);vertical-align:middle;pointer-events:none}

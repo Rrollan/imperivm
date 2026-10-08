@@ -2,8 +2,10 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { LocalCollectionGateway, type CollectionGateway, type CollectionSnapshot, type PackResult } from '../lib/collection/gateway';
 import { useIDos } from './IDosContext';
+import {deckError} from '../lib/engine/deckValidation';
+import {needsCollection, deckCardCounts, freeCardCounts, type CollectionAuth} from '../lib/collection/access';
 
-type CollectionState = { snapshot: CollectionSnapshot | null; busy: boolean; error: string | null; refresh: () => Promise<void>; openPack: () => Promise<PackResult>; useLocalDemo: () => Promise<void> };
+type CollectionState = { snapshot: CollectionSnapshot | null; busy: boolean; error: string | null; refresh: () => Promise<void>; openPack: () => Promise<PackResult>; useLocalDemo: () => Promise<void>; authorizeDeck: (deck: string[]) => Promise<CollectionAuth | undefined> };
 const Context = createContext<CollectionState | null>(null);
 export function useCollection() { const value = useContext(Context); if (!value) throw new Error('CollectionContext is missing'); return value; }
 function localGateway() { let storage: Storage | undefined; try { storage = window.localStorage; } catch {} return new LocalCollectionGateway(storage); }
@@ -51,5 +53,17 @@ export default function CollectionContext({ children }: { children: React.ReactN
     finally { captured.locked = false; if (scope.current === captured) setBusy(false); }
   }
   async function useLocalDemo() { setLocalRevision(idos.session.revision); }
-  return <Context.Provider value={{ snapshot, busy, error, refresh, openPack, useLocalDemo }}>{children}</Context.Provider>;
+  async function authorizeDeck(deck: string[]): Promise<CollectionAuth | undefined> {
+    if (!needsCollection(deck)) {const problem = deckError(deck, freeCardCounts()); if (problem) throw new Error(problem); return undefined;}
+    const captured = scope.current;
+    if (!captured.gateway || captured.locked) throw new Error('The collection is loading.');
+    const current = await captured.gateway.load();
+    if (scope.current !== captured) throw new Error('The account changed. Please choose the deck again.');
+    const problem = deckError(deck, deckCardCounts(current.owned)); if (problem) throw new Error(problem);
+    if (current.mode !== 'idos' || !idos.runtime) throw new Error('Pack cards in online matches require iDos. Use the free starter deck or sign in to iDos.');
+    const auth = await idos.runtime.collectionAuth();
+    if (scope.current !== captured) throw new Error('The account changed. Please choose the deck again.');
+    return auth;
+  }
+  return <Context.Provider value={{ snapshot, busy, error, refresh, openPack, useLocalDemo, authorizeDeck }}>{children}</Context.Provider>;
 }

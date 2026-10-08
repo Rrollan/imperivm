@@ -61,7 +61,7 @@
 .hand-zone .imperial-card .card-attack, .hand-zone .imperial-card .card-health { width: 27px; height: 29px; }
 .hand-zone .imperial-card .card-attack span, .hand-zone .imperial-card .card-health span { font-size: 17px; }
 
-/* Amber gas and struck $RUG rarity coins; pavilion hues live in the metal inlay. */
+/* Amber gas and struck $IMP rarity coins; pavilion hues live in the metal inlay. */
 .imperial-card { --frame-metal: #b18a46; --frame-light: #f5d76e; border-color: var(--card-faction); box-shadow: inset 0 0 0 2px #8a6d1f,inset 3px 3px 3px #fff3,0 5px 0 #211824,0 9px 15px #0009; }
 .imperial-card .card-faction-ribbon { background: var(--card-faction) !important; height: 4px; }
 .imperial-card .card-art { border-color: #b18a46; }

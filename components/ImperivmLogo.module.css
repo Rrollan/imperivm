@@ -1,0 +1,2 @@
+.logo{display:block;width:270px;max-width:100%;height:auto;object-fit:contain;filter:drop-shadow(0 3px 4px #0008)}
+@media(max-width:600px){.logo{width:258px}}

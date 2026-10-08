@@ -50,7 +50,7 @@ Deck **30** · hand **10** · board **5**, expandable to **7** with Agora Expans
 
 Olympus adds six cards with public preparation and conditional arrival effects. All previous cards remain available. See [design, research and validation](docs/research/olympus-design-20261007.md) and [Omni Flash pack 18–25](docs/olympus-vfx/00-START-HERE.md).
 
-All eight Olympus effects are installed; see the [import and validation report](docs/olympus-vfx/IMPORT-20261008.md). The [Agora After Hours expansion](docs/character-expansion-20261008.md) adds 50 playable characters with immediate arrival abilities and conditional synergies to all four starter decks. Inspect their cards and build decks at `/collection` → **New characters**. Original 49 cards and the separate Genesis NFT manifest are preserved.
+All eight Olympus effects are installed; see the [import and validation report](docs/olympus-vfx/IMPORT-20261008.md). The [Agora After Hours expansion](docs/character-expansion-20261008.md) adds 50 pack-exclusive characters with immediate arrival abilities and conditional synergies. Everyone receives 49 free base cards and four legal 30-card starters; expansion deck recipes unlock as cards are collected. Inspect their cards and build decks at `/collection` → **New characters**. Original 49 cards and the separate Genesis NFT manifest are preserved.
 
 Deployment contacts now match the card plane and battlefield spacing. All twelve videos from [VFX pack 26–37](docs/arrival-vfx-26-37/00-START-HERE.md) have been imported: seven landings and two ranged impacts are used in battle; three character appearances are reserved for future cards. See the [import report](docs/arrival-vfx-26-37/IMPORT-20261008.md). Preview/download at `/ui/arena-lab/imperivm-arrival-vfx-26-37/index.html`.
 
@@ -127,7 +127,7 @@ readme/             Screenshots & GIFs for this README
 | **iDos** | 🧪 Typed adapter ready, no Title created yet |
 | **PvP / Mainnet** | 🔜 Future work |
 
-> `$RUG` is a demo currency with no cash value. Not an SPL token.
+> Local demo IMP has no cash value. Live IMP is a closed-loop iDos virtual currency, not an SPL token. SOL/USDC top-up code is prepared, disabled until the Title and live checkout are verified. See the [economy setup](docs/economy-idos-rug.md).
 
 ---
 

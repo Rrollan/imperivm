@@ -1,5 +1,7 @@
 # IMPERIVM: iDos / Solana devnet — передача Жорику
 
+> **Обновление 8 октября:** пользователь выбрал пополнение за реальные SOL / USDC через iDos. Актуальные 49 free / 50 pack-only, live InitialDeposit=0, коллекция Agora, mainnet Store и серверная проверка владения описаны в [economy-idos-rug.md](economy-idos-rug.md). Настройки Genesis/99/500 ниже — исторические и не должны использоваться для нового платного Title. NFT/proof-of-play остаются devnet.
+
 Дата проверки: 8 октября 2026. Ветка `rebirth`, репозиторий https://github.com/Rrollan/imperivm.
 
 ## Что сделано в коде

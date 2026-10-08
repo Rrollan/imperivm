@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { CardDef } from '../../lib/engine/types';
-import { CardBack, RARITY_COLORS } from '../../components/CardView';
+import { RARITY_COLORS } from '../../components/CardView';
 import WalletBar from '../../components/WalletBar';
 import {SiteHeader, SiteFooter} from '../../components/home/SiteChrome';
 import styles from '../../components/home/Home.module.css';
@@ -16,25 +16,23 @@ import { PACK_COST, RARITY_WEIGHTS } from '../../lib/collection/gateway';
 import NftPack from '../../components/NftPack';
 import { useLocale } from '../../components/LocaleContext';
 import {CardDialog} from '../../components/home/CardDialog';
-import {CardFacts} from '../../components/home/CardFacts';
-import {LibraryCardFace} from '../../components/home/LibraryCardFace';
-import { CoinPreview } from '../../components/3d/CoinPreview';
+import {PackOpening} from '../../components/home/PackOpening';
+import {RomanIcon} from '../../components/presentation/RomanIcon';
+import {useIDos} from '../../components/IDosContext';
+import {PaintedIcon} from '../../components/PaintedIcon';
+import RugShop from '../../components/RugShop';
 
 export default function PacksPage() {
   const { t, rarityName, errorText, cardName } = useLocale();
   const collection = useCollection();
   const [inspected, setInspected] = useState<string | null>(null);
   const [pack, setPack] = useState<CardDef[]>([]);
-  const [revealed, setRevealed] = useState(0);
+  const [duplicates, setDuplicates] = useState<boolean[]>([]);
+  const [animating,setAnimating]=useState(false),[openingId,setOpeningId]=useState(0);
+  const inFlight=useRef(false);
+  const idos=useIDos();
   const [opened, setOpened] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    },
-    [],
-  );
+  useEffect(()=>{setPack([]);setDuplicates([]);setOpened(false);setAnimating(false);},[idos.session.revision]);
 
   // Lazy-start ambient on first gesture.
   useEffect(() => {
@@ -54,93 +52,57 @@ export default function PacksPage() {
   }, []);
 
   const handleOpen = async () => {
-    if (collection.busy || (opened && revealed < pack.length)) return;
-    if (timerRef.current) clearInterval(timerRef.current);
-    // Unlock audio context inside the user gesture.
-    await unlockAudio();
-    let cards: CardDef[];
-    try { cards = (await collection.openPack()).cards; } catch { return; }
-    setPack(cards);
-    setRevealed(0);
-    setOpened(true);
-    play('pack-open');
-    let step = 0;
-    timerRef.current = setInterval(() => {
-      step += 1;
-      if (step >= cards.length) {
-        if (timerRef.current) clearInterval(timerRef.current);
-        setRevealed(cards.length);
-        play('card-reveal');
-        return;
-      }
-      setRevealed(step);
-      play('card-reveal');
-    }, 450);
+    if(inFlight.current||collection.busy||animating)return;
+    inFlight.current=true;
+    try{
+      await unlockAudio();
+      const result=await collection.openPack();
+      setPack(result.cards);setDuplicates(result.duplicates??[]);setOpeningId(i=>i+1);setOpened(true);setAnimating(true);play('pack-open');
+    }catch{/* Collection context displays the failed purchase; no reveal is invented. */}
+    finally{inFlight.current=false;}
   };
 
   return (
     <div className={styles.shell}>
       <SiteHeader active="packs" />
 
-      <main className={`${styles.hubMain} max-w-5xl mx-auto px-6 py-12 text-center`}>
-        <h1 className="font-display text-5xl font-bold gold-text tracking-widest">{t('ПАКИ', 'PACKS')}</h1>
-        <p className="mt-3 text-lavender italic font-display text-lg">
-          {collection.snapshot?.mode === 'idos' ? t('Карты и валюта хранятся в iDos Games.', 'Cards and currency managed by iDos Games.') : t('Пять карт. Шансы зависят от редкости. Коллекция сохраняется в этом браузере.', 'Five cards. Weighted by rarity. Yours to keep in this browser.')}
-        </p>
-        <div className="collection-wallet"><strong>{collection.snapshot?.rug ?? '—'} $RUG</strong><span>{collection.snapshot?.mode === 'idos' ? t('Виртуальная валюта iDos', 'iDos virtual currency') : t('Локальная демо-валюта', 'Local demo currency')} · {t('не имеет денежной стоимости', 'no cash value')}</span><Link href="/collection">{t('Открыть коллекцию →', 'View collection →')}</Link></div>
+      <main className={`${styles.hubMain} ${styles.packMain}`}>
+        <header className={styles.pageTitle}><span className={styles.kicker}>AGORA · AFTER HOURS</span><h1>{t('Паки', 'Packs')}</h1><p>{t('Пять карт. Новые связки.','Five cards. New combos.')}</p></header>
+        <div className="collection-wallet"><strong>{collection.snapshot?.rug ?? '—'} $IMP</strong><span>{collection.snapshot?.mode === 'idos' ? t('Баланс iDos', 'iDos balance') : t('Демо · без оплаты', 'Demo · no payment')}</span><Link href="/collection">{t('Коллекция →', 'Collection →')}</Link></div>
         {collection.error && <div className="integration-error" role="status"><p>{errorText(collection.error)}</p><div className="dialog-actions"><button className="secondary-button" onClick={() => void collection.refresh()} disabled={collection.busy}>{t('Повторить', 'Retry')}</button><button className="secondary-button" onClick={() => void collection.useLocalDemo()} disabled={collection.busy}>{t('Локальное демо', 'Use local demo')}</button></div></div>}
 
-        <div className="mt-6 flex flex-wrap justify-center gap-4 text-xs">
+        {opened?<PackOpening key={openingId} cards={pack} duplicates={duplicates} onInspect={setInspected} onComplete={()=>setAnimating(false)} onReplayStart={()=>setAnimating(true)}/>:<div className="pack-idle"><PaintedIcon name="pack" size={170}/></div>}
+
+        <div className={styles.packPurchase}>
+          <button
+            onClick={handleOpen}
+            disabled={collection.busy || !collection.snapshot || collection.snapshot.rug < PACK_COST || animating}
+            className="gold-button"
+          >
+            <PaintedIcon name="pack" size={36}/>{collection.busy ? t('Открываем…', 'Opening…') : opened ? t('Ещё один пак · 50 $IMP', 'Open another · 50 $IMP') : t('Открыть пак · 50 $IMP', 'Open pack · 50 $IMP')}
+          </button>
+        </div>
+        {!animating&&collection.snapshot&&collection.snapshot.rug<PACK_COST&&<p className={styles.packStatus}>{t('Для пака нужно 50 $IMP.','A pack requires 50 $IMP.')}</p>}
+        {!opened&&<Link className={styles.secondaryLink} href="/arena-lab/pack-preview">{t('Предпросмотр анимации','Preview the animation')}<RomanIcon name="next" size={18}/></Link>}
+
+        {opened&&!animating&&<Link href="/collection" className={styles.secondaryLink}><PaintedIcon name="cards" size={30}/>{t('Добавить новые карты в колоду','Build with your new cards')}<RomanIcon name="next" size={20}/></Link>}
+        <details className={styles.menuDetails}><summary>{t('Что в паке?', 'What’s inside?')}</summary><p>{t('Пять случайных карт из 50 персонажей Agora. Шансы редкости указаны для одной карты.','Five random cards from 50 Agora characters. Rarity odds apply to each card.')}</p><div className={styles.rarityChances}>
           {RARITY_WEIGHTS.map(r => (
-            <span key={rarityName(r.rarity)} className="flex items-center gap-1.5 text-parchment/70">
-              <span
-                className="inline-block w-2.5 h-2.5 rotate-45"
-                style={{ background: RARITY_COLORS[r.rarity] }}
-              />
+            <span key={rarityName(r.rarity)} >
+              <i aria-hidden="true" style={{background:RARITY_COLORS[r.rarity]}}/>
               {rarityName(r.rarity)} · {r.weight}%
             </span>
           ))}
         </div>
 
-        <div className="mt-10 flex flex-wrap justify-center gap-4 min-h-[14rem]">
-          {opened
-            ? pack.map((card, i) =>
-                i < revealed ? (
-                  <div key={`${card.id}-${i}`} className={`flip-in ${styles.packReveal}`}>
-                    <button type="button" className={styles.hubCard} onClick={event => {event.currentTarget.focus({preventScroll:true}); setInspected(card.id);}} aria-label={t(`Рассмотреть карту «${cardName(card.id)}»`, `Inspect ${cardName(card.id)}`)}><LibraryCardFace id={card.id}/><CardFacts id={card.id}/></button>
-                  </div>
-                ) : (
-                  <div key={`back-${i}`}>
-                    <CardBack />
-                  </div>
-                ),
-              )
-            : (
-              <div className="flex flex-col items-center gap-4 py-8">
-                <CoinPreview model="chest" size={200} autoRotate={false} label={t('Сундук с картами', 'Card pack chest')} />
-                <p className="text-lavender/60 text-sm italic">{t('Пак ждёт вашего приказа, Император.', 'The pack awaits your command, Imperator.')}</p>
-              </div>
-            )}
-        </div>
-
-        <div className="mt-8">
-          <button
-            onClick={handleOpen}
-            disabled={collection.busy || !collection.snapshot || collection.snapshot.rug < PACK_COST || (opened && revealed < pack.length)}
-            className="gold-button"
-          >
-            {collection.busy ? t('Открываем…', 'Opening…') : opened ? t('✦ Ещё один пак · 50 $RUG', '✦ Open another · 50 $RUG') : t('✦ Открыть пак · 50 $RUG', '✦ Open pack · 50 $RUG')}
-          </button>
-        </div>
-
-        <p className="mt-6 text-xs text-lavender/60">{collection.snapshot?.mode === 'idos' ? t('Коллекция и валюта через iDos SDK.', 'Collection and currency via iDos SDK.') : t('Локальное демо · 500 стартовых $RUG · без кошелька и минта.', 'Local fallback · 500 starter $RUG · no wallet or minting required.')}</p>
+        <p >{collection.snapshot?.mode === 'idos' ? t('Коллекция и баланс сохраняются в вашем аккаунте iDos.', 'Collection and balance belong to your iDos account.') : t('Локальное демо · 500 тестовых $IMP. Демо-карты работают в тренировке; для паковых карт в PvP нужен аккаунт iDos.', 'Local demo · 500 test $IMP. Demo cards work in training; pack cards in PvP require an iDos account.')}</p>
+        <p >{t('Полученная карта открывает до двух копий в колоде, легендарная — одну. Паки могут содержать повторы; в iDos они превращаются в валюту коллекции, а не в IMP.', 'An obtained card unlocks up to two deck copies, or one for a legendary. Packs may contain duplicates; iDos converts them into collection currency, not IMP.')}</p>
+        {collection.snapshot?.mode === 'idos' && <p >{t('Валюта коллекции за повторы', 'Collection currency from duplicates')}: <strong>{collection.snapshot.collectionCurrency ?? 0}</strong> · {t('Обмен на карты готовится; сейчас эта валюта не тратится.', 'Card exchange is in preparation; this currency cannot be spent yet.')}</p>}
+        </details>
+        <details className={styles.menuDetails}><summary><PaintedIcon name="rug" size={30}/>{t('Пополнить $IMP · SOL / USDC', 'Get $IMP · SOL / USDC')}</summary><RugShop/></details>
         <details className={styles.optionalNft}><summary>{t('Коллекционные NFT · devnet (необязательно)', 'Collectible NFTs · devnet (optional)')}</summary><WalletBar /><NftPack /></details>
 
-        <div className="mt-4">
-          <Link href="/" className="text-sm text-lavender/70 hover:text-lavender">
-            {t('← В главный зал', '← Back to the hall')}
-          </Link>
-        </div>
+
       </main>
       <SiteFooter />
       {inspected && <CardDialog id={inspected} onClose={() => setInspected(null)} />}

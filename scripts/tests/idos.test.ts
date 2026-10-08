@@ -1,9 +1,11 @@
+import {CARDS} from '../../lib/cards';
+import {PACK_CARD_IDS} from '../../lib/collection/access';
 import assert from 'node:assert/strict';
 import { ed25519 } from '@noble/curves/ed25519';
 import { PublicKey } from '@solana/web3.js';
 import type { CollectionDefinitions, OperationResult, WalletChallengeResponse } from '@idosgames/core';
 import { authenticateSolanaWallet, SessionQueue } from '../../lib/idos/auth';
-import { validateIDosDefinitions } from '../../lib/collection/idos';
+import { IDOS_RARITIES, idosPackDrops, validateIDosDefinitions } from '../../lib/collection/idos';
 import { IDOS_CONFIG, PACK_COST } from '../../lib/collection/gateway';
 import { bytesToBase64, proofMessage, validPlayProof, verifyPlaySignature, type PlayProof } from '../../lib/solana/proof';
 import { rugMint, tokenBalance } from '../../lib/solana/rug';
@@ -53,8 +55,14 @@ async function main() {
   await queue.forAccount(async () => { steps.push('new-purchase'); });
   assert.equal(steps.at(-1), 'new-purchase');
 
-  const definitions: CollectionDefinitions = { Collections: { [IDOS_CONFIG.collection]: { CollectionID: IDOS_CONFIG.collection } }, PackTypes: { [IDOS_CONFIG.pack]: { CollectibleCount: 5, PriceOptions: { [IDOS_CONFIG.payment]: { Cost: { Standard: { Entries: [{ Type: 'VirtualCurrency', CurrencyID: IDOS_CONFIG.currency, Amount: PACK_COST }] } } } } } } };
+  const definitions: CollectionDefinitions = { Collections: { [IDOS_CONFIG.collection]: { CollectionID: IDOS_CONFIG.collection, Sets: [{SetID: 'AGORA', Collectibles: PACK_CARD_IDS.map(id => ({CollectibleID: id, Rarity: IDOS_RARITIES[CARDS[id].rarity]}))}] } }, PackTypes: { [IDOS_CONFIG.pack]: { CollectibleCount: 5, RarityWeights: {'1':60,'2':25,'3':11,'4':4}, PriceOptions: { [IDOS_CONFIG.payment]: { Cost: { Standard: { Entries: [{ Type: 'VirtualCurrency', CurrencyID: IDOS_CONFIG.currency, Amount: PACK_COST }] } } } } } } };
+  definitions.DuplicateConversions = [1,2,3,4].map(Rarity => ({Rarity,CollectionCurrencyGranted:Rarity}));
   validateIDosDefinitions(definitions);
+  const fullRoll = PACK_CARD_IDS.slice(0,5).map((CollectibleID, index) => ({CollectibleID,IsDuplicate:index === 4}));
+  assert.equal(idosPackDrops({GrantedCollectibles: fullRoll, DuplicateCollectibles: [fullRoll[4]]}).length,5, 'Duplicate list is a subset of the five rolls');
+  assert.equal(idosPackDrops({Packs:[{GrantedCollectibles: fullRoll, DuplicateCollectibles:[fullRoll[4]]}]}).length,5);
+  const biased = structuredClone(definitions); biased.PackTypes![IDOS_CONFIG.pack].RarityWeights!['4'] = 20; assert.throws(() => validateIDosDefinitions(biased), /odds/);
+  const freeDrop = structuredClone(definitions); freeDrop.Collections![IDOS_CONFIG.collection].Sets![0].Collectibles![0].CollectibleID = 'audit'; assert.throws(() => validateIDosDefinitions(freeDrop), /exclusive/);
   const wrong = structuredClone(definitions); wrong.PackTypes![IDOS_CONFIG.pack].CollectibleCount = 4; assert.throws(() => validateIDosDefinitions(wrong), /5 cards/);
   const crypto = structuredClone(definitions); crypto.PackTypes![IDOS_CONFIG.pack].PriceOptions![IDOS_CONFIG.payment].Cost!.Standard!.Entries![0].Type = 'CryptoCurrency'; assert.throws(() => validateIDosDefinitions(crypto), /Crypto payments/);
   const extra = structuredClone(definitions); extra.PackTypes![IDOS_CONFIG.pack].PriceOptions![IDOS_CONFIG.payment].Cost!.Standard!.Entries!.push({ Type: 'VirtualCurrency', CurrencyID: 'OTHER', Amount: 1 }); assert.throws(() => validateIDosDefinitions(extra));

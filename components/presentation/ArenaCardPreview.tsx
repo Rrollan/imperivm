@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useRef,type KeyboardEvent,type PointerEvent} from 'react';
 import {CARDS} from '../../lib/cards';
-import {CARD_FACE,CARD_FRAME_PATH,paintCardFace} from './cardFace';
+import {CARD_FACE,cardFramePath,paintCardFace} from './cardFace';
 import {cardArtPath} from '../../lib/cardArt';
 import type {Locale} from '../../lib/locale';
 import styles from './ArenaLab.module.css';
@@ -51,7 +51,7 @@ export function ArenaCardPreview({id,locale,label,stats,interactive=false,reduce
     const art=new Image(),frame=new Image();
     const font=getComputedStyle(document.body).getPropertyValue('--font-sans').trim()||'sans-serif';
     const draw=()=>{if(!live)return;ctx.clearRect(0,0,CARD_FACE.width,CARD_FACE.height);paintCardFace(ctx,id,locale,font,art.complete&&art.naturalWidth?art:null,undefined,stats,frame.complete&&frame.naturalWidth?frame:null);};
-    art.onload=draw;frame.onload=draw;frame.src=CARD_FRAME_PATH;art.src=cardArtPath(id);draw();void document.fonts.ready.then(draw);
+    art.onload=draw;frame.onload=draw;frame.src=cardFramePath(CARDS[id].rarity);art.src=cardArtPath(id);draw();void document.fonts.ready.then(draw);
     return()=>{live=false;art.onload=null;frame.onload=null;};
   },[id,locale,stats?.attack,stats?.health]);
   const face=<canvas ref={canvas} className={interactive?undefined:styles.inspectedCard} width={CARD_FACE.width} height={CARD_FACE.height} role={interactive?'presentation':'img'} aria-hidden={interactive||undefined} aria-label={interactive?undefined:label}/>;

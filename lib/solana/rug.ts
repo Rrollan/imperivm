@@ -2,7 +2,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { assertDevnet, DEVNET_RPC } from './devnet';
 
 /** Optional future mint. Empty means the token has not been launched. */
-export function rugMint(value = process.env.NEXT_PUBLIC_RUG_DEVNET_MINT): string | null {
+export function rugMint(value = process.env.NEXT_PUBLIC_IMP_DEVNET_MINT || process.env.NEXT_PUBLIC_RUG_DEVNET_MINT): string | null {
   if (!value?.trim() || /^(your|replace|placeholder|todo|<)/i.test(value.trim())) return null;
   try { return new PublicKey(value.trim()).toBase58(); } catch { return null; }
 }

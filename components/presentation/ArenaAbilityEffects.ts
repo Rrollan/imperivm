@@ -26,7 +26,7 @@ export class ArenaAbilityEffects {
     for(let i=0;i<EFFECT_POOL_SIZE;i++){
       const mesh=MeshBuilder.CreatePlane(`ability ${i}`,{width:1,height:1},scene);
       const material=new StandardMaterial(`ability ${i}`,scene);
-      material.diffuseColor=Color3.Black();material.emissiveColor=Color3.White();material.specularColor=Color3.Black();material.disableLighting=true;material.useAlphaFromDiffuseTexture=true;
+      material.diffuseColor=Color3.Black();material.emissiveColor=Color3.Black();material.specularColor=Color3.Black();material.disableLighting=true;material.useAlphaFromDiffuseTexture=true;material.useEmissiveAsIllumination=true;
       material.diffuseTexture=this.glyphs.get('steel')!;material.emissiveTexture=material.diffuseTexture;
       mesh.material=material;mesh.isPickable=false;mesh.renderingGroupId=2;mesh.setEnabled(false);
       this.pool.push({mesh,material});void material.forceCompilationAsync(mesh).then(invalidate).catch(()=>{});
@@ -35,15 +35,17 @@ export class ArenaAbilityEffects {
   private glyph(kind:AccentKind){
     const texture=new DynamicTexture(`ability glyph ${kind}`,128,this.scene,false);texture.hasAlpha=true;
     const c=texture.getContext() as unknown as CanvasRenderingContext2D;
-    c.clearRect(0,0,128,128);c.strokeStyle=kind==='destroy'?'#c6aa88':kind==='weaken'?'#d77969':kind==='gas'?'#77d8de':kind==='heal'?'#b1ecd7':kind==='steel'?'#ecd3a1':'#e5bd73';
+    c.clearRect(0,0,128,128);c.strokeStyle=kind==='destroy'?'#ff714c':kind==='weaken'?'#ff5f7e':kind==='gas'?'#25dcff':kind==='heal'?'#3dffaf':kind==='steel'?'#ffd05f':'#ffb83c';
     c.fillStyle=c.strokeStyle;c.lineWidth=4;c.lineCap='round';c.lineJoin='round';
-    if(kind==='destroy'){c.beginPath();c.moveTo(64,22);c.lineTo(53,49);c.lineTo(75,63);c.lineTo(54,91);c.lineTo(64,106);c.moveTo(53,49);c.lineTo(27,44);c.moveTo(75,63);c.lineTo(104,56);c.stroke();}
-    else if(kind==='steel'){c.beginPath();c.moveTo(33,89);c.lineTo(89,33);c.stroke();c.lineWidth=2;c.moveTo(48,74);c.lineTo(40,41);c.moveTo(68,59);c.lineTo(93,68);c.stroke();}
-    else if(kind==='gas'){c.beginPath();c.moveTo(64,25);c.lineTo(82,46);c.lineTo(64,96);c.lineTo(46,46);c.closePath();c.stroke();c.moveTo(46,46);c.lineTo(82,46);c.stroke();}
-    else if(kind==='weaken'){c.beginPath();c.moveTo(45,91);c.lineTo(82,32);c.stroke();c.strokeStyle='#e5afa0';c.lineWidth=6;c.beginPath();c.moveTo(33,40);c.lineTo(93,93);c.stroke();}
+    const stroke=()=>{c.save();c.strokeStyle='#281120';c.lineWidth+=5;c.shadowColor='#100912';c.shadowBlur=5;c.stroke();c.restore();c.stroke();};
+    c.shadowColor='#211017';c.shadowBlur=4;
+    if(kind==='destroy'){c.beginPath();c.moveTo(64,22);c.lineTo(53,49);c.lineTo(75,63);c.lineTo(54,91);c.lineTo(64,106);c.moveTo(53,49);c.lineTo(27,44);c.moveTo(75,63);c.lineTo(104,56);stroke();}
+    else if(kind==='steel'){c.beginPath();c.moveTo(33,89);c.lineTo(89,33);stroke();c.lineWidth=2;c.moveTo(48,74);c.lineTo(40,41);c.moveTo(68,59);c.lineTo(93,68);stroke();}
+    else if(kind==='gas'){c.beginPath();c.moveTo(64,25);c.lineTo(82,46);c.lineTo(64,96);c.lineTo(46,46);c.closePath();stroke();c.moveTo(46,46);c.lineTo(82,46);stroke();}
+    else if(kind==='weaken'){c.beginPath();c.moveTo(45,91);c.lineTo(82,32);stroke();c.strokeStyle='#e5afa0';c.lineWidth=6;c.beginPath();c.moveTo(33,40);c.lineTo(93,93);stroke();}
     else if(kind==='dice'){c.strokeRect(36,36,56,56);for(const [x,y] of [[49,49],[79,49],[64,64],[49,79],[79,79]]){c.beginPath();c.arc(x,y,3,0,Math.PI*2);c.fill();}}
-    else if(kind==='seal'||kind==='counter'){c.beginPath();c.arc(64,64,34,.2,Math.PI*1.9);c.stroke();c.beginPath();c.moveTo(64,40);c.lineTo(64,86);c.moveTo(44,51);c.lineTo(84,51);c.moveTo(40,71);c.lineTo(50,71);c.moveTo(78,71);c.lineTo(88,71);c.stroke();if(kind==='counter'){c.strokeStyle='#b67c65';c.moveTo(39,89);c.lineTo(89,39);c.stroke();}}
-    else{for(const side of [-1,1]){c.beginPath();c.moveTo(64,99);c.quadraticCurveTo(64+side*35,73,64+side*22,32);c.stroke();for(let i=0;i<4;i++){c.beginPath();c.ellipse(64+side*(19+i),82-i*12,7,3,side*.65,0,Math.PI*2);c.fill();}}}
+    else if(kind==='seal'||kind==='counter'){c.beginPath();c.arc(64,64,34,.2,Math.PI*1.9);stroke();c.beginPath();c.moveTo(64,40);c.lineTo(64,86);c.moveTo(44,51);c.lineTo(84,51);c.moveTo(40,71);c.lineTo(50,71);c.moveTo(78,71);c.lineTo(88,71);stroke();if(kind==='counter'){c.strokeStyle='#b67c65';c.moveTo(39,89);c.lineTo(89,39);stroke();}}
+    else{for(const side of [-1,1]){c.beginPath();c.moveTo(64,99);c.quadraticCurveTo(64+side*35,73,64+side*22,32);stroke();for(let i=0;i<4;i++){c.beginPath();c.ellipse(64+side*(19+i),82-i*12,7,3,side*.65,0,Math.PI*2);c.fill();}}}
     texture.update();return texture;
   }
   begin(batch:PresentationBatch,locate:(uid:string)=>Vector3|undefined,timeline:EffectTimeline|null=null){
@@ -72,9 +74,9 @@ export class ArenaAbilityEffects {
       mesh.position.copyFrom(Vector3.Lerp(from,to,travel));mesh.position.z=-8;
       if(!reduced&&Vector3.DistanceSquared(from,to)>.2)mesh.position.y+=Math.sin(t*Math.PI)*.4;
       const local=Vector3.DistanceSquared(from,to)<.2;
-      const scale=local?1.4+.2*Math.sin(t*Math.PI):.85;
+      const scale=local?1.55+.22*Math.sin(t*Math.PI):1.05;
       mesh.scaling.setAll(scale);mesh.rotation.z=cue.kind==='dice'&&!reduced?Math.sin(t*Math.PI)*.22:0;
-      material.alpha=reduced?.4:Math.sin(t*Math.PI)*.72;
+      material.alpha=reduced?.75:Math.min(1,Math.sin(t*Math.PI)*1.3);
     });
   }
   clear(){this.pool.forEach(p=>p.mesh.setEnabled(false));this.live=[];this.timeline=null;this.locate=null;this.windowStart=-1;}

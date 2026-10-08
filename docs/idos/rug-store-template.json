@@ -1,0 +1,189 @@
+{
+  "Stores": {
+    "IMPERIVM_IMP": {
+      "StoreID": "IMPERIVM_IMP",
+      "Identity": {
+        "DisplayName": "IMP"
+      },
+      "Layout": {
+        "Sections": {
+          "IMP": {
+            "SectionID": "IMP",
+            "Slots": {
+              "250": {
+                "SlotID": "250",
+                "Rotation": {
+                  "Mode": "Fixed",
+                  "OfferID": "IMP_250_V1"
+                }
+              },
+              "1000": {
+                "SlotID": "1000",
+                "Rotation": {
+                  "Mode": "Fixed",
+                  "OfferID": "IMP_1000_V1"
+                }
+              },
+              "2500": {
+                "SlotID": "2500",
+                "Rotation": {
+                  "Mode": "Fixed",
+                  "OfferID": "IMP_2500_V1"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "StoreOffers": {
+    "IMP_250_V1": {
+      "OfferID": "IMP_250_V1",
+      "Identity": {
+        "DisplayName": "250 IMP"
+      },
+      "Pricing": {
+        "Options": {
+          "USDC_V1": {
+            "Cost": {
+              "Standard": {
+                "Entries": [
+                  {
+                    "Type": "CryptoCurrency",
+                    "CurrencyID": "USDC",
+                    "Amount": null
+                  }
+                ]
+              }
+            }
+          },
+          "SOL_V1": {
+            "Cost": {
+              "Standard": {
+                "Entries": [
+                  {
+                    "Type": "CryptoCurrency",
+                    "CurrencyID": "SOL",
+                    "Amount": null
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "Reward": {
+        "Grant": {
+          "Standard": {
+            "Entries": [
+              {
+                "Type": "VirtualCurrency",
+                "CurrencyID": "IMP",
+                "Amount": 250
+              }
+            ]
+          }
+        }
+      }
+    },
+    "IMP_1000_V1": {
+      "OfferID": "IMP_1000_V1",
+      "Identity": {
+        "DisplayName": "1000 IMP"
+      },
+      "Pricing": {
+        "Options": {
+          "USDC_V1": {
+            "Cost": {
+              "Standard": {
+                "Entries": [
+                  {
+                    "Type": "CryptoCurrency",
+                    "CurrencyID": "USDC",
+                    "Amount": null
+                  }
+                ]
+              }
+            }
+          },
+          "SOL_V1": {
+            "Cost": {
+              "Standard": {
+                "Entries": [
+                  {
+                    "Type": "CryptoCurrency",
+                    "CurrencyID": "SOL",
+                    "Amount": null
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "Reward": {
+        "Grant": {
+          "Standard": {
+            "Entries": [
+              {
+                "Type": "VirtualCurrency",
+                "CurrencyID": "IMP",
+                "Amount": 1000
+              }
+            ]
+          }
+        }
+      }
+    },
+    "IMP_2500_V1": {
+      "OfferID": "IMP_2500_V1",
+      "Identity": {
+        "DisplayName": "2500 IMP"
+      },
+      "Pricing": {
+        "Options": {
+          "USDC_V1": {
+            "Cost": {
+              "Standard": {
+                "Entries": [
+                  {
+                    "Type": "CryptoCurrency",
+                    "CurrencyID": "USDC",
+                    "Amount": null
+                  }
+                ]
+              }
+            }
+          },
+          "SOL_V1": {
+            "Cost": {
+              "Standard": {
+                "Entries": [
+                  {
+                    "Type": "CryptoCurrency",
+                    "CurrencyID": "SOL",
+                    "Amount": null
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "Reward": {
+        "Grant": {
+          "Standard": {
+            "Entries": [
+              {
+                "Type": "VirtualCurrency",
+                "CurrencyID": "IMP",
+                "Amount": 2500
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

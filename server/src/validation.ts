@@ -2,6 +2,7 @@ import {deckError} from '../../lib/engine/deckValidation';
 import {HEROES} from '../../lib/heroes';
 import type {ClientMessage, GameIntent, PlayerRegistration} from '../../lib/net/protocol';
 import {normalizeRoomCode, validRoomCode} from '../../lib/net/roomCode';
+import {parseCollectionAuth} from '../../lib/collection/access';
 
 export class ProtocolError extends Error {
   constructor(public code: string, reason: string, public fatal = false) {super(reason);}
@@ -24,7 +25,9 @@ function registration(value: Record<string, unknown>): PlayerRegistration {
   const deckList = value.deckList.map(id => string(id));
   const problem = deckError(deckList);
   if (problem) fail(problem);
-  return {playerName, heroId, deckList};
+  const collectionAuth = value.collectionAuth === undefined ? undefined : parseCollectionAuth(value.collectionAuth);
+  if (collectionAuth === null) fail('Некорректная сессия коллекции iDos.');
+  return {playerName, heroId, deckList, ...(collectionAuth ? {collectionAuth} : {})};
 }
 function intent(value: unknown): GameIntent {
   const data = object(value);

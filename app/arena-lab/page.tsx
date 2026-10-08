@@ -1,4 +1,4 @@
-import ArenaLab from '../../components/presentation/ArenaLab';
+import ArenaLab from '../../components/presentation/ArenaEntry';
 import { HEROES } from '../../lib/heroes';
 
 export const metadata = { title: 'Арена IMPERIVM — новый игровой стол' };

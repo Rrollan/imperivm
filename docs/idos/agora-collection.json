@@ -1,0 +1,363 @@
+{
+  "Collections": {
+    "IMPERIVM_AGORA": {
+      "CollectionID": "IMPERIVM_AGORA",
+      "DisplayName": "Agora After Hours",
+      "Sets": [
+        {
+          "SetID": "AGORA",
+          "Collectibles": [
+            {
+              "CollectibleID": "collateral-squire",
+              "DisplayName": "Collateral Squire",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "reserve-matron",
+              "DisplayName": "Reserve Matron",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "interest-shepherd",
+              "DisplayName": "Interest Shepherd",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "spread-duelist",
+              "DisplayName": "Spread Duelist",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "slippage-netter",
+              "DisplayName": "Slippage Netter",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "credit-lanternist",
+              "DisplayName": "Credit Lanternist",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "amm-tidekeeper",
+              "DisplayName": "AMM Tidekeeper",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "margin-hoplite",
+              "DisplayName": "Margin Hoplite",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "mempool-usher",
+              "DisplayName": "Mempool Usher",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "liquidation-bailiff",
+              "DisplayName": "Liquidation Bailiff",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "delta-sphinx",
+              "DisplayName": "Delta Sphinx",
+              "Rarity": 3,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "oracle-of-solvency",
+              "DisplayName": "Oracle of Solvency",
+              "Rarity": 3,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "poseidon-deep-liquidity",
+              "DisplayName": "Poseidon of Deep Liquidity",
+              "Rarity": 4,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "clay-mint-apprentice",
+              "DisplayName": "Clay Mint Apprentice",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "provenance-scribe",
+              "DisplayName": "Provenance Scribe",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "mosaic-mender",
+              "DisplayName": "Mosaic Mender",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "gallery-gatekeeper",
+              "DisplayName": "Gallery Gatekeeper",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "patina-curator",
+              "DisplayName": "Patina Curator",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "blank-canvas-sentinel",
+              "DisplayName": "Blank Canvas Sentinel",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "reveal-diviner",
+              "DisplayName": "Reveal Diviner",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "soulbound-companion",
+              "DisplayName": "Soulbound Companion",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "royalty-chorister",
+              "DisplayName": "Royalty Chorister",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "unbroken-marble-warden",
+              "DisplayName": "Unbroken Marble Warden",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "medusa-of-missing-mints",
+              "DisplayName": "Medusa of Missing Mints",
+              "Rarity": 3,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "palimpsest-guardian",
+              "DisplayName": "Palimpsest Guardian",
+              "Rarity": 3,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "persephone-second-mint",
+              "DisplayName": "Persephone of the Second Mint",
+              "Rarity": 4,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "relay-page",
+              "DisplayName": "Relay Page",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "copper-lineworker",
+              "DisplayName": "Copper Lineworker",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "beacon-scout",
+              "DisplayName": "Beacon Scout",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "ceramic-cachekeeper",
+              "DisplayName": "Ceramic Cachekeeper",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "bridge-riveter",
+              "DisplayName": "Bridge Riveter",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "signal-oracle",
+              "DisplayName": "Signal Oracle",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "mesh-shieldbearer",
+              "DisplayName": "Mesh Shieldbearer",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "agora-sitewarden",
+              "DisplayName": "Agora Sitewarden",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "packet-ferryman",
+              "DisplayName": "Packet Ferryman",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "atlas-nodebearer",
+              "DisplayName": "Atlas the Nodebearer",
+              "Rarity": 3,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "daedalus-protocolwright",
+              "DisplayName": "Daedalus the Protocolwright",
+              "Rarity": 3,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "hephaestus-public-nodes",
+              "DisplayName": "Hephaestus of Public Nodes",
+              "Rarity": 4,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "copium-jester",
+              "DisplayName": "Copium Jester",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "liquidity-goose",
+              "DisplayName": "Exit Liquidity Goose",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "bagholder-donkey",
+              "DisplayName": "Bagholder Donkey",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "gm-rooster",
+              "DisplayName": "GM Rooster",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "paperhand-merchant",
+              "DisplayName": "Paperhand Merchant",
+              "Rarity": 1,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "fomo-trumpeter",
+              "DisplayName": "FOMO Trumpeter",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "diamond-paw-mastiff",
+              "DisplayName": "Diamond Paw Mastiff",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "hopium-augur",
+              "DisplayName": "Hopium Augur",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "salt-miner-satyr",
+              "DisplayName": "Salt Miner Satyr",
+              "Rarity": 2,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "sir-rug-of-velvet",
+              "DisplayName": "Sir Rug of Velvet",
+              "Rarity": 3,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "sisyphus-of-the-pump",
+              "DisplayName": "Sisyphus of the Pump",
+              "Rarity": 3,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "dionysus-last-pump",
+              "DisplayName": "Dionysus of the Last Pump",
+              "Rarity": 4,
+              "HasSpecialVersion": false
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "PackTypes": {
+    "AGORA_PACK": {
+      "PackTypeID": "AGORA_PACK",
+      "DisplayName": "Agora After Hours",
+      "CollectibleCount": 5,
+      "GuaranteedMinRarity": 1,
+      "GuaranteeMaxRarity": false,
+      "RarityWeights": {
+        "1": 60,
+        "2": 25,
+        "3": 11,
+        "4": 4
+      },
+      "PriceOptions": {
+        "IMP": {
+          "Cost": {
+            "Standard": {
+              "Entries": [
+                {
+                  "Type": "VirtualCurrency",
+                  "CurrencyID": "IMP",
+                  "Amount": 50
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "DuplicateConversions": [
+    {
+      "Rarity": 1,
+      "CollectionCurrencyGranted": 1
+    },
+    {
+      "Rarity": 2,
+      "CollectionCurrencyGranted": 3
+    },
+    {
+      "Rarity": 3,
+      "CollectionCurrencyGranted": 8
+    },
+    {
+      "Rarity": 4,
+      "CollectionCurrencyGranted": 20
+    }
+  ]
+}

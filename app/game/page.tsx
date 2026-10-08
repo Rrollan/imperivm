@@ -21,7 +21,9 @@ import {
 } from '../../lib/engine/engine';
 import { chooseAiAction } from '../../lib/ai';
 import { CARDS } from '../../lib/cards';
-import { DECKS } from '../../lib/decks';
+import { FREE_DECKS as DECKS } from '../../lib/collection/starterDecks';
+import {playableDeck, freeCardCounts} from '../../lib/collection/access';
+import {useCollection} from '../../components/CollectionContext';
 import { HEROES } from '../../lib/heroes';
 import type {
   Action,
@@ -111,6 +113,8 @@ export default function GamePage() {
 }
 
 function GameBoard() {
+  const collection = useCollection();
+  const owned = useRef(freeCardCounts()); owned.current = collection.snapshot?.owned ?? freeCardCounts();
   const { t, cardName, cardText, heroName, powerName, powerText, mechanicText, logLine, errorText } = useLocale();
   const searchParams = useSearchParams();
   const heroParam = searchParams.get('hero');
@@ -232,7 +236,7 @@ function GameBoard() {
       timers.current.forEach(clearTimeout); timers.current.clear();
       const s = createGame(
         heroId,
-        (useCustom ? loadCustomDeck(heroId) : null) ?? DECKS[heroId] ?? DECKS.whale,
+        playableDeck(heroId, owned.current, useCustom ? loadCustomDeck(heroId) : null),
         aiHeroId,
         DECKS[aiHeroId] ?? DECKS.degen,
         { enableMulligan: true },
@@ -284,8 +288,8 @@ function GameBoard() {
 
   // Create the game client-side only (never during SSR).
   useEffect(() => {
-    startGame();
-  }, [startGame]);
+    if (collection.snapshot || collection.error) startGame();
+  }, [startGame, !!(collection.snapshot || collection.error)]);
 
   // Lazy-start the imperial ambient loop on the first deliberate user
   // gesture, then remember it across navigation (localStorage).

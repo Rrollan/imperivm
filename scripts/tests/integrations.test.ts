@@ -19,8 +19,8 @@ async function main() {
   assert.equal((await gateway.load()).rug, 500);
   const pack = await gateway.openPack();
   assert.equal(pack.cards.length, 5); assert.equal(pack.snapshot.rug, 500 - PACK_COST); assert.equal(pack.snapshot.packsOpened, 1);
-  const id = pack.cards[0].id; assert.equal(pack.snapshot.owned[id], 7);
-  assert.equal((await new LocalCollectionGateway(storage).load()).owned[id], 7);
+  const id = pack.cards[0].id; assert.equal(pack.snapshot.owned[id], 5);
+  assert.equal((await new LocalCollectionGateway(storage).load()).owned[id], 5);
   const concurrent = await Promise.allSettled([gateway.openPack(), gateway.openPack()]); assert.equal(concurrent.filter(x => x.status === 'fulfilled').length, 1);
   for (let i = 0; i < 8; i++) await gateway.openPack();
   assert.equal((await gateway.load()).rug, 0); await assert.rejects(gateway.openPack(), /Not enough/); assert.equal((await gateway.load()).packsOpened, 10);

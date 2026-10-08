@@ -20,7 +20,7 @@ export class ArenaAttackEffects {
       const c=texture.getContext() as unknown as CanvasRenderingContext2D;
       const glow=c.createRadialGradient(128,128,2,128,128,116);
       glow.addColorStop(0,'#ffffffdd');glow.addColorStop(.25,'#ffffff88');glow.addColorStop(.65,'#ffffff18');glow.addColorStop(1,'#ffffff00');
-      c.fillStyle=glow;c.fillRect(0,0,256,256);c.strokeStyle='#fff';c.fillStyle='#fff';c.lineJoin='round';c.lineCap='round';c.lineWidth=5;
+      c.fillStyle=glow;c.fillRect(0,0,256,256);c.strokeStyle='#fff';c.fillStyle='#fff';c.lineJoin='round';c.lineCap='round';c.lineWidth=6;c.shadowColor='#251121';c.shadowBlur=8;
       c.beginPath();
       if(kind==='slash'){c.moveTo(28,206);c.bezierCurveTo(68,70,161,21,229,30);c.bezierCurveTo(118,85,94,111,28,206);c.fill();}
       else if(kind==='bolt'){c.moveTo(22,128);c.lineTo(177,116);c.lineTo(173,95);c.lineTo(235,128);c.lineTo(173,160);c.lineTo(177,139);c.closePath();c.fill();}
@@ -33,29 +33,30 @@ export class ArenaAttackEffects {
     this.pieces=Array.from({length:11},(_,i)=>{
       const mesh=MeshBuilder.CreatePlane(`combat accent ${i}`,{size:1},scene),material=new StandardMaterial(`combat accent ${i}`,scene);
       material.disableLighting=true;material.diffuseColor=Color3.Black();material.specularColor=Color3.Black();material.useAlphaFromDiffuseTexture=true;
-      material.diffuseTexture=this.textures[0];material.emissiveTexture=this.textures[0];mesh.material=material;mesh.isPickable=false;mesh.renderingGroupId=2;mesh.setEnabled(false);
+      // Texture supplies the silhouette; emission supplies the style's color without adding white.
+      material.diffuseTexture=this.textures[0];material.useEmissiveAsIllumination=true;mesh.material=material;mesh.isPickable=false;mesh.renderingGroupId=2;mesh.setEnabled(false);
       void material.forceCompilationAsync(mesh).then(invalidate).catch(()=>{});return {mesh,material};
     });
   }
   begin(style:CombatStyle,from?:Vector3,to?:Vector3){
     this.clear();if(!from||!to)return;this.live={style,from:from.clone(),to:to.clone()};
     const shape=style.shape??(style.delivery==='melee'?'slash':style.delivery==='bolt'?'bolt':'orb');
-    this.pieces.forEach(({material},i)=>{const texture=this.textures[shapes.indexOf(i===10?'ring':shape)];material.diffuseTexture=texture;material.emissiveTexture=texture;material.emissiveColor=Color3.FromHexString(style.color);});
+    this.pieces.forEach(({material},i)=>{const texture=this.textures[shapes.indexOf(i===10?'ring':shape)];material.diffuseTexture=texture;material.emissiveColor=Color3.FromHexString(style.color);});
   }
   tick(progress:number,contact:number,reduced:boolean){
     if(!this.live)return;const {style,from,to}=this.live,phase=progress/contact,angle=Math.atan2(to.y-from.y,to.x-from.x);
     this.pieces.forEach(({mesh,material},i)=>{
       if(reduced){mesh.setEnabled(false);return;}
-      if(i===10){const t=(progress-contact)/.28;mesh.setEnabled(t>=0&&t<=1);if(mesh.isEnabled()){mesh.position.copyFrom(to);mesh.position.z=-8;mesh.scaling.setAll(.6+smooth(t)*2.3);material.alpha=.65*(1-t);mesh.rotation.z=0;}return;}
+      if(i===10){const t=(progress-contact)/.28;mesh.setEnabled(t>=0&&t<=1);if(mesh.isEnabled()){mesh.position.copyFrom(to);mesh.position.z=-8;mesh.scaling.setAll(.6+smooth(t)*2.3);material.alpha=.96*(1-t);mesh.rotation.z=0;}return;}
       if(style.delivery==='melee'){
         const t=(progress-contact+.04)/.22;mesh.setEnabled(i===0&&t>=0&&t<=1);if(!mesh.isEnabled())return;
         mesh.position.copyFrom(to);mesh.position.z=-8;mesh.scaling.setAll((style.shape==='shield'?1.65:2.35)*(.75+.25*smooth(t)));mesh.rotation.z=style.shape==='shield'?0:angle-.75;material.alpha=Math.sin(t*Math.PI)*.92;return;
       }
       const p=phase-i*.036;mesh.setEnabled(p>=0&&p<=1.1&&progress<=contact+.08);if(!mesh.isEnabled())return;
       const travel=smooth((p-.25)/.75);mesh.position.copyFrom(Vector3.Lerp(from,to,travel));mesh.position.z=-8-i*.01;
-      const charge=Math.min(1,p/.25),size=style.shape==='rift'?1.25:style.shape==='lightning'?1.15:.95;
+      const charge=Math.min(1,p/.25),size=style.shape==='rift'?1.25:style.shape==='lightning'?1.3:1.1;
       mesh.scaling.setAll(size*charge*(i===0?1:Math.max(.2,1-i*.09)));mesh.rotation.z=style.delivery==='bolt'?angle:style.shape==='rift'?0:p*Math.PI*.55;
-      material.alpha=(i===0?1:.32)*(p>1?Math.max(0,1-(p-1)/.1):1);
+      material.alpha=(i===0?1:.52)*(p>1?Math.max(0,1-(p-1)/.1):1);
     });
   }
   clear(){this.live=null;this.pieces.forEach(p=>p.mesh.setEnabled(false));}

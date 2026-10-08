@@ -34,6 +34,7 @@ import {factionLink} from './factionLink';
 import {rulesetOf,pendingValidatorOrders,type RulesetId} from '../../lib/engine/ruleset';
 import {usePracticeMatch} from './usePracticeMatch';
 import Dialog from '../Dialog';
+import {FREE_DECKS} from '../../lib/collection/starterDecks';
 
 function usePanelFocus(open: boolean, panel: React.RefObject<HTMLElement>, modal = false) {
   useEffect(() => {
@@ -53,10 +54,10 @@ function usePanelFocus(open: boolean, panel: React.RefObject<HTMLElement>, modal
   }, [open, panel, modal]);
 }
 
-export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ruleset='classic-v1' }: { heroId: string; opening: boolean; debug: boolean; seed?:number;opponent?:string;ruleset?:RulesetId }) {
+export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ruleset='classic-v1', initialDeck }: { heroId: string; opening: boolean; debug: boolean; seed?:number;opponent?:string;ruleset?:RulesetId; initialDeck?: readonly string[] }) {
   const locale = useLocale(), reduced = useReducedMotion();
   const sessionRef = useRef<GameSession>();
-  if (!sessionRef.current) sessionRef.current = new GameSession(createLabGame(heroId, opening,seed,opponent,ruleset));
+  if (!sessionRef.current) sessionRef.current = new GameSession(createLabGame(heroId, opening,seed,opponent,ruleset,initialDeck));
   const session = sessionRef.current;
   const [view, setView] = useState<SessionSnapshot>(() => session.snapshot());
   const practice = usePracticeMatch(heroId, debug || !opening, view.shown, view.busy);
@@ -199,7 +200,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
     renderer.current?.cancel(); select(null); setInspect(null);
     setHelp(false);setHistoryOpen(false);setKeyboard(false);setMulliganUids([]);setLastAction(null);setFailure('');
     practice.reset(nextHero, debug || !fromOpening);
-    session.restart(createLabGame(nextHero, fromOpening,seed,opponent,ruleset));
+    session.restart(createLabGame(nextHero, fromOpening,seed,opponent,ruleset,initialDeck ? nextHero === heroId ? initialDeck : FREE_DECKS[nextHero] : undefined));
   }
 
   const card = inspect?.cardId ? CARDS[inspect.cardId] : null;

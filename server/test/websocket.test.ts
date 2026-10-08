@@ -4,8 +4,10 @@ import {setTimeout as delay} from 'node:timers/promises';
 import test from 'node:test';
 import WebSocket from 'ws';
 import {startServer} from '../src/service';
-import {DECKS} from '../../lib/decks';
+import {FREE_DECKS as DECKS} from '../../lib/collection/starterDecks';
 import {CARDS} from '../../lib/cards';
+import {authorizeCollectionDeck} from '../../lib/collection/authority';
+import {PACK_CARD_IDS} from '../../lib/collection/access';
 import type {Action} from '../../lib/engine/types';
 import type {ClientMessage, GameIntent, NetSnapshot, PlayerRegistration, ServerMessage} from '../../lib/net/protocol';
 
@@ -436,4 +438,39 @@ test('30 minutes of player inactivity expires a waiting room; explicit departure
   afterLeave.send({type: 'join', roomCode: match.firstJoined.roomCode, ...registration('Uninvited')});
   assert.ok((await afterLeave.next('error')).reason);
   assert.equal(service.rooms.size, 0);
+});
+
+test('premium decks require backend ownership; free decks and frozen paid-seat reconnect need no wallet lookup', async t => {
+  const previousTitle = process.env.IDOS_TITLE_ID;
+  process.env.IDOS_TITLE_ID = 'fixture-title';
+  t.after(() => {if (previousTitle === undefined) delete process.env.IDOS_TITLE_ID; else process.env.IDOS_TITLE_ID = previousTitle;});
+  const paidCard = PACK_CARD_IDS.find(id => CARDS[id].rarity === 'common')!;
+  const paid = registration('Collector');paid.deckList.splice(0, 2, paidCard, paidCard);
+  const credential = {userId: 'collector', sessionTicket: 'fixture-secret-ticket-never-expose'};
+  let lookups = 0;
+  const fetcher: typeof fetch = async (url, options) => {
+    lookups++; assert.match(String(url), /fixture-title\/Client\/Collection\/GetUserState\/collector$/);
+    assert.equal(new Headers(options?.headers).get('Authorization'), `Bearer ${credential.sessionTicket}`);
+    return new Response(JSON.stringify({Success: true, Data: {CollectionID: 'IMPERIVM_AGORA', OwnedCollectibles: {[paidCard]: 1}}}));
+  };
+  const service = await launch({port: 0, host: '127.0.0.1', origins: [ORIGIN], authorizeDeck: data => authorizeCollectionDeck(data.deckList, data.collectionAuth, fetcher)});
+  t.after(() => service.close());
+  const url = `ws://127.0.0.1:${portOf(service)}`, rejected = new Peer(url);
+  await rejected.open();rejected.send({type: 'create', ...paid});
+  assert.equal((await rejected.next('error')).code, 'collection-access');assert.equal(service.rooms.size, 0);assert.equal(lookups, 0);
+  rejected.send({type: 'create', ...registration('Free player')});
+  await rejected.next('joined');assert.equal(lookups, 0);await rejected.close();
+
+  const collector = new Peer(url);await collector.open();collector.send({type: 'create', ...paid, collectionAuth: credential});
+  const joined = await collector.next('joined');await collector.state(value => value.status === 'waiting');assert.equal(lookups, 1);
+  const opponent = new Peer(url);await opponent.open();opponent.send({type: 'join', roomCode: joined.roomCode, ...registration('Free opponent')});
+  await opponent.next('joined');const before = await collector.state(value => value.status === 'playing');
+  const wire = JSON.stringify([before, opponent.snapshot, ...opponent.messages]);
+  assert.equal(wire.includes(credential.sessionTicket), false);assert.equal(wire.includes('collectionAuth'), false);
+  await collector.close();
+  const resumed = new Peer(url);await resumed.open();
+  // Changed registration deck is ignored: resume uses the existing authorized seat and frozen deck.
+  resumed.send({type: 'join', roomCode: joined.roomCode, resumeToken: joined.resumeToken, ...registration('Collector')});
+  await resumed.next('joined');const after = await resumed.state(value => value.status === 'playing');
+  assert.equal(after.revision, before.revision);assert.equal(lookups, 1);assert.deepEqual(after.game, before.game);
 });

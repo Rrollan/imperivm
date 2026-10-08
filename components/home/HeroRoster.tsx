@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { HEROES } from '../../lib/heroes';
-import { DECKS } from '../../lib/decks';
+import { FREE_DECKS as DECKS } from '../../lib/collection/starterDecks';
 import { useLocale } from '../LocaleContext';
 import { heroPortraitPath } from '../presentation/heroPortrait';
 import { powerRules } from '../presentation/rulesText';
@@ -15,21 +15,21 @@ const STYLES: Record<string, [string, string]> = {
   validator: ['Приказы и рост легиона', 'Orders & a growing legion'],
 };
 
-export function HeroRoster({ selected, onSelect }: { selected: string; onSelect: (id: string) => void }) {
+export function HeroRoster({ selected, onSelect, compact=false }: { selected: string; onSelect: (id: string) => void; compact?:boolean }) {
   const { t, locale, heroName, powerName } = useLocale();
-  return <div className={styles.heroRoster}>
+  return <div className={`${styles.heroRoster} ${compact?styles.compactRoster:''}`}>
     <div className={styles.heroOptions} role="group" aria-label={t('Выбор правителя', 'Choose your ruler')}>
       {Object.values(HEROES).map(hero => <button key={hero.id} type="button" className={styles.heroChoice} aria-pressed={hero.id === selected} onClick={() => onSelect(hero.id)}>
         <span className={styles.coin}><img src={heroPortraitPath(hero.id)} alt="" width="128" height="128" draggable={false} /></span>
         <strong>{heroName(hero.id)}</strong>
-        <span>{STYLES[hero.id][locale === 'ru' ? 0 : 1]}</span>
+        {!compact&&<span>{STYLES[hero.id][locale === 'ru' ? 0 : 1]}</span>}
       </button>)}
     </div>
-    <div className={styles.heroBrief} aria-live="polite" aria-atomic="true">
+    {compact?<details className={styles.compactPower} key={selected}><summary>{powerName(selected)} · {HEROES[selected].powerCost} {t('приказа','orders')}</summary><p>{powerRules(selected,locale)}</p><Link href="/library#rulers">{t('Все способности →','All abilities →')}</Link></details>:<div className={styles.heroBrief} aria-live="polite" aria-atomic="true">
       <div><span className={styles.kicker}>{t('Сила правителя', 'Ruler power')}</span><h3>{powerName(selected)}</h3></div>
       <p>{powerRules(selected, locale)}</p>
       <span className={styles.powerCost}>{HEROES[selected].powerCost} {t('приказа', 'orders')}<small>{t('Один раз за ход', 'Once per turn')}</small></span>
-    </div>
+    </div>}
   </div>;
 }
 
