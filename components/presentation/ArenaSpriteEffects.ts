@@ -9,10 +9,11 @@ import type {Scene} from '@babylonjs/core/scene';
 import type {Mesh} from '@babylonjs/core/Meshes/mesh';
 import registry from '../../public/ui/arena-lab/fx/manifest.json';
 import {VIDEO_IDS,type VideoCue,type VideoId} from './videoCue';
+import {spritePlacement,type FighterBounds} from './deploymentGeometry';
 
 type Source={src:string;maxMs:number;columns:number;rows:number;frameCount:number;fps:number};
 type Clip={texture:Texture;material:StandardMaterial;mesh:Mesh;source:Source};
-type Live={clip:Clip;elapsed:number;durationMs:number};
+type Live={clip:Clip;elapsed:number;durationMs:number;follow?:()=>Vector3|undefined;offsetY:number};
 
 /** One uploaded atlas per effect: battle playback changes UVs, never uploads video frames. */
 export class ArenaSpriteEffects {
@@ -49,15 +50,17 @@ export class ArenaSpriteEffects {
     // but keep separate UV transforms and targets (e.g. two queued spells).
     const pair=[make(texture,0),make(texture.clone(),1)];this.clips.set(id,pair);return pair;
   }
-  trigger(cues:VideoCue[],locate:(uid:string)=>Vector3|undefined,reduced:boolean,windowMs?:number){
+  trigger(cues:VideoCue[],locate:(uid:string)=>Vector3|undefined,reduced:boolean,windowMs?:number,bounds?:(uid:string)=>FighterBounds|undefined){
     if(reduced||this.disposed)return;
     for(const cue of cues.slice(0,2)){
       const at=locate(cue.anchor),pair=this.load(cue.id);if(!at||!pair)continue;
       while(this.live.length>=2)this.remove(this.live[0]);
       const clip=pair.find(c=>!this.live.some(l=>l.clip===c));if(!clip||!clip.texture.isReady())continue;
-      clip.mesh.position.copyFrom(at);clip.mesh.position.z=-9;clip.mesh.scaling.set(cue.width,cue.width,1);
-      clip.mesh.setEnabled(true);clip.material.alpha=.48;
-      this.live.push({clip,elapsed:0,durationMs:Math.min(clip.source.maxMs,windowMs??clip.source.maxMs)});this.frame(clip,0);this.invalidate();
+      const placement=spritePlacement(cue.id,cue.width,bounds?.(cue.anchor));
+      clip.mesh.position.copyFrom(at);clip.mesh.position.y+=placement.offsetY;clip.mesh.position.z=placement.depth;
+      clip.mesh.scaling.set(placement.width,placement.height/(9/16),1);clip.mesh.renderingGroupId=placement.group;
+      clip.mesh.setEnabled(true);clip.material.alpha=placement.alpha;
+      this.live.push({clip,elapsed:0,durationMs:Math.min(clip.source.maxMs,windowMs??clip.source.maxMs),follow:placement.group<2?()=>locate(cue.anchor):undefined,offsetY:placement.offsetY});this.frame(clip,0);this.invalidate();
     }
   }
   private frame(clip:Clip,frame:number){
@@ -66,6 +69,7 @@ export class ArenaSpriteEffects {
   }
   tick(delta:number){this.live.slice().forEach(l=>{
     l.elapsed+=delta;if(l.elapsed>=l.durationMs){this.remove(l);return;}
+    const at=l.follow?.();if(at){l.clip.mesh.position.x=at.x;l.clip.mesh.position.y=at.y+l.offsetY;}
     const sourceTime=l.elapsed*l.clip.source.maxMs/l.durationMs;
     this.frame(l.clip,Math.min(l.clip.source.frameCount-1,Math.floor(sourceTime*l.clip.source.fps/1000)));
   });}

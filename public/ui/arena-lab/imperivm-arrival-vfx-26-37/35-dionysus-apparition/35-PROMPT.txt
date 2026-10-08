@@ -1,0 +1,4 @@
+IMPERIVM isolated game VFX. Image1=35-START.png, Image2=35-END.png. 16:9, 1280x720, 4 seconds, one output.
+Preserve Dionysus identity from START. Feet stay fixed at x=50%, y=80%. He raises the goblet once at 0.25s, a short violet and gold ripple blossoms around the ankles, never above knees. Hold a confident amused pose to 0.70s then dissolve into six broad grape-like violet motes by 1.35s. No walking, floating, character scale change, camera move or cropping.
+From 1.35s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 35-dionysus-apparition.mp4.

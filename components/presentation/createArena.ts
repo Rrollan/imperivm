@@ -424,6 +424,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const time = performance.now(), rawDelta=Math.max(0,time-last), delta=rawDelta; last = time;
     scheduler.tick(delta);
     videoEffects.tick(delta);
+    deployments.tick(delta);
     layoutMoves=layoutMoves.filter(move=>{
       if(move.entry.root.isDisposed()||move.entry.root===press?.entity.root)return false;
       move.elapsed+=delta;
@@ -454,7 +455,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     // Keep the clock alive until the newly introduced materials can draw.
     // Disabled arrows/cached effects cannot keep an otherwise idle board rendering forever.
     if (scene.meshes.some(mesh=>mesh.isEnabled()&&mesh.isVisible&&mesh.visibility>0&&!mesh.isReady(true))) { dirty = 3; return; }
-    if (!scheduler.active && !videoEffects.active && !settling && --dirty <= 0) {
+    if (!scheduler.active && !videoEffects.active && !deployments.active && !settling && --dirty <= 0) {
       engine.stopRenderLoop(render); running = false;
       reportMetrics();
     }
@@ -562,6 +563,16 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       const queued=queueAnchor(uid,[batch.after,batch.before],portrait);if(queued)return point(queued.x,queued.y,-1);
     };
     const cuePositions=new Map(cues.map(cue=>[cue.anchor,locate(cue.anchor)]));
+    const locateSprite=(uid:string)=>entities.get(uid)?.root.position??cuePositions.get(uid);
+    const cueBounds=(uid:string)=>{
+      for(const owner of [0,1]){
+        const board=batch.after.players[owner].board;
+        if(board.some(m=>m.uid===uid)){
+          const row=fighterRow(board.length,owner,portrait);
+          return {width:row.width/50,height:row.height/50,spacing:row.spacing/50};
+        }
+      }
+    };
     effects.begin(batch,locate,timeline);
     projectiles.begin(combat,attack?attacker?.base:undefined,attack?defender?.base:undefined);
     abilities.begin(batch,locate,timeline);
@@ -631,11 +642,10 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       });
       effects.tick(progress,impactAt,options.reducedMotion,duration);
       projectiles.tick(progress,impactAt,options.reducedMotion);
-      deployments.tick(progress,impactAt,options.reducedMotion);
       abilities.tick(progress,impactAt,options.reducedMotion,duration);
       if(timeline)for(const window of timeline.windows){
         if((progress-impactAt)*duration<window.contactMs||spriteContacts.has(window.key))continue;
-        spriteContacts.add(window.key);videoEffects.trigger(cues.filter(c=>c.wave===window.key),uid=>cuePositions.get(uid),options.reducedMotion,window.endMs-window.contactMs);
+        spriteContacts.add(window.key);videoEffects.trigger(cues.filter(c=>c.wave===window.key),locateSprite,options.reducedMotion,window.endMs-window.contactMs,cueBounds);
       }
       if(progress>impactAt)paintFrame((progress-impactAt)*duration);
       deadObjects.forEach(entry=>{
@@ -652,8 +662,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     }, () => {
       if (activeBatch?.id !== batch.id) return;
       hapticContact(batch.action.type);
-      videoEffects.trigger(timeline?cues.filter(c=>!c.wave):cues,uid=>cuePositions.get(uid),options.reducedMotion);
-      if(batch.events?.play)deployments.begin(batch.events.play.cardId,target);
+      videoEffects.trigger(timeline?cues.filter(c=>!c.wave):cues,locateSprite,options.reducedMotion,undefined,cueBounds);
+      if(batch.events?.play)deployments.begin(batch.events.play.cardId,target,{width:boardRow.width/50,height:boardRow.height/50,spacing:boardRow.spacing/50},options.reducedMotion,added?()=>entities.get(added.uid)?.root.position:undefined);
       if(handUid){
         // Replace the arriving card with its battlefield/queue form at the same position,
         // at contact rather than after a return to the hand or a blank frame.
@@ -701,7 +711,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       releaseArrival();releaseDraws();if(landed&&!landed.root.isDisposed()){landed.material.alpha=1;landed.backing.visibility=1;}
       entities.forEach(entry=>{entry.material.alpha=1;entry.face.isPickable=entry.data.owner===0||entry.data.kind!=='hand';entry.root.rotation.y=0;entry.root.rotation.x=0;});
       activeBatch = null; sync(batch.after);
-      effects.clear();projectiles.clear();abilities.clear();deployments.clear();
+      effects.clear();projectiles.clear();abilities.clear();
       resetClock();
     });
     request();
@@ -714,7 +724,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     setPaused: (value:boolean) => {if(paused===value)return;paused=value;scheduler.setPaused(value);if(value){engine.stopRenderLoop(render);running=false;}else request();},
     setLocale: (locale: Locale) => textures.setLocale(locale),
     setQuality: (quality: RenderQuality) => {options.quality=quality;resize();},
-    setReducedMotion: (reduced: boolean) => { options.reducedMotion = reduced; if(reduced)videoEffects.cancel(); },
+    setReducedMotion: (reduced: boolean) => { options.reducedMotion = reduced; if(reduced){videoEffects.cancel();deployments.clear();} },
     present,
     cancel,
     dispose: () => {

@@ -1,0 +1,39 @@
+Generate exactly six separate IMPERIVM VFX videos using the supplied numbered folders. One clip per job, 16:9, 720p, 4 seconds, one variant. For job NN, use its unique NN-START.png as Image1 and NN-END.png as Image2. Do not combine clips or redesign the framing.
+
+JOB 32-colossus-landing — Дорогая карта — тяжёлое приземление / 32-START.png + 32-END.png
+IMPERIVM isolated game VFX. Image1=32-START.png, Image2=32-END.png. 16:9, 1280x720, 4 seconds, one output.
+START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. A broad amber ring expands radially by no more than 5 percent, followed by a tighter cyan shockwave at 0.16s. Six bronze dust wedges skim sideways and fade; the second wave retracts slightly. The complete effect is gone by 0.85s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds.
+From 0.85s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 32-colossus-landing.mp4.
+
+JOB 33-poseidon-apparition — Посейдон — глубокая ликвидность / 33-START.png + 33-END.png
+IMPERIVM isolated game VFX. Image1=33-START.png, Image2=33-END.png. 16:9, 1280x720, 4 seconds, one output.
+Keep the full figure identity and proportions from START. Feet remain locked to the point x=50%, y=80% for the entire shot. Poseidon plants his trident once by 0.25s; a low turquoise ankle ripple stays below the knees. Hold the powerful stance to 0.75s, then dissolve into broad blue droplets from feet to head by 1.40s. No walking, floating, growing, camera zoom, sideways shift or cropping.
+From 1.40s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 33-poseidon-apparition.mp4.
+
+JOB 34-hephaestus-apparition — Гефест — кузница узлов / 34-START.png + 34-END.png
+IMPERIVM isolated game VFX. Image1=34-START.png, Image2=34-END.png. 16:9, 1280x720, 4 seconds, one output.
+Preserve Hephaestus identity from START. Both feet stay fixed at x=50%, y=80%. He lowers his bronze hammer slightly once at 0.25s; one restrained amber spark ring rolls around his boots. Hold the silhouette to 0.70s then dissolve from boots into large amber embers by 1.40s. No new limbs, moving feet, upward beam, camera motion, resizing or framing changes.
+From 1.40s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 34-hephaestus-apparition.mp4.
+
+JOB 35-dionysus-apparition — Дионис — последний памп / 35-START.png + 35-END.png
+IMPERIVM isolated game VFX. Image1=35-START.png, Image2=35-END.png. 16:9, 1280x720, 4 seconds, one output.
+Preserve Dionysus identity from START. Feet stay fixed at x=50%, y=80%. He raises the goblet once at 0.25s, a short violet and gold ripple blossoms around the ankles, never above knees. Hold a confident amused pose to 0.70s then dissolve into six broad grape-like violet motes by 1.35s. No walking, floating, character scale change, camera move or cropping.
+From 1.35s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 35-dionysus-apparition.mp4.
+
+JOB 36-relay-impact — DePIN — импульс попадания / 36-START.png + 36-END.png
+IMPERIVM isolated game VFX. Image1=36-START.png, Image2=36-END.png. 16:9, 1280x720, 4 seconds, one output.
+A sharp white cyan contact flashes at the exact frame centre at 0.04s. Four broad angular forks snap outward by 0.12s, followed by a broken gold radial ripple at 0.18s. Forks retract slightly, then everything fades by 0.55s. The projectile trajectory is rendered separately by the game: do not bake a moving projectile, beam path, target or card into this clip.
+From 0.55s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 36-relay-impact.mp4.
+
+JOB 37-oracle-impact — Оракул — призматическое попадание / 37-START.png + 37-END.png
+IMPERIVM isolated game VFX. Image1=37-START.png, Image2=37-END.png. 16:9, 1280x720, 4 seconds, one output.
+At 0.06s one pearl contact spark occurs exactly at frame centre. Six broad violet and mint facets unfold radially by 0.18s, rotate slightly as a group, and collapse into a short gold glimmer by 0.65s. Keep the contact origin fixed. No projectile trajectory, vertical plume, new target or camera motion.
+From 0.65s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 37-oracle-impact.mp4.
+
+Return all six MP4 files with the exact requested filenames.

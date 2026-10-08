@@ -306,9 +306,10 @@ minionCards.forEach((cardId,index)=>{
   const deploy=videoCues(batch);
   assert.ok(deploy.length>=1&&deploy.length<=2,`${cardId}: deployment and actual outcomes share at most two sprite layers`);
   const special:Record<string,string>={'zeus-liquidator':'23-zeus-apparition','athena-diamond-guard':'24-athena-apparition','hades-rugkeeper':'25-hades-apparition'};
-  const arrival=special[cardId]??(card.cost>=6?'21-legendary-descent':undefined);
+  const arrival=special[cardId];
   const installedArrival=arrival&&Object.prototype.hasOwnProperty.call(registry.clips,arrival)?arrival:undefined;
-  assert.equal(deploy.filter(c=>/^1[0-5]-deploy/.test(c.id)||['21-legendary-descent','23-zeus-apparition','24-athena-apparition','25-hades-apparition'].includes(c.id)).length,1,`${cardId}: played minion must get exactly one deployment clip`);
+  assert.equal(deploy.filter(c=>/^1[0-5]-deploy/.test(c.id)||['23-zeus-apparition','24-athena-apparition','25-hades-apparition'].includes(c.id)).length,1,`${cardId}: played minion must get exactly one deployment clip`);
+  assert.ok(!deploy.some(c=>c.id==='21-legendary-descent'),`${cardId}: a tilted vertical portal cannot represent contact with the flat table`);
   assert.equal(deploy[0].anchor,played.uid,`${cardId}: deployment clip must follow the summoned fighter`);
   deployedRoles.add(identity.role);deployedClips.add(deploy[0].id);
   if(installedArrival)assert.equal(deploy[0].id,installedArrival,`${cardId}: installed legendary arrival replaces its role clip`);

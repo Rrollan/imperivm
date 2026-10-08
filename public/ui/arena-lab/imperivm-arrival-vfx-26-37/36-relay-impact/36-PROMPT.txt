@@ -1,0 +1,4 @@
+IMPERIVM isolated game VFX. Image1=36-START.png, Image2=36-END.png. 16:9, 1280x720, 4 seconds, one output.
+A sharp white cyan contact flashes at the exact frame centre at 0.04s. Four broad angular forks snap outward by 0.12s, followed by a broken gold radial ripple at 0.18s. Forks retract slightly, then everything fades by 0.55s. The projectile trajectory is rendered separately by the game: do not bake a moving projectile, beam path, target or card into this clip.
+From 0.55s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 36-relay-impact.mp4.

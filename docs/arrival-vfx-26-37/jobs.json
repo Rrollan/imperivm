@@ -1,0 +1,125 @@
+[
+  {
+    "n": 26,
+    "id": "26-firmware-landing",
+    "title": "Фаланга прошивки — контакт",
+    "kind": "surface",
+    "active": 0.65,
+    "hook": "Розыгрыш Фаланги прошивки и бойцов DePIN",
+    "visual": "A broad cyan hexagonal shock ring, six chunky bronze circuit corners and three very short gold electric branches radiating sideways. The centre is mostly empty. A distinct luminous cyan contact bead exactly at frame centre. Viewed straight down, all radial spokes coplanar, perfectly circular axes rather than an ellipse. No rising beams.",
+    "motion": "START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. The six bronze circuit corners lock once, and the cyan hexagonal energy expands radially sideways by no more than 5 percent before breaking into six short electrical sparks. The complete effect is gone by 0.65s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds."
+  },
+  {
+    "n": 27,
+    "id": "27-hoplite-landing",
+    "title": "Бронзовый удар — контакт",
+    "kind": "surface",
+    "active": 0.6,
+    "hook": "Выход легионеров и стражей",
+    "visual": "A compact bronze and warm amber circular contact shock, eight broad dust arcs and a few chiselled gold chips radiating in a flat circle. Centre mostly empty. Small bright gold contact nucleus exactly at frame centre. Straight top-down axial view; coplanar symmetrical radial burst, not an ellipse, no upright object.",
+    "motion": "START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. The amber contact burst expands radially sideways by no more than 5 percent. Broad dust arcs skim outward along the flat surface and fade. The complete effect is gone by 0.60s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds."
+  },
+  {
+    "n": 28,
+    "id": "28-priest-landing",
+    "title": "Жрец — мятная печать",
+    "kind": "surface",
+    "active": 0.7,
+    "hook": "Появление жрецов без имитации лечения",
+    "visual": "A mint and pale gold radial arrival seal with four broad elegant curved petals and two short laurel arcs. Open black centre with a tiny pearl of light exactly at centre. Straight top-down view, radial coplanar light; restrained painterly magic, not a tilted portal. No medical plus, no beam.",
+    "motion": "START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. Four mint petals open by a few degrees, followed by a short gold laurel ripple. Petals dissolve from outside inward. This is an arrival accent; no healing symbols. The complete effect is gone by 0.70s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds."
+  },
+  {
+    "n": 29,
+    "id": "29-commander-landing",
+    "title": "Командир — багряный импульс",
+    "kind": "surface",
+    "active": 0.7,
+    "hook": "Выход командиров и военных министров",
+    "visual": "A rich scarlet and antique gold radial shock crest: four broad ribbon-shaped energy arcs separated by large black gaps, a short outer laurel ring, small gold contact spark at exact centre. All flat and front facing in axial top-down view; no writing, no upright banner, no perspective ellipse.",
+    "motion": "START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. Four scarlet ribbon arcs sweep radially outward by no more than 5 percent with one gold ripple, then curl back into short embers. The complete effect is gone by 0.70s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds."
+  },
+  {
+    "n": 30,
+    "id": "30-mosaic-landing",
+    "title": "NFT — мозаичный минт",
+    "kind": "surface",
+    "active": 0.75,
+    "hook": "Выход бойцов NFT",
+    "visual": "A top-down square mosaic ring: four chunky ivory ceramic tile corners edged in sapphire blue and antique gold, separated by broad black gaps, each oriented around the exact centre, tiny gold contact spark. Clean flat radial layout, soft warm painterly materials, no upright shards, no text, no tilted perspective.",
+    "motion": "START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. Four ceramic corners separate radially by no more than 5 percent, blue grout glows once, and each corner breaks into two broad light chips. The complete effect is gone by 0.75s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds."
+  },
+  {
+    "n": 31,
+    "id": "31-meme-landing",
+    "title": "Meme — комедийный выход",
+    "kind": "surface",
+    "active": 0.65,
+    "hook": "Выход мемных бойцов",
+    "visual": "A playful emerald and honey gold top-down contact burst: six chunky coin-shaped light arcs and two small comedy laurel curls around an open black centre with one gold nucleus. Distinct large simplified silhouettes, premium stylized game VFX, no faces, no letters, no real currency logos, no upright plume.",
+    "motion": "START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. The six coin arcs give a short sideways radial bounce, followed by one smaller emerald ripple; coins tumble slightly and wink out separately. The complete effect is gone by 0.65s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds."
+  },
+  {
+    "n": 32,
+    "id": "32-colossus-landing",
+    "title": "Дорогая карта — тяжёлое приземление",
+    "kind": "surface",
+    "active": 0.85,
+    "hook": "Контакт дорогой карты вместо вертикальной печати 21",
+    "visual": "A powerful top-down amber and cyan circular double shockwave with a few large bronze dust wedges and short jagged radial sparks, dark open centre, tiny white gold contact dot precisely at centre. Two broad rings and limited particles, coplanar radial surface impact, no portal, no rising columns, no ellipse.",
+    "motion": "START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. A broad amber ring expands radially by no more than 5 percent, followed by a tighter cyan shockwave at 0.16s. Six bronze dust wedges skim sideways and fade; the second wave retracts slightly. The complete effect is gone by 0.85s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds."
+  },
+  {
+    "n": 33,
+    "id": "33-poseidon-apparition",
+    "title": "Посейдон — глубокая ликвидность",
+    "kind": "apparition",
+    "active": 1.4,
+    "hook": "Будущий Посейдон из набора 50 артов; механика ещё не реализована",
+    "reference": 13,
+    "visual": "Poseidon as a broad-shouldered older Greek sea guardian with flowing dark hair and grey beard, ivory and teal drapery, simple bronze armour and a heavy trident with three clear broad prongs. Full body isolated, facing three quarters, feet together exactly on a baseline at 80 percent frame height; head near 17 percent, entire trident fits within 12 to 88 percent image bounds. A low turquoise water curl around ankles, no sea scene, no wide horizontal wave.",
+    "motion": "Keep the full figure identity and proportions from START. Feet remain locked to the point x=50%, y=80% for the entire shot. Poseidon plants his trident once by 0.25s; a low turquoise ankle ripple stays below the knees. Hold the powerful stance to 0.75s, then dissolve into broad blue droplets from feet to head by 1.40s. No walking, floating, growing, camera zoom, sideways shift or cropping."
+  },
+  {
+    "n": 34,
+    "id": "34-hephaestus-apparition",
+    "title": "Гефест — кузница узлов",
+    "kind": "apparition",
+    "active": 1.4,
+    "hook": "Будущий Гефест из набора 50 артов; механика ещё не реализована",
+    "reference": 38,
+    "visual": "Hephaestus as a muscular middle-aged Greek forge god with dark curly hair and dark beard, weathered green leather apron over an ivory tunic, simple bronze shoulder armour, holding one heavy glowing bronze forge hammer with a cyan core. Full body isolated, facing three quarters, feet fixed together at x50 percent y80 percent, head near y17 percent, all props inside 12 to 88 percent image bounds. Low amber sparks near boots, no forge scenery, no giant pillar.",
+    "motion": "Preserve Hephaestus identity from START. Both feet stay fixed at x=50%, y=80%. He lowers his bronze hammer slightly once at 0.25s; one restrained amber spark ring rolls around his boots. Hold the silhouette to 0.70s then dissolve from boots into large amber embers by 1.40s. No new limbs, moving feet, upward beam, camera motion, resizing or framing changes."
+  },
+  {
+    "n": 35,
+    "id": "35-dionysus-apparition",
+    "title": "Дионис — последний памп",
+    "kind": "apparition",
+    "active": 1.35,
+    "hook": "Будущий Дионис из набора 50 артов; механика ещё не реализована",
+    "reference": 50,
+    "visual": "Dionysus as a charming young Greek revel god with curly auburn hair and beard, a simple grape leaf wreath, burgundy red cape and ivory tunic, holding a wide golden goblet, expressive amused face. Full body isolated in three quarters view, feet together fixed at x50 percent y80 percent; head near y17 percent; all props fit inside 12 to 88 percent bounds. Small violet gold grape-shaped light at ankles, no banquet environment, no text.",
+    "motion": "Preserve Dionysus identity from START. Feet stay fixed at x=50%, y=80%. He raises the goblet once at 0.25s, a short violet and gold ripple blossoms around the ankles, never above knees. Hold a confident amused pose to 0.70s then dissolve into six broad grape-like violet motes by 1.35s. No walking, floating, character scale change, camera move or cropping."
+  },
+  {
+    "n": 36,
+    "id": "36-relay-impact",
+    "title": "DePIN — импульс попадания",
+    "kind": "impact",
+    "active": 0.55,
+    "hook": "Контакт дальнего импульса DePIN; траекторию строит движок",
+    "visual": "A compact cyan and warm gold electrical contact burst precisely at image centre: a small bright core, four broad angular circuit forks, two short broken radial rings. Front-facing axial composition, balanced energy all directions, readable at thumbnail size, no projectile path, no tilted ellipse, no long beam, no interface.",
+    "motion": "A sharp white cyan contact flashes at the exact frame centre at 0.04s. Four broad angular forks snap outward by 0.12s, followed by a broken gold radial ripple at 0.18s. Forks retract slightly, then everything fades by 0.55s. The projectile trajectory is rendered separately by the game: do not bake a moving projectile, beam path, target or card into this clip."
+  },
+  {
+    "n": 37,
+    "id": "37-oracle-impact",
+    "title": "Оракул — призматическое попадание",
+    "kind": "impact",
+    "active": 0.65,
+    "hook": "Контакт магической атаки NFT/оракулов",
+    "visual": "A rich violet and mint prismatic magic impact centred exactly: six broad luminous triangular facets arranged radially around a small pearl white core, short gold edges, large black gaps, no figure. Front-facing axial contact effect on pure black, no tilted portal, no path or stream, no excessive shards or particles.",
+    "motion": "At 0.06s one pearl contact spark occurs exactly at frame centre. Six broad violet and mint facets unfold radially by 0.18s, rotate slightly as a group, and collapse into a short gold glimmer by 0.65s. Keep the contact origin fixed. No projectile trajectory, vertical plume, new target or camera motion."
+  }
+]

@@ -1,0 +1,4 @@
+IMPERIVM isolated game VFX. Image1=34-START.png, Image2=34-END.png. 16:9, 1280x720, 4 seconds, one output.
+Preserve Hephaestus identity from START. Both feet stay fixed at x=50%, y=80%. He lowers his bronze hammer slightly once at 0.25s; one restrained amber spark ring rolls around his boots. Hold the silhouette to 0.70s then dissolve from boots into large amber embers by 1.40s. No new limbs, moving feet, upward beam, camera motion, resizing or framing changes.
+From 1.40s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 34-hephaestus-apparition.mp4.

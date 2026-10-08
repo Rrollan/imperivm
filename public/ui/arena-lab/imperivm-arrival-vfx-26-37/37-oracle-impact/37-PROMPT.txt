@@ -1,0 +1,4 @@
+IMPERIVM isolated game VFX. Image1=37-START.png, Image2=37-END.png. 16:9, 1280x720, 4 seconds, one output.
+At 0.06s one pearl contact spark occurs exactly at frame centre. Six broad violet and mint facets unfold radially by 0.18s, rotate slightly as a group, and collapse into a short gold glimmer by 0.65s. Keep the contact origin fixed. No projectile trajectory, vertical plume, new target or camera motion.
+From 0.65s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 37-oracle-impact.mp4.

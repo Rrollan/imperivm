@@ -52,6 +52,8 @@ Olympus adds six cards with public preparation and conditional arrival effects. 
 
 All eight Olympus effects are installed; see the [import and validation report](docs/olympus-vfx/IMPORT-20261008.md). A separate [set of 50 character illustrations](docs/art-direction/generated-characters-50-20261008/README.md) is prepared for a future expansion; its proposed mechanics are not yet playable. Preview the art at `/ui/arena-lab/character-art-50/index.html`.
 
+Deployment contacts now match the card plane and battlefield spacing. The [next VFX generation pack 26–37](docs/arrival-vfx-26-37/00-START-HERE.md) contains twelve START/END/PROMPT jobs; these videos are not installed yet. Preview/download at `/ui/arena-lab/imperivm-arrival-vfx-26-37/index.html`.
+
 
 Hearthstone-grade card anatomy: blue mana crystal, oval art portrait, gold name ribbon, parchment rules text, gold attack orb, red health drop. Rarity frames from silver to dragon-claw legendary.
 

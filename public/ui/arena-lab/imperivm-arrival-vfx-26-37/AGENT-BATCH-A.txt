@@ -1,0 +1,39 @@
+Generate exactly six separate IMPERIVM VFX videos using the supplied numbered folders. One clip per job, 16:9, 720p, 4 seconds, one variant. For job NN, use its unique NN-START.png as Image1 and NN-END.png as Image2. Do not combine clips or redesign the framing.
+
+JOB 26-firmware-landing — Фаланга прошивки — контакт / 26-START.png + 26-END.png
+IMPERIVM isolated game VFX. Image1=26-START.png, Image2=26-END.png. 16:9, 1280x720, 4 seconds, one output.
+START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. The six bronze circuit corners lock once, and the cyan hexagonal energy expands radially sideways by no more than 5 percent before breaking into six short electrical sparks. The complete effect is gone by 0.65s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds.
+From 0.65s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 26-firmware-landing.mp4.
+
+JOB 27-hoplite-landing — Бронзовый удар — контакт / 27-START.png + 27-END.png
+IMPERIVM isolated game VFX. Image1=27-START.png, Image2=27-END.png. 16:9, 1280x720, 4 seconds, one output.
+START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. The amber contact burst expands radially sideways by no more than 5 percent. Broad dust arcs skim outward along the flat surface and fade. The complete effect is gone by 0.60s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds.
+From 0.60s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 27-hoplite-landing.mp4.
+
+JOB 28-priest-landing — Жрец — мятная печать / 28-START.png + 28-END.png
+IMPERIVM isolated game VFX. Image1=28-START.png, Image2=28-END.png. 16:9, 1280x720, 4 seconds, one output.
+START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. Four mint petals open by a few degrees, followed by a short gold laurel ripple. Petals dissolve from outside inward. This is an arrival accent; no healing symbols. The complete effect is gone by 0.70s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds.
+From 0.70s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 28-priest-landing.mp4.
+
+JOB 29-commander-landing — Командир — багряный импульс / 29-START.png + 29-END.png
+IMPERIVM isolated game VFX. Image1=29-START.png, Image2=29-END.png. 16:9, 1280x720, 4 seconds, one output.
+START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. Four scarlet ribbon arcs sweep radially outward by no more than 5 percent with one gold ripple, then curl back into short embers. The complete effect is gone by 0.70s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds.
+From 0.70s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 29-commander-landing.mp4.
+
+JOB 30-mosaic-landing — NFT — мозаичный минт / 30-START.png + 30-END.png
+IMPERIVM isolated game VFX. Image1=30-START.png, Image2=30-END.png. 16:9, 1280x720, 4 seconds, one output.
+START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. Four ceramic corners separate radially by no more than 5 percent, blue grout glows once, and each corner breaks into two broad light chips. The complete effect is gone by 0.75s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds.
+From 0.75s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 30-mosaic-landing.mp4.
+
+JOB 31-meme-landing — Meme — комедийный выход / 31-START.png + 31-END.png
+IMPERIVM isolated game VFX. Image1=31-START.png, Image2=31-END.png. 16:9, 1280x720, 4 seconds, one output.
+START is the authored contact-peak frame and must be the first visible frame. Pulse its centre once at 0.05s. The six coin arcs give a short sideways radial bounce, followed by one smaller emerald ripple; coins tumble slightly and wink out separately. The complete effect is gone by 0.65s. Keep the black centre open and the contact origin fixed at x50%, y50%. Equal X/Y radial scale, orthographic view straight down. No rising beam, upward fountain, standing portal, ellipse or perspective tilt. All particles remain within the image bounds.
+From 0.65s until 4.00s every pixel must be flat pure black #000000, no residual glow or particles. Fixed framing and camera throughout; no zoom, pan, crop or reframing. Preserve the reference proportions and empty margins. Pure black background, no scenery, floor texture, card, frame, UI, lettering, numbers, logo or watermark. No audio; the game adds synchronized sound. Simplified premium Greco-Roman crypto fantasy materials, broad readable shapes.
+Return the MP4 as 31-meme-landing.mp4.
+
+Return all six MP4 files with the exact requested filenames.
