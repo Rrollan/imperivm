@@ -14,6 +14,9 @@ import {DECKS} from '../lib/decks';
 import {abilityCues} from '../components/presentation/abilityCues';
 import {GameSession,type PresentationBatch} from '../components/presentation/GameSession';
 import {videoCues} from '../components/presentation/videoCue';
+import registry from '../public/ui/arena-lab/fx/manifest.json';
+
+const meleeImpact=Object.prototype.hasOwnProperty.call(registry.clips,'22-titan-cleave')?'22-titan-cleave':'01-impact';
 
 const restoreDelayedFixtures=installDelayedSpellFixtures(['senate-censure', 'restoration-rite']);
 
@@ -110,7 +113,7 @@ function passTurn(game:GameSession,label:string){
   const batch=dispatch(game,'attack enemy fighter',action=>action.type==='attack'&&action.target==='defender');
   assert.equal(batch.events?.attack?.targetUid,'defender');
   assert.equal(batch.events?.damages?.find(d=>d.uid==='defender')?.health,2);
-  assert.deepEqual(cueIds(batch),[{id:'01-impact',anchor:'defender'}]);
+  assert.deepEqual(cueIds(batch),[{id:meleeImpact,anchor:'defender'}]);
   assert.deepEqual(abilityCues(batch),[],'A regular trade has no extra ability accent');
 }
 {
@@ -119,7 +122,7 @@ function passTurn(game:GameSession,label:string){
   const batch=dispatch(game,'attack enemy ruler',action=>action.type==='attack'&&action.target==='hero');
   assert.equal(batch.events?.attack?.targetUid,'hero');
   assert.equal(batch.after.players[1].treasury,batch.before.players[1].treasury-2);
-  assert.deepEqual(cueIds(batch),[{id:'01-impact',anchor:'hero-1'}]);
+  assert.deepEqual(cueIds(batch),[{id:meleeImpact,anchor:'hero-1'}]);
   assert.deepEqual(abilityCues(batch),[],'A regular face attack must not imply lifesteal');
 }
 

@@ -1,7 +1,7 @@
 /** Replay a reviewed VFX import without modifying any original video. */
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
-import {readFile,access,mkdtemp,rm} from 'node:fs/promises';
+import {readFile,access,mkdtemp,rm,mkdir} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {resolve,join,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -26,5 +26,11 @@ try{
     const prepared=join(temporary,`${clip.id}.mp4`);
     execFileSync('ffmpeg',['-hide_banner','-loglevel','error','-y','-ss',String(clip.sourceRange[0]),'-t',String(clip.sourceRange[1]-clip.sourceRange[0]),'-i',source,'-t',String(clip.playbackSeconds),'-an','-vf',clip.preprocess.join(','),'-c:v','libx264','-crf','18','-preset','fast','-pix_fmt','yuv420p',prepared],{stdio:'inherit'});
     execFileSync(process.execPath,[resolve(root,'scripts/vfx/import.mjs'),clip.id,prepared,'0',String(clip.playbackSeconds-.001)],{stdio:'inherit',cwd:root});
+    if(ledger.generatePreviews){
+      const registry=JSON.parse(await readFile(resolve(root,'public/ui/arena-lab/fx/manifest.json'),'utf8'));
+      const installed=registry.clips[clip.id],duration=installed.frameCount/installed.fps;
+      const previews=resolve(root,'public/ui/arena-lab/fx/previews');await mkdir(previews,{recursive:true});
+      execFileSync('ffmpeg',['-hide_banner','-loglevel','error','-y','-i',prepared,'-an','-vf',`fps=${installed.fps},scale=640:360:flags=lanczos,eq=saturation=0.82,fade=t=out:st=${Math.max(0,duration-.15)}:d=0.12`,'-frames:v',String(installed.frameCount),'-c:v','libx264','-crf','22','-preset','fast','-pix_fmt','yuv420p','-movflags','+faststart',resolve(previews,`${clip.id}.mp4`)],{stdio:'inherit'});
+    }
   }
 }finally{await rm(temporary,{recursive:true,force:true});}

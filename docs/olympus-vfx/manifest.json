@@ -9,7 +9,7 @@
     "sourceImage": "exec-8eb0d318-09cb-4edb-85bd-70e80e4fda3d.png",
     "sha256": "db89e09fd7a6233e56d86f070404a95e82b98798238ce39d56a4661ec79a361f",
     "generator": "Built-in image_gen, 2026-10-07",
-    "installed": false
+    "installed": true
   },
   {
     "id": "19-diamond-phalanx",
@@ -21,7 +21,7 @@
     "sourceImage": "exec-deadd0e9-e806-42ea-b036-6d4206a09866.png",
     "sha256": "763f6652e83b4182c8a3b0441694900c83638549be485b4272e71b57739373b2",
     "generator": "Built-in image_gen, 2026-10-07",
-    "installed": false
+    "installed": true
   },
   {
     "id": "20-underworld-rift",
@@ -33,7 +33,7 @@
     "sourceImage": "exec-f7ba6674-34c8-4165-ad15-98555a23e0fb.png",
     "sha256": "d1d12ae9688d57f518a13fb50ec1f8c1c9460d702c890b33481664206efb86ae",
     "generator": "Built-in image_gen, 2026-10-07",
-    "installed": false
+    "installed": true
   },
   {
     "id": "21-legendary-descent",
@@ -45,7 +45,7 @@
     "sourceImage": "exec-f3883caa-70d7-4432-83a9-deae25082cf6.png",
     "sha256": "94a8d1d05bb8c7a38855fcd4a4ffa27357ec269b3aaf143563581fb7dcc6bece",
     "generator": "Built-in image_gen, 2026-10-07",
-    "installed": false
+    "installed": true
   },
   {
     "id": "22-titan-cleave",
@@ -57,7 +57,7 @@
     "sourceImage": "exec-a56278ef-9266-417d-93cb-37ddb6dfa651.png",
     "sha256": "a47dd5757839529d529b032b8381f1dca10c218a648d84ce0a7d3a93b6a30db5",
     "generator": "Built-in image_gen, 2026-10-07",
-    "installed": false
+    "installed": true
   },
   {
     "id": "23-zeus-apparition",
@@ -69,7 +69,7 @@
     "sourceImage": "exec-3a43d99d-c651-4e7c-8568-bc6ad377ccd8.png",
     "sha256": "434e394cbd6acf603243f1da9cb2ef4f6955bbeb598dfd00834f2ecee35bf331",
     "generator": "Built-in image_gen, 2026-10-07",
-    "installed": false
+    "installed": true
   },
   {
     "id": "24-athena-apparition",
@@ -81,7 +81,7 @@
     "sourceImage": "exec-13ed74c4-0e44-4f75-b8be-a751a330345c.png",
     "sha256": "ffcb0edcc04c83d275aae52d1af940d1cab2077b63f35933cfe8bd88e948c11c",
     "generator": "Built-in image_gen, 2026-10-07",
-    "installed": false
+    "installed": true
   },
   {
     "id": "25-hades-apparition",
@@ -93,6 +93,6 @@
     "sourceImage": "exec-00f10d33-db35-45a1-87ec-69ea1ac1adb8.png",
     "sha256": "88214ebc0778c4c8534d2ce0b534370d9ba99c5c9ac832c5bb0213edb5153188",
     "generator": "Built-in image_gen, 2026-10-07",
-    "installed": false
+    "installed": true
   }
 ]

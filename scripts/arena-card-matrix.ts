@@ -16,6 +16,7 @@ import {abilityCues} from '../components/presentation/abilityCues';
 import {videoCues,VIDEO_IDS} from '../components/presentation/videoCue';
 import {cardIdentity} from '../components/presentation/cardIdentity';
 import roles from '../components/presentation/cardRoles.json';
+import registry from '../public/ui/arena-lab/fx/manifest.json';
 import {isInstantSpell} from '../lib/engine/spellTiming';
 import {installDelayedSpellFixtures} from './delayed-spell-fixtures';
 
@@ -23,6 +24,8 @@ const cardIds=Object.keys(CARDS).sort();
 const restoreDelayedFixtures=installDelayedSpellFixtures(['flash-loan']);
 const findings:string[]=[];
 const observedRoleAnimations=new Map<string,string>();
+const deployedRoles=new Set<string>();
+const deployedClips=new Set<string>();
 const covered:{cardId:string;phase:'play'|'queue'|'resolve';cueCount:number}[]=[];
 const knownVideoIds=new Set<string>(VIDEO_IDS);
 const semanticAnchors=new Set(['arena-center','row-0','row-1','gas-counter','hero-power','hero-0','hero-1']);
@@ -302,9 +305,14 @@ minionCards.forEach((cardId,index)=>{
   assert.equal((roles as Record<string,string>)[cardId],identity.role,`${cardId}: explicit role metadata must reach identity`);
   const deploy=videoCues(batch);
   assert.ok(deploy.length>=1&&deploy.length<=2,`${cardId}: deployment and actual outcomes share at most two sprite layers`);
-  assert.equal(deploy.filter(c=>c.id.startsWith('10-deploy')||c.id.startsWith('11-deploy')||c.id.startsWith('12-deploy')||c.id.startsWith('13-deploy')||c.id.startsWith('14-deploy')||c.id.startsWith('15-deploy')).length,1,`${cardId}: played minion must get exactly one deployment clip`);
+  const special:Record<string,string>={'zeus-liquidator':'23-zeus-apparition','athena-diamond-guard':'24-athena-apparition','hades-rugkeeper':'25-hades-apparition'};
+  const arrival=special[cardId]??(card.cost>=6?'21-legendary-descent':undefined);
+  const installedArrival=arrival&&Object.prototype.hasOwnProperty.call(registry.clips,arrival)?arrival:undefined;
+  assert.equal(deploy.filter(c=>/^1[0-5]-deploy/.test(c.id)||['21-legendary-descent','23-zeus-apparition','24-athena-apparition','25-hades-apparition'].includes(c.id)).length,1,`${cardId}: played minion must get exactly one deployment clip`);
   assert.equal(deploy[0].anchor,played.uid,`${cardId}: deployment clip must follow the summoned fighter`);
-  if(observedRoleAnimations.has(identity.role))assert.equal(observedRoleAnimations.get(identity.role),deploy[0].id,`${identity.role}: all cards in a role share its deployment cue`);
+  deployedRoles.add(identity.role);deployedClips.add(deploy[0].id);
+  if(installedArrival)assert.equal(deploy[0].id,installedArrival,`${cardId}: installed legendary arrival replaces its role clip`);
+  else if(observedRoleAnimations.has(identity.role))assert.equal(observedRoleAnimations.get(identity.role),deploy[0].id,`${identity.role}: ordinary cards in a role share its deployment cue`);
   else observedRoleAnimations.set(identity.role,deploy[0].id);
 
   if(card.halvingPeriod){
@@ -371,9 +379,9 @@ spellCards.forEach((cardId,index)=>{
 
 const minionRoles=Array.from(new Set(minionCards.map(id=>cardIdentity(id).role)));
 assert.equal(minionRoles.length,6,'The catalog must exercise six distinct fighter roles');
-assert.equal(observedRoleAnimations.size,6,'Every fighter role must have a deployment clip');
-const deploymentCueIds=Array.from(new Set(observedRoleAnimations.values()));
-assert.equal(deploymentCueIds.length,6,'Six fighter roles must map to six distinct deployment clips');
+assert.equal(deployedRoles.size,6,'Every fighter role must have a deployment clip, including legendary arrivals');
+assert.equal(new Set(observedRoleAnimations.values()).size,observedRoleAnimations.size,'Ordinary fighter roles must retain distinct deployment clips');
+const deploymentCueIds=Array.from(deployedClips);
 assert.equal(spellCards.length+minionCards.length,cardIds.length);
 for(const id of cardIds){
   assert.equal(CARDS[id].id,id,`${id}: map key and CardDef ID must agree`);

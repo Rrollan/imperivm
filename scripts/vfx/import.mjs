@@ -3,11 +3,11 @@ import { readFile, writeFile, mkdir, stat, rename } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ids=['01-impact','02-builder-heal','03-whale-impact','04-degen-draw','05-validator-gas','06-victory','07-spell-impact','08-spell-buff','09-spell-counter','10-deploy-legionary','11-deploy-guard','12-deploy-commander','13-deploy-minister','14-deploy-priest','15-deploy-engineer','16-edict-weaken','17-edict-heal'];
+const ids=['01-impact','02-builder-heal','03-whale-impact','04-degen-draw','05-validator-gas','06-victory','07-spell-impact','08-spell-buff','09-spell-counter','10-deploy-legionary','11-deploy-guard','12-deploy-commander','13-deploy-minister','14-deploy-priest','15-deploy-engineer','16-edict-weaken','17-edict-heal','18-olympian-lightning','19-diamond-phalanx','20-underworld-rift','21-legendary-descent','22-titan-cleave','23-zeus-apparition','24-athena-apparition','25-hades-apparition'];
 const [id,sourceArg,startArg='0',endArg]=process.argv.slice(2);
 if(!ids.includes(id)||!sourceArg||!endArg)throw new Error('Usage: node scripts/vfx/import.mjs <id> <original.mp4> <startSeconds> <endSeconds>');
 const source=resolve(sourceArg),start=Number(startArg),end=Number(endArg),duration=end-start;
-if(!Number.isFinite(start)||!Number.isFinite(end)||start<0||duration<.2||duration>(id==='06-victory'?2:1))throw new Error('Choose a finite, short active range: combat 0.2–1s; victory ≤ 2s.');
+if(!Number.isFinite(start)||!Number.isFinite(end)||start<0||duration<.2||duration>(id==='06-victory'?2:Number(id.slice(0,2))>=21?1.6:1))throw new Error('Choose a finite, short active range: combat 0.2–1s; legendary 21–25 ≤ 1.6s; victory ≤ 2s.');
 if(id!=='06-victory'){
   process.argv=[...process.argv.slice(0,2),id,sourceArg,String(start),String(duration)];
   await import('./atlas.mjs');

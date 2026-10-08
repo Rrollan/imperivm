@@ -7,6 +7,7 @@ import {fileURLToPath} from 'node:url';
 const [id,sourceArg,startArg='0',durationArg='.4']=process.argv.slice(2);
 const ids=['01-impact','02-builder-heal','03-whale-impact','04-degen-draw','05-validator-gas','07-spell-impact','08-spell-buff','09-spell-counter','10-deploy-legionary','11-deploy-guard','12-deploy-commander','13-deploy-minister','14-deploy-priest','15-deploy-engineer','16-edict-weaken','17-edict-heal','18-olympian-lightning','19-diamond-phalanx','20-underworld-rift','21-legendary-descent','22-titan-cleave','23-zeus-apparition','24-athena-apparition','25-hades-apparition'];
 const start=Number(startArg),duration=Number(durationArg),fps=30,columns=4,frameCount=Math.round(duration*fps),rows=Math.ceil(frameCount/columns);
+const frameWidth=Number(id?.slice(0,2))>=18?256:192,frameHeight=frameWidth*9/16;
 if(!ids.includes(id)||!sourceArg||!Number.isFinite(start)||start<0||!Number.isFinite(duration)||duration<.2||duration>(Number(id.slice(0,2))>=21?1.6:1))throw new Error('Usage: atlas.mjs <combat-id> <original.mp4> <startSeconds> <durationSeconds 0.2–1 (legendary 21–25: up to 1.6)>');
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..'),out=resolve(root,'public/ui/arena-lab/fx');
 const source=resolve(sourceArg),target=resolve(out,`${id}.atlas.webp`),temp=resolve(out,`${id}.atlas.importing.webp`);
@@ -15,7 +16,7 @@ const sharp=createRequire(new URL('../tripo/package.json',import.meta.url))('sha
 const probe=JSON.parse(execFileSync('ffprobe',['-v','error','-show_entries','format=duration:stream=width,height,codec_type','-of','json',source],{encoding:'utf8'}));
 const video=probe.streams.find(s=>s.codec_type==='video');
 if(!video||Math.abs(video.width/video.height-16/9)>.03||start+duration>Number(probe.format.duration))throw new Error('Expected a valid 16:9 source and an existing source range.');
-execFileSync('ffmpeg',['-hide_banner','-loglevel','error','-y','-ss',String(start),'-t',String(frameCount/fps),'-i',source,'-an','-vf',`fps=${fps},scale=192:108:flags=lanczos,eq=saturation=0.82,fade=t=out:st=${Math.max(0,duration-.15)}:d=0.12,tile=${columns}x${rows}`,'-frames:v','1','-c:v','png',png],{stdio:'inherit'});
+execFileSync('ffmpeg',['-hide_banner','-loglevel','error','-y','-ss',String(start),'-t',String(frameCount/fps),'-i',source,'-an','-vf',`fps=${fps},scale=${frameWidth}:${frameHeight}:flags=lanczos,eq=saturation=0.82,fade=t=out:st=${Math.max(0,duration-.15)}:d=0.12,tile=${columns}x${rows}`,'-frames:v','1','-c:v','png',png],{stdio:'inherit'});
 await sharp(png).webp({quality:82}).toFile(temp);await unlink(png);
 const size=(await stat(temp)).size;if(size>300000)throw new Error('Atlas exceeds its 300 KB budget.');
 await rename(temp,target);
@@ -23,4 +24,4 @@ const registryPath=resolve(out,'manifest.json'),registry=JSON.parse(await readFi
 registry.composite='sprite-additive-black';
 registry.clips[id]={src:`/ui/arena-lab/fx/${id}.atlas.webp`,maxMs:Math.round(frameCount/fps*1000),columns,rows,frameCount,fps,bytes:size,sourceRange:[start,start+duration]};
 await writeFile(registryPath,`${JSON.stringify(registry,null,2)}\n`);
-console.log(`${id}: ${columns*192}×${rows*108}, ${frameCount} frames, ${frameCount/fps}s, ${size} bytes; no runtime video decoding.`);
+console.log(`${id}: ${columns*frameWidth}×${rows*frameHeight}, ${frameCount} frames, ${frameCount/fps}s, ${size} bytes; no runtime video decoding.`);

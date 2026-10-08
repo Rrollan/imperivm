@@ -218,6 +218,110 @@
         0,
         0.599
       ]
+    },
+    "18-olympian-lightning": {
+      "src": "/ui/arena-lab/fx/18-olympian-lightning.atlas.webp",
+      "maxMs": 800,
+      "columns": 4,
+      "rows": 6,
+      "frameCount": 24,
+      "fps": 30,
+      "bytes": 83782,
+      "sourceRange": [
+        0,
+        0.799
+      ]
+    },
+    "19-diamond-phalanx": {
+      "src": "/ui/arena-lab/fx/19-diamond-phalanx.atlas.webp",
+      "maxMs": 800,
+      "columns": 4,
+      "rows": 6,
+      "frameCount": 24,
+      "fps": 30,
+      "bytes": 102430,
+      "sourceRange": [
+        0,
+        0.799
+      ]
+    },
+    "20-underworld-rift": {
+      "src": "/ui/arena-lab/fx/20-underworld-rift.atlas.webp",
+      "maxMs": 833,
+      "columns": 4,
+      "rows": 7,
+      "frameCount": 25,
+      "fps": 30,
+      "bytes": 81138,
+      "sourceRange": [
+        0,
+        0.849
+      ]
+    },
+    "21-legendary-descent": {
+      "src": "/ui/arena-lab/fx/21-legendary-descent.atlas.webp",
+      "maxMs": 1300,
+      "columns": 4,
+      "rows": 10,
+      "frameCount": 39,
+      "fps": 30,
+      "bytes": 271152,
+      "sourceRange": [
+        0,
+        1.2990000000000002
+      ]
+    },
+    "22-titan-cleave": {
+      "src": "/ui/arena-lab/fx/22-titan-cleave.atlas.webp",
+      "maxMs": 633,
+      "columns": 4,
+      "rows": 5,
+      "frameCount": 19,
+      "fps": 30,
+      "bytes": 76000,
+      "sourceRange": [
+        0,
+        0.649
+      ]
+    },
+    "23-zeus-apparition": {
+      "src": "/ui/arena-lab/fx/23-zeus-apparition.atlas.webp",
+      "maxMs": 1500,
+      "columns": 4,
+      "rows": 12,
+      "frameCount": 45,
+      "fps": 30,
+      "bytes": 146796,
+      "sourceRange": [
+        0,
+        1.499
+      ]
+    },
+    "24-athena-apparition": {
+      "src": "/ui/arena-lab/fx/24-athena-apparition.atlas.webp",
+      "maxMs": 1500,
+      "columns": 4,
+      "rows": 12,
+      "frameCount": 45,
+      "fps": 30,
+      "bytes": 174884,
+      "sourceRange": [
+        0,
+        1.499
+      ]
+    },
+    "25-hades-apparition": {
+      "src": "/ui/arena-lab/fx/25-hades-apparition.atlas.webp",
+      "maxMs": 1500,
+      "columns": 4,
+      "rows": 12,
+      "frameCount": 45,
+      "fps": 30,
+      "bytes": 134186,
+      "sourceRange": [
+        0,
+        1.499
+      ]
     }
   }
 }
