@@ -25,7 +25,6 @@ import { PresentationScheduler } from './PresentationScheduler';
 import { ArenaEffects } from './ArenaEffects';
 import { ArenaSpriteEffects } from './ArenaSpriteEffects';
 import { videoCues, VIDEO_IDS } from './videoCue';
-import {isSurfaceLanding} from './deploymentGeometry';
 import type { PresentationBatch } from './GameSession';
 import {MOTION, smooth, settle, attackTravel,deathProgress,publicPlayPhase,drawPhase} from './motionSpec';
 import {battleCommand,fighterReadiness} from './battleReadability';
@@ -109,6 +108,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   let disposed = false, running = false, dirty = 3, last = 0, portrait = false, readyReported=false, paused=false;
   let shown: GameState | null = null, selected: string | null = null;
   let hovered: string | null = null, reportedHover: string | null = null, overlayOpen=false;
+  let readyBefore=new Set<string>();const readinessPulses=new Map<string,number>();
   let activeBatch: PresentationBatch | null = null;
   let compact=false,yScale=1;
   const point=(x:number,y:number,z=0)=>new Vector3((x-800)/50,(500-y)*yScale/50,z);
@@ -147,19 +147,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     materials.set(name, mat); return mat;
   }
   const bronze = material('aged-bronze', '#87633a', .3);
-  const marker=(oval:boolean)=>{
-    const texture=new DynamicTexture(oval?'laurel target':'ready corners',512,scene,false);texture.hasAlpha=true;
-    const ctx=texture.getContext() as unknown as CanvasRenderingContext2D;
-    ctx.clearRect(0,0,512,512);ctx.strokeStyle='#ffffff';ctx.fillStyle='#ffffff';ctx.lineWidth=5;ctx.lineCap='round';
-    if(oval){
-      for(let i=0;i<4;i++){ctx.save();ctx.translate(256,256);ctx.rotate(i*Math.PI/2);ctx.beginPath();ctx.moveTo(-19,-230);ctx.lineTo(0,-248);ctx.lineTo(19,-230);ctx.stroke();ctx.beginPath();ctx.arc(0,0,226,-Math.PI/2+.16,-Math.PI/2+.48);ctx.stroke();ctx.restore();}
-    }else{
-      for(const [x,y,sx,sy] of [[19,19,1,1],[493,19,-1,1],[19,493,1,-1],[493,493,-1,-1]]){ctx.beginPath();ctx.moveTo(x,y+sy*66);ctx.lineTo(x,y);ctx.lineTo(x+sx*66,y);ctx.stroke();}
-      ctx.beginPath();ctx.moveTo(232,9);ctx.lineTo(256,28);ctx.lineTo(280,9);ctx.stroke();
-    }
-    texture.update();return texture;
-  };
-  const ovalMarker=marker(true),cardMarker=marker(false);
+  const cardMarker=new Texture('/ui/arena-lab/native/aim-v2/laurel.webp',scene,false,true,Texture.TRILINEAR_SAMPLINGMODE,request,request);cardMarker.hasAlpha=true;
+  const ovalMarker=cardMarker;
   const board = MeshBuilder.CreatePlane('painted Roman arena', { width: 32, height: 20 }, scene);
   board.position.z = 1.7; board.isPickable = false;
   const boardMaterial = material('painted arena surface', '#ffffff', 0);
@@ -221,10 +210,13 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const texture = textures.make(`${keyId}-ink`, face);
     const mat = new StandardMaterial(`${keyId}-material`, scene); mat.diffuseTexture = texture.texture; mat.emissiveTexture = texture.texture; mat.emissiveColor = Color3.White(); mat.diffuseColor = Color3.Black(); mat.disableLighting = true; mat.specularColor = Color3.Black(); mat.useAlphaFromDiffuseTexture = true;
     faceMesh.parent = root; faceMesh.position.z = -.01; faceMesh.material = mat; faceMesh.metadata = data;
-    const halo = MeshBuilder.CreatePlane(`${keyId}-engraved-marker`,{width:width*1.08,height:height*1.06},scene);
-    const haloMat = new StandardMaterial(`${keyId}-halo-material`, scene); haloMat.diffuseColor = Color3.Black(); haloMat.emissiveColor = Color3.FromHexString('#427650'); haloMat.alpha = oval ? .9 : .22; haloMat.disableLighting = true;
+    const halo = MeshBuilder.CreatePlane(`${keyId}-engraved-marker`,{width:width*1.4,height:height*1.16},scene);
+    const haloMat = new StandardMaterial(`${keyId}-halo-material`, scene); haloMat.diffuseColor = Color3.Black(); haloMat.emissiveColor = Color3.FromHexString('#160d04'); haloMat.alpha = oval ? .9 : .22; haloMat.disableLighting = true;
+    // Full-colour carved laurel is behind the card face; only the relief edges
+    // remain visible. It shares the bronze palette of the board.
     haloMat.diffuseTexture=oval?ovalMarker:cardMarker;haloMat.emissiveTexture=haloMat.diffuseTexture;haloMat.useAlphaFromDiffuseTexture=true;
-    halo.parent = root; halo.position.z = -.03; halo.material = haloMat; halo.isPickable = false; halo.setEnabled(false);
+    halo.parent = root; halo.position.z = .08; halo.material = haloMat; halo.isPickable = false; halo.setEnabled(false);
+    if(data.kind==='minion'||data.kind==='hero'||data.kind==='power')effects.addReadyGlow(halo);
     const hitArea=['command','power','gas','block','deck','scroll'].includes(data.kind)
       ? MeshBuilder.CreatePlane(`${keyId}-touch-target`,{size:1,sideOrientation:Mesh.DOUBLESIDE},scene) : null;
     if(hitArea){hitArea.parent=root;hitArea.position.z=-.02;hitArea.visibility=0;hitArea.metadata=data;}
@@ -237,17 +229,19 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   function highlights() {
     const legal = shown ? (shown as GameState & {presentationActions?:Action[]}).presentationActions??legalActions(shown) : [];
     const targets = legal.filter(a => a.type === 'attack' && a.attackerUid === selected).map(a => a.type === 'attack' ? a.target : '');
-    entities.forEach(entry => {
+    const readyNow=new Set<string>();entities.forEach(entry => {
       const ready = shown?.turn === 0 && legal.some(a => a.type === 'attack' && a.attackerUid === entry.data.uid);
       const powerReady = entry.data.kind === 'power' && shown?.turn === 0 && legal.some(a=>a.type==='hero-power');
       const target = entry.data.owner === 1 && targets.includes(entry.data.kind === 'hero' ? 'hero' : entry.data.uid);
       const active = selected === entry.data.uid;
+      if((ready||powerReady)&&!activeBatch){readyNow.add(entry.data.uid);if(!readyBefore.has(entry.data.uid))readinessPulses.set(entry.data.uid,performance.now());}
       entry.halo.setEnabled(!activeBatch && (ready || powerReady || target || active));
-      const color = target ? '#f5d593' : active ? '#fff0bc' : '#7adccc';
+      const color = target ? '#381309' : active ? '#4b2a0b' : '#160d04';
       entry.haloMaterial.emissiveColor = Color3.FromHexString(color);
-      entry.haloMaterial.alpha = target || active ? 1 : .85;
+      entry.haloMaterial.alpha = target ? .48 : active ? 1 : .95;
       entry.hoverTarget=!overlayOpen&&!activeBatch&&entry.data.kind==='hand'&&entry.data.owner===0&&hovered===entry.data.uid?1:0;
     });
+    readyBefore=readyNow;
     updateAim();
     request();
   }
@@ -333,10 +327,10 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     return picked?.hit ? picked.pickedMesh?.metadata as ArenaTarget : null;
   }
   function updateAim() {
-    if(!selected||activeBatch){effects.hideAim();return;}
+    if(!selected||activeBatch||overlayOpen){effects.hideAim();return;}
     const source=entities.get(selected);if(!source){effects.hideAim();return;}
     const target=hitTarget(press?.entity.data.uid);
-    const valid=target?.owner===1&&!!shown&&legalActions(shown).some(a=>a.type==='attack'&&a.attackerUid===selected&&a.target===(target.kind==='hero'?'hero':target.uid));
+    const valid=target?.owner===1&&!!shown&&((shown as GameState & {presentationActions?:Action[]}).presentationActions??legalActions(shown)).some(a=>a.type==='attack'&&a.attackerUid===selected&&a.target===(target.kind==='hero'?'hero':target.uid));
     const to=valid&&target?entities.get(target.uid)?.base:positionOnTable();
     if(to){
       const dx=to.x-source.base.x,dy=to.y-source.base.y,destination=valid&&target?entities.get(target.uid):undefined;
@@ -344,6 +338,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       const targetEdge=destination?targetingEdge(dx,dy,destination.width*50*(destination.data.kind==='hero'?.8125:.94),destination.height*50*(destination.data.kind==='hero'?.8125:.94),destination.data.kind==='hero'):0;
       const insets=targetingInsets(Math.hypot(dx,dy)*50,sourceEdge,targetEdge);
       effects.aim(source.base,to,valid,insets.sourceInset,insets.targetInset,insets.headLength);
+      effects.lockAimTarget(valid?destination?.base:undefined,destination?.width,destination?.height,destination?.data.kind==='hero');
     }else effects.hideAim();
     canvas.style.cursor=valid?'crosshair':'pointer';
   }
@@ -404,8 +399,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       if (typeof event.pointerId === 'number' && canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     }
   });
-  const cancelPointer = () => { clearPress(true); options.onHover(null); };
-  const leavePointer = () => { if (!press) { hovered = null; reportedHover = null; options.onHover(null); highlights(); } };
+  const cancelPointer = () => { selected=null;clearPress(true);effects.hideAim();options.onHover(null); };
+  const leavePointer = () => { if (!press) { hovered = null; reportedHover = null; options.onHover(null); highlights();effects.hideAim(); } };
   canvas.addEventListener('pointercancel', cancelPointer);
   canvas.addEventListener('pointerleave', leavePointer);
 
@@ -474,6 +469,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       settling ||= entry.hoverLift!==entry.hoverTarget;
     });
     effects.flush();
+    effects.tickAim(delta,options.reducedMotion);
+    let readinessMoving=false;readinessPulses.forEach((started,uid)=>{const entry=entities.get(uid),t=(time-started)/700;if(!entry||t>=1||options.reducedMotion||activeBatch){readinessPulses.delete(uid);return;}if(!readyBefore.has(uid)||selected===uid)return;readinessMoving=true;entry.haloMaterial.alpha=.85+.15*Math.sin(t*Math.PI);entry.haloMaterial.emissiveColor=Color3.FromHexString('#332008').scale(Math.sin(t*Math.PI)*.5);});
     scene.render();
     if(options.measure){frameSamples.push(rawDelta);renderSamples.push(performance.now()-time);if(frameSamples.length>300){frameSamples.shift();renderSamples.shift();}}
     if(options.measure&&time>=nextMetricAt){nextMetricAt=time+1000;reportMetrics();}
@@ -481,7 +478,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     // Keep the clock alive until the newly introduced materials can draw.
     // Disabled arrows/cached effects cannot keep an otherwise idle board rendering forever.
     if (scene.meshes.some(mesh=>mesh.isEnabled()&&mesh.isVisible&&mesh.visibility>0&&!mesh.isReady(true))) { dirty = 3; return; }
-    if (!scheduler.active && !videoEffects.active && !deployments.active && !settling && --dirty <= 0) {
+    if (!scheduler.active && !videoEffects.active && !deployments.active && !(effects.aimAnimating&&!options.reducedMotion) && !readinessMoving && !settling && --dirty <= 0) {
       engine.stopRenderLoop(render); running = false;
       reportMetrics();
     }
@@ -633,10 +630,12 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       }
       if(handUid){const t=Math.min(1,progress/impactAt),ease=t*t*(3-2*t);settling.forEach(({entry,start,target})=>{if(!entry.root.isDisposed())entry.root.position.copyFrom(Vector3.Lerp(start,target,ease));});}
       if(landed&&!landed.root.isDisposed()){
-        const fade=options.reducedMotion?1:smooth((progress-impactAt)*duration/MOTION.arrivalFadeMs);
+        const elapsedContact=(progress-impactAt)*duration;
+        const fade=options.reducedMotion?1:smooth(elapsedContact/Math.min(110,MOTION.arrivalFadeMs));
         landed.material.alpha=fade;landed.backing.visibility=fade;
         if(heldArrival){heldArrival.material.alpha=1-fade;heldArrival.backing.visibility=1-fade;if(fade===1)releaseArrival();}
-        landed.root.scaling.setAll(.98+.02*fade);
+        const size=.98+.02*fade,pulse=options.reducedMotion?0:Math.exp(-elapsedContact/85)*Math.sin(elapsedContact/38)*.025;
+        landed.root.scaling.set(size*(1+pulse),size*(1-pulse),size);
       }
       drawFlights.forEach(f=>{
         const elapsed=(progress-impactAt)*duration-(timeline?.tailMs??0)-f.delay;
@@ -689,8 +688,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       if (activeBatch?.id !== batch.id) return;
       hapticContact(batch.action.type);
       videoEffects.trigger(timeline?cues.filter(c=>!c.wave):cues,locateSprite,options.reducedMotion,undefined,cueBounds);
-      const authoredLanding=cues.find(cue=>isSurfaceLanding(cue.id)&&cue.anchor===added?.uid);
-      if((batch.events?.play||added)&&!(authoredLanding&&videoEffects.ready(authoredLanding.id)))deployments.begin(batch.events?.play?.cardId??added!.cardId,target,{width:boardRow.width/50,height:boardRow.height/50,spacing:boardRow.spacing/50},options.reducedMotion,added?()=>entities.get(added.uid)?.root.position:undefined);
+      if(batch.events?.play||added)deployments.begin(batch.events?.play?.cardId??added!.cardId,target,{width:boardRow.width/50,height:boardRow.height/50,spacing:boardRow.spacing/50},options.reducedMotion,added?()=>entities.get(added.uid)?.root.position:undefined);
       if(handUid){
         // Replace the arriving card with its battlefield/queue form at the same position,
         // at contact rather than after a return to the hand or a blank frame.

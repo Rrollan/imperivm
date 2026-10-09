@@ -12,6 +12,13 @@ export function costCurve(ids: readonly string[]) {
   for (const id of ids) if (Object.hasOwn(CARDS,id)) bins[Math.min(7,CARDS[id].cost)]++;
   return bins;
 }
+/** A full-deck replacement is atomic and respects the current ownership/copy cap. */
+export function replaceDeckCard(ids:readonly string[],removeId:string,addId:string,limits:Record<string,number>){
+  const index=ids.lastIndexOf(removeId);if(ids.length!==30||index<0||!Object.hasOwn(CARDS,addId))return null;
+  const count=ids.filter(id=>id===addId).length-(removeId===addId?1:0);
+  if(count>=(limits[addId]??0))return null;
+  const next=[...ids];next[index]=addId;return next;
+}
 /** Transparent recipe/curve helper, not a win-rate or meta prediction. Preserves legal chosen cards. */
 export function completeOwnedDeck(ids: readonly string[], hero: string, owned: Record<string,number>) {
   const limits=deckCardCounts(owned), result:string[]=[], counts:Record<string,number>={};

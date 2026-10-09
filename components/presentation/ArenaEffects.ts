@@ -6,6 +6,7 @@ import { Vector3 } from '@babylonjs/core/Maths/math.vector';
 import type { Scene } from '@babylonjs/core/scene';
 import type { Mesh } from '@babylonjs/core/Meshes/mesh';
 import type { PresentationBatch } from './GameSession';
+import {ArenaAim3D} from './ArenaAim3D';
 import {battleFloats,type FloatKind} from './battleFloats';
 import {EFFECT_POOL_SIZE,type EffectTimeline} from './effectTimeline';
 
@@ -14,9 +15,7 @@ const MAX_FLASHES=EFFECT_POOL_SIZE;
 
 /** Transient feedback uses the same battle clock and camera as the pieces. */
 export class ArenaEffects {
-  private aimTexture: DynamicTexture;
-  private aimMesh: Mesh;
-  private aimMaterial: StandardMaterial;
+  private aimVolume:ArenaAim3D;
   private flashes: Flash[] = [];
   private pool: Flash[]=[];
   private timeline:EffectTimeline|null=null;
@@ -26,12 +25,7 @@ export class ArenaEffects {
   private aimKey='';
 
   constructor(private scene: Scene, private invalidate: () => void) {
-    this.aimTexture = new DynamicTexture('target arrow', {width:2400,height:1500}, scene, false);
-    this.aimTexture.hasAlpha = true;
-    this.aimMaterial = this.ink('arrow ink', this.aimTexture);
-    this.aimMesh = MeshBuilder.CreatePlane('targeting arc',{width:32,height:20},scene);
-    this.aimMesh.position.z=-12; this.aimMesh.material=this.aimMaterial;
-    this.aimMesh.isPickable=false; this.aimMesh.renderingGroupId=3; this.aimMesh.setEnabled(false);
+    this.aimVolume=new ArenaAim3D(scene,invalidate);
     for(let i=0;i<MAX_FLASHES;i++)this.allocate();
   }
 
@@ -59,40 +53,12 @@ export class ArenaEffects {
     this.pendingAim={from:from.clone(),to:to.clone(),valid,sourceInset,targetInset,headLength};this.invalidate();
   }
   flush(){const pending=this.pendingAim;this.pendingAim=null;if(pending)this.drawAim(pending.from,pending.to,pending.valid,pending.sourceInset,pending.targetInset,pending.headLength);}
-  private drawAim(from:Vector3,to:Vector3,valid:boolean,sourceInset:number,targetInset:number,headLength:number) {
-    const ctx=this.aimTexture.getContext() as unknown as CanvasRenderingContext2D;
-    ctx.setTransform(1,0,0,1,0,0);
-    ctx.clearRect(0,0,2400,1500);ctx.scale(1.5,1.5);
-    const a={x:800+from.x*50,y:500-from.y*50},b={x:800+to.x*50,y:500-to.y*50};
-    const length=Math.hypot(b.x-a.x,b.y-a.y);
-    if(length<sourceInset+targetInset+3){this.hideAim();return;}
-    const unit={x:(b.x-a.x)/length,y:(b.y-a.y)/length};
-    a.x+=unit.x*sourceInset;a.y+=unit.y*sourceInset;b.x-=unit.x*targetInset;b.y-=unit.y*targetInset;
-    const lane=Math.hypot(b.x-a.x,b.y-a.y),bend=Math.min(40,lane*.13),shaftWidth=Math.max(2,Math.min(5,lane*.08));
-    const control={x:(a.x+b.x)/2-unit.y*bend,y:(a.y+b.y)/2+unit.x*bend};
-    ctx.lineCap='round';ctx.lineJoin='round';
-    // A tapered bronze-edged ribbon, sampled along one smooth curve. The
-    // silhouette stays crisp at desktop scale without a low-resolution stroke.
-    const sides:[{x:number;y:number}[],{x:number;y:number}[]]=[[],[]];
-    for(let i=0;i<=32;i++){
-      const t=i/32,u=1-t,x=u*u*a.x+2*u*t*control.x+t*t*b.x,y=u*u*a.y+2*u*t*control.y+t*t*b.y;
-      const dx=2*u*(control.x-a.x)+2*t*(b.x-control.x),dy=2*u*(control.y-a.y)+2*t*(b.y-control.y),d=Math.max(1,Math.hypot(dx,dy)),width=shaftWidth*(1-.5*t);
-      sides[0].push({x:x-dy/d*width,y:y+dx/d*width});sides[1].push({x:x+dy/d*width,y:y-dx/d*width});
-    }
-    const gradient=ctx.createLinearGradient(a.x,a.y,b.x,b.y);gradient.addColorStop(0,valid?'#278c8d':'#886136');gradient.addColorStop(.5,valid?'#74e7e0':'#dfb664');gradient.addColorStop(1,'#ffdfa0');
-    ctx.shadowColor='#170c08';ctx.shadowBlur=5;ctx.shadowOffsetY=2;
-    ctx.beginPath();[...sides[0],...sides[1].reverse()].forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle=gradient;ctx.strokeStyle='#42311b';ctx.lineWidth=2;ctx.fill();ctx.stroke();
-    ctx.shadowBlur=0;ctx.shadowOffsetY=0;
-    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(control.x,control.y,b.x,b.y);ctx.strokeStyle=valid?'#ffdb9b':'#ffebbc';ctx.lineWidth=2;ctx.stroke();
-    const angle=Math.atan2(b.y-control.y,b.x-control.x);
-    ctx.save();ctx.translate(b.x,b.y);ctx.rotate(angle);
-    ctx.beginPath();ctx.moveTo(headLength,0);ctx.lineTo(-headLength*.4,-headLength*.64);ctx.lineTo(-headLength*.18,0);ctx.lineTo(-headLength*.4,headLength*.64);ctx.closePath();ctx.fillStyle=valid?'#f6bd7b':'#efcc87';ctx.strokeStyle='#5b341e';ctx.lineWidth=headLength<12?1.5:3;ctx.fill();ctx.stroke();
-    ctx.beginPath();ctx.moveTo(headLength*.85,0);ctx.lineTo(-headLength*.14,0);ctx.strokeStyle='#fff0c8';ctx.lineWidth=headLength<12?1:2;ctx.stroke();ctx.restore();
-    if(valid){ctx.strokeStyle='#f5c98b';ctx.lineWidth=2;for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(800+to.x*50,500-to.y*50,25,i*Math.PI/2+.2,i*Math.PI/2+1.1);ctx.stroke();}}
-    this.aimTexture.update();this.aimMesh.setEnabled(true);
-  }
-
-  hideAim(){this.pendingAim=null;this.aimKey='';this.aimMesh.setEnabled(false);}
+  private drawAim(from:Vector3,to:Vector3,valid:boolean,sourceInset:number,targetInset:number,headLength:number){this.aimVolume.update(from,to,valid,sourceInset,targetInset,headLength);}
+  lockAimTarget(position:Vector3|undefined,width?:number,height?:number,oval?:boolean){this.aimVolume.lock(position,width,height,oval);}
+  addReadyGlow(mesh:Mesh){this.aimVolume.glow.addIncludedOnlyMesh(mesh);}
+  tickAim(delta:number,reduced:boolean){this.aimVolume.tick(delta,reduced);}
+  get aimAnimating(){return this.aimVolume.animating;}
+  hideAim(){this.pendingAim=null;this.aimKey='';this.aimVolume.hide();}
 
   begin(batch:PresentationBatch,locate:(uid:string)=>Vector3|undefined,timeline:EffectTimeline|null=null) {
     this.clear();
@@ -135,5 +101,5 @@ export class ArenaEffects {
   }
 
   clear(){this.hideAim();this.flashes.forEach(f=>f.mesh.setEnabled(false));this.flashes=[];this.timeline=null;this.locate=null;this.windowStart=-1;}
-  dispose(){this.clear();this.pool.forEach(f=>{f.mesh.dispose();f.material.dispose();f.texture.dispose();});this.pool=[];this.aimMesh.dispose();this.aimTexture.dispose();this.aimMaterial.dispose();}
+  dispose(){this.clear();this.pool.forEach(f=>{f.mesh.dispose();f.material.dispose();f.texture.dispose();});this.pool=[];this.aimVolume.dispose();}
 }

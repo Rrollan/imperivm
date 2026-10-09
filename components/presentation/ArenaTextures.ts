@@ -179,19 +179,19 @@ export class ArenaTextures {
     rounded(ctx,9,9,366,366,56);ctx.fillStyle='#392419';ctx.fill();ctx.save();ctx.clip();
     const art=this.image(cardArtPath(minion.cardId));if(art)cover(ctx,art,17,17,350,350);
     const shade=ctx.createLinearGradient(0,220,0,375);shade.addColorStop(0,'#20120b00');shade.addColorStop(1,'#20120bed');ctx.fillStyle=shade;ctx.fillRect(9,220,366,155);ctx.restore();
-    rounded(ctx,9,9,366,366,56);ctx.strokeStyle=ready?'#8fe5d6':minion.taunt?'#efd295':'#ba8d4e';ctx.lineWidth=12;ctx.stroke();
+    rounded(ctx,9,9,366,366,56);ctx.strokeStyle=ready?'#f0c778':minion.taunt?'#efd295':'#ba8d4e';ctx.lineWidth=12;ctx.stroke();
     const label=CARDS[minion.cardId].faction;ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`700 48px ${this.font}`;ctx.lineWidth=5;ctx.strokeStyle='#20120b';ctx.fillStyle='#fff0ce';ctx.strokeText(label,192,267,250);ctx.fillText(label,192,267,250);
     this.badge(ctx,String(minion.attack),61,327,'#ab832e',46);this.badge(ctx,String(Math.max(0,minion.health)),323,327,'#a8322f',46);
     const symbol:RomanSymbol=minion.staked?'lock':ready?'gladius':readiness==='fresh'?'hourglass':'spent';
-    this.badge(ctx,'',322,61,ready?'#16766a':'#453226',38);drawRomanSymbol(ctx,symbol,322,61,48,ready?'#ddfff5':'#edce91');
+    this.badge(ctx,'',322,61,ready?'#773222':'#453226',38);drawRomanSymbol(ctx,symbol,322,61,48,ready?'#fff0bd':'#edce91');
     if(minion.taunt)drawRomanSymbol(ctx,'shield',192,329,49,'#edce91');ctx.restore();
   }
 
   private drawMinion(ctx: CanvasRenderingContext2D, minion: Minion, ready=false,readiness?:FighterReadiness) {
     paintCardFace(ctx,minion.cardId,this.locale,this.font,this.image(cardArtPath(minion.cardId)),ready,{attack:minion.attack,health:minion.health},this.image(cardFramePath(CARDS[minion.cardId].rarity)),'battlefield');
     const symbol:RomanSymbol=minion.staked?'lock':ready||readiness==='ready'||readiness==='rush'?'gladius':readiness==='fresh'?'hourglass':'spent';
-    this.badge(ctx,'',323,61,minion.staked?'#315e59':ready?'#17796b':'#514335',33);
-    drawRomanSymbol(ctx,symbol,323,61,44,minion.staked?'#a8e2da':ready?'#e2fff1':'#f4dda7');
+    this.badge(ctx,'',323,61,minion.staked?'#315e59':ready?'#773222':'#514335',33);
+    drawRomanSymbol(ctx,symbol,323,61,44,minion.staked?'#a8e2da':ready?'#fff0bd':'#f4dda7');
     if(minion.lifesteal){
       this.badge(ctx,'',312,420,'#632d29',24);drawRomanSymbol(ctx,'drop',312,420,30,'#f0c8a9');
     }

@@ -31,7 +31,7 @@ export default function CollectionPage() {
   const inventory = mode === 'nft' ? nfts.counts : owned;
   const catalogMode = mode === 'catalog' || mode === 'characters';
   const visible = Object.values(CARDS).filter(c => (filter === 'All' || c.faction === filter) && (catalogMode || inventory[c.id] > 0) && (mode !== 'characters' || !!CHARACTER_CARDS[c.id]) && `${cardName(c.id)} ${cardText(c.id)} ${c.name} ${c.text}`.toLowerCase().includes(query.toLowerCase()));
-  if(building)return <div className={styles.shell}><SiteHeader active="collection"/><DeckWorkshop onClose={()=>setBuilding(false)} onInspect={setInspected}/><SiteFooter/>{inspected&&<CardDialog id={inspected} onClose={()=>setInspected(null)}/>}</div>;
+  if(building)return <div className={styles.shell}><DeckWorkshop onClose={()=>setBuilding(false)} onInspect={setInspected}/>{inspected&&<CardDialog id={inspected} onClose={()=>setInspected(null)}/>}</div>;
   return <div className={styles.shell}><SiteHeader active="collection" /><main className={`${styles.hubMain} collection-page`}>
     <nav className="collection-nav"><Link href="/"><RomanIcon name="temple" size={18}/>{t('Главная', 'Home')}</Link><Link href="/packs"><RomanIcon name="pack" size={18}/>{t('Паки', 'Packs')}</Link><Link href="/leaderboard"><RomanIcon name="crown" size={18}/>{t('Победы', 'Victories')}</Link><button onClick={() => setTrade(true)}>{t('Обмен ↗', 'Trade ↗')}</button></nav>
     <p className="eyebrow">{t('Соберите свой легион', 'Assemble your legion')}</p><h1 className="font-display text-4xl sm:text-5xl gold-text">{t('Коллекция', 'The collection')}</h1>

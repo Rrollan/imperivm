@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "composite": "sprite-additive-black",
+  "composite": "black-key-premultiplied",
   "clips": {
     "01-impact": {
       "src": "/ui/arena-lab/fx/01-impact.atlas.webp",
@@ -330,12 +330,14 @@
       "rows": 5,
       "frameCount": 19,
       "fps": 30,
-      "bytes": 79266,
+      "bytes": 202330,
       "sourceRange": [
         0,
         0.649
       ],
-      "composite": "luma-alpha"
+      "composite": "black-key",
+      "frameWidth": 384,
+      "frameHeight": 216
     },
     "27-hoplite-landing": {
       "src": "/ui/arena-lab/fx/27-hoplite-landing.atlas.webp",
@@ -344,12 +346,14 @@
       "rows": 4,
       "frameCount": 16,
       "fps": 30,
-      "bytes": 79660,
+      "bytes": 199742,
       "sourceRange": [
         0,
         0.549
       ],
-      "composite": "luma-alpha"
+      "composite": "black-key",
+      "frameWidth": 384,
+      "frameHeight": 216
     },
     "28-priest-landing": {
       "src": "/ui/arena-lab/fx/28-priest-landing.atlas.webp",
@@ -358,12 +362,14 @@
       "rows": 5,
       "frameCount": 19,
       "fps": 30,
-      "bytes": 60932,
+      "bytes": 154136,
       "sourceRange": [
         0,
         0.649
       ],
-      "composite": "luma-alpha"
+      "composite": "black-key",
+      "frameWidth": 384,
+      "frameHeight": 216
     },
     "29-commander-landing": {
       "src": "/ui/arena-lab/fx/29-commander-landing.atlas.webp",
@@ -372,12 +378,14 @@
       "rows": 5,
       "frameCount": 18,
       "fps": 30,
-      "bytes": 61316,
+      "bytes": 162338,
       "sourceRange": [
         0,
         0.599
       ],
-      "composite": "luma-alpha"
+      "composite": "black-key",
+      "frameWidth": 384,
+      "frameHeight": 216
     },
     "30-mosaic-landing": {
       "src": "/ui/arena-lab/fx/30-mosaic-landing.atlas.webp",
@@ -386,12 +394,14 @@
       "rows": 5,
       "frameCount": 19,
       "fps": 30,
-      "bytes": 87528,
+      "bytes": 219484,
       "sourceRange": [
         0,
         0.649
       ],
-      "composite": "luma-alpha"
+      "composite": "black-key",
+      "frameWidth": 384,
+      "frameHeight": 216
     },
     "31-meme-landing": {
       "src": "/ui/arena-lab/fx/31-meme-landing.atlas.webp",
@@ -400,12 +410,14 @@
       "rows": 4,
       "frameCount": 16,
       "fps": 30,
-      "bytes": 70260,
+      "bytes": 174336,
       "sourceRange": [
         0,
         0.549
       ],
-      "composite": "luma-alpha"
+      "composite": "black-key",
+      "frameWidth": 384,
+      "frameHeight": 216
     },
     "32-colossus-landing": {
       "src": "/ui/arena-lab/fx/32-colossus-landing.atlas.webp",
@@ -414,12 +426,14 @@
       "rows": 6,
       "frameCount": 24,
       "fps": 30,
-      "bytes": 146192,
+      "bytes": 277590,
       "sourceRange": [
         0,
         0.799
       ],
-      "composite": "luma-alpha"
+      "composite": "black-key",
+      "frameWidth": 384,
+      "frameHeight": 216
     },
     "33-poseidon-apparition": {
       "src": "/ui/arena-lab/fx/33-poseidon-apparition.atlas.webp",

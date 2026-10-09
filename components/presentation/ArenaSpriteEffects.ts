@@ -1,18 +1,35 @@
 import {Texture} from '@babylonjs/core/Materials/Textures/texture';
-import {StandardMaterial} from '@babylonjs/core/Materials/standardMaterial';
+import {ShaderMaterial} from '@babylonjs/core/Materials/shaderMaterial';
+import {Effect} from '@babylonjs/core/Materials/effect';
 import {Material} from '@babylonjs/core/Materials/material';
 import {Engine} from '@babylonjs/core/Engines/engine';
 import {MeshBuilder} from '@babylonjs/core/Meshes/meshBuilder';
-import {Color3} from '@babylonjs/core/Maths/math.color';
-import type {Vector3} from '@babylonjs/core/Maths/math.vector';
+import {Vector4,type Vector3} from '@babylonjs/core/Maths/math.vector';
 import type {Scene} from '@babylonjs/core/scene';
 import type {Mesh} from '@babylonjs/core/Meshes/mesh';
 import registry from '../../public/ui/arena-lab/fx/manifest.json';
 import {VIDEO_IDS,type VideoCue,type VideoId} from './videoCue';
 import {spritePlacement,type FighterBounds} from './deploymentGeometry';
 
-type Source={src:string;maxMs:number;columns:number;rows:number;frameCount:number;fps:number;composite?:'luma-alpha'};
-type Clip={texture:Texture;material:StandardMaterial;mesh:Mesh;source:Source};
+// Authored clips are RGB already multiplied against black. Combining them
+// with luminance opacity a second time made both metal and light disappear.
+Effect.ShadersStore.imperivmContactInkVertexShader=`
+precision highp float;
+attribute vec3 position; attribute vec2 uv;
+uniform mat4 worldViewProjection; uniform vec4 atlasTransform;
+varying vec2 spriteUV;
+void main(){spriteUV=uv*atlasTransform.xy+atlasTransform.zw;gl_Position=worldViewProjection*vec4(position,1.0);}`;
+Effect.ShadersStore.imperivmContactInkFragmentShader=`
+precision highp float;
+varying vec2 spriteUV; uniform sampler2D atlas; uniform float opacity;
+void main(){vec3 ink=texture2D(atlas,spriteUV).rgb;
+float energy=max(ink.r,max(ink.g,ink.b));
+float coverage=smoothstep(0.012,0.10,energy)*min(1.0,energy*3.0);
+if(coverage<0.006)discard;
+gl_FragColor=vec4(clamp(ink/max(coverage,0.015),0.0,1.0),coverage*opacity);}`;
+
+type Source={src:string;maxMs:number;columns:number;rows:number;frameCount:number;fps:number;composite?:'luma-alpha'|'black-key'};
+type Clip={texture:Texture;material:ShaderMaterial;mesh:Mesh;source:Source};
 type Live={clip:Clip;elapsed:number;durationMs:number;follow?:()=>Vector3|undefined;offsetY:number};
 
 /** One uploaded atlas per effect: battle playback changes UVs, never uploads video frames. */
@@ -36,15 +53,9 @@ export class ArenaSpriteEffects {
     texture.wrapU=Texture.CLAMP_ADDRESSMODE;texture.wrapV=Texture.CLAMP_ADDRESSMODE;
     texture.uScale=1/source.columns;texture.vScale=1/source.rows;
     const make=(ink:Texture,index:number):Clip=>{
-    const material=new StandardMaterial(`sprite:${id}:${index}`,this.scene);
-    material.diffuseColor=Color3.Black();material.emissiveColor=Color3.Black();material.emissiveTexture=ink;
-    material.disableLighting=true;material.useEmissiveAsIllumination=true;material.specularColor=Color3.Black();
-    material.alphaMode=Engine.ALPHA_ADD;material.transparencyMode=Material.MATERIAL_ALPHABLEND;
-    // On pale marble, additive RGB saturates cyan/violet into white. These
-    // authored black-background clips use luminance as opacity, preserving ink.
-    { // All shipped atlases have black backgrounds; alpha preserves colour on marble.
-      ink.getAlphaFromRGB=true;material.opacityTexture=ink;material.alphaMode=Engine.ALPHA_COMBINE;
-    }
+    const material=new ShaderMaterial(`sprite:${id}:${index}`,this.scene,{vertex:'imperivmContactInk',fragment:'imperivmContactInk'},{attributes:['position','uv'],uniforms:['worldViewProjection','atlasTransform','opacity'],samplers:['atlas'],needAlphaBlending:true});
+    material.setTexture('atlas',ink);material.setFloat('opacity',1);
+    material.alphaMode=Engine.ALPHA_COMBINE;material.transparencyMode=Material.MATERIAL_ALPHABLEND;
     const mesh=MeshBuilder.CreatePlane(`sprite:${id}:${index}`,{width:1,height:9/16},this.scene);
     mesh.material=material;mesh.isPickable=false;mesh.renderingGroupId=2;mesh.setEnabled(false);
     const clip={texture:ink,material,mesh,source};
@@ -65,13 +76,14 @@ export class ArenaSpriteEffects {
       const placement=spritePlacement(cue.id,cue.width,bounds?.(cue.anchor));
       clip.mesh.position.copyFrom(at);clip.mesh.position.y+=placement.offsetY;clip.mesh.position.z=placement.depth;
       clip.mesh.scaling.set(placement.width,placement.height/(9/16),1);clip.mesh.renderingGroupId=placement.group;
-      clip.mesh.setEnabled(true);clip.material.alpha=placement.alpha;
+      clip.mesh.setEnabled(true);clip.material.setFloat('opacity',placement.alpha);
       this.live.push({clip,elapsed:0,durationMs:Math.min(clip.source.maxMs,windowMs??clip.source.maxMs),follow:placement.group<2?()=>locate(cue.anchor):undefined,offsetY:placement.offsetY});this.frame(clip,0);this.invalidate();
     }
   }
   private frame(clip:Clip,frame:number){
     clip.texture.uOffset=(frame%clip.source.columns)/clip.source.columns;
     clip.texture.vOffset=1-(Math.floor(frame/clip.source.columns)+1)/clip.source.rows;
+    clip.material.setVector4('atlasTransform',new Vector4(clip.texture.uScale,clip.texture.vScale,clip.texture.uOffset,clip.texture.vOffset));
   }
   tick(delta:number){this.live.slice().forEach(l=>{
     l.elapsed+=delta;if(l.elapsed>=l.durationMs){this.remove(l);return;}
