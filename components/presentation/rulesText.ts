@@ -68,7 +68,7 @@ export function retaliationRules(attack:number,locale:Locale){
 export function powerRules(id: string, locale: Locale,ruleset:RulesetId='classic-v1') {
   const ru = locale === 'ru';
   switch (HEROES[id].power) {
-    case 'heal-treasury': return ru ? 'Восстанавливает 2 здоровья казне и 1 самому раненому своему бойцу. При равенстве — первому в строю.' : 'Restore 2 treasury health and 1 to your most wounded fighter; formation order breaks ties.';
+    case 'heal-treasury': return ru ? 'Восстанавливает 2 здоровья казне и 2 самому раненому своему бойцу. При равенстве — первому в строю.' : 'Restore 2 treasury health and 2 to your most wounded fighter; formation order breaks ties.';
     case 'gain-gas': return ru?'Потратьте приказы сейчас. В начале следующего своего хода получите +2 приказа сверх запаса, после исполнения указов.':'Spend orders now. Gain +2 orders above capacity at the start of your next turn, after edicts resolve.';
     case 'draw-burn': return ru ? 'Добирает карту. Ваша казна получает 2 урона.' : 'Draw a card. Your treasury takes 2 damage.';
     case 'damage-random-enemy': return ru ? '2 урона случайному бойцу противника. Если бойцов нет — казне.' : 'Deal 2 damage to a random enemy fighter, or the treasury if none remain.';

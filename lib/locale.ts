@@ -60,7 +60,7 @@ export const CARD_RU: Record<string, { name: string; text: string }> = {
 
 const HERO_RU: Record<string, { name: string; title: string; powerName: string; powerText: string }> = {
   whale: { name: 'Кит', title: 'Властелин рынка', powerName: 'Обвал рынка', powerText: 'Наносит 2 урона случайному вражескому существу, а если их нет — вражеской казне. Рынок даёт, а Кит забирает.' },
-  builder: { name: 'Строитель', title: 'Мастер релизов', powerName: 'Выпустить патч', powerText: 'Восстанавливает 2 здоровья казне и 1 самому раненому бойцу.' },
+  builder: { name: 'Строитель', title: 'Мастер релизов', powerName: 'Выпустить патч', powerText: 'Восстанавливает 2 здоровья казне и 2 самому раненому бойцу.' },
   degen: { name: 'Деген', title: 'Безрассудный инвестор', powerName: 'Влететь на всё', powerText: 'Возьмите карту и получите 2 урона. Анализ — для трусов.' },
   validator: { name: 'Валидатор', title: 'Хранитель блоков', powerName: 'Подтвердить блок', powerText: 'В начале следующего своего хода даёт +2 приказа сверх запаса.' },
   strategist:{name:'Стратег',title:'Маршал легиона',powerName:'Сбор легиона',powerText:'Призывает Пиксельного оруженосца 1/1.'},

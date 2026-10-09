@@ -25,12 +25,12 @@ function rounded(ctx: CanvasRenderingContext2D, x: number, y: number, w: number,
   ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
 }
 
-function fillArt(ctx: CanvasRenderingContext2D, image: HTMLImageElement, x: number, y: number, w: number, h: number, upperPortrait=false) {
+function fillArt(ctx: CanvasRenderingContext2D, image: HTMLImageElement, x: number, y: number, w: number, h: number, portraitBias=.5) {
   // Square illustrations fill the same portrait window as tall illustrations.
   // The surrounding clip owns the crop; no parchment/black bands inside the art.
   const ratio = Math.max(w / image.naturalWidth, h / image.naturalHeight);
   const width = image.naturalWidth * ratio, height = image.naturalHeight * ratio;
-  ctx.drawImage(image, x + (w - width) / 2, y + (h - height) * (upperPortrait?.28:.5), width, height);
+  ctx.drawImage(image, x + (w - width) / 2, y + (h - height) * portraitBias, width, height);
 }
 
 function wrappedLines(ctx:CanvasRenderingContext2D,text:string,width:number){
@@ -54,7 +54,7 @@ function words(ctx: CanvasRenderingContext2D, text: string, x: number, y: number
   });
 }
 
-export function paintCardName(ctx:CanvasRenderingContext2D,text:string,font:string,x:number,y:number,width:number,size=44,line=34){
+export function paintCardName(ctx:CanvasRenderingContext2D,text:string,font:string,x:number,y:number,width:number,size=42,line=32){
   ctx.fillStyle='#fff5df';ctx.font=`800 ${size}px ${font}`;ctx.textAlign='center';ctx.textBaseline='alphabetic';
   // Two lines fit the original nameplate. Never squeeze glyphs horizontally.
   if(ctx.measureText(text).width>width){
@@ -65,15 +65,15 @@ export function paintCardName(ctx:CanvasRenderingContext2D,text:string,font:stri
   words(ctx,text,x,y,width,line);
 }
 
-export function cardFaceLayout(rarity:Rarity,battlefield=false){
-  const source=CARD_FRAME_LAYOUT[rarity],removed=battlefield?CARD_FACE.height-BATTLE_FACE.height:0;
+export function cardFaceLayout(rarity:Rarity,battlefield=false,height=battlefield?BATTLE_FACE.height:CARD_FACE.height){
+  const source=CARD_FRAME_LAYOUT[rarity],removed=CARD_FACE.height-height;
   return {art:{...source.art,h:source.art.h-removed},nameY:source.nameY-removed,statsY:source.statsY-removed};
 }
 
-function paintFrame(ctx:CanvasRenderingContext2D,frame:HTMLImageElement,rarity:Rarity,battlefield:boolean){
-  if(!battlefield){ctx.drawImage(frame,0,0,CARD_FACE.width,CARD_FACE.height);return;}
+function paintFrame(ctx:CanvasRenderingContext2D,frame:HTMLImageElement,rarity:Rarity,height:number){
+  if(height===CARD_FACE.height){ctx.drawImage(frame,0,0,CARD_FACE.width,CARD_FACE.height);return;}
   const top=112,bottom=CARD_FRAME_LAYOUT[rarity].art.y+CARD_FRAME_LAYOUT[rarity].art.h;
-  const removed=CARD_FACE.height-BATTLE_FACE.height,sy=frame.naturalHeight/CARD_FACE.height;
+  const removed=CARD_FACE.height-height,sy=frame.naturalHeight/CARD_FACE.height;
   // Three vertical slices preserve the gem, nameplate, stat sockets and corners.
   ctx.drawImage(frame,0,0,frame.naturalWidth,top*sy,0,0,CARD_FACE.width,top);
   ctx.drawImage(frame,0,top*sy,frame.naturalWidth,(bottom-top)*sy,0,top,CARD_FACE.width,bottom-top-removed);
@@ -101,13 +101,14 @@ export function paintBadge(ctx: CanvasRenderingContext2D,font:string, value: str
 
 
 /** The hand and inspection share one card face; portrait art is never fitted into a square. */
-export function paintCardFace(ctx:CanvasRenderingContext2D,id:string,locale:Locale,font:string,art:HTMLImageElement|null,playable?:boolean,stats?:{attack:number;health:number},frame?:HTMLImageElement|null,variant:'card'|'battlefield'|'queued'='card'){
+export function paintCardFace(ctx:CanvasRenderingContext2D,id:string,locale:Locale,font:string,art:HTMLImageElement|null,playable?:boolean,stats?:{attack:number;health:number},frame?:HTMLImageElement|null,variant:'card'|'battlefield'|'queued'='card',reframeHeight?:number){
     const def = CARDS[id];
-    const battlefield=variant==='battlefield',height=battlefield?BATTLE_FACE.height:CARD_FACE.height;
-    const layout=cardFaceLayout(def.rarity,battlefield),{x,y,w,h}=layout.art;
+    const battlefield=variant==='battlefield',height=reframeHeight??(battlefield?BATTLE_FACE.height:CARD_FACE.height);
+    const layout=cardFaceLayout(def.rarity,battlefield,height),{x,y,w,h}=layout.art;
+    const crop=Math.min(1,(CARD_FACE.height-height)/(CARD_FACE.height-BATTLE_FACE.height));
     if(!frame){rounded(ctx,9,9,366,height-18,20);ctx.fillStyle='#8c693c';ctx.fill();rounded(ctx,17,17,350,height-34,14);ctx.fillStyle='#ead7ab';ctx.fill();}
-    ctx.save();rounded(ctx,x,y,w,h,18);ctx.clip();ctx.fillStyle='#c7ab77';ctx.fillRect(x,y,w,h);if(art)fillArt(ctx,art,x,y,w,h,battlefield);ctx.restore();
-    if(frame){ctx.save();if(playable){ctx.shadowColor='#fff0bc';ctx.shadowBlur=8;}paintFrame(ctx,frame,def.rarity,battlefield);ctx.restore();}
+    ctx.save();rounded(ctx,x,y,w,h,18);ctx.clip();ctx.fillStyle='#c7ab77';ctx.fillRect(x,y,w,h);if(art)fillArt(ctx,art,x,y,w,h,.5-.22*crop);ctx.restore();
+    if(frame){ctx.save();if(playable){ctx.shadowColor='#fff0bc';ctx.shadowBlur=8;}paintFrame(ctx,frame,def.rarity,height);ctx.restore();}
     else{ctx.fillStyle='#4d3423';rounded(ctx,18,layout.nameY-36,348,72,8);ctx.fill();}
     paintCardName(ctx,cardName(id,locale),font,192,layout.nameY,316);
     paintBadge(ctx,font,`${def.cost}`,48,56,variant==='card'&&playable===false?'#566967':'#287f9a',39);
@@ -115,14 +116,12 @@ export function paintCardFace(ctx:CanvasRenderingContext2D,id:string,locale:Loca
       const radius=37;
       paintBadge(ctx,font,`${stats?.attack??def.attack}`,64,layout.statsY,stats&&stats.attack>(def.attack??0)?'#6e8040':'#b38637',radius);
       paintBadge(ctx,font,`${stats?.health??def.health}`,320,layout.statsY,'#b7483c',radius);
-      // Hand factions stay visible for building links; court pieces prioritise
-      // one large ability seal. Full rules stay in inspection.
-      const ru=locale==='ru';
-      const tag=def.ultimate?(ru?'КОМБО':'COMBO'):def.taunt?(ru?'ЗАЩИТА':'TAUNT'):def.rush?(ru?'НАТИСК':'RUSH'):def.lifesteal?(ru?'ВАМПИР':'DRAIN'):def.priority?(ru?'ПРИОРИТ.':'PRIORITY'):def.halvingPeriod?(ru?`РОСТ ${def.halvingPeriod}`:`GROW ${def.halvingPeriod}`):def.battlecry?(ru?'ВЫХОД':'ARRIVAL'):(ru?'БОЕЦ':'FIGHTER');
-      const seal=variant==='card'?def.faction.toUpperCase():tag;
-      ctx.fillStyle='#302016';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`800 ${variant==='card'?44:34}px ${font}`;
-      if(ctx.measureText(seal).width>168)ctx.font=`800 ${variant==='card'?38:30}px ${font}`;
-      ctx.fillText(seal,192,layout.statsY,168);
+      // Identity never changes when a card enters the court. Status has its
+      // own engraved pictogram, and the inspector carries the complete rules.
+      const seal=def.faction.toUpperCase();
+      ctx.fillStyle='#302016';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`800 38px ${font}`;
+      if(ctx.measureText(seal).width>168)ctx.font=`800 34px ${font}`;
+      ctx.fillText(seal,192,layout.statsY);
     }else if(variant!=='queued'){
       ctx.font=`750 29px ${font}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#70502b';ctx.fillText(isInstantSpell(def)?(locale==='ru'?'МГНОВЕННО':'INSTANT'):(locale==='ru'?'УКАЗ':'EDICT'),192,layout.statsY,270);
     }

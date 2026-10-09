@@ -15,6 +15,7 @@ import {Texture} from '@babylonjs/core/Materials/Textures/texture';
 import {ArenaAim3D} from './ArenaAim3D';
 import {ArenaDeploymentEffects} from './ArenaDeploymentEffects';
 import {deploymentDrop,deploymentContact} from './deploymentMotion';
+import {deploymentReframe} from './deploymentReframe';
 import {targetingEdge,targetingInsets} from './targetingGeometry';
 import {readinessInk} from './arenaMarks';
 import {ArenaTextures,type Face} from './ArenaTextures';
@@ -55,7 +56,7 @@ export function ArenaAimPreview(){
   const rimTexture=readinessInk(scene,false),rimMaterial=ink('ready frame light',rimTexture),rim=MeshBuilder.CreatePlane('ready frame',{width:bounds.width*1.075,height:bounds.height*1.055},scene);rim.parent=sourceRoot;rim.position.z=.12;rim.material=rimMaterial;rim.isPickable=false;rimMaterial.alpha=.85;
   let arrival=0,dropping=false,activeId='gps-gladiator',heavy=false,duration=620,contacted=false,debugAt=0;
   const flightOrigin=new Vector3(-.9,-7,-2.5);
-  drop.current=id=>{if(!CARDS[id])return;activeId=id;heavy=CARDS[id].cost>=6||CARDS[id].rarity==='legendary';duration=heavy?1000:620;arrival=0;dropping=true;contacted=false;fx.hide();contacts.clear();rim.setEnabled(false);source.scaling.x=backing.scaling.x=CARD_FACE.ratio/BATTLE_FACE.ratio;face.update({kind:'card',cardId:id});sourceRoot.getChildMeshes().forEach(m=>m.renderingGroupId=2);};
+  drop.current=id=>{if(!CARDS[id])return;activeId=id;heavy=CARDS[id].cost>=6||CARDS[id].rarity==='legendary';duration=heavy?1000:620;arrival=0;dropping=true;contacted=false;fx.hide();contacts.clear();rim.setEnabled(false);source.scaling.set(1,CARD_FACE.height/BATTLE_FACE.height,1);backing.scaling.copyFrom(source.scaling);face.update({kind:'card',cardId:id});sourceRoot.getChildMeshes().forEach(m=>m.renderingGroupId=2);};
   apply.current=()=>{
     if(dropping)return;
     const {locked,oval,short}=state.current,at=short?new Vector3(-2.6,3.3,0):new Vector3(2.8,5.4,0);
@@ -64,7 +65,7 @@ export function ArenaAimPreview(){
     const insets=targetingInsets(Math.hypot(dx,dy)*50,sourceEdge,targetEdge);
     fx.update(sourceBase,at,locked,insets.sourceInset,insets.targetInset,insets.headLength);fx.lock(locked?at:undefined,oval?2.6:bounds.width,oval?2.6:bounds.height,oval);
   };
-  reset.current=()=>{dropping=false;contacts.clear();source.scaling.x=backing.scaling.x=1;sourceRoot.position.copyFrom(sourceBase);sourceRoot.rotation.setAll(0);sourceRoot.scaling.setAll(1);sourceRoot.getChildMeshes().forEach(m=>m.renderingGroupId=0);rim.setEnabled(true);face.update(fighterFace('gps-gladiator',true));apply.current();};
+  reset.current=()=>{dropping=false;contacts.clear();source.scaling.setAll(1);backing.scaling.setAll(1);sourceRoot.position.copyFrom(sourceBase);sourceRoot.rotation.setAll(0);sourceRoot.scaling.setAll(1);sourceRoot.getChildMeshes().forEach(m=>m.renderingGroupId=0);rim.setEnabled(true);face.update(fighterFace('gps-gladiator',true));apply.current();};
   const resize=()=>{if(disposed)return;engine.setHardwareScalingLevel(1/pixelRatio(element.clientWidth,element.clientHeight,window.devicePixelRatio,'auto'));engine.resize();const aspect=element.clientWidth/Math.max(1,element.clientHeight),h=10;camera.orthoTop=h;camera.orthoBottom=-h;camera.orthoLeft=-h*aspect;camera.orthoRight=h*aspect;apply.current();};
   const observer=new ResizeObserver(resize);observer.observe(element);resize();let last=performance.now();
   engine.runRenderLoop(()=>{
@@ -75,9 +76,11 @@ export function ArenaAimPreview(){
       arrival+=dt;
       if(arrival<duration&&!state.current.still){
         const pose=deploymentDrop(arrival/duration,heavy);sourceRoot.position.copyFrom(Vector3.Lerp(flightOrigin,sourceBase,pose.travel));sourceRoot.position.z-=pose.lift;sourceRoot.scaling.setAll((.62+.38*pose.travel)*pose.scale);sourceRoot.rotation.set(pose.tiltX,pose.tiltY,-.10*(1-pose.travel));
-        contacts.flight(sourceRoot.position,{...bounds,width:bounds.width*source.scaling.x*sourceRoot.scaling.x,height:bounds.height*sourceRoot.scaling.y},sourceBase.z-sourceRoot.position.z);
+        const height=Math.round(deploymentReframe(arrival/duration).height/2)*2;
+        source.scaling.y=backing.scaling.y=height/BATTLE_FACE.height;face.update({kind:'card',cardId:activeId,reframeHeight:height});
+        contacts.flight(sourceRoot.position,{...bounds,width:bounds.width*sourceRoot.scaling.x,height:bounds.height*source.scaling.y*sourceRoot.scaling.y},sourceBase.z-sourceRoot.position.z);
       }else{
-        if(!contacted){contacted=true;source.scaling.x=backing.scaling.x=1;face.update(fighterFace(activeId,false));sourceRoot.getChildMeshes().forEach(m=>m.renderingGroupId=0);contacts.begin(activeId,sourceBase,bounds,state.current.still);}
+        if(!contacted){contacted=true;source.scaling.setAll(1);backing.scaling.setAll(1);face.update(fighterFace(activeId,false));sourceRoot.getChildMeshes().forEach(m=>m.renderingGroupId=0);contacts.begin(activeId,sourceBase,bounds,state.current.still);}
         const pose=deploymentContact(arrival-duration,heavy);sourceRoot.position.copyFrom(sourceBase);sourceRoot.position.z-=state.current.still?0:pose.lift;sourceRoot.scaling.setAll(1);sourceRoot.rotation.set(state.current.still?0:pose.tiltX,0,0);
         if(arrival>duration+700&&!state.current.freeze){dropping=false;contacts.clear();}
       }

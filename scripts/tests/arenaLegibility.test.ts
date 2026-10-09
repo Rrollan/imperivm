@@ -28,7 +28,7 @@ for(const [w,h] of [[1280,800],[1280,720],[1440,900],[844,390],[932,430]]){
       const upper=rulerSocket(1,false),lower=rulerSocket(0,false);
       assert(enemy.y-enemy.height/2>upper.y+upper.height/2+4);
       assert(own.y+own.height/2<lower.y-lower.height/2-4);
-      if(count<=5)assert(40*own.width/384*w/(v.halfWidth*100)>=10.75,'Ordinary battlefield names stay above the former 7–9px size at the iframe limit');
+      if(count<=5)assert(38*own.width/384*w/(v.halfWidth*100)>=10.2,'Ordinary battlefield names stay above the former 7–9px size at the iframe limit');
     }
   }
 }

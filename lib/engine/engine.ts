@@ -981,7 +981,7 @@ export function applyAction(state: GameState, action: Action): GameState {
           break;
         case 'heal-treasury':
           applyEffect(s, s.turn, { kind: 'heal-treasury', amount: 2 });
-          {const wounded=[...me.board].filter(m=>m.health<m.maxHealth).sort((a,b)=>(b.maxHealth-b.health)-(a.maxHealth-a.health))[0];if(wounded)wounded.health=Math.min(wounded.maxHealth,wounded.health+1);}
+          {const wounded=[...me.board].filter(m=>m.health<m.maxHealth).sort((a,b)=>(b.maxHealth-b.health)-(a.maxHealth-a.health))[0];if(wounded)wounded.health=Math.min(wounded.maxHealth,wounded.health+2);}
           break;
         case 'draw-burn':
           drawCards(s, s.turn, 1);

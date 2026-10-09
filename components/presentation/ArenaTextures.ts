@@ -13,7 +13,7 @@ import {drawRomanSymbol,type RomanSymbol} from './romanSymbols';
 import {TURN_INLAY_OUTLINE,PORTRAIT_TURN_INLAY_OUTLINE} from './boardSockets';
 
 export type Face =
-  | { kind: 'card'; cardId: string; playable?:boolean }
+  | { kind: 'card'; cardId: string; playable?:boolean; reframeHeight?:number }
   | { kind: 'minion'; minion: Minion; ready?: boolean;readiness?:FighterReadiness;compact?:boolean }
   | { kind: 'hero'; heroId: string; treasury: number; aspect?:number; framed?:boolean; model?: boolean }
   | { kind: 'power'; heroId: string; cost: number; available: boolean; aspect?: number; model?: boolean }
@@ -87,11 +87,11 @@ export class ArenaTextures {
       this.painting=draw;
       ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,size.width*scale,size.height*scale);
       // A flight may change between a tall hand face and a shorter court face.
-      const height=face.kind==='minion'?BATTLE_FACE.height:['card','queued'].includes(face.kind)?CARD_FACE.height:size.height;
+      const height=face.kind==='minion'?BATTLE_FACE.height:face.kind==='card'?face.reframeHeight??CARD_FACE.height:face.kind==='queued'?CARD_FACE.height:size.height;
       ctx.setTransform(scale,0,0,scale*size.height/height,0,0);
       ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
       if (face.kind === 'back') this.drawBack(ctx,size.height);
-      else if (face.kind === 'card') this.drawCard(ctx, face.cardId,face.playable);
+      else if (face.kind === 'card') this.drawCard(ctx, face.cardId,face.playable,face.reframeHeight);
       else if (face.kind === 'minion') face.compact?this.drawCompactMinion(ctx,face.minion,face.ready,face.readiness):this.drawMinion(ctx, face.minion, face.ready,face.readiness);
       else if (face.kind === 'hero') this.drawHero(ctx, face.heroId, face.treasury,face.aspect??1,face.framed);
       else if (face.kind === 'power') this.drawPower(ctx, face);
@@ -132,8 +132,8 @@ export class ArenaTextures {
     paintBadge(ctx,this.font,value,x,y,color,radius);
   }
 
-  private drawCard(ctx:CanvasRenderingContext2D,id:string,playable?:boolean){
-    paintCardFace(ctx,id,this.locale,this.font,this.image(cardArtPath(id)),playable,undefined,this.image(cardFramePath(CARDS[id].rarity)));
+  private drawCard(ctx:CanvasRenderingContext2D,id:string,playable?:boolean,reframeHeight?:number){
+    paintCardFace(ctx,id,this.locale,this.font,this.image(cardArtPath(id)),playable,undefined,this.image(cardFramePath(CARDS[id].rarity)),'card',reframeHeight);
   }
 
   private drawQueued(ctx:CanvasRenderingContext2D,face:Extract<Face,{kind:'queued'}>){

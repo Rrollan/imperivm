@@ -55,8 +55,24 @@ async function main(){
  let state=fixture('builder');
  // Same printed card, different missing health: the wounded target is explicit.
  state.players[0].board=[fighter('less','pixel-squire',{health:3}),fighter('most','pixel-squire',{health:1})];
- let b=power(state);assert.equal(b.after.players[0].board[1].health,2);assert.equal(b.after.players[0].treasury,30);
+ let b=power(state);assert.equal(b.after.players[0].board[1].health,3);assert.equal(b.after.players[0].treasury,30);
  assert.equal(videoCues(b)[0].anchor,'most','Fighter-only healing follows the fighter');
+ for(const seat of [0,1] as const){
+  const patch=fixture('builder',seat),me=patch.players[seat],foe=patch.players[seat===0?1:0];
+  me.treasury=29;
+  me.board=[fighter('first','pixel-squire',{health:2}),fighter('tie','pixel-squire',{health:2})];
+  foe.treasury=18;foe.board=[fighter('enemy','pixel-squire',{health:1})];
+  const applied=power(patch).after;
+  assert.deepEqual(applied.players[seat].board.map(m=>m.health),[4,2],'Heal 2, with deterministic formation ties');
+  assert.equal(applied.players[seat].treasury,30,'Treasury heal is capped');
+  assert.equal(applied.players[seat===0?1:0].treasury,foe.treasury,'Opponent treasury is untouched');
+  assert.deepEqual(applied.players[seat===0?1:0].board.map(m=>[m.uid,m.attack,m.health,m.maxHealth,m.canAttack,m.staked]),foe.board.map(m=>[m.uid,m.attack,m.health,m.maxHealth,m.canAttack,m.staked]),'Only the owner is healed');
+  assert.equal(applied.players[seat].gas,8,'Same two-order cost for either seat');
+  assert.equal(gameSnapshot(applied,seat,0).players[seat].board[0].health,4,'Online snapshot includes the same repair');
+  me.treasury=30;me.board=[fighter('cap','pixel-squire',{health:3})];
+  assert.equal(power(patch).after.players[seat].board[0].health,4,'No overhealing');
+  me.board[0].health=4;assert(!legalActions(patch).some(a=>a.type==='hero-power'),'Never offer a repair with nothing to heal');
+ }
  state=fixture('athena');assert(!legalActions(state).some(a=>a.type==='hero-power'));
  state.players[0].board=[fighter('first','pixel-squire',{health:1}),fighter('second','pixel-squire',{health:1,fresh:true})];
  b=power(state);assert.equal(b.after.players[0].board[0].maxHealth,5);assert.equal(b.after.players[0].board[1].maxHealth,4);

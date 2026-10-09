@@ -45,6 +45,7 @@ import {hapticContact} from '../../lib/haptics';
 import {arenaViewport} from './arenaViewport';
 import {readinessInk} from './arenaMarks';
 import {deploymentDrop,deploymentContact,isArrivalClip} from './deploymentMotion';
+import {deploymentReframe} from './deploymentReframe';
 
 export type ArenaTarget = { kind: 'hand' | 'minion' | 'hero' | 'power' | 'command' | 'gas' | 'block' | 'deck' | 'scroll' | 'queue'; uid: string; owner: 0 | 1; cardId?: string };
 export interface ArenaMetrics { meshes: number; triangles: number; drawCalls: number; renderScale: number; renderWidth: number; renderHeight: number; models: number; failedModels: number; frames: number; frameMedianMs: number; frameP95Ms: number; renderP95Ms: number; gpu: string; pending: string[] }
@@ -112,6 +113,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   let hovered: string | null = null, reportedHover: string | null = null, overlayOpen=false;
   let readyBefore=new Set<string>();const readinessPulses=new Map<string,number>();
   let activeBatch: PresentationBatch | null = null;
+  let restoreReframe:(()=>void)|null=null;
   let compact=false,yScale=1;
   const point=(x:number,y:number,z=0)=>new Vector3((x-800)/50,(500-y)*yScale/50,z);
   const row=(count:number,owner:number)=>fighterRow(count,owner,portrait,compact);
@@ -488,10 +490,10 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   function releaseArrival(){if(heldArrival){destroy(heldArrival);heldArrival=null;}}
   function releaseDraws(){drawFlights.forEach(f=>{if(f.temporary){entities.delete(f.entry.data.uid);destroy(f.entry);}else if(!f.entry.root.isDisposed()){f.entry.root.rotation.y=0;paint(f.entry,f.face);}});drawFlights=[];}
   function resetClock(){sandStream.setEnabled(false);}
-  function cancel() { scheduler.cancel(); releaseArrival(); releaseDraws();layoutMoves=[];effects.clear();projectiles.clear();abilities.clear();deployments.clear(); videoEffects.cancel(); activeBatch = null; released=null; entities.forEach(entry=>{entry.material.alpha=1;entry.backing.visibility=1;entry.hoverLift=0;entry.root.rotation.x=0;entry.root.rotation.y=0;}); resetClock(); clearPress(); if (shown) sync(shown); }
+  function cancel() { scheduler.cancel(); restoreReframe?.();restoreReframe=null;releaseArrival(); releaseDraws();layoutMoves=[];effects.clear();projectiles.clear();abilities.clear();deployments.clear(); videoEffects.cancel(); activeBatch = null; released=null; entities.forEach(entry=>{entry.material.alpha=1;entry.backing.visibility=1;entry.hoverLift=0;entry.root.rotation.x=0;entry.root.rotation.y=0;}); resetClock(); clearPress(); if (shown) sync(shown); }
 
   async function present(batch: PresentationBatch, impact: () => void) {
-    scheduler.cancel(); releaseArrival();releaseDraws();deployments.clear();layoutMoves=[]; activeBatch = batch; options.onHover(null); hovered = null; selected = null; highlights();
+    scheduler.cancel();restoreReframe?.();restoreReframe=null;releaseArrival();releaseDraws();deployments.clear();layoutMoves=[]; activeBatch = batch; options.onHover(null); hovered = null; selected = null; highlights();
     const command = entities.get('turn-command'); if (command) paint(command, { kind: 'command', state: 'busy', engraved: true, portrait,compact });
     const attack = batch.action.type === 'attack' ? batch.action : null;
     const attacker = attack ? entities.get(attack.attackerUid) : null;
@@ -534,10 +536,10 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       : point(boardRow.center+(addedIndex-(boardSize-1)/2)*boardRow.spacing,boardRow.y,-.15));
     const queuedCast=batch.action.type==='cast-spell'&&!immediate;
     const landingScale = moving ? new Vector3((queuedCast?QUEUED_CARD.width:boardRow.width)/(moving.width*50),(queuedCast?QUEUED_CARD.height:boardRow.height)/(moving.height*50),1) : Vector3.One();
-    // The tall hand card stays rigid during flight. At contact sync replaces it
-    // with the wider portrait crop, rather than stretching the illustration in air.
+    // Width converges uniformly. Shortening the artwork aperture below gives
+    // the arriving face exactly the court dimensions before the handoff.
     if(handUid&&moving&&CARDS[moving.data.cardId??'']?.type==='minion'){
-      const rigid=Math.min(landingScale.x,landingScale.y);landingScale.set(rigid,rigid,1);
+      const rigid=landingScale.x;landingScale.set(rigid,rigid,1);
     }
     const settling = handUid ? batch.after.players[owner].board.flatMap((m,index)=>{
       const entry=entities.get(m.uid); return entry ? [{entry,start:entry.root.position.clone(),target:point(boardRow.center+(index-(boardSize-1)/2)*boardRow.spacing,boardRow.y,-.15)}] : [];
@@ -547,6 +549,9 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const deadObjects = Array.from(entities.values()).filter(entry => deaths.has(entry.data.uid));
     const playedCard=handUid?CARDS[moving?.data.cardId??'']:undefined;
     const nativePlay=playedCard?.type==='minion',nativeDrop=nativePlay||!!added;
+    const reframeMeshes=nativePlay&&moving?[moving.face,moving.backing,moving.halo].map(mesh=>({mesh,y:mesh.scaling.y})):[];
+    let reframeHeight=CARD_FACE.height;
+    if(nativePlay&&moving){const entry=moving,original=entry.painted;restoreReframe=()=>{if(entry.root.isDisposed())return;reframeMeshes.forEach(({mesh,y})=>mesh.scaling.y=y);paint(entry,original);};}
     const arrivalCard=added?CARDS[added.cardId]:nativePlay?playedCard:undefined;
     const heavyDrop=!!arrivalCard&&(arrivalCard.cost>=6||arrivalCard.rarity==='legendary');
     const legendaryPlay=!!playedCard&&playedCard.type==='minion'&&(playedCard.cost>=6||playedCard.rarity==='legendary')&&!options.reducedMotion;
@@ -642,7 +647,12 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
             moving.root.scaling.copyFrom(Vector3.Lerp(originScale,landingScale,pose.travel).scale(pose.scale));
             moving.root.rotation.x=pose.tiltX;moving.root.rotation.y=pose.tiltY;moving.root.rotation.z=phase?0:startRotation*(1-pose.travel);
           }
-          deployments.flight(moving.root.position,{width:moving.width*moving.root.scaling.x,height:moving.height*moving.root.scaling.y,spacing:boardRow.spacing/50},Math.max(0,target.z-moving.root.position.z));
+          const height=deploymentReframe(publicPlay?Math.max(0,(time-.77)/.23):time,CARD_FACE.width*boardRow.height/boardRow.width).height;
+          // Quantise to two logical pixels to avoid redundant Retina uploads.
+          reframeHeight=Math.round(height/2)*2;
+          reframeMeshes.forEach(({mesh,y})=>mesh.scaling.y=y*reframeHeight/CARD_FACE.height);
+          paint(moving,{kind:'card',cardId:playedCard!.id,reframeHeight});
+          deployments.flight(moving.root.position,{width:moving.width*moving.root.scaling.x,height:moving.height*moving.root.scaling.y*reframeHeight/CARD_FACE.height,spacing:boardRow.spacing/50},Math.max(0,target.z-moving.root.position.z));
         }
       }
       if(handUid){const t=Math.min(1,progress/impactAt),ease=t*t*(3-2*t);settling.forEach(({entry,start,target})=>{if(!entry.root.isDisposed())entry.root.position.copyFrom(Vector3.Lerp(start,target,ease));});}
@@ -757,7 +767,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       impact();
     }, () => {
       if (activeBatch?.id !== batch.id) return;
-      releaseArrival();releaseDraws();if(landed&&!landed.root.isDisposed()){landed.material.alpha=1;landed.backing.visibility=1;}
+      restoreReframe?.();restoreReframe=null;releaseArrival();releaseDraws();if(landed&&!landed.root.isDisposed()){landed.material.alpha=1;landed.backing.visibility=1;}
       entities.forEach(entry=>{entry.material.alpha=1;entry.face.isPickable=entry.data.owner===0||entry.data.kind!=='hand';entry.root.rotation.y=0;entry.root.rotation.x=0;});
       activeBatch = null; sync(batch.after);
       effects.clear();projectiles.clear();abilities.clear();

@@ -26,7 +26,7 @@ export const HEROES: Record<string, HeroDef> = {
     title: 'The Shipwright',
     powerName: 'Deploy Patch',
     powerText:
-      'Restore 2 to your treasury and 1 to your most wounded fighter. Ship fixes, not excuses.',
+      'Restore 2 to your treasury and 2 to your most wounded fighter. Ship fixes, not excuses.',
     powerCost: 2,
     power: 'heal-treasury',
   },
