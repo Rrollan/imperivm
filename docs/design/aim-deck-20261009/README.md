@@ -1,5 +1,7 @@
 # Aim, contact effects and deck workshop — 9 October 2026
 
+The laurel markers and arrival overlays below are superseded by [native aiming and arrival](../native-arrival-20261009/README.md). The deck workshop work remains current; screenshots below preserve the earlier iteration.
+
 ## Implementation
 
 The shared AI/online Babylon renderer draws a raised quadratic Bezier ribbon with a bronze bevel and crimson enamel. The spearhead and open laurel crest were painted with built-in ImageGen, using the arena itself as a material reference. The shaft ends beneath the spearhead socket; short lanes shrink the head and overlapping faces hide the arrow. Card/ruler apertures keep the point outside the target face. Table coordinates are XY, with lift toward the camera along negative Z. All effect meshes are non-pickable.

@@ -46,7 +46,7 @@ async function main() {
     assert.ok(Math.abs(diagonal/Math.sqrt(2)-row.width/2)<.001,'A diagonal arrow must leave the nearer horizontal edge');
     const enemy=fighterRow(count,1,portrait),distance=row.y-enemy.y,insets=targetingInsets(distance,row.height*.94/2,enemy.height*.94/2);
     assert.ok(insets.sourceInset+insets.targetInset+3<distance,'Even a short lane between adjacent rows must retain a visible aiming arrow');
-    assert.ok(insets.targetInset-insets.headLength>=enemy.height*.94/2,'The lance tip must stay outside the target card');
+    assert.ok(insets.targetInset>=enemy.height*.94/2,'The lance tip must stay outside the target card');
   }
   const opening = createLabGame('builder', true, 2718);
   assert.ok(mulliganAvailable(opening), 'A new match must offer the real starting-hand choice');

@@ -43,6 +43,8 @@ import {combatStyle} from './combatStyle';
 import {ArenaAttackEffects} from './ArenaAttackEffects';
 import {hapticContact} from '../../lib/haptics';
 import {arenaViewport} from './arenaViewport';
+import {readinessInk} from './arenaMarks';
+import {deploymentDrop,deploymentContact,isArrivalClip} from './deploymentMotion';
 
 export type ArenaTarget = { kind: 'hand' | 'minion' | 'hero' | 'power' | 'command' | 'gas' | 'block' | 'deck' | 'scroll' | 'queue'; uid: string; owner: 0 | 1; cardId?: string };
 export interface ArenaMetrics { meshes: number; triangles: number; drawCalls: number; renderScale: number; renderWidth: number; renderHeight: number; models: number; failedModels: number; frames: number; frameMedianMs: number; frameP95Ms: number; renderP95Ms: number; gpu: string; pending: string[] }
@@ -138,8 +140,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   const abilities = new ArenaAbilityEffects(scene,request);
   const deployments=new ArenaDeploymentEffects(scene,request);
   const videoEffects = new ArenaSpriteEffects(scene,request);
-  // Warm every small combat atlas during loading, before its first contact.
-  if(!options.reducedMotion)videoEffects.prepare(VIDEO_IDS.filter(id=>id!=='06-victory'&&!['33-poseidon-apparition','34-hephaestus-apparition','35-dionysus-apparition'].includes(id)).map(id=>({id,anchor:'arena-center',width:4})));
+  // Arrival is native geometry. Only attacks/spells warm authored atlases.
+  if(!options.reducedMotion)videoEffects.prepare(VIDEO_IDS.filter(id=>id!=='06-victory'&&!isArrivalClip(id)).map(id=>({id,anchor:'arena-center',width:4})));
 
   function material(name: string, color: string, specular = .2) {
     const known = materials.get(name); if (known) return known;
@@ -147,8 +149,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     materials.set(name, mat); return mat;
   }
   const bronze = material('aged-bronze', '#87633a', .3);
-  const cardMarker=new Texture('/ui/arena-lab/native/aim-v2/laurel.webp',scene,false,true,Texture.TRILINEAR_SAMPLINGMODE,request,request);cardMarker.hasAlpha=true;
-  const ovalMarker=cardMarker;
+  const cardMarker=readinessInk(scene,false),ovalMarker=readinessInk(scene,true);
   const board = MeshBuilder.CreatePlane('painted Roman arena', { width: 32, height: 20 }, scene);
   board.position.z = 1.7; board.isPickable = false;
   const boardMaterial = material('painted arena surface', '#ffffff', 0);
@@ -210,10 +211,9 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const texture = textures.make(`${keyId}-ink`, face);
     const mat = new StandardMaterial(`${keyId}-material`, scene); mat.diffuseTexture = texture.texture; mat.emissiveTexture = texture.texture; mat.emissiveColor = Color3.White(); mat.diffuseColor = Color3.Black(); mat.disableLighting = true; mat.specularColor = Color3.Black(); mat.useAlphaFromDiffuseTexture = true;
     faceMesh.parent = root; faceMesh.position.z = -.01; faceMesh.material = mat; faceMesh.metadata = data;
-    const halo = MeshBuilder.CreatePlane(`${keyId}-engraved-marker`,{width:width*1.4,height:height*1.16},scene);
+    const halo = MeshBuilder.CreatePlane(`${keyId}-ready-rim`,{width:width*1.075,height:height*1.055},scene);
     const haloMat = new StandardMaterial(`${keyId}-halo-material`, scene); haloMat.diffuseColor = Color3.Black(); haloMat.emissiveColor = Color3.FromHexString('#160d04'); haloMat.alpha = oval ? .9 : .22; haloMat.disableLighting = true;
-    // Full-colour carved laurel is behind the card face; only the relief edges
-    // remain visible. It shares the bronze palette of the board.
+    // Light follows the existing physical rim, without adding an ornament.
     haloMat.diffuseTexture=oval?ovalMarker:cardMarker;haloMat.emissiveTexture=haloMat.diffuseTexture;haloMat.useAlphaFromDiffuseTexture=true;
     halo.parent = root; halo.position.z = .08; halo.material = haloMat; halo.isPickable = false; halo.setEnabled(false);
     if(data.kind==='minion'||data.kind==='hero'||data.kind==='power')effects.addReadyGlow(halo);
@@ -228,17 +228,15 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
 
   function highlights() {
     const legal = shown ? (shown as GameState & {presentationActions?:Action[]}).presentationActions??legalActions(shown) : [];
-    const targets = legal.filter(a => a.type === 'attack' && a.attackerUid === selected).map(a => a.type === 'attack' ? a.target : '');
     const readyNow=new Set<string>();entities.forEach(entry => {
       const ready = shown?.turn === 0 && legal.some(a => a.type === 'attack' && a.attackerUid === entry.data.uid);
       const powerReady = entry.data.kind === 'power' && shown?.turn === 0 && legal.some(a=>a.type==='hero-power');
-      const target = entry.data.owner === 1 && targets.includes(entry.data.kind === 'hero' ? 'hero' : entry.data.uid);
       const active = selected === entry.data.uid;
       if((ready||powerReady)&&!activeBatch){readyNow.add(entry.data.uid);if(!readyBefore.has(entry.data.uid))readinessPulses.set(entry.data.uid,performance.now());}
-      entry.halo.setEnabled(!activeBatch && (ready || powerReady || target || active));
-      const color = target ? '#381309' : active ? '#4b2a0b' : '#160d04';
+      entry.halo.setEnabled(!activeBatch && (ready || powerReady || active));
+      const color = active ? '#fff4cf' : '#e6bd78';
       entry.haloMaterial.emissiveColor = Color3.FromHexString(color);
-      entry.haloMaterial.alpha = target ? .48 : active ? 1 : .95;
+      entry.haloMaterial.alpha = active ? 1 : .85;
       entry.hoverTarget=!overlayOpen&&!activeBatch&&entry.data.kind==='hand'&&entry.data.owner===0&&hovered===entry.data.uid?1:0;
     });
     readyBefore=readyNow;
@@ -470,7 +468,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     });
     effects.flush();
     effects.tickAim(delta,options.reducedMotion);
-    let readinessMoving=false;readinessPulses.forEach((started,uid)=>{const entry=entities.get(uid),t=(time-started)/700;if(!entry||t>=1||options.reducedMotion||activeBatch){readinessPulses.delete(uid);return;}if(!readyBefore.has(uid)||selected===uid)return;readinessMoving=true;entry.haloMaterial.alpha=.85+.15*Math.sin(t*Math.PI);entry.haloMaterial.emissiveColor=Color3.FromHexString('#332008').scale(Math.sin(t*Math.PI)*.5);});
+    let readinessMoving=false;readinessPulses.forEach((started,uid)=>{const entry=entities.get(uid),t=(time-started)/700;if(!entry||t>=1||options.reducedMotion||activeBatch){readinessPulses.delete(uid);return;}if(!readyBefore.has(uid)||selected===uid)return;readinessMoving=true;entry.haloMaterial.alpha=.85+.15*Math.sin(t*Math.PI);entry.haloMaterial.emissiveColor=Color3.FromHexString('#e6bd78').scale(1+Math.sin(t*Math.PI)*.15);});
     scene.render();
     if(options.measure){frameSamples.push(rawDelta);renderSamples.push(performance.now()-time);if(frameSamples.length>300){frameSamples.shift();renderSamples.shift();}}
     if(options.measure&&time>=nextMetricAt){nextMetricAt=time+1000;reportMetrics();}
@@ -493,7 +491,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   function cancel() { scheduler.cancel(); releaseArrival(); releaseDraws();layoutMoves=[];effects.clear();projectiles.clear();abilities.clear();deployments.clear(); videoEffects.cancel(); activeBatch = null; released=null; entities.forEach(entry=>{entry.material.alpha=1;entry.backing.visibility=1;entry.hoverLift=0;entry.root.rotation.x=0;entry.root.rotation.y=0;}); resetClock(); clearPress(); if (shown) sync(shown); }
 
   async function present(batch: PresentationBatch, impact: () => void) {
-    scheduler.cancel(); releaseArrival();releaseDraws();layoutMoves=[]; activeBatch = batch; options.onHover(null); hovered = null; selected = null; highlights();
+    scheduler.cancel(); releaseArrival();releaseDraws();deployments.clear();layoutMoves=[]; activeBatch = batch; options.onHover(null); hovered = null; selected = null; highlights();
     const command = entities.get('turn-command'); if (command) paint(command, { kind: 'command', state: 'busy', engraved: true, portrait,compact });
     const attack = batch.action.type === 'attack' ? batch.action : null;
     const attacker = attack ? entities.get(attack.attackerUid) : null;
@@ -543,6 +541,9 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const deaths = new Set(batch.events?.deaths?.map(dead => dead.uid) ?? []);
     const deadObjects = Array.from(entities.values()).filter(entry => deaths.has(entry.data.uid));
     const playedCard=handUid?CARDS[moving?.data.cardId??'']:undefined;
+    const nativePlay=playedCard?.type==='minion',nativeDrop=nativePlay||!!added;
+    const arrivalCard=added?CARDS[added.cardId]:nativePlay?playedCard:undefined;
+    const heavyDrop=!!arrivalCard&&(arrivalCard.cost>=6||arrivalCard.rarity==='legendary');
     const legendaryPlay=!!playedCard&&playedCard.type==='minion'&&(playedCard.cost>=6||playedCard.rarity==='legendary')&&!options.reducedMotion;
     const publicPlay=handUid!==null&&(owner===1||legendaryPlay)&&!options.reducedMotion;
     const revealAt=legendaryPlay?point(800,475,-7):point(portrait?1070:1205,325,-6),revealSize=legendaryPlay?1.95:portrait?1.85:1.65,revealScale=new Vector3(revealSize,revealSize,1);
@@ -571,7 +572,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const impactAt=contactMs/duration;
     if(batch.after.winner!==null)videoEffects.cancel();
     // Victory belongs inside the result dialog; ordinary accents belong on battle pieces.
-    const cues=videoCues(batch).filter(cue=>cue.id!=='06-victory');
+    const cues=videoCues(batch).filter(cue=>cue.id!=='06-victory'&&!isArrivalClip(cue.id));
     const spriteContacts=new Set<string>();
     if(!options.reducedMotion)videoEffects.prepare(cues);
     const locate=(uid:string)=>{
@@ -627,15 +628,31 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
           if(handUid){moving.root.scaling.copyFrom(Vector3.Lerp(startScale,landingScale,eased));moving.root.rotation.z=startRotation*(1-eased);moving.root.rotation.x=0;moving.root.rotation.y=0;}
           else moving.root.scaling.setAll(options.reducedMotion?1:1 + Math.sin(progress * Math.PI) * .04);
         }
+        if(nativePlay&&progress<impactAt&&!options.reducedMotion){
+          const time=Math.min(1,progress/impactAt),phase=publicPlay?publicPlayPhase(time):null;
+          if(!phase||phase.landing>0){
+            const pose=deploymentDrop(phase?Math.max(0,(time-.77)/.23):time,heavyDrop);
+            const origin=phase?revealAt:start,originScale=phase?revealScale:startScale;
+            moving.root.position.copyFrom(Vector3.Lerp(origin,target,pose.travel));moving.root.position.z-=pose.lift;
+            moving.root.scaling.copyFrom(Vector3.Lerp(originScale,landingScale,pose.travel).scale(pose.scale));
+            moving.root.rotation.x=pose.tiltX;moving.root.rotation.y=pose.tiltY;moving.root.rotation.z=phase?0:startRotation*(1-pose.travel);
+          }
+          deployments.flight(moving.root.position,{width:moving.width*moving.root.scaling.x,height:moving.height*moving.root.scaling.y,spacing:boardRow.spacing/50},Math.max(0,target.z-moving.root.position.z));
+        }
       }
       if(handUid){const t=Math.min(1,progress/impactAt),ease=t*t*(3-2*t);settling.forEach(({entry,start,target})=>{if(!entry.root.isDisposed())entry.root.position.copyFrom(Vector3.Lerp(start,target,ease));});}
       if(landed&&!landed.root.isDisposed()){
         const elapsedContact=(progress-impactAt)*duration;
-        const fade=options.reducedMotion?1:smooth(elapsedContact/Math.min(110,MOTION.arrivalFadeMs));
-        landed.material.alpha=fade;landed.backing.visibility=fade;
-        if(heldArrival){heldArrival.material.alpha=1-fade;heldArrival.backing.visibility=1-fade;if(fade===1)releaseArrival();}
-        const size=.98+.02*fade,pulse=options.reducedMotion?0:Math.exp(-elapsedContact/85)*Math.sin(elapsedContact/38)*.025;
-        landed.root.scaling.set(size*(1+pulse),size*(1-pulse),size);
+        if(nativeDrop){
+          const pose=deploymentContact(elapsedContact,heavyDrop);
+          landed.material.alpha=1;landed.backing.visibility=1;landed.root.scaling.setAll(1);
+          landed.root.position.z=landed.base.z-(options.reducedMotion?0:pose.lift);landed.root.rotation.x=options.reducedMotion?0:pose.tiltX;
+        }else{
+          const fade=options.reducedMotion?1:smooth(elapsedContact/MOTION.arrivalFadeMs);
+          landed.material.alpha=fade;landed.backing.visibility=fade;
+          if(heldArrival){heldArrival.material.alpha=1-fade;heldArrival.backing.visibility=1-fade;if(fade===1)releaseArrival();}
+          landed.root.scaling.setAll(.98+.02*fade);
+        }
       }
       drawFlights.forEach(f=>{
         const elapsed=(progress-impactAt)*duration-(timeline?.tailMs??0)-f.delay;
@@ -688,7 +705,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       if (activeBatch?.id !== batch.id) return;
       hapticContact(batch.action.type);
       videoEffects.trigger(timeline?cues.filter(c=>!c.wave):cues,locateSprite,options.reducedMotion,undefined,cueBounds);
-      if(batch.events?.play||added)deployments.begin(batch.events?.play?.cardId??added!.cardId,target,{width:boardRow.width/50,height:boardRow.height/50,spacing:boardRow.spacing/50},options.reducedMotion,added?()=>entities.get(added.uid)?.root.position:undefined);
+      if(added){const socket=point(boardRow.center+(addedIndex-(boardSize-1)/2)*boardRow.spacing,boardRow.y,-.15);deployments.begin(added.cardId,socket,{width:boardRow.width/50,height:boardRow.height/50,spacing:boardRow.spacing/50},options.reducedMotion,()=>entities.get(added.uid)?.root.position);}
+      else deployments.clear();
       if(handUid){
         // Replace the arriving card with its battlefield/queue form at the same position,
         // at contact rather than after a return to the hand or a blank frame.
@@ -697,12 +715,12 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         sync(batch.after);
         deadObjects.forEach(entry=>entities.set(entry.data.uid,entry));
         landed=added?entities.get(added.uid):!immediate&&pending.length?entities.get(`queued-${pending[pending.length-1].uid}`):undefined;
-        if(landed&&!options.reducedMotion){landed.material.alpha=0;landed.backing.visibility=0;}else releaseArrival();
+        if(landed&&!options.reducedMotion&&!nativeDrop){landed.material.alpha=0;landed.backing.visibility=0;}else releaseArrival();
       }else if(drawn.length||resolving.length||added){
         // Retain doomed pieces until their death phase, while real hand/queue changes commit.
         const retained=[...deadObjects,...(timeline?resolving.map(r=>r.entry):[])];
         retained.forEach(entry=>entities.delete(entry.data.uid));sync(batch.after);retained.forEach(entry=>entities.set(entry.data.uid,entry));
-        if(added){landed=entities.get(added.uid);if(landed&&!options.reducedMotion){landed.material.alpha=0;landed.backing.visibility=0;}}
+        if(added){landed=entities.get(added.uid);if(landed&&!options.reducedMotion&&!nativeDrop){landed.material.alpha=0;landed.backing.visibility=0;}}
       }
       drawn.forEach((c,i)=>{
         let entry=c.owner===0?entities.get(c.uid):c.index<8?entities.get(`back-${c.index}`):undefined;
