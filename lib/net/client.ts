@@ -4,7 +4,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {normalizeRoomCode, validRoomCode} from './roomCode';
 import type {ClientMessage, GameIntent, NetSnapshot, PlayerRegistration, ServerMessage} from './protocol';
 
-export type NetStatus = 'idle' | 'connecting' | 'waiting' | 'playing' | 'reconnecting' | 'finished' | 'error';
+export type NetStatus = 'idle' | 'connecting' | 'queued' | 'waiting' | 'playing' | 'reconnecting' | 'finished' | 'error';
 interface SavedSeat extends Omit<PlayerRegistration, 'collectionAuth'> {roomCode: string; resumeToken: string}
 const SESSION_KEY = 'imperivm.net-game.v1';
 const HEARTBEAT_MS = 10_000;
@@ -30,6 +30,7 @@ function readMessage(data: unknown): ServerMessage | null {
   try {value = JSON.parse(data);} catch {return null;}
   if (!record(value)) return null;
   switch (value.type) {
+    case 'queued': return [value.enteredAt, value.expiresAt, value.serverTime].every(n => typeof n === 'number' && Number.isSafeInteger(n)) && (value.expiresAt as number) > (value.enteredAt as number) ? {type: 'queued', enteredAt: value.enteredAt as number, expiresAt: value.expiresAt as number, serverTime: value.serverTime as number} : null;
     case 'state': return isSnapshot(value.snapshot) ? {type: 'state', snapshot: value.snapshot} : null;
     case 'joined': return (value.you === 'p1' || value.you === 'p2') && typeof value.roomCode === 'string' && validRoomCode(value.roomCode) && typeof value.resumeToken === 'string' && record(value.opponent) && typeof value.opponent.name === 'string' ? {type: 'joined', you: value.you, roomCode: value.roomCode, resumeToken: value.resumeToken, opponent: {name: value.opponent.name}} : null;
     case 'error': return typeof value.reason === 'string' && typeof value.code === 'string' ? {type: 'error', reason: value.reason, code: value.code, fatal: value.fatal === true} : null;
@@ -53,6 +54,7 @@ export function useNetGame({roomCode: initialRoomCode}: {roomCode?: string} = {}
   const [status, setStatus] = useState<NetStatus>('idle'), [snapshot, setSnapshot] = useState<NetSnapshot | null>(null);
   const [error, setError] = useState(''), [pending, setPending] = useState(false), [connected, setConnected] = useState(false);
   const [identity, setIdentity] = useState<SavedSeat | null>(null), [timeOffset, setTimeOffset] = useState(0);
+  const [queue, setQueue] = useState<{enteredAt: number; expiresAt: number} | null>(null);
   const socket = useRef<WebSocket | null>(null), seat = useRef<SavedSeat | null>(null), current = useRef<NetSnapshot | null>(null);
   const activeRegistration = useRef<PlayerRegistration | null>(null), enabled = useRef(false), attempt = useRef(0), generation = useRef(0);
   const requestPending = useRef(false);
@@ -92,7 +94,9 @@ export function useNetGame({roomCode: initialRoomCode}: {roomCode?: string} = {}
       lastInbound = Date.now(); const incoming = readMessage(event.data);
       if (!incoming) {setError('Сервер прислал неподдерживаемое сообщение.'); return;}
       switch (incoming.type) {
+        case 'queued': setQueue({enteredAt: incoming.enteredAt, expiresAt: incoming.expiresAt}); setTimeOffset(incoming.serverTime - Date.now()); setConnected(true); setStatus('queued'); clearRequest(); break;
         case 'joined': {
+          setQueue(null);
           const details = activeRegistration.current;
           if (!details) return;
           const value: SavedSeat = {playerName: details.playerName, heroId: details.heroId, deckList: [...details.deckList], roomCode: incoming.roomCode, resumeToken: incoming.resumeToken};
@@ -104,7 +108,7 @@ export function useNetGame({roomCode: initialRoomCode}: {roomCode?: string} = {}
           setConnected(true); setStatus(incoming.snapshot.status); setError(''); clearRequest(); break;
         case 'error':
           setError(incoming.reason); clearRequest();
-          if (incoming.fatal) {enabled.current = false; seat.current = null; current.current = null; setSnapshot(null); setIdentity(null); saveSeat(null); setStatus('error'); setConnected(false); ws.close();}
+          if (incoming.fatal) {enabled.current = false; seat.current = null; current.current = null; setQueue(null); setSnapshot(null); setIdentity(null); saveSeat(null); setStatus('error'); setConnected(false); ws.close();}
           else if (!current.current) setStatus('error');
           break;
         case 'gameOver': setStatus('finished'); clearRequest(); break;
@@ -125,7 +129,7 @@ export function useNetGame({roomCode: initialRoomCode}: {roomCode?: string} = {}
       if (!enabled.current) return;
       // Creation is not safe to replay: the response may have been lost after allocation.
       const saved = seat.current;
-      if (!saved && message.type === 'create') {enabled.current = false; setStatus('error'); setError('Соединение оборвалось до получения кода. Создайте комнату заново.'); return;}
+      if (!saved && (message.type === 'create' || message.type === 'queue')) {enabled.current = false; setQueue(null); setStatus('error'); setError(message.type === 'queue' ? 'Связь прервалась во время поиска. Начните поиск снова.' : 'Соединение оборвалось до получения кода. Создайте комнату заново.'); return;}
       const retry: ClientMessage = saved ? {type: 'join', ...saved} : message;
       setStatus('reconnecting'); const delay = Math.min(15_000, 800 * 2 ** Math.min(attempt.current++, 5)) + Math.floor(Math.random() * 350);
       retryTimer.current = setTimeout(() => connectRef.current(retry, true), delay);
@@ -156,15 +160,16 @@ export function useNetGame({roomCode: initialRoomCode}: {roomCode?: string} = {}
     window.addEventListener('online', restore); window.addEventListener('offline', offline); document.addEventListener('visibilitychange', visible);
     return () => {window.removeEventListener('online', restore); window.removeEventListener('offline', offline); document.removeEventListener('visibilitychange', visible);};
   }, [clearRequest]);
-  const begin = useCallback((details: PlayerRegistration, code?: string) => {
-    stop(); seat.current = null; current.current = null; setSnapshot(null); setIdentity(null); saveSeat(null); attempt.current = 0;
+  const begin = useCallback((details: PlayerRegistration, code?: string, matchmaking = false) => {
+    stop(); seat.current = null; current.current = null; setQueue(null); setSnapshot(null); setIdentity(null); saveSeat(null); attempt.current = 0;
     const cleaned = {...details, playerName: details.playerName.trim(), deckList: [...details.deckList]}; activeRegistration.current = cleaned;
     if (!cleaned.playerName || cleaned.playerName.length > 32 || (code !== undefined && !validRoomCode(code))) {setStatus('error'); setError('Укажите имя до 32 символов и код комнаты из 6 символов.'); return;}
     enabled.current = true; setPending(true);
-    connect(code === undefined ? {type: 'create', ...cleaned} : {type: 'join', ...cleaned, roomCode: normalizeRoomCode(code)}, false);
+    connect(matchmaking ? {type: 'queue', ...cleaned} : code === undefined ? {type: 'create', ...cleaned} : {type: 'join', ...cleaned, roomCode: normalizeRoomCode(code)}, false);
   }, [connect, stop]);
   const create = useCallback((details: PlayerRegistration) => begin(details), [begin]);
   const join = useCallback((code: string, details: PlayerRegistration) => begin(details, code), [begin]);
+  const findOpponent = useCallback((details: PlayerRegistration) => begin(details, undefined, true), [begin]);
   const sendIntent = useCallback(async (intent: GameIntent): Promise<void> => {
     const ws = socket.current, room = current.current;
     if (!ws || ws.readyState !== WebSocket.OPEN || !room || !connected || !navigator.onLine) {setError('Нет соединения. Дождитесь переподключения — ход не отправлен.'); return;}
@@ -180,7 +185,7 @@ export function useNetGame({roomCode: initialRoomCode}: {roomCode?: string} = {}
   }, [connect]);
   const leave = useCallback(async (): Promise<void> => {
     const ws = socket.current; if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({type: 'leave'} satisfies ClientMessage));
-    stop(); seat.current = null; current.current = null; activeRegistration.current = null; setIdentity(null); setSnapshot(null); setStatus('idle'); setError(''); saveSeat(null);
+    stop(); seat.current = null; current.current = null; activeRegistration.current = null; setQueue(null); setIdentity(null); setSnapshot(null); setStatus('idle'); setError(''); saveSeat(null);
   }, [stop]);
-  return {status, snapshot, error, pending, connected, identity, timeOffset, create, join, sendIntent, sync, leave};
+  return {status, snapshot, queue, error, pending, connected, identity, timeOffset, create, join, findOpponent, sendIntent, sync, leave};
 }

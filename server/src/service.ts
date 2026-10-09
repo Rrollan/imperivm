@@ -4,20 +4,36 @@ import {RoomAuthority} from './rooms';
 import {parseMessage, ProtocolError} from './validation';
 import {authorizeCollectionDeck} from '../../lib/collection/authority';
 import type {PlayerRegistration} from '../../lib/net/protocol';
+import {createImpBalanceReader, type ImpBalance} from './impBalance';
+import {validSolanaAddress} from '../../lib/solana/tokenBalance';
 
 export interface ServiceOptions {
   port?: number; host?: string; origins?: string[]; clock?: () => number;
   tickIntervalMs?: number; log?: (line: string) => void;
   maxMessagesPerWindow?: number;
   authorizeDeck?: (registration: PlayerRegistration) => Promise<void>;
+  readImpBalance?: (owner: string) => Promise<ImpBalance>;
 }
 export function startServer(options: ServiceOptions = {}) {
   const origins = new Set(options.origins ?? ['http://localhost:3101', 'http://127.0.0.1:3101', 'http://localhost:3000', 'http://127.0.0.1:3000']);
   const rooms = new RoomAuthority(options.clock, options.log);
-  const server = createServer((request, response) => {
+  const readImpBalance = options.readImpBalance ?? createImpBalanceReader();
+  const server = createServer(async (request, response) => {
     response.setHeader('Content-Type', 'application/json');
     response.setHeader('Cache-Control', 'no-store');
-    if (request.method === 'GET' && request.url === '/health') {response.end(JSON.stringify({status: 'ok', rooms: rooms.size})); return;}
+    if (request.method === 'GET' && request.url === '/health') {response.end(JSON.stringify({status: 'ok', rooms: rooms.size, queued: rooms.queued, capabilities: ['random-pvp', 'imp-balance'], version: process.env.RENDER_GIT_COMMIT?.slice(0, 12) ?? 'local'})); return;}
+    if (request.url?.startsWith('/wallet/imp')) {
+      const origin = request.headers.origin;
+      if (origin && !origins.has(origin)) {response.statusCode = 403; response.end(JSON.stringify({error: 'Origin not allowed'})); return;}
+      if (origin) {response.setHeader('Access-Control-Allow-Origin', origin); response.setHeader('Vary', 'Origin');}
+      const url = new URL(request.url, 'http://authority.local');
+      if (url.pathname !== '/wallet/imp' || request.method !== 'GET') {response.statusCode = 405; response.end(JSON.stringify({error: 'GET required'})); return;}
+      const owner = url.searchParams.get('owner');
+      if (!owner || !validSolanaAddress(owner) || [...url.searchParams.keys()].some(key => key !== 'owner') || url.searchParams.getAll('owner').length !== 1) {response.statusCode = 400; response.end(JSON.stringify({error: 'Invalid wallet address'})); return;}
+      try {response.end(JSON.stringify(await readImpBalance(owner)));}
+      catch {response.statusCode = 503; response.setHeader('Retry-After', '10'); response.end(JSON.stringify({error: 'Wallet balance temporarily unavailable'}));}
+      return;
+    }
     response.statusCode = 404; response.end(JSON.stringify({error: 'Not found'}));
   });
   const wss = new WebSocketServer({noServer: true, maxPayload: 16 * 1024, perMessageDeflate: false});
@@ -37,6 +53,7 @@ export function startServer(options: ServiceOptions = {}) {
     alive.set(socket, true);
     let windowStart = Date.now(), messages = 0;
     let registrationPending = false;
+    let registrationGeneration = 0;
     socket.on('pong', () => alive.set(socket, true));
     socket.on('message', async (data, binary) => {
       try {
@@ -46,12 +63,15 @@ export function startServer(options: ServiceOptions = {}) {
         if (binary) throw new ProtocolError('bad-message', 'Ожидается текстовый JSON.');
         const raw = data instanceof ArrayBuffer ? Buffer.from(data).toString('utf8') : Array.isArray(data) ? Buffer.concat(data).toString('utf8') : data.toString('utf8');
         const message = parseMessage(raw);
-        if ((message.type === 'create' || message.type === 'join') && !(message.type === 'join' && message.resumeToken)) {
+        if (message.type === 'leave') registrationGeneration++;
+        if ((message.type === 'create' || message.type === 'join' || message.type === 'queue') && !(message.type === 'join' && message.resumeToken)) {
           if (registrationPending || checkingCollections >= 32) throw new ProtocolError('collection-busy', 'Коллекция проверяется. Подождите несколько секунд.');
           registrationPending = true; checkingCollections++;
+          const generation = registrationGeneration;
           try {await (options.authorizeDeck ? options.authorizeDeck(message) : authorizeCollectionDeck(message.deckList, message.collectionAuth,fetch,message.heroId??'builder'));}
           catch {throw new ProtocolError('collection-access', 'Не удалось подтвердить карты колоды или правителя в iDos. Войдите в iDos или выберите бесплатную колоду.');}
           finally {registrationPending = false; checkingCollections--;}
+          if (generation !== registrationGeneration) return;
         }
         if (socket.readyState === WebSocket.OPEN) rooms.handle(socket, message);
       } catch (error: unknown) {rooms.rejected(socket, error);}

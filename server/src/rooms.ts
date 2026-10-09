@@ -8,11 +8,12 @@ import {ProtocolError} from './validation';
 
 export const TURN_MS = 75_000;
 export const ROOM_TTL_MS = 30 * 60_000;
+export const QUEUE_TTL_MS = 5 * 60_000;
 interface Player {
   name: string; heroId: string; deck: string[]; token: string; socket: WebSocket | null;
 }
 interface Room {
-  code: string; players: [Player, Player | null]; game: GameState | null; revision: number;
+  code: string; mode: 'friend' | 'random'; players: [Player, Player | null]; game: GameState | null; revision: number;
   lastActivity: number; turnDeadline: number; reason: NetSnapshot['resultReason']; history: NetSnapshot['history'];
 }
 const digest = (value: string) => createHash('sha256').update(value).digest();
@@ -27,15 +28,17 @@ export function send(socket: WebSocket, message: ServerMessage): void {
 export class RoomAuthority {
   private rooms = new Map<string, Room>();
   private membership = new Map<WebSocket, Room>();
+  private queue = new Map<WebSocket, {player: Player; enteredAt: number}>();
   constructor(private clock: () => number = Date.now, private log: (line: string) => void = console.warn) {}
   get size(): number {return this.rooms.size;}
+  get queued(): number {return this.queue.size;}
   private error(code: string, reason: string, fatal = false): never {throw new ProtocolError(code, reason, fatal);}
   private makePlayer(data: PlayerRegistration, socket: WebSocket): Player {
     return {name: data.playerName, heroId: data.heroId ?? 'builder', deck: [...data.deckList], token: randomBytes(32).toString('base64url'), socket};
   }
   private view(room: Room, seat: PlayerId): NetSnapshot {
     const now = this.clock(), player = room.players[seat]!;
-    return {id: room.code, roomCode: room.code, mode: 'friend', seat, heroId: player.heroId,
+    return {id: room.code, roomCode: room.code, mode: room.mode, seat, heroId: player.heroId,
       revision: room.revision, status: !room.game ? 'waiting' : room.game.winner === null ? 'playing' : 'finished',
       names: [room.players[0].name, room.players[1]?.name ?? null], serverTime: now, turnDuration: 75,
       expiresAt: room.lastActivity + ROOM_TTL_MS, opponentPresent: room.players[(1 - seat) as PlayerId]?.socket?.readyState === WebSocket.OPEN,
@@ -67,7 +70,7 @@ export class RoomAuthority {
   private join(socket: WebSocket, message: JoinMessage): void {
     const room = this.rooms.get(message.roomCode);
     if (!room) return this.error('room-expired', 'Комната не найдена или закрыта. Создайте новую.', true);
-    const existing = room.players.find(player => player && sameName(player.name, message.playerName));
+    const existing = message.resumeToken ? room.players.find(player => player && timingSafeEqual(digest(player.token), digest(message.resumeToken!))) : room.players.find(player => player && sameName(player.name, message.playerName));
     if (message.resumeToken || existing) {
       if (!existing || !message.resumeToken || !timingSafeEqual(digest(existing.token), digest(message.resumeToken))) {
         return this.error('resume-denied', 'Место занято. Вернуться можно только из вкладки, где вы начали бой.', true);
@@ -88,17 +91,37 @@ export class RoomAuthority {
     }
     room.lastActivity = this.clock(); this.publish(room, true);
   }
+  private enqueue(socket: WebSocket, message: PlayerRegistration): void {
+    if (this.queue.size >= 500 || this.rooms.size >= 500) return this.error('capacity', 'Все столы заняты. Попробуйте позже.', true);
+    const available = this.queue.entries().next().value as [WebSocket, {player: Player; enteredAt: number}] | undefined;
+    if (!available) {
+      const enteredAt = this.clock();
+      this.queue.set(socket, {player: this.makePlayer(message, socket), enteredAt});
+      send(socket, {type: 'queued', enteredAt, expiresAt: enteredAt + QUEUE_TTL_MS, serverTime: this.clock()}); return;
+    }
+    const [opponentSocket, opponent] = available; this.queue.delete(opponentSocket);
+    let code: string; do {code = createRoomCode();} while (this.rooms.has(code));
+    const players: [Player, Player] = [opponent.player, this.makePlayer(message, socket)];
+    if (randomInt(2)) players.reverse();
+    const [a, b] = players;
+    const room: Room = {code, mode: 'random', players, game: createGame(a.heroId, a.deck, b.heroId, b.deck, {enableMulligan: true}, randomInt(0x7fffffff)), revision: 1,
+      lastActivity: this.clock(), turnDeadline: this.clock() + TURN_MS, reason: null, history: []};
+    this.rooms.set(code, room); players.forEach(player => this.membership.set(player.socket!, room));
+    this.remember(room, 'Соперник найден. Выберите стартовые карты.', 'Opponent found. Choose your opening cards.'); this.publish(room, true);
+  }
   handle(socket: WebSocket, message: ClientMessage): void {
     this.tick();
     if (message.type === 'ping') {send(socket, {type: 'pong', serverTime: this.clock()}); return;}
     if (message.type === 'leave') {this.disconnect(socket, true); return;}
-    if (message.type === 'create' || message.type === 'join') {
-      if (this.membership.has(socket)) return this.error('already-joined', 'Сначала выйдите из текущей комнаты.');
+    if (message.type === 'sync' && this.queue.has(socket)) {const entry = this.queue.get(socket)!; send(socket, {type: 'queued', enteredAt: entry.enteredAt, expiresAt: entry.enteredAt + QUEUE_TTL_MS, serverTime: this.clock()}); return;}
+    if (message.type === 'create' || message.type === 'join' || message.type === 'queue') {
+      if (this.membership.has(socket) || this.queue.has(socket)) return this.error('already-joined', 'Сначала отмените поиск или выйдите из комнаты.');
+      if (message.type === 'queue') {this.enqueue(socket, message); return;}
       if (message.type === 'join') {this.join(socket, message); return;}
       if (this.rooms.size >= 500) return this.error('capacity', 'Все столы заняты. Попробуйте позже.', true);
       let code: string;
       do {code = createRoomCode();} while (this.rooms.has(code));
-      const room: Room = {code, players: [this.makePlayer(message, socket), null], game: null, revision: 0,
+      const room: Room = {code, mode: 'friend', players: [this.makePlayer(message, socket), null], game: null, revision: 0,
         lastActivity: this.clock(), turnDeadline: 0, reason: null, history: []};
       this.rooms.set(code, room); this.membership.set(socket, room); this.publish(room, true); return;
     }
@@ -136,6 +159,7 @@ export class RoomAuthority {
     send(socket, {type: 'error', code: problem.code, reason: problem.message, ...(problem.fatal ? {fatal: true} : {})});
   }
   disconnect(socket: WebSocket, explicit = false): void {
+    this.queue.delete(socket);
     const room = this.membership.get(socket); this.membership.delete(socket);
     if (!room) return;
     const player = room.players.find(p => p?.socket === socket);
@@ -149,6 +173,12 @@ export class RoomAuthority {
   }
   tick(): void {
     const now = this.clock();
+    for (const [socket, entry] of this.queue) {
+      if (socket.readyState !== WebSocket.OPEN || now - entry.enteredAt >= QUEUE_TTL_MS) {
+        this.queue.delete(socket);
+        send(socket, {type: 'error', code: 'queue-expired', reason: 'За 5 минут соперник не нашёлся. Можно начать поиск снова.', fatal: true});
+      }
+    }
     for (const room of this.rooms.values()) {
       if (now - room.lastActivity >= ROOM_TTL_MS) {
         this.rooms.delete(room.code);

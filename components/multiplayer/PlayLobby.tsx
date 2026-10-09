@@ -23,6 +23,7 @@ const modeDefinitions = [
 ] as const;
 export function PlayLobby() {
   const params = useSearchParams();
+  if (params.get('mode') === 'random') return <CustomLobby random/>;
   if (process.env.NEXT_PUBLIC_IDOS_STATIC_BUILD === 'true' && (params.get('mode') === 'friend' || params.has('code') || params.has('room'))) return <CustomLobby/>;
   return !params.get('room') && (params.get('mode') === 'friend' || params.has('code')) ? <CustomLobby/> : <MatchmakingLobby/>;
 }

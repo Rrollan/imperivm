@@ -48,7 +48,7 @@ export function parseMessage(raw: string): ClientMessage {
   try {value = JSON.parse(raw) as unknown;} catch {fail('Ожидается JSON-сообщение.');}
   const data = object(value);
   switch (data.type) {
-    case 'create': return {type: 'create', ...registration(data)};
+    case 'create': case 'queue': return {type: data.type, ...registration(data)};
     case 'join': {
       const roomCode = normalizeRoomCode(string(data.roomCode, 16));
       if (!validRoomCode(roomCode)) fail('Код комнаты состоит из 6 букв и цифр.');

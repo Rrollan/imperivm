@@ -7,6 +7,7 @@ import type { SolanaSignMessageFeature, SolanaSignTransactionFeature } from '@so
 import { DEVNET_CHAIN, readDevnetBalance } from '../lib/solana/devnet';
 import { bytesToBase64, proofMessage, verifyPlaySignature, type PlayProof } from '../lib/solana/proof';
 import {playProofEnabled} from '../lib/solana/features';
+const walletChain = () => playProofEnabled() ? DEVNET_CHAIN : 'solana:mainnet';
 
 type Phantom = Omit<Wallet, 'features'> & { features: Wallet['features'] & StandardConnectFeature & StandardEventsFeature & Partial<StandardDisconnectFeature> & Partial<SolanaSignMessageFeature> & Partial<SolanaSignTransactionFeature> };
 type WalletState = {
@@ -42,7 +43,7 @@ export default function WalletContext({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (!wallet) return;
     return wallet.features['standard:events'].on('change', change => {
-      if (change.accounts) { const next = change.accounts.find(a => a.chains.includes(DEVNET_CHAIN)) ?? null; liveAccount.current = next; setAccount(next); setBalance(null); setError(null); }
+      if (change.accounts) { const next = change.accounts.find(a => a.chains.includes(walletChain())) ?? null; liveAccount.current = next; setAccount(next); setBalance(null); setError(null); }
     });
   }, [wallet]);
   const owner = account?.address ?? null;
@@ -62,8 +63,8 @@ export default function WalletContext({ children }: { children: React.ReactNode 
       const candidate = getWallets().get().find(w => w.name.toLowerCase() === 'phantom' && 'standard:connect' in w.features && 'standard:events' in w.features) as Phantom | undefined;
       if (!candidate) throw new Error('Install Phantom to connect. Demo play is always available.');
       const result = await candidate.features['standard:connect'].connect();
-      const selected = result.accounts.find(a => a.chains.includes(DEVNET_CHAIN));
-      if (!selected) throw new Error('This wallet account does not support Solana devnet.');
+      const selected = result.accounts.find(a => a.chains.includes(walletChain()));
+      if (!selected) throw new Error('This wallet account does not support the required Solana network.');
       liveWallet.current = candidate; liveAccount.current = selected; setWallet(candidate); setAccount(selected);
       return selected.address;
     } catch (e) { setError(e instanceof Error ? e.message : 'Connection declined. Continue in demo mode.'); return null; }
@@ -108,6 +109,7 @@ export default function WalletContext({ children }: { children: React.ReactNode 
     const selected = liveAccount.current;
     const feature = wallet?.features['solana:signTransaction'];
     if (!selected || selected.address !== expectedOwner || !feature) throw new Error('Connect the same Phantom account to approve this devnet transaction.');
+    if (!selected.chains.includes(DEVNET_CHAIN)) throw new Error('This account does not support Solana devnet.');
     if (lock.current) throw new Error('A wallet request is already open.');
     if (!feature.supportedTransactionVersions.includes(0)) throw new Error('This wallet does not support v0 transactions.');
     lock.current = true; setBusy(true);

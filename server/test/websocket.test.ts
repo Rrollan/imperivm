@@ -474,3 +474,45 @@ test('premium decks require backend ownership; free decks and frozen paid-seat r
   await resumed.next('joined');const after = await resumed.state(value => value.status === 'playing');
   assert.equal(after.revision, before.revision);assert.equal(lookups, 1);assert.deepEqual(after.game, before.game);
 });
+
+test('random queue pairs real sockets, preserves private hands and supports same-name reconnect', async t => {
+  const service = await launch({port: 0, host: '127.0.0.1', origins: [ORIGIN]}); t.after(() => service.close());
+  const url = `ws://127.0.0.1:${portOf(service)}`;
+  const first = new Peer(url), second = new Peer(url);
+  await Promise.all([first.open(), second.open()]);
+  first.send({type: 'queue', ...registration('Marcus')});
+  const queued = await first.next('queued'); assert.equal(queued.expiresAt - queued.enteredAt, 300000);
+  second.send({type: 'queue', ...registration('Marcus', 'builder')});
+  const [a, b] = await Promise.all([first.next('joined'), second.next('joined')]);
+  assert.equal(a.roomCode, b.roomCode); assert.notEqual(a.resumeToken, b.resumeToken);
+  const [sa, sb] = await Promise.all([first.state(s => s.status === 'playing'), second.state(s => s.status === 'playing')]);
+  assert.equal(sa.mode, 'random'); assert.notEqual(sa.seat, sb.seat);
+  assert.equal(sa.game!.players[(1 - sa.seat) as 0 | 1].hand, undefined);
+  const wire = JSON.stringify(sa); assert.ok(!wire.includes(b.resumeToken)); assert.equal(service.rooms.queued, 0);
+  await first.close();
+  const restored = new Peer(url); await restored.open();
+  restored.send({type: 'join', ...registration('Marcus'), roomCode: a.roomCode, resumeToken: a.resumeToken});
+  assert.equal((await restored.next('joined')).resumeToken, a.resumeToken);
+  const before = await restored.state(s => s.status === 'playing');
+  restored.send({type: 'intent', revision: before.revision, intent: {type: 'concede'}});
+  await Promise.all([restored.state(s => s.status === 'finished'), second.state(s => s.status === 'finished')]);
+});
+test('queue cancellation, disconnect and expiry remove seats before another pairing', async t => {
+  let now = 1000;
+  const service = await launch({port: 0, host: '127.0.0.1', origins: [ORIGIN], clock: () => now}); t.after(() => service.close());
+  const url = `ws://127.0.0.1:${portOf(service)}`, a = new Peer(url); await a.open();
+  a.send({type: 'queue', ...registration('A')}); await a.next('queued');
+  a.send({type: 'leave'}); a.send({type: 'ping'}); await a.next('pong'); assert.equal(service.rooms.queued, 0);
+  a.send({type: 'queue', ...registration('A')}); await a.next('queued');
+  now += 300001; service.rooms.tick(); assert.equal((await a.next('error')).code, 'queue-expired'); assert.equal(service.rooms.queued, 0);
+  const b = new Peer(url); await b.open(); b.send({type: 'queue', ...registration('B')}); await b.next('queued'); await b.close();
+  const c = new Peer(url); await c.open(); c.send({type: 'queue', ...registration('C')}); await c.next('queued'); assert.equal(service.rooms.size, 0);
+});
+test('cancel while collection authorization is pending never allocates a queue seat', async t => {
+  let release!: () => void;
+  const check = new Promise<void>(resolve => {release = resolve;});
+  const service = await launch({port: 0, host: '127.0.0.1', origins: [ORIGIN], authorizeDeck: () => check}); t.after(() => service.close());
+  const a = new Peer(`ws://127.0.0.1:${portOf(service)}`); await a.open();
+  a.send({type: 'queue', ...registration('A')}); a.send({type: 'leave'}); a.send({type: 'ping'}); await a.next('pong'); release();
+  await delay(20); a.send({type: 'ping'}); await a.next('pong'); assert.equal(service.rooms.queued, 0); assert.equal(service.rooms.size, 0);
+});

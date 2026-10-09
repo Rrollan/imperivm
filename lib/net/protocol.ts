@@ -4,6 +4,7 @@ import type {CollectionAuth} from '../collection/access';
 export type Seat = 'p1' | 'p2';
 export interface PlayerRegistration {playerName: string; deckList: string[]; heroId?: string; collectionAuth?: CollectionAuth}
 export interface CreateMessage extends PlayerRegistration {type: 'create'}
+export interface QueueMessage extends PlayerRegistration {type: 'queue'}
 export interface JoinMessage extends PlayerRegistration {type: 'join'; roomCode: string; resumeToken?: string}
 export type GameIntent =
   | {type: 'playCard'; cardId: string}
@@ -16,7 +17,7 @@ export type GameIntent =
   | {type: 'concede'};
 /** cardId / cardIds identify card INSTANCE UIDs, not catalogue definition IDs. */
 export interface IntentMessage {type: 'intent'; intent: GameIntent; revision?: number}
-export type ClientMessage = CreateMessage | JoinMessage | IntentMessage | {type: 'ping'} | {type: 'sync'} | {type: 'leave'};
+export type ClientMessage = CreateMessage | QueueMessage | JoinMessage | IntentMessage | {type: 'ping'} | {type: 'sync'} | {type: 'leave'};
 export interface NetSnapshot extends OnlineRoom {
   roomCode: string;
   names: [string, string | null];
@@ -27,4 +28,4 @@ export interface JoinedMessage {type: 'joined'; you: Seat; roomCode: string; res
 export interface StateMessage {type: 'state'; snapshot: NetSnapshot}
 export interface ErrorMessage {type: 'error'; reason: string; code: string; fatal?: boolean}
 export interface GameOverMessage {type: 'gameOver'; winner: Seat | 'draw'; reason: string}
-export type ServerMessage = JoinedMessage | StateMessage | ErrorMessage | GameOverMessage | {type: 'opponentLeft'} | {type: 'pong'; serverTime: number};
+export type ServerMessage = JoinedMessage | StateMessage | ErrorMessage | GameOverMessage | {type: 'queued'; enteredAt: number; expiresAt: number; serverTime: number} | {type: 'opponentLeft'} | {type: 'pong'; serverTime: number};
