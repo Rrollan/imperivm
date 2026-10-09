@@ -49,6 +49,7 @@ export function ArenaCardPreview({id,locale,label,stats,interactive=false,reduce
     const ctx=canvas.current?.getContext('2d');if(!ctx)return;
     let live=true;
     const art=new Image(),frame=new Image();
+    art.crossOrigin='anonymous';frame.crossOrigin='anonymous';
     const font=getComputedStyle(document.body).getPropertyValue('--font-sans').trim()||'sans-serif';
     const draw=()=>{if(!live)return;ctx.setTransform(FACE_TEXTURE_SCALE,0,0,FACE_TEXTURE_SCALE,0,0);ctx.clearRect(0,0,CARD_FACE.width,CARD_FACE.height);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';paintCardFace(ctx,id,locale,font,art.complete&&art.naturalWidth?art:null,undefined,stats,frame.complete&&frame.naturalWidth?frame:null);};
     art.onload=draw;frame.onload=draw;frame.src=cardFramePath(CARDS[id].rarity);art.src=cardArtPath(id);draw();void document.fonts.ready.then(draw);

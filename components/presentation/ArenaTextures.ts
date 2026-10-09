@@ -68,7 +68,11 @@ export class ArenaTextures {
     if (known?.complete&&known.naturalWidth)return known;
     if(this.painting){const waiting=this.waiting.get(src)??new Set<()=>void>();waiting.add(this.painting);this.waiting.set(src,waiting);}
     if (known) return null;
-    const image = new Image(); this.images.set(src, image);
+    const image = new Image();
+    // iDos serves artwork from its CDN, separate from the game's origin.
+    // Request CORS before src so the painted canvas stays usable by WebGL.
+    image.crossOrigin = 'anonymous';
+    this.images.set(src, image);
     image.onload = () => { const waiting=this.waiting.get(src);this.waiting.delete(src);if (!this.disposed) waiting?.forEach(draw => draw()); };
     image.onerror = () => this.invalidate();
     image.src = src;

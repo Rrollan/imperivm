@@ -7,6 +7,18 @@ import {fileURLToPath} from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const base = process.env.IDOS_ASSET_BASE || './';
 if (base !== './' && base !== 'http://127.0.0.1:3113/' && !/^https:\/\/static\.idos\.games\/drive\/app\/SI4IPS8B\/v\/[a-z0-9]+\/$/.test(base)) throw new Error('Expected the SI4IPS8B asset base returned by begin_build_upload.');
+// An optional existing iDos version can supply unchanged public artwork.
+// Code chunks still belong to this build. Keep that artwork version in storage.
+// The Title origin mirrors /v/<build>/ files; images use that route so canvas
+// artwork works in both PROD and DEV, without depending on CDN CORS caching.
+const version = base.match(/^https:\/\/static\.idos\.games\/drive\/app\/SI4IPS8B\/v\/(bld[a-z0-9]+)\/$/)?.[1];
+const ownPublicBase = version ? `/v/${version}/` : base;
+const publicBase = process.env.IDOS_PUBLIC_ASSET_BASE || ownPublicBase;
+const reuseAssets = publicBase !== ownPublicBase && publicBase !== base;
+if (reuseAssets && !/^https:\/\/static\.idos\.games\/drive\/app\/SI4IPS8B\/v\/[a-z0-9]+\/$/.test(publicBase) && !/^\/v\/bld[a-z0-9]+\/$/.test(publicBase)) throw new Error('Shared artwork must belong to an existing SI4IPS8B build on the iDos CDN or this Title origin.');
+// CSS URLs resolve against the stylesheet's CDN origin, not the HTML origin.
+const cssPublicBase = publicBase.startsWith('/v/') ? `https://static.idos.games/drive/app/SI4IPS8B${publicBase}` : publicBase;
+function publicPrefix(css = false) { const value = css ? cssPublicBase : publicBase; return value === './' && css ? '../' : value; }
 const outDir = path.join(root, 'dist', 'idos');
 const publicValues = {
   NEXT_PUBLIC_IDOS_TITLE_ID: 'SI4IPS8B', NEXT_PUBLIC_IDOS_SOLANA_NETWORK_ID: 'solana',
@@ -26,7 +38,7 @@ const define = Object.fromEntries([...references].map(key => [`process.env.${key
 const roots = execFileSync('git', ['ls-files', 'public'], {cwd: root, encoding: 'utf8'}).trim().split('\n');
 const directories = [...new Set(roots.map(file => file.split('/')[1]))].filter(dir => !dir.includes('.'));
 const pattern = new RegExp(`([\x22\x27\x60(])/(?:${directories.join('|')})/`, 'g');
-function publicUrls(source, css = false) {const prefix = base === './' && css ? '../' : base; return source.replace(pattern, match => `${match[0]}${prefix}${match.slice(2)}`);}
+function publicUrls(source, css = false) {const prefix = publicPrefix(css); return source.replace(pattern, match => `${match[0]}${prefix}${match.slice(2)}`);}
 await build({
   root: path.join(root, 'platform/idos'), base, publicDir: false,
   define: {...define, global: 'globalThis'}, esbuild: {jsx: 'automatic'},
@@ -42,7 +54,7 @@ await build({
 const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const referencesInBundle = new Set();
 for (const file of readdirSync(path.join(outDir, 'assets')).filter(file => /\.(js|css)$/.test(file))) {
-  const prefix = base === './' && file.endsWith('.css') ? '../' : base;
+  const prefix = publicPrefix(file.endsWith('.css'));
   const matcher = new RegExp(escape(prefix)+`(?:${directories.join('|')})/`, 'g');
   const source = readFileSync(path.join(outDir, 'assets', file), 'utf8');
   for (const match of source.matchAll(matcher)) {
@@ -68,8 +80,10 @@ for (const reference of referencesInBundle) {
 // Include only versioned artwork, never user-supplied unfinished Flow directories.
 for (const file of selectedAssets) {
   if (!existsSync(path.join(root, file)) || /\.(zip|txt|md|html|blend|psd)$/i.test(file)) throw new Error(`Unsupported public asset: ${file}`);
-  const destination = path.join(outDir, file.slice('public/'.length));
-  mkdirSync(path.dirname(destination), {recursive: true}); copyFileSync(path.join(root, file), destination);
+  if (!reuseAssets) {
+    const destination = path.join(outDir, file.slice('public/'.length));
+    mkdirSync(path.dirname(destination), {recursive: true}); copyFileSync(path.join(root, file), destination);
+  }
 }
 writeFileSync(path.join(outDir, 'models-availability.json'), JSON.stringify({}));
-console.log(`Static iDos game ready: ${outDir} (${selectedAssets.size} referenced public assets; Title SI4IPS8B, paid actions validate the token binding).`);
+console.log(`Static iDos game ready: ${outDir} (${selectedAssets.size} referenced public assets${reuseAssets ? ` reused from ${publicBase}` : ''}; Title SI4IPS8B, paid actions validate the token binding).`);
