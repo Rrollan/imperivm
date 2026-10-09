@@ -6,6 +6,7 @@ import {cardArtPath} from '../../lib/cardArt';
 import type {Locale} from '../../lib/locale';
 import styles from './ArenaLab.module.css';
 import material from './ArenaCardMaterial.module.css';
+import {requestArenaImage} from './arenaImage';
 
 /** The exact hand face, with optional inspection-only material. No extra renderer. */
 export function ArenaCardPreview({id,locale,label,stats,interactive=false,reduced=false}:{id:string;locale:Locale;label:string;stats?:{attack:number;health:number};interactive?:boolean;reduced?:boolean}){
@@ -48,12 +49,11 @@ export function ArenaCardPreview({id,locale,label,stats,interactive=false,reduce
   useEffect(()=>{
     const ctx=canvas.current?.getContext('2d');if(!ctx)return;
     let live=true;
-    const art=new Image(),frame=new Image();
-    art.crossOrigin='anonymous';frame.crossOrigin='anonymous';
+    const art=requestArenaImage(cardArtPath(id)),frame=requestArenaImage(cardFramePath(CARDS[id].rarity));
     const font=getComputedStyle(document.body).getPropertyValue('--font-sans').trim()||'sans-serif';
-    const draw=()=>{if(!live)return;ctx.setTransform(FACE_TEXTURE_SCALE,0,0,FACE_TEXTURE_SCALE,0,0);ctx.clearRect(0,0,CARD_FACE.width,CARD_FACE.height);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';paintCardFace(ctx,id,locale,font,art.complete&&art.naturalWidth?art:null,undefined,stats,frame.complete&&frame.naturalWidth?frame:null);};
-    art.onload=draw;frame.onload=draw;frame.src=cardFramePath(CARDS[id].rarity);art.src=cardArtPath(id);draw();void document.fonts.ready.then(draw);
-    return()=>{live=false;art.onload=null;frame.onload=null;};
+    const draw=()=>{if(!live)return;ctx.setTransform(FACE_TEXTURE_SCALE,0,0,FACE_TEXTURE_SCALE,0,0);ctx.clearRect(0,0,CARD_FACE.width,CARD_FACE.height);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';paintCardFace(ctx,id,locale,font,art.image.complete&&art.image.naturalWidth?art.image:null,undefined,stats,frame.image.complete&&frame.image.naturalWidth?frame.image:null);};
+    void art.loaded.then(draw,()=>{});void frame.loaded.then(draw,()=>{});draw();void document.fonts.ready.then(draw);
+    return()=>{live=false;};
   },[id,locale,stats?.attack,stats?.health]);
   const face=<canvas ref={canvas} className={interactive?undefined:styles.inspectedCard} width={CARD_FACE.width*FACE_TEXTURE_SCALE} height={CARD_FACE.height*FACE_TEXTURE_SCALE} role={interactive?'presentation':'img'} aria-hidden={interactive||undefined} aria-label={interactive?undefined:label}/>;
   if(!interactive)return face;

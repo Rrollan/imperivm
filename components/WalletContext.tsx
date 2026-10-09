@@ -6,6 +6,7 @@ import type { StandardConnectFeature, StandardDisconnectFeature, StandardEventsF
 import type { SolanaSignMessageFeature, SolanaSignTransactionFeature } from '@solana/wallet-standard-features';
 import { DEVNET_CHAIN, readDevnetBalance } from '../lib/solana/devnet';
 import { bytesToBase64, proofMessage, verifyPlaySignature, type PlayProof } from '../lib/solana/proof';
+import {playProofEnabled} from '../lib/solana/features';
 
 type Phantom = Omit<Wallet, 'features'> & { features: Wallet['features'] & StandardConnectFeature & StandardEventsFeature & Partial<StandardDisconnectFeature> & Partial<SolanaSignMessageFeature> & Partial<SolanaSignTransactionFeature> };
 type WalletState = {
@@ -53,7 +54,7 @@ export default function WalletContext({ children }: { children: React.ReactNode 
       if (liveAccount.current?.address === captured) { setBalance(amount); setError(null); }
     } catch { if (liveAccount.current?.address === captured) setError('Devnet balance unavailable. Retry when the RPC responds.'); }
   }, []);
-  useEffect(() => { setBalance(null); if (owner) void refresh(); }, [owner, refresh]);
+  useEffect(() => { setBalance(null); if (owner && playProofEnabled()) void refresh(); }, [owner, refresh]);
   async function connect() {
     if (lock.current) return null;
     lock.current = true; setBusy(true); setError(null);

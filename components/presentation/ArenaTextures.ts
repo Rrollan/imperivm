@@ -4,13 +4,14 @@ import type { Scene } from '@babylonjs/core/scene';
 import { CARDS } from '../../lib/cards';
 import { cardName,type Locale } from '../../lib/locale';
 import type { Minion } from '../../lib/engine/types';
-import {CARD_FACE,BATTLE_FACE,FACE_TEXTURE_SCALE,CARD_FRAME_LAYOUT,cardFramePath,paintCardFace,paintBadge} from './cardFace';
+import {CARD_FACE,BATTLE_FACE,FACE_TEXTURE_SCALE,CARD_FRAME_LAYOUT,cardFramePath,cardArtworkPaths,paintCardFace,paintBadge} from './cardFace';
 import {heroPortraitPath} from './heroPortrait';
 import {cardArtPath} from '../../lib/cardArt';
 import {ordersLayout,ordersView} from './ordersView';
 import type {BattleCommand,FighterReadiness} from './battleReadability';
 import {drawRomanSymbol,type RomanSymbol} from './romanSymbols';
 import {TURN_INLAY_OUTLINE,PORTRAIT_TURN_INLAY_OUTLINE} from './boardSockets';
+import {requestArenaImage} from './arenaImage';
 
 export type Face =
   | { kind: 'card'; cardId: string; playable?:boolean; reframeHeight?:number }
@@ -50,6 +51,7 @@ function contain(ctx: CanvasRenderingContext2D, image: HTMLImageElement, x: numb
 /** Retina faces; source art is fetched only for visible cards/heroes. */
 export class ArenaTextures {
   private images = new Map<string, HTMLImageElement>();
+  private pendingImages = new Set<string>();
   private redraws = new Set<() => void>();
   private waiting = new Map<string,Set<()=>void>>();
   private painting: (()=>void)|null=null;
@@ -68,15 +70,12 @@ export class ArenaTextures {
     if (known?.complete&&known.naturalWidth)return known;
     if(this.painting){const waiting=this.waiting.get(src)??new Set<()=>void>();waiting.add(this.painting);this.waiting.set(src,waiting);}
     if (known) return null;
-    const image = new Image();
-    // iDos serves artwork from its CDN, separate from the game's origin.
-    // Request CORS before src so the painted canvas stays usable by WebGL.
-    image.crossOrigin = 'anonymous';
+    const {image,loaded} = requestArenaImage(src);
     this.images.set(src, image);
-    image.onload = () => { const waiting=this.waiting.get(src);this.waiting.delete(src);if (!this.disposed) waiting?.forEach(draw => draw()); };
-    image.onerror = () => this.invalidate();
-    image.src = src;
-    return null;
+    this.pendingImages.add(src);
+    const settle = () => {this.pendingImages.delete(src);const waiting=this.waiting.get(src);this.waiting.delete(src);if (!this.disposed) {waiting?.forEach(draw => draw());this.invalidate();}};
+    void loaded.then(settle, error => {if (!this.disposed) console.warn(error.message);settle();});
+    return image.complete&&image.naturalWidth ? image : null;
   }
 
   make(name: string, initial: Face) {
@@ -129,8 +128,12 @@ export class ArenaTextures {
   }
 
   setLocale(locale: Locale) { this.locale = locale; this.redraws.forEach(draw => draw()); }
-  isReady() { return Array.from(this.images.values()).every(image => image.complete); }
-  preloadCards(ids:string[]){ids.forEach(id=>{this.image(cardArtPath(id));this.image(cardFramePath(CARDS[id].rarity));});}
+  isReady() { return this.pendingImages.size === 0; }
+  async preloadCards(ids:string[],onProgress?:(progress:{loaded:number;total:number})=>void){
+    const paths=new Set(cardArtworkPaths(ids));
+    let loaded=0;onProgress?.({loaded,total:paths.size});
+    return await Promise.allSettled(Array.from(paths,src=>{this.image(src);return requestArenaImage(src).loaded.finally(()=>onProgress?.({loaded:++loaded,total:paths.size}));}));
+  }
 
   private badge(ctx: CanvasRenderingContext2D, value: string, x: number, y: number, color: string, radius = 43) {
     paintBadge(ctx,this.font,value,x,y,color,radius);

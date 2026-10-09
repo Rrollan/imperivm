@@ -1,5 +1,6 @@
 import {isInstantSpell} from '../../lib/engine/spellTiming';
 import {CARDS} from '../../lib/cards';
+import {cardArtPath} from '../../lib/cardArt';
 import {cardName,type Locale} from '../../lib/locale';
 import type {Rarity} from '../../lib/engine/types';
 import {cardHint,type CardFaceStats} from './cardHint';
@@ -7,9 +8,13 @@ import {cardHint,type CardFaceStats} from './cardHint';
 export const CARD_FACE={width:384,height:672,ratio:384/672};
 // A wider court piece leaves room for readable names without covering the rulers.
 // Only the artwork aperture becomes shorter; engraved panels keep their proportions.
-export const BATTLE_FACE={width:384,height:536,ratio:384/536};
+export const BATTLE_FACE={width:384,height:550,ratio:384/550};
 export const FACE_TEXTURE_SCALE=2;
 export function cardFramePath(rarity:Rarity){return `/ui/cards/rarity-v1/${rarity}.png`;}
+/** Network snapshots redact private cards/decks with empty IDs. */
+export function cardArtworkPaths(ids:readonly string[]){
+  return Array.from(new Set(ids.filter(id=>Boolean(CARDS[id])).flatMap(id=>[cardArtPath(id),cardFramePath(CARDS[id].rarity)])));
+}
 // Measured against the transparent aperture and engraved panels of each painting.
 // Hand/inspection use the original coordinates; court pieces shorten only the aperture.
 export const CARD_FRAME_LAYOUT:Record<Rarity,{art:{x:number;y:number;w:number;h:number};nameY:number;statsY:number}>={

@@ -15,4 +15,5 @@
 
 .loading[data-reduced=true] .motes{display:none}.loading[data-reduced=true] .progress::after,.loading[data-reduced=true] .tip{animation:none}
 .logo{display:block;margin-inline:auto;}
+.measuredProgress{display:block;width:180px;height:4px;margin:0 auto;border:0;border-radius:4px;overflow:hidden;appearance:none;accent-color:#e1bd71;background:#ae80554d;}.measuredProgress::-webkit-progress-bar{background:#ae80554d}.measuredProgress::-webkit-progress-value{background:#e1bd71}.measuredProgress::-moz-progress-bar{background:#e1bd71}.count{font-size:12px;color:#d7bd91;margin-top:8px;}
 @media(max-height:540px){.tip{font-size:16px;min-height:44px;}}

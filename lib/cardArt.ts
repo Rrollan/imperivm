@@ -4,5 +4,7 @@ import { CHARACTER_CARD_ART } from './characterCards';
 const renewed = new Set(['dogen', 'pepito', 'fud-hydra']);
 
 export function cardArtPath(id: string): string {
-  return CHARACTER_CARD_ART[id] ?? `/cards/${renewed.has(id) ? 'renewed/' : ''}${id}.webp`;
+  // Keep each directory explicit: static packaging must discover the renewed
+  // portraits as well as the original cards, including dynamically selected IDs.
+  return CHARACTER_CARD_ART[id] ?? (renewed.has(id) ? `/cards/renewed/${id}.webp` : `/cards/${id}.webp`);
 }

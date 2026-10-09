@@ -59,6 +59,7 @@ export interface ArenaOptions {
   onMetrics: (metrics: ArenaMetrics) => void;
   onFailure: (message: string) => void;
   onReady?: () => void;
+  onLoading?: (progress:{loaded:number;total:number}) => void;
   measure?: boolean;
   quality?: RenderQuality;
 }
@@ -110,6 +111,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   const scheduler = new PresentationScheduler();
   let disposed = false, running = false, dirty = 3, last = 0, portrait = false, readyReported=false, paused=false;
   let shown: GameState | null = null, selected: string | null = null;
+  let preparing=false,prepared=false;
   let hovered: string | null = null, reportedHover: string | null = null, overlayOpen=false;
   let readyBefore=new Set<string>();const readinessPulses=new Map<string,number>();
   let activeBatch: PresentationBatch | null = null;
@@ -311,6 +313,17 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     deckStack.position.copyFrom(point(portrait?1163:1390,portrait?99:175,-.5));
     gasFill(state);
     entities.forEach((entry,id)=>{if(!used.has(id)){destroy(entry);entities.delete(id);}});highlights();
+    if(!preparing){
+      preparing=true;
+      // AI hands/decks are local; online projections contain only disclosed IDs.
+      // Download portraits, not GPU textures, before opening the battlefield.
+      const cards=state.players.flatMap(player=>[...player.hand.map(card=>card.cardId),...player.board.map(card=>card.cardId),...player.deck]);
+      void Promise.all([textures.preloadCards(cards,progress=>{if(!disposed)options.onLoading?.(progress);}),document.fonts.ready]).then(([results])=>{
+        if(disposed)return;
+        if(results.some(result=>result.status==='rejected')){options.onFailure('artwork');return;}
+        prepared=true;request();
+      });
+    }
   }
 
   type Press = { entity: Entity; startX: number; startY: number; dragged: boolean; start: Vector3 };
@@ -438,7 +451,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     if (disposed || document.hidden || paused) return;
     if(!readyReported){
       const visibleReady=scene.meshes.every(mesh=>!mesh.isEnabled()||!mesh.isVisible||mesh.visibility<=0||mesh.isReady(true));
-      if(shown&&textures.isReady()&&painting.isReady()&&(!portrait||portraitPainting?.isReady())&&visibleReady){
+      if(shown&&prepared&&textures.isReady()&&painting.isReady()&&(!portrait||portraitPainting?.isReady())&&visibleReady){
         readyReported=true;options.onReady?.();
       }
     }
@@ -560,7 +573,10 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const revealAt=legendaryPlay?point(800,475,-7):point(portrait?1070:1205,325,-6),revealSize=legendaryPlay?1.95:portrait?1.85:1.65,revealScale=new Vector3(revealSize,revealSize,1);
     const spec=attack?MOTION.attack:handUid?(legendaryPlay?MOTION.legendaryPlay:publicPlay?MOTION.enemyPlay:MOTION.play):batch.action.type==='hero-power'?MOTION.power:MOTION.turn;
     const drawn=batch.after.players.flatMap((p,owner)=>p.hand.filter(c=>!batch.before.players[owner].hand.some(old=>old.uid===c.uid)).map(c=>({...c,owner:owner as 0|1,index:p.hand.findIndex(h=>h.uid===c.uid)})));
-    textures.preloadCards(drawn.filter(c=>c.owner===0).map(c=>c.cardId));
+    // The opponent's face is revealed during its flight too. Wait for each new
+    // portrait before presenting it, rather than land a blank parchment panel.
+    await textures.preloadCards([...drawn.filter(c=>c.owner===0).map(c=>c.cardId),...(playedCard?[playedCard.id]:[]),...(added?[added.cardId]:[])]);
+    if(disposed||activeBatch?.id!==batch.id)return;
     const timeline=effectTimeline(batch,options.reducedMotion);
     const investmentPayout=validatorPayout(batch);
     const paintOrdersFrame=(paid:boolean)=>{

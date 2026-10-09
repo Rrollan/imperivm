@@ -150,6 +150,7 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
   const currentView = useRef(view); currentView.current = view;
   const previous = useRef({view, revision: room.revision}), requested = useRef<{revision: number; action: Action} | null>(null);
   const [ready, setReady] = useState(false), [failure, setFailure] = useState(''), [animating, setAnimating] = useState(false);
+  const [loadingProgress,setLoadingProgress]=useState<{loaded:number;total:number}>();
   const [selected, setSelected] = useState<string | null>(null), selection = useRef<string | null>(null);
   const [inspect, setInspect] = useState<ArenaTarget | null>(null), [help, setHelp] = useState(false), [history, setHistory] = useState(false), [keyboard, setKeyboard] = useState(false);
   const [picks, setPicks] = useState<string[]>([]), [concede, setConcede] = useState(false), [now, setNow] = useState(Date.now());
@@ -190,7 +191,7 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
         const arena = createArena(element, {locale, reducedMotion: reduced,
           onPick: target => callbacks.current.pick(target), onHover: () => {},
           onPlay: uid => callbacks.current.play(uid), onAttack: (uid, target) => callbacks.current.attack(uid, target),
-          onMetrics: () => {}, onFailure: setFailure, onReady: () => {if (!cancelled) setReady(true);}});
+          onLoading:setLoadingProgress, onMetrics: () => {}, onFailure: setFailure, onReady: () => {if (!cancelled) setReady(true);}});
         renderer.current = arena; arena.sync(currentView.current);
       } catch {setFailure('webgl');}
     }).catch(() => {if (!cancelled) setFailure('load');});
@@ -258,10 +259,10 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
     <canvas ref={canvas} className={arenaStyles.canvas} aria-label={t('Онлайн-арена IMPERIVM. Управление с клавиатуры доступно в меню игры.', 'IMPERIVM online arena. Keyboard controls are available in the game menu.')}/>
     <div className={styles.netHud} data-online={connected}><span>{roomCode || 'PvP'}</span><strong role="status">{status}</strong>{game.winner === null && <span className={styles.netClock} data-urgent={seconds <= 15} aria-label={`${seconds} ${t('секунд до конца хода', 'seconds until turn end')}`}><RomanIcon name="hourglass"/>{seconds}</span>}</div>
     <header className={arenaStyles.header}><button className={arenaStyles.settingsButton} onClick={() => {select(null); setInspect(null); setHelp(true);}} aria-label={t('Меню игры', 'Game menu')}><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M13 3h6l1 4 3 2 4-1 3 5-3 3v3l3 3-3 5-4-1-3 2-1 4h-6l-1-4-3-2-4 1-3-5 3-3v-3l-3-3 3-5 4 1 3-2z"/><circle cx="16" cy="17" r="5"/></svg></button></header>
-    {!ready && !failure && <ArenaLoading/>}
+    {!ready && !failure && <ArenaLoading progress={loadingProgress}/>}
     {showOpening && <div className={arenaStyles.modalBackdrop}><section ref={openingPanel} className={arenaStyles.mulligan} role="dialog" aria-modal="true" aria-labelledby="opening-hand-title"><fieldset className={styles.netOpening} disabled={!active}><OpeningHand hand={me.hand ?? []} selected={picks} locale={locale} onToggle={uid => setPicks(old => old.includes(uid) ? old.filter(p => p !== uid) : [...old, uid])} onConfirm={() => act({type: 'mulligan', uids: (me.hand ?? []).filter(h => picks.includes(h.uid)).map(h => h.uid)})}/></fieldset></section></div>}
     {(error || failure || !connected || !room.opponentPresent) && <div className={arenaStyles.error} role="alert">
-      {error || (failure ? t('Не удалось отрисовать арену. Обновите страницу для восстановления графики.', 'Could not render the arena. Reload to restore graphics.') : !connected ? t('Переподключение… Действия временно недоступны.', 'Reconnecting… Actions are temporarily unavailable.') : <>{t('Ждём возвращения соперника.', 'Waiting for your opponent to reconnect.')}{room.disconnectDeadline !== null && <> {Math.max(0, Math.ceil((room.disconnectDeadline - now - timeOffset) / 1000))} {t('сек.', 'sec.')}</>}</>)}
+      {error || (failure === 'artwork' ? t('Рисунки карт не загрузились. Проверьте соединение и повторите загрузку.', 'Card artwork did not load. Check your connection and retry loading.') : failure ? t('Не удалось отрисовать арену. Обновите страницу для восстановления графики.', 'Could not render the arena. Reload to restore graphics.') : !connected ? t('Переподключение… Действия временно недоступны.', 'Reconnecting… Actions are temporarily unavailable.') : <>{t('Ждём возвращения соперника.', 'Waiting for your opponent to reconnect.')}{room.disconnectDeadline !== null && <> {Math.max(0, Math.ceil((room.disconnectDeadline - now - timeOffset) / 1000))} {t('сек.', 'sec.')}</>}</>)}
       {(error || failure) && <button onClick={() => {if (failure) window.location.reload(); else void refresh();}} aria-label={t('Обновить состояние', 'Refresh state')}><RomanIcon name="scroll"/></button>}
     </div>}
     {inspect && card && <ArenaInspection key={`${inspect.kind}:${inspect.uid}`} {...inspectionProps} title={cardName(card.id)} eyebrow={roleName(card.id, locale)} kind="card"

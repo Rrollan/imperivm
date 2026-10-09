@@ -65,6 +65,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
   const [selected, setSelected] = useState<string | null>(null);
   const [inspect, setInspect] = useState<ArenaTarget | null>(null);
   const [ready, setReady] = useState(false);
+  const [loadingProgress,setLoadingProgress]=useState<{loaded:number;total:number}>();
   const [failure, setFailure] = useState('');
   const [muted, updateMuted] = useState(true);
   const [quality,setQuality] = useState<RenderQuality>('auto');
@@ -164,6 +165,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
           onPick: target => callbacks.current.pick(target), onHover: () => {},
           onPlay: uid => callbacks.current.play(uid), onAttack: (uid, target) => callbacks.current.attack(uid, target),
           onMetrics: setMetrics, onFailure: setFailure,onReady:()=>{if(!cancelled)setReady(true);},
+          onLoading:setLoadingProgress,
         });
         renderer.current = arena; arena.sync(session.snapshot().shown);
       } catch { setFailure('webgl'); }
@@ -244,9 +246,9 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
 
 
 
-    {!ready && !failure && <ArenaLoading/>}
+    {!ready && !failure && <ArenaLoading progress={loadingProgress}/>}
     {showMulligan&&<div className={styles.modalBackdrop}><section ref={mulliganPanel} className={styles.mulligan} role="dialog" aria-modal="true" aria-labelledby="opening-hand-title"><OpeningHand hand={view.state.players[0].hand} selected={mulliganUids} locale={locale.locale} onToggle={uid=>setMulliganUids(previous=>previous.includes(uid)?previous.filter(value=>value!==uid):[...previous,uid])} onConfirm={()=>dispatch({type:'mulligan',uids:mulliganUids})}/></section></div>}
-    {failure && <div className={styles.error} role="alert">{failure === 'webgl' || failure === 'load' ? <><strong>{locale.t('Не удалось открыть новую арену', 'Could not open the new arena')}</strong><span>{locale.t('Проверьте поддержку WebGL и обновите страницу.', 'Check WebGL support and reload the page.')}</span><Link href="/game">{locale.t('Открыть текущую игру', 'Open current game')}</Link></> : failure === 'context-lost' ? locale.t('Восстанавливаем графику. Матч сохранён.', 'Restoring graphics. Match preserved.') : failure === 'presentation' ? locale.t('Действие выполнено. Обновите страницу для восстановления графики.', 'Action completed. Reload to restore graphics.') : failure}<button onClick={() => setFailure('')} aria-label={locale.t('Закрыть сообщение', 'Dismiss message')}><RomanIcon name="close"/></button></div>}
+    {failure && <div className={styles.error} role="alert">{failure === 'artwork' ? <><strong>{locale.t('Рисунки карт не загрузились', 'Card artwork did not load')}</strong><span>{locale.t('Проверьте соединение и повторите загрузку. Мы не начнём бой с пустыми картами.', 'Check your connection and try again. The match will wait for its artwork.')}</span><button onClick={() => window.location.reload()}>{locale.t('Повторить загрузку', 'Retry loading')}</button></> : failure === 'webgl' || failure === 'load' ? <><strong>{locale.t('Не удалось открыть новую арену', 'Could not open the new arena')}</strong><span>{locale.t('Проверьте поддержку WebGL и обновите страницу.', 'Check WebGL support and reload the page.')}</span><Link href="/game">{locale.t('Открыть текущую игру', 'Open current game')}</Link></> : failure === 'context-lost' ? locale.t('Восстанавливаем графику. Матч сохранён.', 'Restoring graphics. Match preserved.') : failure === 'presentation' ? locale.t('Действие выполнено. Обновите страницу для восстановления графики.', 'Action completed. Reload to restore graphics.') : failure}{failure !== 'artwork' && <button onClick={() => setFailure('')} aria-label={locale.t('Закрыть сообщение', 'Dismiss message')}><RomanIcon name="close"/></button>}</div>}
 
     {inspect && card && <ArenaInspection key={`${inspect.kind}:${inspect.uid}`} {...inspectionProps}
       title={locale.cardName(card.id)} eyebrow={roleName(card.id,locale.locale)} kind="card"
@@ -313,9 +315,9 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
 
     {historyOpen&&<div className={styles.modalBackdrop}><section ref={historyPanel} className={styles.history} role="dialog" aria-modal="true" aria-label={locale.t('История боя','Battle history')}><button className={styles.close} onClick={()=>setHistoryOpen(false)} aria-label={locale.t('Закрыть историю','Close history')}><RomanIcon name="close"/></button><BattleChronicle entries={view.history} locale={locale.locale} cardName={locale.cardName} heroName={locale.heroName} powerName={locale.powerName} onCard={(cardId,owner)=>{setHistoryOpen(false);setInspect({kind:'queue',uid:'historical-card',owner,cardId});}}/></section></div>}
 
-    {practice.pending && <Dialog title={locale.t('Подписать начало матча · devnet','Sign match start · devnet')} onClose={practice.demo}>
-      <p className="integration-note">{locale.t('Бесплатная подпись Phantom подтвердит участие вашего кошелька в этом матче с ИИ. Победа откроет создание NFT-бейджа. Можно продолжить без подписи.', 'A free Phantom message signature records wallet participation in this AI match. Winning unlocks the NFT badge. You can continue without signing.')}</p>
-      <div className="dialog-actions"><button className="primary-button" disabled={practice.signing} onClick={() => void practice.sign()}>{practice.signing ? locale.t('Ожидаем Phantom…','Waiting for Phantom…') : locale.t('Подписать и играть','Sign & play')}</button><button className="secondary-button" disabled={practice.signing} onClick={practice.demo}>{locale.t('Продолжить в демо','Continue in demo')}</button></div>
+    {practice.pending && <Dialog title={locale.t('Записать участие кошелька','Record wallet participation')} onClose={practice.demo}>
+      <p className="integration-note">{locale.t('Необязательная подпись сообщения в Phantom связывает кошелёк с этим матчем. Она не подтверждает победу, не создаёт NFT и не списывает SOL. Для игры подпись не нужна.', 'An optional Phantom message signature links your wallet to this match. It does not verify a win, create an NFT or spend SOL. No signature is needed to play.')}</p>
+      <div className="dialog-actions"><button className="primary-button" disabled={practice.signing} onClick={practice.demo}>{locale.t('Играть без подписи','Play without signing')}</button><button className="secondary-button" disabled={practice.signing} onClick={() => void practice.sign()}>{practice.signing ? locale.t('Ожидаем Phantom…','Waiting for Phantom…') : locale.t('Подтвердить участие','Record participation')}</button></div>
       {practice.error && <p className="integration-error" role="status">{locale.errorText(practice.error)}</p>}
     </Dialog>}
     {shown.winner !== null && !view.busy && <div className={styles.modalBackdrop}><section ref={resultPanel} className={`${styles.result} ${styles.resultWithFx}`} role="dialog" aria-modal="true" aria-label={locale.t('Результат боя','Battle result')}><span className={styles.eyebrow}>IMPERIVM</span><BattleResultEmblem outcome={shown.winner===0?'win':shown.winner==='draw'?'draw':'loss'} reduced={reduced} title={shown.winner===0?locale.t('Ваша империя устояла','Your empire stands'):shown.winner==='draw'?locale.t('Империи пали вместе','Both empires fell'):locale.t('Казна опустела','The treasury is empty')} replayLabel={locale.t('Повторить триумф','Replay triumph')}/><p>{shown.winner===0?locale.t('Венец заслужен. Империя помнит победу.','Your laurel is earned. The empire remembers.'):locale.t('Каждая потеря — урок для следующего боя.','Every loss is a lesson for the next battle.')}</p><button className={styles.primary} onClick={()=>restart()}>{locale.t('Ещё один бой','Another battle')}</button></section></div>}
