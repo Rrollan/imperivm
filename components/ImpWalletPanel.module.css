@@ -1,0 +1,31 @@
+.panel {border: 1px solid #b08d4940; border-radius: 14px; padding: 16px; margin-top: 16px; background: linear-gradient(140deg,#49372040,#21171170); color: #e9dbbf;}
+.intro {display: flex; align-items: center; gap: 11px; margin-bottom: 13px;}
+.symbol {display: grid; place-items: center; color: #d3b26e; border: 1px solid #ab884647; width: 42px; height: 42px; border-radius: 50%; flex: none; background: #b0852312;}
+.intro strong {font-size: 14px; font-weight: 600; color: #edd5a0;}
+.intro p, .hint, .footnote {color: #bcaa90; font-size: 12px; line-height: 1.5; margin: 4px 0 0;}
+.panel .button {display: inline-flex; align-items: center; justify-content: center; gap: 9px; font: inherit; font-size: 13px; line-height: 1.3; min-height: 42px; padding: 10px 14px; border: 1px solid #aa884b66; border-radius: 9px; color: #e8dabe; background-image: none !important; background-color: #392c20; text-shadow: none; box-shadow: inset 0 1px #fff1;}
+.panel .primary {background-color: #d0ae68; border-color: #e6c582; color: #24170e; font-weight: 650;}
+.panel .button:not(:disabled):hover {background-color: #4e3b27; border-color: #d1ab6b;}
+.panel .primary:not(:disabled):hover {background-color: #e1c281;}
+.panel .button:disabled, .panel .tab:disabled {opacity: .55; cursor: wait;}
+.panel button:focus-visible, .panel input:focus-visible, .panel a:focus-visible {outline: 2px solid #e8c576; outline-offset: 3px;}
+.actions {display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-top: 12px;}
+.actions a, .platformLink {font-size: 12px; color: #b9d2bd; text-underline-offset: 3px;}
+.platformLink {display: inline-block; margin-top: 12px;}
+.tabs {display: flex; gap: 6px; padding: 4px; background: #120d0966; border-radius: 10px; margin: 14px 0;}
+.panel .tab {flex: 1; padding: 9px 12px; min-height: 37px; background-image: none !important; background-color: transparent; font: inherit; font-size: 13px; color: #bcaa90; border: 1px solid transparent; border-radius: 7px; box-shadow: none; text-shadow: none;}
+.panel .selected {background-color: #6f542c55; color: #edd5a0; border-color: #a580424d;}
+.form {margin-top: 14px;}
+.form label {display: block; font-size: 12px; color: #c3b294; margin-bottom: 7px;}
+.inputRow {display: flex; align-items: center; gap: 10px; padding: 7px 13px; border: 1px solid #ac874a66; border-radius: 10px; background: #130e0b55; color: #c6ae7c;}
+.inputRow input {flex: 1; width: 100%; min-width: 0; padding: 4px 0; background: transparent; border: none; box-shadow: none; color: #f1dfb5; font: inherit; font-size: 21px; font-variant-numeric: tabular-nums;}
+.inputRow span {font-size: 13px;}
+.review, .pending {background: #160f0a55; border: 1px solid #b8934f55; padding: 14px; border-radius: 11px;}
+.review > strong {display: block; font-size: 26px; color: #e5c078; margin: 8px 0; font-variant-numeric: tabular-nums;}
+.review small {font-size: 14px; font-weight: 500;}
+.review p, .pending p, .fee {font-size: 12px; line-height: 1.55; color: #c9b697; margin: 8px 0;}
+.pending strong {font-size: 14px; color: #e9c584;}
+.eyebrow {font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #cab58d;}
+.footnote {margin-top: 12px; font-size: 11px;}
+.notice {margin: 12px 0 0; font-size: 12px; line-height: 1.55; border: 1px solid #b86b474f; border-radius: 9px; padding: 10px 12px; color: #e8bea2; background: #71361922; overflow-wrap: anywhere;}
+@media (max-width: 520px) {.panel {padding: 13px;}.actions .button {flex: 1 1 auto;}.symbol {display: none;}.review > strong {font-size: 23px;}}

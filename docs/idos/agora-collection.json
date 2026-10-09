@@ -362,7 +362,7 @@
                 {
                   "Type": "CryptoCurrency",
                   "CurrencyID": "Main",
-                  "Amount": 50
+                  "Amount": 225000
                 }
               ]
             }
@@ -387,7 +387,7 @@
                 {
                   "Type": "CryptoCurrency",
                   "CurrencyID": "Main",
-                  "Amount": 200
+                  "Amount": 900000
                 }
               ]
             }

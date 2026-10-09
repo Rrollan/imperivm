@@ -6,7 +6,7 @@ import { PublicKey } from '@solana/web3.js';
 import type { CollectionDefinitions, OperationResult, WalletChallengeResponse } from '@idosgames/core';
 import { authenticateSolanaWallet, SessionQueue } from '../../lib/idos/auth';
 import { IDOS_RARITIES, idosPackDrops, validateIDosDefinitions } from '../../lib/collection/idos';
-import { IDOS_CONFIG, PACK_COST } from '../../lib/collection/gateway';
+import { IDOS_CONFIG, REAL_PACK_COST } from '../../lib/collection/gateway';
 import { bytesToBase64, proofMessage, validPlayProof, verifyPlaySignature, type PlayProof } from '../../lib/solana/proof';
 import { rugMint, tokenBalance } from '../../lib/solana/rug';
 import { readPendingBadge } from '../../lib/solana/badgeReceipt';
@@ -57,7 +57,7 @@ async function main() {
   await queue.forAccount(async () => { steps.push('new-purchase'); });
   assert.equal(steps.at(-1), 'new-purchase');
 
-  const definitions: CollectionDefinitions = { Collections: { [IDOS_CONFIG.collection]: { CollectionID: IDOS_CONFIG.collection, Sets: [{SetID: 'AGORA', Collectibles: PACK_CARD_IDS.map(id => ({CollectibleID: id, Rarity: IDOS_RARITIES[CARDS[id].rarity]}))}] } }, PackTypes: { [IDOS_CONFIG.pack]: { CollectibleCount: 5, RarityWeights: {'1':60,'2':25,'3':11,'4':4}, PriceOptions: { [IDOS_CONFIG.payment]: { Cost: { Standard: { Entries: [{ Type: IDOS_CONFIG.currencyType, CurrencyID: IDOS_CONFIG.currency, Amount: PACK_COST }] } } } } } } };
+  const definitions: CollectionDefinitions = { Collections: { [IDOS_CONFIG.collection]: { CollectionID: IDOS_CONFIG.collection, Sets: [{SetID: 'AGORA', Collectibles: PACK_CARD_IDS.map(id => ({CollectibleID: id, Rarity: IDOS_RARITIES[CARDS[id].rarity]}))}] } }, PackTypes: { [IDOS_CONFIG.pack]: { CollectibleCount: 5, RarityWeights: {'1':60,'2':25,'3':11,'4':4}, PriceOptions: { [IDOS_CONFIG.payment]: { Cost: { Standard: { Entries: [{ Type: IDOS_CONFIG.currencyType, CurrencyID: IDOS_CONFIG.currency, Amount: REAL_PACK_COST }] } } } } } } };
   definitions.DuplicateConversions = [1,2,3,4].map(Rarity => ({Rarity,CollectionCurrencyGranted:Rarity}));
   validateIDosDefinitions(definitions);
   const issued = {CryptoCurrencies: {Main: {CurrencyID: 'Main', Status: 'Active' as const, Permissions: {SpendableInGame: true}, Networks: [{NetworkID: IMPERIVM_TITLE.network, ContractAddress: String(IMPERIVM_TITLE.mint), Decimals: 6}]}}};
@@ -73,6 +73,8 @@ async function main() {
   const freeDrop = structuredClone(definitions); freeDrop.Collections![IDOS_CONFIG.collection].Sets![0].Collectibles![0].CollectibleID = 'audit'; assert.throws(() => validateIDosDefinitions(freeDrop), /exclusive/);
   const wrong = structuredClone(definitions); wrong.PackTypes![IDOS_CONFIG.pack].CollectibleCount = 4; assert.throws(() => validateIDosDefinitions(wrong), /5 cards/);
   const crypto = structuredClone(definitions); crypto.PackTypes![IDOS_CONFIG.pack].PriceOptions![IDOS_CONFIG.payment].Cost!.Standard!.Entries![0].CurrencyID = 'OTHER_TOKEN'; assert.throws(() => validateIDosDefinitions(crypto), /configured currency/);
+  const usd = structuredClone(definitions); usd.PackTypes![IDOS_CONFIG.pack].PriceOptions![IDOS_CONFIG.payment].Cost!.Standard!.Entries![0].AmountUsd = 0.5; assert.throws(() => validateIDosDefinitions(usd), /cost exactly/, 'A fixed price must never silently become an FX-priced debit');
+  const cheap = structuredClone(definitions); cheap.PackTypes![IDOS_CONFIG.pack].PriceOptions![IDOS_CONFIG.payment].Cost!.Standard!.Entries![0].Amount = 50; assert.throws(() => validateIDosDefinitions(cheap), /cost exactly/, 'Old demo price must not charge real tokens');
   const extra = structuredClone(definitions); extra.PackTypes![IDOS_CONFIG.pack].PriceOptions![IDOS_CONFIG.payment].Cost!.Standard!.Entries!.push({ Type: 'VirtualCurrency', CurrencyID: 'OTHER', Amount: 1 }); assert.throws(() => validateIDosDefinitions(extra));
 
   const proof: PlayProof = { owner, matchId: 'match-idos-test', heroId: 'builder', createdAt: '2026-10-08T00:00:00Z', message: proofMessage('localhost:3101', 'match-idos-test', 'builder', 'nonce-idos-test', '2026-10-08T00:00:00Z'), signature: '' };

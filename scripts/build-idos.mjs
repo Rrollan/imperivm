@@ -106,7 +106,7 @@ for (const file of selectedAssets) {
 const codeManifestPath=process.env.IDOS_SHARED_CODE_MANIFEST;
 let sharedCode=[];
 if(codeManifestPath){
-  if(!version)throw new Error('Code reuse requires an iDos upload AssetBase.');
+  if(!version && base !== './')throw new Error('Code reuse requires an iDos upload AssetBase or a relative build.');
   const manifest=JSON.parse(readFileSync(path.resolve(root,codeManifestPath),'utf8'));
   if(!/^bld[a-z0-9]+$/.test(manifest.buildId))throw new Error('Invalid shared code version.');
   sharedCode=readdirSync(path.join(outDir,'assets')).filter(name=>{

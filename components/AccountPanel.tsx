@@ -9,6 +9,7 @@ import {useIDos} from './IDosContext';
 import {useCollection} from './CollectionContext';
 import {useLocale} from './LocaleContext';
 import {formatImpAmount, readImpWalletBalance} from '../lib/solana/imp';
+import {ImpWalletPanel} from './ImpWalletPanel';
 import styles from './AccountPanel.module.css';
 
 export function AccountPanel({onClose}: {onClose: () => void}) {
@@ -42,8 +43,8 @@ export function AccountPanel({onClose}: {onClose: () => void}) {
       </section>
       <section className={styles.balance} aria-label={t('Игровой баланс', 'Game balance')}>
         <h3>{inIDos ? t('На игровом счёте iDos', 'In your iDos game account') : t('Демо-баланс', 'Demo balance')}</h3>
-        <div className={styles.amount}><strong>{gameBalance !== undefined ? gameBalance.toLocaleString(locale === 'ru' ? 'ru-RU' : 'en-US', {maximumFractionDigits: 6}) : '—'}</strong> IMP</div>
-        <p>{inIDos ? t('Для паков и кейсов. Пополните IMP в iDos.', 'For packs and cases. Deposit IMP in iDos.') : t('Только для бесплатной тренировки.', 'For free practice only.')}</p>
+        <div className={styles.amount}><strong>{gameBalance !== undefined ? formatImpAmount(collection.snapshot?.exactBalance ?? String(gameBalance), locale) : '—'}</strong> IMP</div>
+        <p>{inIDos ? t('IMP, которые вы отдельно перевели в iDos. Вход кошельком не переносит токены.', 'IMP you separately transferred to iDos. Signing in does not move tokens.') : t('Только для бесплатной тренировки.', 'For free practice only.')}</p>
       </section>
     </div>
     <div className={styles.actions}>
@@ -52,6 +53,7 @@ export function AccountPanel({onClose}: {onClose: () => void}) {
       {owner && <button className={button} disabled={reading || collection.busy} onClick={() => {setRevision(value => value + 1); void collection.refresh();}}>{reading || collection.busy ? t('Обновляем…', 'Refreshing…') : t('Обновить', 'Refresh')}</button>}
       {idos.session.status === 'error' && <button className={button} disabled={idos.busy} onClick={() => void idos.retry()}>{t('Повторить вход', 'Retry sign-in')}</button>}
     </div>
+    {idos.configured && <ImpWalletPanel walletBalance={current?.amount} onBalanceChanged={() => setRevision(value => value + 1)}/>}
     <p className={styles.note}>{t('Вход подтверждается подписью сообщения. Бесплатные бои с ИИ и игроками не требуют SOL.', 'Sign-in uses a message signature. Free AI and PvP battles require no SOL.')}</p>
     {idos.session.status === 'restricted' && <p className={styles.notice} role="status">{t('iDos ограничил доступ к аккаунту. Бесплатная тренировка доступна.', 'iDos restricted account access. Free training remains available.')}</p>}
     {(idos.session.error || wallet.error || collection.error) && <p className={styles.notice} role="status">{errorText(idos.session.error ?? wallet.error ?? collection.error ?? '')}</p>}

@@ -12,7 +12,7 @@ import {videoCues} from '../../components/presentation/videoCue';
 import {abilityCues} from '../../components/presentation/abilityCues';
 import {arenaViewport} from '../../components/presentation/arenaViewport';
 import {fighterRow} from '../../components/presentation/battleLayout';
-import {heroesFromCollectibles,LocalCollectionGateway,parseLocalCollection,IDOS_CONFIG,rulerCollectible} from '../../lib/collection/gateway';
+import {heroesFromCollectibles,LocalCollectionGateway,parseLocalCollection,IDOS_CONFIG,REAL_PACK_COST,REAL_RULER_CASE_COST,rulerCollectible} from '../../lib/collection/gateway';
 import {PACK_CARD_IDS} from '../../lib/collection/access';
 import {IDOS_RARITIES,validateIDosDefinitions,validateRulerCase} from '../../lib/collection/idos';
 import {authorizeCollectionDeck} from '../../lib/collection/authority';
@@ -101,7 +101,7 @@ async function main(){
  await assert.rejects(gateway.openRulerCase());assert.equal((await gateway.load()).rug,100);
  assert.deepEqual(parseLocalCollection(JSON.stringify({version:2,rug:500,packsOpened:0,owned:{},heroes:['forged']})).heroes,FREE_HERO_IDS);
  assert(!heroesFromCollectibles({'ruler-athena':0,'ruler-hermes':-1,'ruler-poseidon':'1'}).includes('poseidon'));
- const defs:CollectionDefinitions={Collections:{[IDOS_CONFIG.collection]:{Sets:[{SetID:'AGORA',Collectibles:[...PACK_CARD_IDS.map(id=>({CollectibleID:id,Rarity:IDOS_RARITIES[CARDS[id].rarity]})),...CASE_HERO_IDS.map(id=>({CollectibleID:rulerCollectible(id),Rarity:5}))]}]}},PackTypes:{[IDOS_CONFIG.pack]:{CollectibleCount:5,RarityWeights:{1:60,2:25,3:11,4:4,5:0},PriceOptions:{[IDOS_CONFIG.payment]:{Cost:{Standard:{Entries:[{Type:IDOS_CONFIG.currencyType,CurrencyID:IDOS_CONFIG.currency,Amount:50}]}}}}},[IDOS_CONFIG.rulerCase]:{CollectibleCount:1,RarityWeights:{5:100},GuaranteedMinRarity:5,PriceOptions:{[IDOS_CONFIG.payment]:{Cost:{Standard:{Entries:[{Type:IDOS_CONFIG.currencyType,CurrencyID:IDOS_CONFIG.currency,Amount:200}]}}}}}},DuplicateConversions:[1,2,3,4,5].map(Rarity=>({Rarity,CollectionCurrencyGranted:100}))};
+ const defs:CollectionDefinitions={Collections:{[IDOS_CONFIG.collection]:{Sets:[{SetID:'AGORA',Collectibles:[...PACK_CARD_IDS.map(id=>({CollectibleID:id,Rarity:IDOS_RARITIES[CARDS[id].rarity]})),...CASE_HERO_IDS.map(id=>({CollectibleID:rulerCollectible(id),Rarity:5}))]}]}},PackTypes:{[IDOS_CONFIG.pack]:{CollectibleCount:5,RarityWeights:{1:60,2:25,3:11,4:4,5:0},PriceOptions:{[IDOS_CONFIG.payment]:{Cost:{Standard:{Entries:[{Type:IDOS_CONFIG.currencyType,CurrencyID:IDOS_CONFIG.currency,Amount:REAL_PACK_COST}]}}}}},[IDOS_CONFIG.rulerCase]:{CollectibleCount:1,RarityWeights:{5:100},GuaranteedMinRarity:5,PriceOptions:{[IDOS_CONFIG.payment]:{Cost:{Standard:{Entries:[{Type:IDOS_CONFIG.currencyType,CurrencyID:IDOS_CONFIG.currency,Amount:REAL_RULER_CASE_COST}]}}}}}},DuplicateConversions:[1,2,3,4,5].map(Rarity=>({Rarity,CollectionCurrencyGranted:100}))};
  validateIDosDefinitions(defs);validateRulerCase(defs);
  const unsafe=structuredClone(defs);unsafe.PackTypes![IDOS_CONFIG.pack].RarityWeights![5]=1;assert.throws(()=>validateIDosDefinitions(unsafe));
  const altered=structuredClone(defs);altered.PackTypes![IDOS_CONFIG.rulerCase].CollectibleCount=2;assert.throws(()=>validateRulerCase(altered));

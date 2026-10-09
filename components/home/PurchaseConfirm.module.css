@@ -1,0 +1,10 @@
+.dialog {box-sizing:border-box;width:min(520px,calc(100vw - 32px));max-height:calc(100svh - 32px);overflow:auto;padding:30px;border:1px solid #9c7949;border-radius:16px;background:#291e18;color:#f6e8cc;box-shadow:0 24px 90px #0008;font:400 15px/1.6 var(--font-sans),sans-serif;}
+.dialog::backdrop{background:#100c10ba;backdrop-filter:blur(8px)}
+.kicker{margin:0;color:#c3a573;font-size:11px;letter-spacing:.14em}
+.dialog h2{margin:12px 0 18px;color:#edce92;font:700 32px/1.2 var(--font-roman),Georgia,serif}
+.price{display:block;font-size:32px;font-variant-numeric:tabular-nums;color:#ecc773}
+.price span{font-size:15px;color:#cdb88c}.dialog p{margin:12px 0}.note{color:#cdbba2;font-size:13px}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:25px}
+.dialog .actions button{flex:1;min-width:120px;min-height:48px;padding:10px 16px;border:1px solid #967746;border-radius:8px;background:#392b21!important;background-image:none!important;color:#f7e6c0;font:600 14px/1.4 var(--font-sans),sans-serif;box-shadow:none;cursor:pointer}
+.dialog .actions .confirm{background:#7b2e29!important;border-color:#bb8655}
+.dialog .actions button:focus-visible{outline:2px solid #edce92;outline-offset:3px}

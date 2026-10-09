@@ -12,7 +12,7 @@ import { markAmbientStarted, shouldStartAmbient } from '../../lib/audio/events';
 import { startAmbient } from '../../lib/audio/sfx';
 import { unlockAudio } from '../../lib/audio/manager';
 import { useCollection } from '../../components/CollectionContext';
-import { PACK_COST, RARITY_WEIGHTS } from '../../lib/collection/gateway';
+import { collectionPrice, RARITY_WEIGHTS } from '../../lib/collection/gateway';
 import NftPack from '../../components/NftPack';
 import { useLocale } from '../../components/LocaleContext';
 import {CardDialog} from '../../components/home/CardDialog';
@@ -22,9 +22,12 @@ import {useIDos} from '../../components/IDosContext';
 import {PaintedIcon} from '../../components/PaintedIcon';
 import {RulerCase} from '../../components/home/RulerCase';
 import RugShop from '../../components/RugShop';
+import {PurchaseConfirm} from '../../components/home/PurchaseConfirm';
+import {cryptoAffordable, COMMERCE_CONFIG} from '../../lib/idos/commerce';
+import {formatImpAmount} from '../../lib/solana/imp';
 
 export default function PacksPage() {
-  const { t, rarityName, errorText, cardName } = useLocale();
+  const { t, locale, rarityName, errorText, cardName } = useLocale();
   const collection = useCollection();
   const [inspected, setInspected] = useState<string | null>(null);
   const [pack, setPack] = useState<CardDef[]>([]);
@@ -32,8 +35,12 @@ export default function PacksPage() {
   const [animating,setAnimating]=useState(false),[openingId,setOpeningId]=useState(0);
   const inFlight=useRef(false);
   const idos=useIDos();
-  const [opened, setOpened] = useState(false);
-  useEffect(()=>{setPack([]);setDuplicates([]);setOpened(false);setAnimating(false);},[idos.session.revision]);
+  const [opened, setOpened] = useState(false), [confirm, setConfirm] = useState(false);
+  const paid = collection.snapshot?.mode === 'idos';
+  const cost = collectionPrice(collection.snapshot?.mode, 'pack');
+  const price = new Intl.NumberFormat('ru-RU').format(cost);
+  const affordable = !!collection.snapshot && cryptoAffordable(collection.snapshot.exactBalance ?? String(collection.snapshot.rug), String(cost));
+  useEffect(()=>{setPack([]);setDuplicates([]);setOpened(false);setAnimating(false);setConfirm(false);},[idos.session.revision]);
 
   // Lazy-start ambient on first gesture.
   useEffect(() => {
@@ -69,21 +76,24 @@ export default function PacksPage() {
 
       <main className={`${styles.hubMain} ${styles.packMain}`}>
         <header className={styles.pageTitle}><span className={styles.kicker}>AGORA · AFTER HOURS</span><h1>{t('Паки', 'Packs')}</h1><p>{t('Пять карт. Новые связки.','Five cards. New combos.')}</p></header>
-        <div className="collection-wallet"><strong>{collection.snapshot?.rug ?? '—'} $IMP</strong><span>{collection.snapshot?.mode === 'idos' ? t('Баланс iDos', 'iDos balance') : t('Демо · без оплаты', 'Demo · no payment')}</span><Link href="/collection">{t('Коллекция →', 'Collection →')}</Link></div>
+        <div className="collection-wallet"><strong>{collection.snapshot ? formatImpAmount(collection.snapshot.exactBalance ?? String(collection.snapshot.rug), locale) : '—'} IMP</strong><span>{collection.snapshot?.mode === 'idos' ? t('Баланс iDos', 'iDos balance') : t('Демо · без оплаты', 'Demo · no payment')}</span><Link href="/collection">{t('Коллекция →', 'Collection →')}</Link></div>
         {collection.error && <div className="integration-error" role="status"><p>{errorText(collection.error)}</p><div className="dialog-actions"><button className="secondary-button" onClick={() => void collection.refresh()} disabled={collection.busy}>{t('Повторить', 'Retry')}</button><button className="secondary-button" onClick={() => void collection.useLocalDemo()} disabled={collection.busy}>{t('Локальное демо', 'Use local demo')}</button></div></div>}
 
         {opened?<PackOpening key={openingId} cards={pack} duplicates={duplicates} onInspect={setInspected} onComplete={()=>setAnimating(false)} onReplayStart={()=>setAnimating(true)}/>:<div className="pack-idle"><PaintedIcon name="pack" size={170}/></div>}
 
         <div className={styles.packPurchase}>
           <button
-            onClick={handleOpen}
-            disabled={collection.busy || !collection.snapshot || collection.snapshot.rug < PACK_COST || animating}
+            onClick={() => paid ? setConfirm(true) : void handleOpen()}
+            disabled={collection.busy || !collection.snapshot || !affordable || !!collection.snapshot.purchaseBlocked || (paid && !COMMERCE_CONFIG.enabled) || animating}
             className="gold-button"
           >
-            <PaintedIcon name="pack" size={36}/>{collection.busy ? t('Открываем…', 'Opening…') : opened ? t('Ещё один пак · 50 $IMP', 'Open another · 50 $IMP') : t('Открыть пак · 50 $IMP', 'Open pack · 50 $IMP')}
+            <PaintedIcon name="pack" size={36}/>{collection.busy ? t('Открываем…', 'Opening…') : `${opened ? t('Ещё один пак', 'Open another') : t('Открыть пак', 'Open pack')} · ${price} ${paid ? 'IMP' : t('демо IMP', 'demo IMP')}`}
           </button>
         </div>
-        {!animating&&collection.snapshot&&collection.snapshot.rug<PACK_COST&&<p className={styles.packStatus}>{t('Для пака нужно 50 $IMP.','A pack requires 50 $IMP.')}</p>}
+        {!animating&&collection.snapshot&&!affordable&&<p className={styles.packStatus}>{t('Для пака нужно', 'A pack requires')} {price} {paid ? t('IMP на игровом счёте. Переведите выбранную сумму из кошелька ниже.', 'IMP on your game balance. Transfer your chosen amount from the wallet below.') : t('демо IMP.', 'demo IMP.')}</p>}
+        {collection.snapshot?.purchaseBlocked && <p role="status" className={styles.packStatus}>{collection.snapshot.purchaseBlocked}</p>}
+        {paid && !COMMERCE_CONFIG.enabled && <p className={styles.packStatus}>{t('Покупки за реальные IMP временно выключены.', 'Real IMP purchases are temporarily disabled.')}</p>}
+        {paid && <p className={styles.packStatus}>{t('Цены фиксированы в IMP. Рыночная стоимость токена меняется; курс в долларах не гарантирован.', 'Prices are fixed in IMP. Market value changes; no dollar exchange rate is guaranteed.')}</p>}
         {!opened&&process.env.NEXT_PUBLIC_IDOS_STATIC_BUILD!=='true'&&<Link className={styles.secondaryLink} href="/arena-lab/pack-preview">{t('Предпросмотр анимации','Preview the animation')}<RomanIcon name="next" size={18}/></Link>}
 
         {opened&&!animating&&<Link href="/collection" className={styles.secondaryLink}><PaintedIcon name="cards" size={30}/>{t('Добавить новые карты в колоду','Build with your new cards')}<RomanIcon name="next" size={20}/></Link>}
@@ -100,13 +110,14 @@ export default function PacksPage() {
         <p >{t('Полученная карта открывает до двух копий в колоде, легендарная — одну. Паки могут содержать повторы; в iDos они превращаются в валюту коллекции, а не в IMP.', 'An obtained card unlocks up to two deck copies, or one for a legendary. Packs may contain duplicates; iDos converts them into collection currency, not IMP.')}</p>
         {collection.snapshot?.mode === 'idos' && <p >{t('Валюта коллекции за повторы', 'Collection currency from duplicates')}: <strong>{collection.snapshot.collectionCurrency ?? 0}</strong> · {t('Обмен на карты готовится; сейчас эта валюта не тратится.', 'Card exchange is in preparation; this currency cannot be spent yet.')}</p>}
         </details>
-        <details className={styles.menuDetails}><summary><PaintedIcon name="rug" size={30}/>{t('Пополнить $IMP · SOL / USDC', 'Get $IMP · SOL / USDC')}</summary><RugShop/></details>
-        <details className={styles.optionalNft}><summary>{t('Коллекционные NFT · devnet (необязательно)', 'Collectible NFTs · devnet (optional)')}</summary><WalletBar /><NftPack /></details>
+        <details className={styles.menuDetails}><summary><PaintedIcon name="rug" size={30}/>{t('Перевести IMP в игру', 'Transfer IMP to the game')}</summary><RugShop/></details>
+        {process.env.NEXT_PUBLIC_PLAY_PROOF_ENABLED === 'true' && <details className={styles.optionalNft}><summary>{t('Коллекционные NFT · devnet (необязательно)', 'Collectible NFTs · devnet (optional)')}</summary><WalletBar /><NftPack /></details>}
 
 
         <RulerCase/>
       </main>
       <SiteFooter />
+      {confirm && <PurchaseConfirm kind="pack" amount={cost} onClose={() => setConfirm(false)} onConfirm={() => {setConfirm(false); void handleOpen();}}/>}
       {inspected && <CardDialog id={inspected} onClose={() => setInspected(null)} />}
     </div>
   );

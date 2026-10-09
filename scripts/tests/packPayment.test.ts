@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {PackPaymentReceipt, type ReceiptStorage} from '../../lib/collection/paymentReceipt';
+import {collectionPrice, PACK_COST, REAL_PACK_COST, REAL_RULER_CASE_COST} from '../../lib/collection/gateway';
+import {cryptoAffordable} from '../../lib/idos/commerce';
+const values = new Map<string, string>();
+const storage: ReceiptStorage = {getItem: key => values.get(key) ?? null, setItem: (key, value) => {values.set(key, value);}, removeItem: key => {values.delete(key);}};
+const receipt = new PackPaymentReceipt('TITLE', 'user-a', storage);
+assert.equal(receipt.status(), 'none'); receipt.begin('AGORA_PACK', REAL_PACK_COST);
+assert.equal(new PackPaymentReceipt('TITLE', 'user-a', storage).status(), 'pending', 'Network loss/reload must retain payment intent');
+assert.throws(() => receipt.begin('AGORA_PACK', REAL_PACK_COST), /заблокировано/);
+assert.equal(new PackPaymentReceipt('TITLE', 'user-b', storage).status(), 'none', 'Accounts cannot inherit another payment');
+receipt.accept(); assert.equal(receipt.status(), 'accepted'); receipt.clear(); assert.equal(receipt.status(), 'none');
+assert.throws(() => new PackPaymentReceipt('T', 'U', {getItem: () => '{bad', setItem: () => {}, removeItem: () => {}}).begin('AGORA_PACK', REAL_PACK_COST), /повреждён/);
+assert.throws(() => new PackPaymentReceipt('T', 'U', {getItem: () => null, setItem: () => {throw new Error('Quota full');}, removeItem: () => {}}).begin('AGORA_PACK', REAL_PACK_COST), /Quota/);
+assert.equal(collectionPrice('local', 'pack'), PACK_COST); assert.equal(collectionPrice('idos', 'pack'), REAL_PACK_COST); assert.equal(collectionPrice('idos', 'ruler'), REAL_RULER_CASE_COST);
+assert.equal(cryptoAffordable('224999.999999', String(REAL_PACK_COST)), false); assert.equal(cryptoAffordable('225000.000001', String(REAL_PACK_COST)), true);
+console.log('Pack payment checks passed: real/demo separation, exact affordability, durable unknown-payment guard, reload/account isolation and storage failure. No financial transactions.');

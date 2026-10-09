@@ -168,7 +168,7 @@ readme/             Screenshots & GIFs for this README
 | **PvP** | ✅ Authoritative free private duels and random matchmaking tested on iDos; wager mode not implemented |
 | **Mainnet checkout** | 🧪 iDos Main decimals corrected to 6; purchases remain disabled until an owner payment test |
 
-> Local demo IMP has no cash value. Live $IMP is the verified Solana mainnet SPL token bound to iDos `Main`. Phantom holdings and the deposited iDos game balance are separate. The current arena is available in an iDos test build; purchases remain disabled pending owner wallet/payment testing. AI training needs no extra match signature or SOL. See the [current iDos setup and test link](docs/idos/SI4IPS8B-integration.md) and [contest checklist](docs/hackathon-20261009/README.md).
+> Local demo IMP has no cash value. Live $IMP is the verified Solana mainnet SPL token bound to iDos `Main`. Phantom holdings and the deposited iDos game balance are separate. Explicit deposits/withdrawals use the iDos pool with player confirmation and receipt recovery; live transfers still need owner verification. Real packs cost 225,000 IMP and ruler cases 900,000 IMP; demo costs remain 50/200. The current arena is available in an iDos test build; purchases remain disabled pending owner wallet/payment testing. AI training needs no extra match signature or SOL. See the [current iDos setup and test link](docs/idos/SI4IPS8B-integration.md) and [contest checklist](docs/hackathon-20261009/README.md).
 
 ---
 

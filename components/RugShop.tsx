@@ -8,6 +8,7 @@ import {IMPERIVM_TITLE} from '../lib/idos/title';
 import {IDOS_CONFIG} from '../lib/collection/gateway';
 import {useCollection} from './CollectionContext';
 import {useLocale} from './LocaleContext';
+import {ImpWalletPanel} from './ImpWalletPanel';
 import {COMMERCE_CONFIG, cryptoAffordable, RugCommerce, type RugOffer} from '../lib/idos/commerce';
 import styles from './RugShop.module.css';
 
@@ -15,13 +16,13 @@ export default function RugShop() {
   const idos = useIDos(), collection = useCollection(), {t, errorText} = useLocale();
   const [offers, setOffers] = useState<RugOffer[]>([]), [selected, setSelected] = useState<RugOffer | null>(null);
   const [pending, setPending] = useState(false), [busy, setBusy] = useState(false), [message, setMessage] = useState('');
-  const [tokenReady, setTokenReady] = useState(false), [tokenError, setTokenError] = useState('');
+  const [tokenError, setTokenError] = useState('');
   const gateway = useRef<RugCommerce | null>(null), scope = useRef(0), locked = useRef(false);
-  const active = COMMERCE_CONFIG.enabled && collection.snapshot?.mode === 'idos' && idos.session.status === 'wallet';
+  const active = IDOS_CONFIG.currencyType === 'VirtualCurrency' && COMMERCE_CONFIG.enabled && collection.snapshot?.mode === 'idos' && idos.session.status === 'wallet';
   useEffect(() => {
-    let cancelled = false; setTokenReady(false); setTokenError('');
+    let cancelled = false; setTokenError('');
     if (!idos.runtime || !['guest', 'wallet'].includes(idos.session.status)) return;
-    void idos.runtime.tokenBalance().then(() => {if (!cancelled) setTokenReady(true);}).catch(error => {if (!cancelled) setTokenError(error instanceof Error ? error.message : 'iDos token unavailable.');});
+    void idos.runtime.tokenBalance().catch(error => {if (!cancelled) setTokenError(error instanceof Error ? error.message : 'iDos token unavailable.');});
     return () => {cancelled = true;};
   }, [idos.runtime, idos.session.revision, idos.session.status]);
   const refresh = useCallback(async () => {
@@ -55,14 +56,13 @@ export default function RugShop() {
   }
   if (IDOS_CONFIG.title === IMPERIVM_TITLE.id && IDOS_CONFIG.currencyType === 'CryptoCurrency') return <section className={styles.shop} aria-labelledby="rug-shop-title">
     <div className={styles.heading}><span className={styles.coin} aria-hidden="true"><PaintedIcon name="rug" size={66}/></span><div><span className={styles.label}>iDos Games · Solana mainnet</span><h2 id="rug-shop-title">{t('Кошелёк $IMP', '$IMP wallet')}</h2><p>{t('Токен IMPERIVM для паков и правителей.', 'The IMPERIVM token for card packs and rulers.')}</p></div></div>
-    <div className={styles.empty}><p>{collection.snapshot?.mode === 'local' ? t('Сейчас вы в бесплатном демо. Для настоящего $IMP войдите в iDos кошельком.', 'You are in the free demo. Sign in to iDos to use real $IMP.') : t('Покупка и пополнение открываются в кошельке iDos. Цена и комиссия показаны там до подтверждения.', 'Buy and deposit through the iDos wallet. Review the price and fee there before confirming.')}</p><div className={styles.actions}>
-      {idos.session.status !== 'wallet' && <button disabled={idos.busy || collection.busy} onClick={() => void idos.login()}>{t('Войти кошельком', 'Sign in with wallet')}</button>}
-      {tokenReady && (idos.embedded ? <button disabled={idos.busy} onClick={() => void walletPanel()}>{t('Открыть кошелёк iDos', 'Open iDos wallet')}</button> : <a href={IMPERIVM_TITLE.appUrl} target="_blank" rel="noopener noreferrer">{t('Открыть $IMP на iDos ↗', 'Open $IMP on iDos ↗')}</a>)}
+    <div className={styles.empty}><p>{collection.snapshot?.mode === 'local' ? t('Сейчас вы в бесплатном демо. Для настоящего $IMP войдите в iDos кошельком.', 'You are in the free demo. Sign in to iDos to use real $IMP.') : t('Паки оплачиваются с игрового счёта iDos. Переведите нужную сумму своих IMP из Phantom; покупка пака подтверждается отдельно.', 'Packs use your iDos game balance. Transfer the IMP amount you need from Phantom; buying a pack is a separate confirmation.')}</p><div className={styles.actions}>
       <button disabled={collection.busy} onClick={() => void collection.refresh()}>{t('Обновить баланс', 'Refresh balance')}</button>
     </div></div>
+    <ImpWalletPanel/>
     {message && <p className={styles.notice} role="status">{errorText(message)}</p>}
     {tokenError && <p className={styles.notice} role="status">{errorText(tokenError)}</p>}
-    <p className={styles.footer}>{t('Solana mainnet · реальные средства. Демо бесплатно; NFT и proof-of-play — devnet.', 'Solana mainnet · real funds. Demo is free; NFTs and proof of play use devnet.')}</p>
+    <p className={styles.footer}>{t('Solana mainnet · реальные IMP. Подключение кошелька бесплатно. Сумму каждого перевода и комиссию сети вы подтверждаете в Phantom.', 'Solana mainnet · real IMP. Connecting a wallet is free. You confirm each transfer amount and network fee in Phantom.')}</p>
   </section>;
   return <section className={styles.shop} aria-labelledby="rug-shop-title">
     <div className={styles.heading}><span className={styles.coin} aria-hidden="true"><PaintedIcon name="rug" size={66}/></span><div><span className={styles.label}>iDos Games · Solana</span><h2 id="rug-shop-title">{t('Пополнить $IMP', 'Get more $IMP')}</h2><p>{t('SOL / USDC → $IMP → паки с новыми картами.', 'SOL / USDC → $IMP → packs with new cards.')}</p></div></div>

@@ -6,6 +6,7 @@ import {authorizeCollectionDeck} from '../../lib/collection/authority';
 import type {PlayerRegistration} from '../../lib/net/protocol';
 import {createImpBalanceReader, type ImpBalance} from './impBalance';
 import {validSolanaAddress} from '../../lib/solana/tokenBalance';
+import {createWalletRpcRelay, parseWalletRpc, type WalletRpcRequest} from './walletRpc';
 
 export interface ServiceOptions {
   port?: number; host?: string; origins?: string[]; clock?: () => number;
@@ -13,15 +14,40 @@ export interface ServiceOptions {
   maxMessagesPerWindow?: number;
   authorizeDeck?: (registration: PlayerRegistration) => Promise<void>;
   readImpBalance?: (owner: string) => Promise<ImpBalance>;
+  callWalletRpc?: (request: WalletRpcRequest) => Promise<unknown>;
 }
 export function startServer(options: ServiceOptions = {}) {
   const origins = new Set(options.origins ?? ['http://localhost:3101', 'http://127.0.0.1:3101', 'http://localhost:3000', 'http://127.0.0.1:3000']);
   const rooms = new RoomAuthority(options.clock, options.log);
   const readImpBalance = options.readImpBalance ?? createImpBalanceReader();
+  const callWalletRpc = options.callWalletRpc ?? createWalletRpcRelay();
+  const rpcLimits = new Map<string, {start: number; count: number}>();
   const server = createServer(async (request, response) => {
     response.setHeader('Content-Type', 'application/json');
     response.setHeader('Cache-Control', 'no-store');
-    if (request.method === 'GET' && request.url === '/health') {response.end(JSON.stringify({status: 'ok', rooms: rooms.size, queued: rooms.queued, capabilities: ['random-pvp', 'imp-balance'], version: process.env.RENDER_GIT_COMMIT?.slice(0, 12) ?? 'local'})); return;}
+    if (request.method === 'GET' && request.url === '/health') {response.end(JSON.stringify({status: 'ok', rooms: rooms.size, queued: rooms.queued, capabilities: ['random-pvp', 'imp-balance', 'wallet-rpc'], paidPvp: {enabled: false, reason: 'External TCG escrow settlement API is not available'}, version: process.env.RENDER_GIT_COMMIT?.slice(0, 12) ?? 'local'})); return;}
+    if (request.url === '/wallet/rpc') {
+      const origin = request.headers.origin;
+      if (!origin || !origins.has(origin)) {response.statusCode = 403; response.end(JSON.stringify({error: 'Origin not allowed'})); return;}
+      response.setHeader('Access-Control-Allow-Origin', origin); response.setHeader('Vary', 'Origin');
+      response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS'); response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      if (request.method === 'OPTIONS') {response.statusCode = 204; response.end(); return;}
+      if (request.method !== 'POST') {response.statusCode = 405; response.end(JSON.stringify({error: 'POST required'})); return;}
+      const ip = request.socket.remoteAddress ?? 'unknown', now = Date.now();
+      for (const [key, item] of rpcLimits) if (now - item.start >= 60_000) rpcLimits.delete(key);
+      const quota = rpcLimits.get(ip) ?? {start: now, count: 0}; rpcLimits.set(ip, quota);
+      if (++quota.count > 150 || rpcLimits.size > 1024) {response.statusCode = 429; response.setHeader('Retry-After', '60'); response.end(JSON.stringify({error: 'RPC rate limit'})); return;}
+      if (Number(request.headers['content-length'] ?? 0) > 8192) {response.statusCode = 413; response.end(JSON.stringify({error: 'Request too large'})); return;}
+      let rpc: WalletRpcRequest;
+      try {
+        let size = 0; const parts: Buffer[] = [];
+        for await (const chunk of request) {size += chunk.length; if (size > 8192) throw new Error('Request too large'); parts.push(chunk);}
+        rpc = parseWalletRpc(JSON.parse(Buffer.concat(parts).toString('utf8')));
+      } catch {response.statusCode = 400; response.end(JSON.stringify({error: 'Invalid wallet RPC request'})); return;}
+      try {response.end(JSON.stringify(await callWalletRpc(rpc)));}
+      catch {response.statusCode = 503; response.setHeader('Retry-After', '10'); response.end(JSON.stringify({jsonrpc: '2.0', id: rpc.id, error: {code: -32000, message: 'Wallet RPC temporarily unavailable'}}));}
+      return;
+    }
     if (request.url?.startsWith('/wallet/imp')) {
       const origin = request.headers.origin;
       if (origin && !origins.has(origin)) {response.statusCode = 403; response.end(JSON.stringify({error: 'Origin not allowed'})); return;}

@@ -7,6 +7,12 @@ export {cleanOwned, configuredTitle} from './access';
 export const COLLECTION_KEY = 'imperivm.collection.v1';
 export const PACK_COST = 50;
 export const RULER_CASE_COST=200;
+// Demo credits are deliberately separate from real SPL-token prices.
+export const REAL_PACK_COST = 225_000;
+export const REAL_RULER_CASE_COST = 900_000;
+export function collectionPrice(mode: 'local' | 'idos' | undefined, kind: 'pack' | 'ruler'): number {
+  return mode === 'idos' ? (kind === 'pack' ? REAL_PACK_COST : REAL_RULER_CASE_COST) : (kind === 'pack' ? PACK_COST : RULER_CASE_COST);
+}
 export {rulerCollectible,cleanHeroes,heroesFromCollectibles} from './heroAccess';
 import {cleanHeroes} from './heroAccess';
 import {IMPERIVM_TITLE} from '../idos/title';
@@ -14,7 +20,7 @@ export const RARITY_WEIGHTS: { rarity: Rarity; weight: number }[] = [
   { rarity: 'common', weight: 60 }, { rarity: 'rare', weight: 25 },
   { rarity: 'epic', weight: 11 }, { rarity: 'legendary', weight: 4 },
 ];
-export interface CollectionSnapshot { mode: 'local' | 'idos'; rug: number; owned: Record<string, number>; packsOpened: number; collectionCurrency?: number; heroes?:string[]; }
+export interface CollectionSnapshot { mode: 'local' | 'idos'; rug: number; exactBalance?: string; purchaseBlocked?: string; owned: Record<string, number>; packsOpened: number; collectionCurrency?: number; heroes?:string[]; }
 export interface PackResult { cards: CardDef[]; snapshot: CollectionSnapshot; duplicates?: boolean[]; }
 export interface RulerCaseResult {heroId:string;duplicate:boolean;snapshot:CollectionSnapshot}
 export interface CollectionGateway { load(): Promise<CollectionSnapshot>; openPack(): Promise<PackResult>; openRulerCase():Promise<RulerCaseResult>; }

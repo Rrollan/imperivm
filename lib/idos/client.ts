@@ -101,6 +101,17 @@ export class IDosRuntime {
       return amount;
     });
   }
+  async withImpTransfers<T>(work: (service: import('./walletTransfer').ImpTransferService) => Promise<T>): Promise<T> {
+    return this.withAccount(async client => {
+      const session = this.session;
+      if (session.status !== 'wallet' || !session.owner || !session.userId) throw new Error('Войдите тем же кошельком в iDos перед переводом IMP.');
+      const {ImpTransferService, TransferJournal, transferJournalKey} = await import('./walletTransfer');
+      // Storage is mandatory: a transaction cannot start without a durable recovery receipt.
+      const service = new ImpTransferService(client, new TransferJournal(window.localStorage, session.userId, session.owner));
+      if (!navigator.locks) throw new Error('Для перевода IMP нужен современный браузер с защитой от повторных операций. Откройте кошелёк на iDos.');
+      return navigator.locks.request(transferJournalKey(session.userId, session.owner), () => work(service));
+    });
+  }
   async publishPracticeWins(wins: number) {
     if (!Number.isSafeInteger(wins) || wins < 1) throw new Error('No signed practice wins to publish.');
     return this.withAccount(async client => {
