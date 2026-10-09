@@ -77,6 +77,6 @@ assert.deepEqual(drawPhase(0),{approach:0,landing:0,flip:0});assert.deepEqual(dr
 const matches=[];for(const a of Object.keys(DECKS))for(const b of Object.keys(DECKS))for(const seed of [21,375,2718,104729]){
  const result=probeMatch(a,DECKS[a],b,DECKS[b],seed);assert.notEqual(result.winner,null);matches.push({a,b,seed,...result});
 }
-const blocks=matches.map(m=>m.blocks).sort((a,b)=>a-b),report={scope:'64 deterministic greedy-AI matches; not human PvP balance or wall-clock duration',medianBlocks:blocks[Math.floor(blocks.length/2)],minBlocks:blocks[0],maxBlocks:blocks.at(-1),matches};
+const blocks=matches.map(m=>m.blocks).sort((a,b)=>a-b),report={scope:`${matches.length} deterministic greedy-AI matches; not human PvP balance or wall-clock duration`,medianBlocks:blocks[Math.floor(blocks.length/2)],minBlocks:blocks[0],maxBlocks:blocks.at(-1),matches};
 writeFileSync('docs/research/olympus-simulation-20261007.json',JSON.stringify(report,null,2)+'\n');
-console.log(`OLYMPUS OK: capacity, summon cap, immutable instant expansion, pre-play ultimates, unstake exploit, removal counterplay, same-turn faction setup, public metadata privacy, motion endpoints; 64 complete matches, median ${report.medianBlocks} blocks.`);
+console.log(`OLYMPUS OK: capacity, summon cap, immutable instant expansion, pre-play ultimates, unstake exploit, removal counterplay, same-turn faction setup, public metadata privacy, motion endpoints; ${matches.length} complete matches, median ${report.medianBlocks} blocks.`);

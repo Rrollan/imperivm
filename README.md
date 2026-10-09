@@ -33,7 +33,7 @@ A Hearthstone-style card battler set in imperial Rome — on Solana. Read the me
 
 ## ⚔️ The chain is the board
 
-Every turn creates a block. Tactical **instant spells** act immediately; **edicts** wait in a public mempool until your next turn, giving the opponent a response window.
+Every turn advances a local game block. Tactical **instant spells** act immediately; **edicts** wait in a public mempool until your next turn, giving the opponent a response window. These are game rules; turns do not submit Solana transactions.
 
 | Mechanic | What it does |
 | --- | --- |
@@ -108,7 +108,9 @@ Screenshot sources and capture details are recorded in [the current media ledger
 
 ## 🏛️ Colosseum submission
 
-Built for the **Crypto World's Fair Hackathon** (Colosseum, 2026) — entering the **Superteam Kazakhstan** and **iDos Games** side tracks.
+Built for the **Crypto World's Fair Hackathon** (Colosseum, 2026), targeting the **Superteam Kazakhstan × iDos Games** side track. Submission and eligibility acceptance are not yet verified. The separate general KZ track has its own registration requirements.
+
+See the [hackathon preparation packet](docs/hackathon-20261009/README.md) for application copy, recording scripts, the current-interface deck and remaining iDos/mainnet checks.
 
 | Name | Role | Contact |
 |------|------|---------|
@@ -160,11 +162,11 @@ readme/             Screenshots & GIFs for this README
 | **Local game** | ✅ Full AI matches, 9 rulers, 99 cards, demo packs, owned deck builder |
 | **Solana** | 🧪 Devnet only. Phantom connect, proof-of-play signatures |
 | **NFTs** | 🧪 Metaplex Core collection + Candy Machine coded, not yet live-minted |
-| **iDos** | 🧪 Typed adapter ready, no Title created yet |
+| **iDos** | 🧪 SDK/adapter ready; MCP read on 9 October returned zero Titles for the connected publisher |
 | **PvP** | ✅ Authoritative free online 1v1; paid entitlements require configured iDos |
 | **Mainnet checkout** | 🧪 Prepared, disabled until configured and verified |
 
-> Local demo IMP has no cash value. Live IMP is a closed-loop iDos virtual currency, not an SPL token. SOL/USDC top-up code is prepared, disabled until the Title and live checkout are verified. See the [economy setup](docs/economy-idos-rug.md).
+> Local demo IMP has no cash value. Planned live IMP is a closed-loop iDos virtual currency, not an SPL token. SOL/USDC top-up code is prepared, disabled until the Title and live checkout are verified. The iDos side track separately requires a **mainnet game token**; that launch/integration remains unverified. See the [economy setup](docs/economy-idos-rug.md) and [current contest checklist](docs/hackathon-20261009/README.md).
 
 ---
 

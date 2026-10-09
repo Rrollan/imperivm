@@ -202,7 +202,7 @@ const matchups=heroes.flatMap((hero,index)=>heroes.slice(index+1).map(opponent=>
   return {hero,opponent,matches:pair.length,heroWinRate:rate(wins,pair.length)};
 }));
 const curves=heroes.map(hero=>({hero,averageCost:Math.round(DECKS[hero].reduce((sum,id)=>sum+CARDS[id].cost,0)/30*100)/100,costThreeOrLess:DECKS[hero].filter(id=>CARDS[id].cost<=3).length,costSevenOrMore:DECKS[hero].filter(id=>CARDS[id].cost>=7).length}));
-const report={scope:'288 seeded greedy/pressure AI matches, both seats, optional mulligans. A smoke/balance probe, not measured human PvP or elapsed match minutes.',matches:samples.length,draws:samples.filter(sample=>sample.winner==='draw').length,medianBlocks:blocks[Math.floor(blocks.length/2)],minBlocks:blocks[0],maxBlocks:blocks.at(-1),firstSeatWinRate:rate(samples.filter(sample=>sample.winner===0).length,samples.length),conditionalCases,ultimates:samples.reduce((sum,sample)=>sum+sample.ultimates,0),reservePurchases:samples.reduce((sum,sample)=>sum+sample.reservePurchases,0),heroes:measured,matchups,curves};
+const report={scope:`${samples.length} seeded greedy/pressure AI matches, both seats, optional mulligans. A smoke/balance probe, not measured human PvP or elapsed match minutes.`,matches:samples.length,draws:samples.filter(sample=>sample.winner==='draw').length,medianBlocks:blocks[Math.floor(blocks.length/2)],minBlocks:blocks[0],maxBlocks:blocks.at(-1),firstSeatWinRate:rate(samples.filter(sample=>sample.winner===0).length,samples.length),conditionalCases,ultimates:samples.reduce((sum,sample)=>sum+sample.ultimates,0),reservePurchases:samples.reduce((sum,sample)=>sum+sample.reservePurchases,0),heroes:measured,matchups,curves};
 console.log(JSON.stringify(report,null,2));
 for(const hero of measured)if(hero.winRate<40||hero.winRate>60)console.warn(`BALANCE REVIEW: ${hero.hero} ${hero.winRate}% under this policy mix; inspect the matchup, not just its hero power.`);
 if(report.firstSeatWinRate>60||report.firstSeatWinRate<40)console.warn(`BALANCE REVIEW: first seat ${report.firstSeatWinRate}% under this policy mix; inspect opening tempo in human PvP.`);
@@ -212,4 +212,4 @@ if(process.argv.includes('--report')){
   assert.match(document,/<!-- MEASURED-START -->[\s\S]*<!-- MEASURED-END -->/);
   writeFileSync(path,document.replace(/<!-- MEASURED-START -->[\s\S]*<!-- MEASURED-END -->/,content));
 }
-console.log(`CHARACTERS OK: all 50 playable, unchanged 49 originals, actual art files, four legal starters, ${transitions} focused transitions, ${conditionalCases} ultimate branches and ${samples.length} complete bounded matches.`);
+console.log(`CHARACTERS OK: all 50 playable, unchanged 49 originals, actual art files, ${heroes.length} legal deck recipes, ${transitions} focused transitions, ${conditionalCases} ultimate branches and ${samples.length} complete bounded matches.`);
