@@ -2,9 +2,9 @@ import { DynamicTexture } from '@babylonjs/core/Materials/Textures/dynamicTextur
 import { Texture } from '@babylonjs/core/Materials/Textures/texture';
 import type { Scene } from '@babylonjs/core/scene';
 import { CARDS } from '../../lib/cards';
-import { type Locale } from '../../lib/locale';
+import { cardName,type Locale } from '../../lib/locale';
 import type { Minion } from '../../lib/engine/types';
-import {CARD_FACE,CARD_FRAME_LAYOUT,cardFramePath,paintCardFace,paintBadge} from './cardFace';
+import {CARD_FACE,BATTLE_FACE,FACE_TEXTURE_SCALE,CARD_FRAME_LAYOUT,cardFramePath,paintCardFace,paintBadge} from './cardFace';
 import {heroPortraitPath} from './heroPortrait';
 import {cardArtPath} from '../../lib/cardArt';
 import {ordersLayout,ordersView} from './ordersView';
@@ -47,7 +47,7 @@ function contain(ctx: CanvasRenderingContext2D, image: HTMLImageElement, x: numb
   ctx.drawImage(image, x + (w - width) / 2, y + (h - height) / 2, width, height);
 }
 
-/** Small render textures; source art is fetched only for visible cards/heroes. */
+/** Retina faces; source art is fetched only for visible cards/heroes. */
 export class ArenaTextures {
   private images = new Map<string, HTMLImageElement>();
   private redraws = new Set<() => void>();
@@ -76,14 +76,20 @@ export class ArenaTextures {
   }
 
   make(name: string, initial: Face) {
-    const size = ['card','minion','queued'].includes(initial.kind)?{width:CARD_FACE.width,height:CARD_FACE.height}:initial.kind==='orders'?{width:1248,height:160}:initial.kind==='queueTitle'?{width:512,height:256}:initial.kind === 'command' ? { width: 768, height: 336 } : ['hero','power'].includes(initial.kind) ? { width: 384, height: 384 } : initial.kind === 'gas' ? { width: 384, height: 256 } : { width: 384, height: 512 };
-    const texture = new DynamicTexture(name, size, this.scene, true, Texture.TRILINEAR_SAMPLINGMODE);
+    const size = initial.kind==='minion'?BATTLE_FACE:['card','queued'].includes(initial.kind)?CARD_FACE:initial.kind==='orders'?{width:1248,height:160}:initial.kind==='queueTitle'?{width:512,height:256}:initial.kind === 'command' ? { width: 768, height: 336 } : ['hero','power'].includes(initial.kind) ? { width: 384, height: 384 } : initial.kind === 'gas' ? { width: 384, height: 256 } : { width: 384, height: 512 };
+    const scale=['card','minion','queued','hero','power'].includes(initial.kind)?FACE_TEXTURE_SCALE:1;
+    const texture = new DynamicTexture(name, {width:size.width*scale,height:size.height*scale}, this.scene, true, Texture.TRILINEAR_SAMPLINGMODE);
+    texture.anisotropicFilteringLevel=4;
     texture.hasAlpha = true;
     const ctx = texture.getContext() as unknown as CanvasRenderingContext2D;
     let face = initial;
     const draw = () => {
       this.painting=draw;
-      ctx.clearRect(0, 0, size.width, size.height);
+      ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,size.width*scale,size.height*scale);
+      // A flight may change between a tall hand face and a shorter court face.
+      const height=face.kind==='minion'?BATTLE_FACE.height:['card','queued'].includes(face.kind)?CARD_FACE.height:size.height;
+      ctx.setTransform(scale,0,0,scale*size.height/height,0,0);
+      ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
       if (face.kind === 'back') this.drawBack(ctx,size.height);
       else if (face.kind === 'card') this.drawCard(ctx, face.cardId,face.playable);
       else if (face.kind === 'minion') face.compact?this.drawCompactMinion(ctx,face.minion,face.ready,face.readiness):this.drawMinion(ctx, face.minion, face.ready,face.readiness);
@@ -175,12 +181,17 @@ export class ArenaTextures {
 
   /** Phone court pieces prioritise the portrait, attack and health. Tap for full rules. */
   private drawCompactMinion(ctx:CanvasRenderingContext2D,minion:Minion,ready=false,readiness?:FighterReadiness){
-    ctx.save();ctx.scale(1,CARD_FACE.height/384);
+    ctx.save();ctx.scale(1,BATTLE_FACE.height/384);
     rounded(ctx,9,9,366,366,56);ctx.fillStyle='#392419';ctx.fill();ctx.save();ctx.clip();
     const art=this.image(cardArtPath(minion.cardId));if(art)cover(ctx,art,17,17,350,350);
     const shade=ctx.createLinearGradient(0,220,0,375);shade.addColorStop(0,'#20120b00');shade.addColorStop(1,'#20120bed');ctx.fillStyle=shade;ctx.fillRect(9,220,366,155);ctx.restore();
     rounded(ctx,9,9,366,366,56);ctx.strokeStyle=ready?'#f0c778':minion.taunt?'#efd295':'#ba8d4e';ctx.lineWidth=12;ctx.stroke();
-    const label=CARDS[minion.cardId].faction;ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`700 48px ${this.font}`;ctx.lineWidth=5;ctx.strokeStyle='#20120b';ctx.fillStyle='#fff0ce';ctx.strokeText(label,192,267,250);ctx.fillText(label,192,267,250);
+    // Phone pieces cannot carry a paragraph at 60px wide. Show a large name
+    // cue; tapping retains the full name, original portrait and exact rules.
+    const label=cardName(minion.cardId,this.locale).split(' ')[0];
+    rounded(ctx,24,236,336,58,12);ctx.fillStyle='#21130bdd';ctx.fill();
+    ctx.font=`800 64px ${this.font}`;const nameSize=Math.min(64,64*284/Math.max(1,ctx.measureText(label).width));
+    ctx.font=`800 ${nameSize}px ${this.font}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff5df';ctx.fillText(label,192,266);
     this.badge(ctx,String(minion.attack),61,327,'#ab832e',46);this.badge(ctx,String(Math.max(0,minion.health)),323,327,'#a8322f',46);
     const symbol:RomanSymbol=minion.staked?'lock':ready?'gladius':readiness==='fresh'?'hourglass':'spent';
     this.badge(ctx,'',322,61,ready?'#773222':'#453226',38);drawRomanSymbol(ctx,symbol,322,61,48,ready?'#fff0bd':'#edce91');
@@ -193,7 +204,7 @@ export class ArenaTextures {
     this.badge(ctx,'',323,61,minion.staked?'#315e59':ready?'#773222':'#514335',33);
     drawRomanSymbol(ctx,symbol,323,61,44,minion.staked?'#a8e2da':ready?'#fff0bd':'#f4dda7');
     if(minion.lifesteal){
-      this.badge(ctx,'',312,420,'#632d29',24);drawRomanSymbol(ctx,'drop',312,420,30,'#f0c8a9');
+      this.badge(ctx,'',312,270,'#632d29',24);drawRomanSymbol(ctx,'drop',312,270,30,'#f0c8a9');
     }
   }
 

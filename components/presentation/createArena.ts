@@ -122,7 +122,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   const heroY=(owner:number)=>compact&&owner===0?610:rulerSocket(owner,portrait).y;
   const queueX=()=>queueSlot(0,portrait).x;
   const queueY=(owner:number)=>queueSlot(owner,portrait).y;
-  const handY=()=>portrait?1030:compact?835:865;
+  const handY=()=>portrait?1030:compact?835:859;
   const ordersFace=(state:GameState):Face=>({kind:'orders',gas:state.players[0].gas,max:state.players[0].maxGas,portrait});
   const entities = new Map<string, Entity>();
   let heldArrival: Entity | null = null;
@@ -281,7 +281,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     });
     const hand = state.players[0].hand;
     const spacing = Math.min(portrait?116:130,(portrait?670:900)/Math.max(1,hand.length-1));
-    hand.forEach((c,i)=>{const x=800+(i-(hand.length-1)/2)*spacing,h=compact?240:portrait?196:234;keep(c.uid,{kind:'hand',uid:c.uid,owner:0,cardId:c.cardId},{kind:'card',cardId:c.cardId,playable:playableCards.has(c.uid)},h*CARD_FACE.ratio,h,x,handY()+Math.abs(x-800)*.024,-1-i*.015);});
+    hand.forEach((c,i)=>{const x=800+(i-(hand.length-1)/2)*spacing,h=compact?240:portrait?196:248;keep(c.uid,{kind:'hand',uid:c.uid,owner:0,cardId:c.cardId},{kind:'card',cardId:c.cardId,playable:playableCards.has(c.uid)},h*CARD_FACE.ratio,h,x,handY()+Math.abs(x-800)*.024,-1-i*.015);});
     const backs = Math.min(8,state.players[1].hand.length);
     for(let i=0;i<backs;i++){const e=keep(`back-${i}`,{kind:'hand',uid:`back-${i}`,owner:1},{kind:'back'},50,70,800+(i-(backs-1)/2)*40,portrait?-93:35,.5);e.face.isPickable=false;}
     for(const owner of [0,1] as const){
@@ -534,6 +534,11 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       : point(boardRow.center+(addedIndex-(boardSize-1)/2)*boardRow.spacing,boardRow.y,-.15));
     const queuedCast=batch.action.type==='cast-spell'&&!immediate;
     const landingScale = moving ? new Vector3((queuedCast?QUEUED_CARD.width:boardRow.width)/(moving.width*50),(queuedCast?QUEUED_CARD.height:boardRow.height)/(moving.height*50),1) : Vector3.One();
+    // The tall hand card stays rigid during flight. At contact sync replaces it
+    // with the wider portrait crop, rather than stretching the illustration in air.
+    if(handUid&&moving&&CARDS[moving.data.cardId??'']?.type==='minion'){
+      const rigid=Math.min(landingScale.x,landingScale.y);landingScale.set(rigid,rigid,1);
+    }
     const settling = handUid ? batch.after.players[owner].board.flatMap((m,index)=>{
       const entry=entities.get(m.uid); return entry ? [{entry,start:entry.root.position.clone(),target:point(boardRow.center+(index-(boardSize-1)/2)*boardRow.spacing,boardRow.y,-.15)}] : [];
     }) : [];

@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useRef,type KeyboardEvent,type PointerEvent} from 'react';
 import {CARDS} from '../../lib/cards';
-import {CARD_FACE,cardFramePath,paintCardFace} from './cardFace';
+import {CARD_FACE,FACE_TEXTURE_SCALE,cardFramePath,paintCardFace} from './cardFace';
 import {cardArtPath} from '../../lib/cardArt';
 import type {Locale} from '../../lib/locale';
 import styles from './ArenaLab.module.css';
@@ -50,11 +50,11 @@ export function ArenaCardPreview({id,locale,label,stats,interactive=false,reduce
     let live=true;
     const art=new Image(),frame=new Image();
     const font=getComputedStyle(document.body).getPropertyValue('--font-sans').trim()||'sans-serif';
-    const draw=()=>{if(!live)return;ctx.clearRect(0,0,CARD_FACE.width,CARD_FACE.height);paintCardFace(ctx,id,locale,font,art.complete&&art.naturalWidth?art:null,undefined,stats,frame.complete&&frame.naturalWidth?frame:null);};
+    const draw=()=>{if(!live)return;ctx.setTransform(FACE_TEXTURE_SCALE,0,0,FACE_TEXTURE_SCALE,0,0);ctx.clearRect(0,0,CARD_FACE.width,CARD_FACE.height);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';paintCardFace(ctx,id,locale,font,art.complete&&art.naturalWidth?art:null,undefined,stats,frame.complete&&frame.naturalWidth?frame:null);};
     art.onload=draw;frame.onload=draw;frame.src=cardFramePath(CARDS[id].rarity);art.src=cardArtPath(id);draw();void document.fonts.ready.then(draw);
     return()=>{live=false;art.onload=null;frame.onload=null;};
   },[id,locale,stats?.attack,stats?.health]);
-  const face=<canvas ref={canvas} className={interactive?undefined:styles.inspectedCard} width={CARD_FACE.width} height={CARD_FACE.height} role={interactive?'presentation':'img'} aria-hidden={interactive||undefined} aria-label={interactive?undefined:label}/>;
+  const face=<canvas ref={canvas} className={interactive?undefined:styles.inspectedCard} width={CARD_FACE.width*FACE_TEXTURE_SCALE} height={CARD_FACE.height*FACE_TEXTURE_SCALE} role={interactive?'presentation':'img'} aria-hidden={interactive||undefined} aria-label={interactive?undefined:label}/>;
   if(!interactive)return face;
   return <span ref={surface} className={`${styles.inspectedCard} ${material.surface}`} data-rarity={CARDS[id].rarity} data-motion={enabled?'on':'off'} role="img" aria-label={label} tabIndex={enabled?0:undefined}
     aria-description={enabled?(locale==='ru'?'Двигайте указатель или нажимайте стрелки, чтобы рассмотреть материал карты.':'Move the pointer or use arrow keys to inspect the card material.'):undefined}

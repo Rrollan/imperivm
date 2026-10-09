@@ -7,17 +7,17 @@ import { videoCues } from '../components/presentation/videoCue';
 import {MOTION,settle,attackTravel,deathProgress,accentProgress,publicPlayPhase} from '../components/presentation/motionSpec';
 import {HEROES} from '../lib/heroes';
 import {abilityCues} from '../components/presentation/abilityCues';
-import {pixelRatio} from '../components/presentation/renderQuality';
+import {pixelRatio,RENDER_PIXEL_BUDGET} from '../components/presentation/renderQuality';
 import {fighterRow} from '../components/presentation/battleLayout';
 import {rulerSocket,turnSocket,edictRegister} from '../components/presentation/boardSockets';
 import {ordersLayout} from '../components/presentation/ordersView';
 import {targetingEdge,targetingInsets} from '../components/presentation/targetingGeometry';
 
 async function main() {
-  assert.ok(pixelRatio(1280,800,2,'auto')>1.4,'Retina must improve image resolution above CSS pixels');
+  assert.equal(pixelRatio(1440,900,2,'auto'),2,'A normal Retina arena must render at native device resolution');
   assert.equal(pixelRatio(1280,800,2,'fast'),1,'Performance mode must retain the CSS pixel budget');
   assert.ok(3840*2160*pixelRatio(3840,2160,2,'auto')**2<=3840*2160,'Large windows must not render at four times their area');
-  assert.ok(1920*1080*pixelRatio(1920,1080,2,'sharp')**2<=4_000_001,'Sharp mode must respect its pixel budget');
+  assert.ok(1920*1080*pixelRatio(1920,1080,2,'sharp')**2<=RENDER_PIXEL_BUDGET.sharp,'Sharp mode must respect its pixel budget');
   for(let count=1;count<=7;count++){
     const row=fighterRow(count,0,true),left=row.center-(count-1)*row.spacing/2-row.width/2,right=row.center+(count-1)*row.spacing/2+row.width/2;
     assert.ok(left>450&&right<1140,'A complete portrait row must clear both table edges and the hourglass socket');
