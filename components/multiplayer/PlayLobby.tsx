@@ -23,11 +23,12 @@ const modeDefinitions = [
 ] as const;
 export function PlayLobby() {
   const params = useSearchParams();
+  if (process.env.NEXT_PUBLIC_IDOS_STATIC_BUILD === 'true' && (params.get('mode') === 'friend' || params.has('code') || params.has('room'))) return <CustomLobby/>;
   return !params.get('room') && (params.get('mode') === 'friend' || params.has('code')) ? <CustomLobby/> : <MatchmakingLobby/>;
 }
 function MatchmakingLobby() {
   const {t, locale, heroName, heroTitle, powerName} = useLocale();
-  const MODES = modeDefinitions.map((item, index) => ({...item, title: t(item.title, ['Against AI', 'With a friend', 'Random opponent'][index]), copy: t(item.copy, ['Learn your deck and try combos at your own pace.', 'Create a private table and invite a friend.', 'Meet another player who is looking for a match.'][index])}));
+  const MODES = modeDefinitions.map((item, index) => ({...item, title: t(item.title, ['Against AI', 'With a friend', 'Random opponent'][index]), copy: t(item.copy, ['Learn your deck and try combos at your own pace.', 'Create a private table and invite a friend.', 'Meet another player who is looking for a match.'][index])})).filter(item => process.env.NEXT_PUBLIC_IDOS_STATIC_BUILD !== 'true' || item.id !== 'random');
   const collection=useCollection();
   const [authorizing,setAuthorizing]=useState(false),[accessError,setAccessError]=useState('');
   async function launchOnline(){
@@ -40,9 +41,9 @@ function MatchmakingLobby() {
   }
   const params = useSearchParams(), invite = params.get('room'), router = useRouter();
   const initial = params.get('mode');
-  const [mode, setMode] = useState<'ai' | 'friend' | 'random'>(invite ? 'friend' : initial === 'friend' || initial === 'random' ? initial : 'ai');
+  const [mode, setMode] = useState<'ai' | 'friend' | 'random'>(process.env.NEXT_PUBLIC_IDOS_STATIC_BUILD === 'true' ? 'ai' : invite ? 'friend' : initial === 'friend' || initial === 'random' ? initial : 'ai');
   const [hero, setHero] = useState(() => Object.hasOwn(HEROES, params.get('hero') || '') ? params.get('hero')! : 'builder');
-  const {session, error, pending, connected, send, refresh} = useOnlineSession(true);
+  const {session, error, pending, connected, send, refresh} = useOnlineSession(process.env.NEXT_PUBLIC_IDOS_STATIC_BUILD !== 'true');
   const [now, setNow] = useState(() => Date.now()), [copied, setCopied] = useState(false);
   useEffect(() => {const id = window.setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(id);}, []);
   const room = session?.room, queued = session?.queue, locked = !!room || !!queued;

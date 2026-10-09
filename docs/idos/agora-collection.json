@@ -308,6 +308,35 @@
               "HasSpecialVersion": false
             }
           ]
+        },
+        {
+          "SetID": "OLYMPUS",
+          "Collectibles": [
+            {
+              "CollectibleID": "ruler-athena",
+              "DisplayName": "Athena",
+              "Rarity": 5,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "ruler-hermes",
+              "DisplayName": "Hermes",
+              "Rarity": 5,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "ruler-hephaestus",
+              "DisplayName": "Hephaestus",
+              "Rarity": 5,
+              "HasSpecialVersion": false
+            },
+            {
+              "CollectibleID": "ruler-poseidon",
+              "DisplayName": "Poseidon",
+              "Rarity": 5,
+              "HasSpecialVersion": false
+            }
+          ]
         }
       ]
     }
@@ -331,9 +360,34 @@
             "Standard": {
               "Entries": [
                 {
-                  "Type": "VirtualCurrency",
-                  "CurrencyID": "IMP",
+                  "Type": "CryptoCurrency",
+                  "CurrencyID": "Main",
                   "Amount": 50
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "OLYMPUS_RULER_CASE": {
+      "PackTypeID": "OLYMPUS_RULER_CASE",
+      "DisplayName": "Olympus rulers",
+      "CollectibleCount": 1,
+      "GuaranteedMinRarity": 5,
+      "GuaranteeMaxRarity": false,
+      "RarityWeights": {
+        "5": 100
+      },
+      "PriceOptions": {
+        "IMP": {
+          "Cost": {
+            "Standard": {
+              "Entries": [
+                {
+                  "Type": "CryptoCurrency",
+                  "CurrencyID": "Main",
+                  "Amount": 200
                 }
               ]
             }
@@ -358,6 +412,10 @@
     {
       "Rarity": 4,
       "CollectionCurrencyGranted": 20
+    },
+    {
+      "Rarity": 5,
+      "CollectionCurrencyGranted": 100
     }
   ]
 }

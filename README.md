@@ -162,11 +162,11 @@ readme/             Screenshots & GIFs for this README
 | **Local game** | ✅ Full AI matches, 9 rulers, 99 cards, demo packs, owned deck builder |
 | **Solana** | 🧪 Devnet only. Phantom connect, proof-of-play signatures |
 | **NFTs** | 🧪 Metaplex Core collection + Candy Machine coded, not yet live-minted |
-| **iDos** | 🧪 SDK/adapter ready; MCP read on 9 October returned zero Titles for the connected publisher |
+| **iDos** | 🧪 Title SI4IPS8B configured; current game uploaded as a staged test build, not deployed |
 | **PvP** | ✅ Authoritative free online 1v1; paid entitlements require configured iDos |
-| **Mainnet checkout** | 🧪 Prepared, disabled until configured and verified |
+| **Mainnet checkout** | 🧪 SPL IMP mint verified; purchases blocked until iDos corrects Main decimals from 0 to 6 |
 
-> Local demo IMP has no cash value. Planned live IMP is a closed-loop iDos virtual currency, not an SPL token. SOL/USDC top-up code is prepared, disabled until the Title and live checkout are verified. The iDos side track separately requires a **mainnet game token**; that launch/integration remains unverified. See the [economy setup](docs/economy-idos-rug.md) and [current contest checklist](docs/hackathon-20261009/README.md).
+> Local demo IMP has no cash value. Live $IMP is the verified Solana mainnet SPL token bound to iDos `Main`. The current arena is available in an iDos test build; real purchases are blocked by a platform decimals mismatch and wallet/payment testing is pending. See the [current iDos setup and test link](docs/idos/SI4IPS8B-integration.md) and [contest checklist](docs/hackathon-20261009/README.md).
 
 ---
 

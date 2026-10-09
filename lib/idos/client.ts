@@ -2,7 +2,8 @@ import { createIDosGamesClient, type IDosGamesClient, type GetLeaderboardRespons
 import { BrowserPlatformAdapter } from '@idosgames/core/platform';
 import { IDOS_CONFIG } from '../collection/gateway';
 import { authenticateSolanaWallet, idosResult, SessionQueue } from './auth';
-import { DEVNET_RPC } from '../solana/devnet';
+import {IMPERIVM_TITLE} from './title';
+import {validateImpToken} from './token';
 import type {CollectionAuth} from '../collection/access';
 
 export type IDosSession = { status: 'demo' | 'connecting' | 'guest' | 'wallet' | 'restricted' | 'error'; owner: string | null; userId: string | null; error: string | null; revision: number };
@@ -36,7 +37,9 @@ export class IDosRuntime {
         if (owner || this.embeddedOwner) {
           const defs = idosResult(await this.client.blockchain.getDefinitions());
           const network = defs.Blockchain?.Networks?.[IDOS_CONFIG.network];
-          if (network?.Type !== 'Solana' || network.RpcUrl?.replace(/\/$/, '') !== DEVNET_RPC) throw new Error('Configure the iDos login network with the Solana devnet RPC. The IMP shop has a separate mainnet configuration.');
+          // A wallet login signs a challenge, not a transaction. Pool/RPC details may be
+          // supplied by the platform registry; they need not appear in title config.
+          if (network?.Type !== 'Solana') throw new Error('Configure the iDos wallet login network as Solana.');
         }
         const pass = this.client.auth.playAccess;
         const address = owner ?? this.embeddedOwner;
@@ -87,6 +90,16 @@ export class IDosRuntime {
   async standings(): Promise<IDosStandings> {
     if (!IDOS_CONFIG.leaderboard) throw new Error('iDos leaderboard is not configured.');
     return this.withAccount(async client => ({ board: idosResult(await client.leaderboard.getLeaderboard(IDOS_CONFIG.leaderboard)), ownScore: idosResult(await client.leaderboard.getMyProgress(IDOS_CONFIG.leaderboard)).CurrentScore ?? 0 }));
+  }
+  async tokenBalance(): Promise<string> {
+    return this.withAccount(async client => {
+      const definitions = idosResult(await client.title.getCurrencyDefinitions());
+      if (IDOS_CONFIG.title === IMPERIVM_TITLE.id) validateImpToken(definitions);
+      idosResult(await client.blockchain.getUserState());
+      const amount = client.data.user.getCryptoCurrencyAmount(IDOS_CONFIG.currency);
+      if (!/^\d+(?:\.\d+)?$/.test(amount)) throw new Error('iDos returned an invalid IMP balance.');
+      return amount;
+    });
   }
   async publishPracticeWins(wins: number) {
     if (!Number.isSafeInteger(wins) || wins < 1) throw new Error('No signed practice wins to publish.');

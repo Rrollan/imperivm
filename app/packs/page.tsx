@@ -84,7 +84,7 @@ export default function PacksPage() {
           </button>
         </div>
         {!animating&&collection.snapshot&&collection.snapshot.rug<PACK_COST&&<p className={styles.packStatus}>{t('Для пака нужно 50 $IMP.','A pack requires 50 $IMP.')}</p>}
-        {!opened&&<Link className={styles.secondaryLink} href="/arena-lab/pack-preview">{t('Предпросмотр анимации','Preview the animation')}<RomanIcon name="next" size={18}/></Link>}
+        {!opened&&process.env.NEXT_PUBLIC_IDOS_STATIC_BUILD!=='true'&&<Link className={styles.secondaryLink} href="/arena-lab/pack-preview">{t('Предпросмотр анимации','Preview the animation')}<RomanIcon name="next" size={18}/></Link>}
 
         {opened&&!animating&&<Link href="/collection" className={styles.secondaryLink}><PaintedIcon name="cards" size={30}/>{t('Добавить новые карты в колоду','Build with your new cards')}<RomanIcon name="next" size={20}/></Link>}
         <details className={styles.menuDetails}><summary>{t('Что в паке?', 'What’s inside?')}</summary><p>{t('Пять случайных карт из 50 персонажей Agora. Шансы редкости указаны для одной карты.','Five random cards from 50 Agora characters. Rarity odds apply to each card.')}</p><div className={styles.rarityChances}>

@@ -9,6 +9,7 @@ export const PACK_COST = 50;
 export const RULER_CASE_COST=200;
 export {rulerCollectible,cleanHeroes,heroesFromCollectibles} from './heroAccess';
 import {cleanHeroes} from './heroAccess';
+import {IMPERIVM_TITLE} from '../idos/title';
 export const RARITY_WEIGHTS: { rarity: Rarity; weight: number }[] = [
   { rarity: 'common', weight: 60 }, { rarity: 'rare', weight: 25 },
   { rarity: 'epic', weight: 11 }, { rarity: 'legendary', weight: 4 },
@@ -81,13 +82,14 @@ export class LocalCollectionGateway implements CollectionGateway {
   }
 }
 export const IDOS_CONFIG = {
-  title: configuredTitle(process.env.NEXT_PUBLIC_IDOS_TITLE_ID),
+  title: configuredTitle(process.env.NEXT_PUBLIC_IDOS_TITLE_ID ?? IMPERIVM_TITLE.id),
   collection: process.env.NEXT_PUBLIC_IDOS_COLLECTION_ID || 'IMPERIVM_AGORA',
   pack: process.env.NEXT_PUBLIC_IDOS_PACK_TYPE_ID || 'AGORA_PACK',
-  currency: process.env.NEXT_PUBLIC_IDOS_CURRENCY_ID || 'IMP',
+  currency: process.env.NEXT_PUBLIC_IDOS_CURRENCY_ID || IMPERIVM_TITLE.currency,
+  currencyType: process.env.NEXT_PUBLIC_IDOS_CURRENCY_TYPE === 'VirtualCurrency' ? 'VirtualCurrency' : 'CryptoCurrency',
   payment: process.env.NEXT_PUBLIC_IDOS_PRICE_OPTION_ID || 'IMP',
   leaderboard: process.env.NEXT_PUBLIC_IDOS_LEADERBOARD_ID || '',
-  network: process.env.NEXT_PUBLIC_IDOS_SOLANA_NETWORK_ID || 'SOLANA_DEVNET',
-  rulerCasesEnabled:process.env.NEXT_PUBLIC_IDOS_RULER_CASE_ENABLED==='true',
+  network: process.env.NEXT_PUBLIC_IDOS_SOLANA_NETWORK_ID || IMPERIVM_TITLE.network,
+  rulerCasesEnabled:process.env.NEXT_PUBLIC_IDOS_RULER_CASE_ENABLED!=='false',
   rulerCase:process.env.NEXT_PUBLIC_IDOS_RULER_CASE_TYPE_ID||'OLYMPUS_RULER_CASE',
-};
+} as const;

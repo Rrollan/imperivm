@@ -15,6 +15,7 @@ import { RulesGuide } from '../../components/home/RulesGuide';
 import { SiteFooter, SiteHeader } from '../../components/home/SiteChrome';
 import {PaintedIcon} from '../../components/PaintedIcon';
 import {RomanIcon} from '../../components/presentation/RomanIcon';
+import {HEROES} from '../../lib/heroes';
 import styles from '../../components/home/Home.module.css';
 
 const ALL_CARDS = Object.values(CARDS).sort((a, b) => a.cost - b.cost || a.name.localeCompare(b.name));
@@ -38,10 +39,10 @@ export default function LibraryPage() {
   const { t, locale, cardName, rarityName } = useLocale();
   const [section, setSection] = useState<Section>('cards'), [query, setQuery] = useState(''), [faction, setFaction] = useState('all'), [kind, setKind] = useState('all'), [rarity, setRarity] = useState('all'), [inspected, setInspected] = useState<string | null>(null);
   useEffect(() => {
-    const sync = () => { const value = window.location.hash.slice(1); if (value === 'rulers' || value === 'rules' || value === 'cards') setSection(value); };
+    const sync = () => { const hash = window.location.hash.slice(1); const value = hash.startsWith('/') ? hash.split('#')[1] : hash; if (value === 'rulers' || value === 'rules' || value === 'cards') setSection(value); };
     sync(); window.addEventListener('hashchange', sync); return () => window.removeEventListener('hashchange', sync);
   }, []);
-  function selectSection(value: Section) { setSection(value); window.history.replaceState(null, '', `#${value}`); }
+  function selectSection(value: Section) { setSection(value); window.history.replaceState(null, '', process.env.NEXT_PUBLIC_IDOS_STATIC_BUILD === 'true' ? `#/library#${value}` : `#${value}`); }
   const visible = useMemo(() => {
     const search = query.trim().toLocaleLowerCase(locale);
     return ALL_CARDS.filter(card => {
@@ -59,7 +60,7 @@ export default function LibraryPage() {
     <SiteHeader active="library" />
     <main className={`${styles.main} ${styles.libraryMain}`}>
       <header className={styles.libraryHeading}><div><p className={styles.kicker}>{t('Знай свой легион', 'Know your legion')}</p><h1>{t('Библиотека', 'The library')}</h1><p>{t('Нажми на карту — изучи способности.', 'Tap a card to explore its abilities.')}</p></div><Link href="/arena?hero=builder" className={styles.secondaryButton}>{t('На арену', 'To the arena')} <PaintedIcon name="play" size={38}/></Link></header>
-      <div className={styles.libraryTabs} role="group" aria-label={t('Раздел библиотеки', 'Library section')}>{(['cards', 'rulers', 'rules'] as const).map(value => <button key={value} type="button" aria-pressed={value === section} onClick={() => selectSection(value)}><PaintedIcon name={value==='cards'?'cards':value==='rulers'?'heroes':'rules'} size={34}/>{value === 'cards' ? t('Карты', 'Cards') : value === 'rulers' ? t('Правители', 'Rulers') : t('Правила', 'Rules')}<small>{value === 'cards' ? ALL_CARDS.length : value === 'rulers' ? 4 : 'I–III'}</small></button>)}</div>
+      <div className={styles.libraryTabs} role="group" aria-label={t('Раздел библиотеки', 'Library section')}>{(['cards', 'rulers', 'rules'] as const).map(value => <button key={value} type="button" aria-pressed={value === section} onClick={() => selectSection(value)}><PaintedIcon name={value==='cards'?'cards':value==='rulers'?'heroes':'rules'} size={34}/>{value === 'cards' ? t('Карты', 'Cards') : value === 'rulers' ? t('Правители', 'Rulers') : t('Правила', 'Rules')}<small>{value === 'cards' ? ALL_CARDS.length : value === 'rulers' ? Object.keys(HEROES).length : 'I–III'}</small></button>)}</div>
 
       {section === 'cards' && <section aria-label={t('Каталог карт', 'Card catalogue')}>
         <div className={styles.libraryFilters}>

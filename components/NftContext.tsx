@@ -16,7 +16,7 @@ type CoreReader = (owner: string, deployment: GenesisDeployment) => Promise<Owne
 /** A unavailable/throttled/malformed DAS proxy always falls back to confirmed Core RPC reads. */
 export async function readNftCards(owner: string, deployment: GenesisDeployment, readCore: CoreReader = async (address, scope) =>
   (await import('../lib/solana/ownedCore')).ownedCoreCards(address, scope)): Promise<{ cards: OwnedCardNFT[]; partial: boolean }> {
-  if (process.env.NEXT_PUBLIC_GENESIS_COLLECTION !== deployment.collection || metadataBase() !== deployment.metadataOrigin) return { cards: await readCore(owner, deployment), partial: false };
+  if (process.env.NEXT_PUBLIC_IDOS_STATIC_BUILD === 'true' || process.env.NEXT_PUBLIC_GENESIS_COLLECTION !== deployment.collection || metadataBase() !== deployment.metadataOrigin) return { cards: await readCore(owner, deployment), partial: false };
   try {
     const response = await fetch(`/api/nft/owned?owner=${encodeURIComponent(owner)}`, { signal: AbortSignal.timeout(45_000), cache: 'no-store' });
     if (!response.ok) throw new Error('DAS unavailable');

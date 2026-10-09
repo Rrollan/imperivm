@@ -1,6 +1,6 @@
 # IMPERIVM — текст питча для записи
 
-Это черновик с честным статусом на **9 октября 2026**, до завершения iDos и живой проверки кошелька. Цель — **1:40–1:55**, предел проверенной формы — **2:00**. Демо игры и питч — два разных видео.
+Это черновик с честным статусом на **10 октября 2026**, до завершения iDos и живой проверки кошелька. Цель — **1:40–1:55**, предел проверенной формы — **2:00**. Демо игры и питч — два разных видео.
 
 Для международных судей предпочтительна английская версия, если удобно говорить. Русская версия ниже подходит для записи с последующими английскими субтитрами. Записывает основатель: камера на уровне глаз, тихая комната, горизонтальный кадр, без музыки. Прочитай пробный дубль с таймером; если он выходит за две минуты, убери предложение про гарнизон и предложение про состав бесплатного набора.
 
@@ -16,7 +16,7 @@
 
 Для Solana реализованы поддержка Phantom и проверка подписи участия в матче. Такая подпись находится вне блокчейна; она не доказывает результат боя. Код коллекционного бейджа первой победы использует Metaplex Core в devnet, но живой выпуск ещё нужно проверить.
 
-Адаптеры iDos уже подготовлены. Публикация на платформе, проверка кошелька и mainnet-токен игры остаются шагами завершения хакатонной версии. Тестовый IMP в демо — виртуальная валюта.
+Тестовая версия уже загружена на iDos. Токен IMP выпущен в Solana mainnet, его адрес и параметры проверены. Покупки паков пока закрыты до исправления настройки токена платформой. Дальше — проверка кошелька и публикация. В демо используются отдельные тестовые IMP.
 
 Я собираю и проверяю игру итерациями: от читаемых карт и удобной колоды до понятных тактических решений на арене. Для этого хакатона моя цель — показать честный, работающий продукт с понятной интеграцией Solana.
 
@@ -34,7 +34,7 @@ The playable build has ninety-nine cards, nine rulers, a deck workshop, pack rev
 
 For Solana, we have implemented Phantom support and verification of signed match-participation messages. These signatures are off-chain; they do not prove a battle result. First-victory collectible code uses Metaplex Core on devnet, but a live mint still needs verification.
 
-The iDos adapters are prepared. Platform publication, live wallet testing, and the mainnet game token remain final hackathon tasks. Demo IMP is virtual currency.
+A test build is uploaded to iDos. IMP is launched on Solana mainnet, with its mint and parameters verified. Pack purchases are blocked until the platform corrects its token definition. Wallet testing and publication are next. Demo IMP is separate test currency.
 
 I'm testing each iteration, from deck tools to tactical decisions. My goal for this hackathon is a working game with an honest, understandable Solana integration.
 

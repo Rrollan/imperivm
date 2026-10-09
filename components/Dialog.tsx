@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import {RomanIcon} from './presentation/RomanIcon';
 import { useLocale } from './LocaleContext';
+import styles from './Dialog.module.css';
 export default function Dialog({ title, onClose, children, wide = false }: {
   title: string; onClose: () => void; children: React.ReactNode; wide?: boolean;
 }) {
@@ -26,7 +27,7 @@ export default function Dialog({ title, onClose, children, wide = false }: {
   }, []);
   return <div className="dialog-backdrop" onClick={onClose}>
     <div ref={ref} className={`imperial-dialog ${wide ? 'dialog-wide' : ''}`} role="dialog" aria-modal="true" aria-label={title} onClick={e => e.stopPropagation()}>
-      <div className="dialog-heading"><h2>{title}</h2><button className="icon-button" onClick={onClose} aria-label={t('Закрыть окно', 'Close dialog')}><RomanIcon name="close"/></button></div>
+      <div className="dialog-heading"><h2>{title}</h2><button type="button" className={styles.close} onClick={onClose} aria-label={t('Закрыть окно', 'Close dialog')}><RomanIcon name="close" size={19}/></button></div>
       {children}
     </div>
   </div>;

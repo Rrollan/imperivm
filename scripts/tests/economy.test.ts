@@ -4,7 +4,7 @@ import {CARDS} from '../../lib/cards';
 import {FREE_CARD_IDS, PACK_CARD_IDS, freeCardCounts, deckCardCounts, needsCollection, playableDeck, parseCollectionAuth} from '../../lib/collection/access';
 import {FREE_DECKS} from '../../lib/collection/starterDecks';
 import {DECKS} from '../../lib/decks';
-import {COLLECTION_KEY, LocalCollectionGateway, parseLocalCollection} from '../../lib/collection/gateway';
+import {IDOS_CONFIG, COLLECTION_KEY, LocalCollectionGateway, parseLocalCollection} from '../../lib/collection/gateway';
 import {authorizeCollectionDeck} from '../../lib/collection/authority';
 import {saveCustomDeck} from '../../lib/deckbuilder';
 import {deckError} from '../../lib/engine/deckValidation';
@@ -28,7 +28,7 @@ function currencies(): CurrencyDefinitions {return {CryptoCurrencies:{
 const blockchain: BlockchainConfigResponse = {Blockchain:{Networks:{SOLANA_MAINNET:{Type:'Solana',RpcUrl:'https://api.mainnet-beta.solana.com'}}}};
 function storefront(): GetStorefrontResponse {return {ServerTimeUtc:'2026-10-08T00:00:00Z',AdCreditBalance:0,Stores:[{
  StoreID:'IMPERIVM_IMP',SortOrder:0,Sections:[{SectionID:'IMP',SortOrder:0,Slots:[{SlotID:'250',SortOrder:0,Offer:{OfferID:'IMP_250_TEST',
-  Rewards:{Standard:{Entries:[{Type:'VirtualCurrency',CurrencyID:'IMP',Amount:250}]}},
+  Rewards:{Standard:{Entries:[{Type:'VirtualCurrency',CurrencyID:IDOS_CONFIG.currency,Amount:250}]}},
   State:{PurchasedTotal:0,PurchasedToday:0,PurchasedThisRotation:0,IsFirstPurchaseAvailable:true,SoldOut:false},
   PriceOptions:[{OptionID:'USDC_V1',IsFree:false,IsAdPaid:false,IsStorePaid:false,Cost:{Standard:{Entries:[{Type:'CryptoCurrency',CurrencyID:'USDC',Amount:1}]}}},
     {OptionID:'SOL_V1',IsFree:false,IsAdPaid:false,IsStorePaid:false,Cost:{Standard:{Entries:[{Type:'CryptoCurrency',CurrencyID:'SOL',Amount:0.002}]}}}],
@@ -39,7 +39,7 @@ function scenario() {
  let session:IDosSession={status:'wallet',userId:auth.userId,owner:'fixture-wallet',error:null,revision:0}, charges=0;
  const offer=store.Stores![0].Sections![0].Slots![0].Offer!;
  const receipt=(option:string):StorePurchaseResponse => ({ServerTimeUtc:store.ServerTimeUtc,OfferID:offer.OfferID,Count:1,Resources:{
-   Grant:{Standard:{Entries:[{Type:'VirtualCurrency',CurrencyID:'IMP',Amount:250}]}},
+   Grant:{Standard:{Entries:[{Type:'VirtualCurrency',CurrencyID:IDOS_CONFIG.currency,Amount:250}]}},
    Consume:{Standard:{Entries:[{Type:'CryptoCurrency',CurrencyID:option==='USDC_V1'?'USDC':'SOL',Amount:option==='USDC_V1'?1:0.002}]}},
  }});
  let execute = async (option:string):Promise<OperationResult<StorePurchaseResponse>> => {offer.State!.PurchasedTotal++; return ok(receipt(option));};

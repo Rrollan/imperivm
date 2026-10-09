@@ -1,4 +1,4 @@
-# Тексты заявки — 9 октября 2026
+# Тексты заявки — статус интеграции обновлён 10 октября 2026
 
 Тексты соответствуют текущему коду и проверенному демо. Перед submit обновить статус iDos/mainnet после фактической проверки. Поля о команде, финансировании, пользователях и выручке заполняет основатель по своим данным; здесь они не выдуманы.
 
@@ -18,7 +18,7 @@ The current playable build contains 99 cards and nine rulers, with 49 free base 
 
 Solana integration currently includes Phantom wallet support, Ed25519 verification of signed match-participation messages and devnet Metaplex Core first-victory badge code. These participation messages are off-chain; AI wins remain self-reported and are not trustless competitive results. A successful live badge mint has not yet been verified.
 
-iDos SDK integration and SOL/USDC checkout adapters are implemented. The connected iDos publisher currently has no Titles, so catalog publication and live checkout remain pending. Demo IMP is a local test currency; the proposed live IMP balance is an iDos virtual currency, not an SPL token. The required mainnet game token and its meaningful integration still need owner-approved launch and verification before the iDos side-track entry is ready.
+iDos Title SI4IPS8B is configured and the current game has been uploaded as a staged platform test build. The founder launched the IMP SPL token on Solana mainnet; its mint and six decimals have been verified through read-only RPC. Packs and ruler cases are configured to use that token, but purchases are blocked until iDos corrects a protected Main currency definition that reports zero decimals. Catalog deployment, owner wallet testing, live payments and platform PvP remain pending. Demo IMP is separate local test currency.
 
 Play: https://imperivm.onrender.com
 
@@ -34,11 +34,11 @@ IMPERIVM — браузерная карточная игра в сеттинг�
 
 Рабочая версия содержит 99 карт и 9 правителей. Бесплатная база — 49 карт и 5 правителей; ещё 50 персонажей и 4 правителя связаны с паками и кейсами. Без кошелька доступны тренировки. В демо работают конструктор колод, анимированное раскрытие паков и новая Babylon.js арена; в репозитории есть авторитетный WS-сервер бесплатного PvP.
 
-В коде реализованы Phantom, проверяемая подпись сообщения об участии в матче и devnet NFT-бейдж первой победы на Metaplex Core. Подпись не является on-chain результатом боя; победы с ИИ self-reported. Успешный live mint ещё не проверен. SDK и платёжные адаптеры iDos подготовлены; Title, публикация, live checkout и обязательный mainnet-токен остаются шагами завершения.
+В коде реализованы Phantom, проверяемая подпись сообщения об участии в матче и devnet NFT-бейдж первой победы на Metaplex Core. Подпись не является on-chain результатом боя; победы с ИИ self-reported. Успешный live mint ещё не проверен. Title SI4IPS8B настроен, текущая игра загружена в тестовую версию iDos. Выпущенный основателем SPL $IMP проверен в mainnet. Паки и кейсы привязаны к токену, но покупки блокируются до исправления Main.Decimals на платформе (0 вместо 6). Публикация, вход владельца, оплата и платформенный PvP ещё требуют проверки.
 
 ## Technology / integration field
 
-Next.js, React, TypeScript, Babylon.js, authoritative Node.js WebSocket server; Solana wallet identity and off-chain Ed25519 participation signatures; Metaplex Core first-win badge code on Solana devnet; iDos Games SDK with live Title configuration and catalog build pending. Demo/live virtual IMP must be distinguished from the required mainnet SPL game token, which is not yet verified.
+Next.js, React, TypeScript, Babylon.js, authoritative Node.js WebSocket server; Solana wallet identity and off-chain Ed25519 participation signatures; Metaplex Core first-win badge code on Solana devnet; iDos Games SDK with configured Title SI4IPS8B and a staged static build; verified Solana mainnet SPL IMP mint. Live purchases are blocked by the iDos Main decimals mismatch; local demo IMP is separate.
 
 ## Development history field
 
@@ -51,7 +51,7 @@ The inspected repository history starts on 3 October 2026, within the Crypto Wor
 | GitHub | https://github.com/Rrollan/imperivm — repository, not profile |
 | Browser demo | https://imperivm.onrender.com |
 | iDos catalog URL | Copy only after actual publication and launch check |
-| Mainnet token | Verified mint and Explorer link after owner-reviewed launch |
+| Mainnet token | [Verified mint](https://explorer.solana.com/address/7nfdxHzxab9UBhsZd8RCbWqDN45xJMuX33Pkpibeidos); live usage pending decimals fix and wallet test |
 | Demo video | Public/unlisted working-product recording, ≤3 minutes |
 | Pitch video | ≤2 minutes in the inspected live form; founder on camera or voice with clear identity |
 | Deck | Export/share the reviewed PPTX after final integration-status update |
@@ -69,6 +69,8 @@ The [official Colosseum form guidance](https://colosseum.com/hackathon) also ask
 ## Сохранено в Colosseum
 
 9 октября обновлены project details и Media draft. Новая аватарка создана из эмблемы сайта; category Gaming, сайт и GitHub актуальны. Публичная страница: https://colosseum.com/arena/projects/pichat. Финальная заявка не отправлена. Обязательные ссылки на demo и pitch пустые; профиль участника не завершён.
+
+Следующие тексты обновлены локально для следующего сохранения; это не подтверждение повторного сохранения формы 10 октября.
 
 ### Brief introduction
 
@@ -88,8 +90,8 @@ Next.js, React, TypeScript, Tailwind CSS, Babylon.js, Node.js WebSocket server; 
 
 ### Solana usage
 
-Phantom support and Ed25519 match-participation messages are implemented. Signatures are off-chain; AI wins are self-reported. Metaplex Core first-win badge code uses devnet; live mint is unverified. iDos SOL/USDC checkout adapters are prepared but disabled. Demo IMP is virtual, not SPL. The required mainnet game token and catalog publication remain pending.
+Phantom support and Ed25519 match-participation messages are implemented. Signatures are off-chain; AI wins are self-reported. Metaplex Core first-win badge code uses devnet; live mint is unverified. iDos Title SI4IPS8B and staged game build are configured. The founder launched SPL IMP on mainnet; its mint and six decimals were verified read-only. Pack/case token charges are blocked until iDos corrects Main.Decimals from zero to six. Live wallet/payment testing and game deployment remain pending. Demo IMP is local test currency.
 
 ### Additional context for judges
 
-The current playable game is on Render; GitHub main contains the new imperial arena. Repository history begins 3 Oct 2026. Game blocks are local turns, not chain transactions. iDos Title/build, mainnet token and owner wallet tests remain pending. This is an in-progress hackathon draft; no SOL prize pool, live bonding-curve game or verified NFT mint is claimed.
+The current playable game is on Render; GitHub main contains the new imperial arena. Repository history begins 3 Oct 2026. Game blocks are local turns, not chain transactions. iDos Title SI4IPS8B and staged build are ready; mainnet IMP mint is verified. Live wallet tests, platform decimals correction, WS origins and game deployment remain pending. [Current test and integration status](https://github.com/Rrollan/imperivm/blob/main/docs/idos/SI4IPS8B-integration.md). This is an in-progress hackathon draft; no SOL prize pool, live bonding-curve game or verified NFT mint is claimed.

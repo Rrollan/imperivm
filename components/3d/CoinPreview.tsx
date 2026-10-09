@@ -13,7 +13,7 @@ const LazyCoin = dynamic(() => import('./Coin3D'), { ssr: false, loading: () => 
 type Availability = Partial<Record<ModelKey, { available: boolean; fallback: string }>>;
 let discovery: Promise<Availability> | undefined;
 function discoverModels() {
-  return discovery ??= fetch('/api/models').then(async response => {
+  return discovery ??= fetch(process.env.NEXT_PUBLIC_IDOS_STATIC_BUILD === 'true' ? './models-availability.json' : '/api/models').then(async response => {
     if (!response.ok) throw new Error('Model discovery unavailable');
     return await response.json() as Availability;
   }).catch(() => { discovery = undefined; return {}; });

@@ -57,7 +57,7 @@ export function CustomLobby() {
     finally {setCheckingDeck(false);}
   }
   const room = net.snapshot, roomCode = net.identity?.roomCode || room?.roomCode;
-  const shareLink = roomCode && typeof window !== 'undefined' ? `${window.location.origin}/play?mode=friend&code=${roomCode}` : '';
+  const shareLink = roomCode && typeof window !== 'undefined' ? `${process.env.NEXT_PUBLIC_IDOS_STATIC_BUILD === 'true' ? window.location.href.split('#')[0]+'#' : window.location.origin}/play?mode=friend&code=${roomCode}` : '';
   const copy = async (kind: 'code' | 'link') => {
     try {await navigator.clipboard.writeText(kind === 'code' ? roomCode || '' : shareLink); setCopied(kind); setCopyFailed(false);}
     catch {setCopied(null); setCopyFailed(true);}

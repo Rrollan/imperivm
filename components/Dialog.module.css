@@ -1,0 +1,19 @@
+.close {
+  display: grid;
+  place-items: center;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  border: 1px solid #af8148;
+  border-radius: 50%;
+  color: #f1d7a2;
+  background-image: radial-gradient(circle at 35% 20%, #765035, #3c261b 58%, #231711) !important;
+  box-shadow: inset 0 1px 1px #f5d19880, inset 0 -2px 3px #140b09, 0 2px 5px #0005;
+  cursor: pointer;
+}
+.close svg {display: block; width: 19px; height: 19px;}
+.close:not(:disabled):hover {border-color: #e0b774; color: #fff0cd; filter: brightness(1.12);}
+.close:active {transform: translateY(1px);}
+.close:focus-visible {outline: 2px solid #d4af70; outline-offset: 3px;}
