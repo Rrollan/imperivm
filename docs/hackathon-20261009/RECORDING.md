@@ -16,7 +16,7 @@
 | 00:55–01:33 | Поставить бойца, показать доступную атаку, атаковать; сыграть указ в публичную очередь | Разница мгновенного эффекта и отложенного указа. Ответный удар — половина атаки защитника. |
 | 01:33–01:53 | Использовать полезную способность правителя или реальную условную связку | Объяснить условие и видимый результат. Не ждать редкий эффект всю запись. |
 | 01:53–02:15 | Открыть **демо** пак; раскрыть карты по одной | Пять карт, различия редкостей, новые персонажи. Демо-баланс не имеет денежной стоимости. |
-| 02:15–02:38 | После live-проверки: показать кошелёк, запрос подписи участия и результат; devnet бейдж/Explorer если реально minted | Отдельно назвать off-chain подпись и сеть NFT. Если не проверено — показать имеющийся UI и честно сказать «путь ещё проверяется», не симулировать success. |
+| 02:15–02:38 | После проверки владельца: показать вход Phantom и отдельные балансы кошелька/iDos. Альтернатива — настоящий фрагмент бесплатного PvP | Дополнительная подпись матча и NFT выключены. Показывать реальный баланс или матч; не симулировать success. |
 | 02:38–02:45 | Вернуться к игре; ссылка на актуальную страницу | После iDos-публикации писать именно страницу каталога. |
 
 Можно заранее записать несколько обычных матчей и выбрать реальные действия. Не выдавать диагностику, постановочный баланс, спliced wallet success или неподтверждённую транзакцию за live-прохождение. Онлайн PvP добавлять только после реального матча на двух устройствах/аккаунтах. Демо не обязано заканчиваться победой; лучше показать понятную механику.
@@ -31,13 +31,13 @@ You choose a ruler, build a thirty-card deck and try to empty your opponent's Tr
 
 The playable build has ninety-nine cards and nine rulers. It includes free starter decks, a collection workshop, sequential pack reveals and the imperial arena you see in our demo.
 
-For Solana, we have implemented Phantom support and verified participation messages. First-victory collectible code uses Metaplex Core on devnet. Participation signatures are off-chain, and AI results are self-reported.
+For Solana, we have implemented Phantom identity and real IMP balance reading. Wallet holdings and the deposited iDos game balance are separate. Training needs no extra match signature or SOL. Experimental NFT badges are disabled; mint is unverified.
 
-The iDos SDK and checkout adapters are prepared. Platform publication, live wallet testing and the required mainnet game token remain our final hackathon tasks. We will update this description after those steps are verified.
+A test build is staged on iDos. Free random PvP has been tested with two independent clients. IMP is launched on Solana mainnet, with its mint and six decimals verified. Owner wallet/payment testing and catalog release remain pending; purchases are disabled.
 
 You can play the current game in your browser and inspect the code on GitHub. Thank you for trying IMPERIVM.
 
-Этот текст описывает состояние **9 октября**, не финальную готовность. После интеграции заменить предпоследний абзац фактически проверенной формулировкой, указать сеть токена отдельно от devnet NFT. Пользователь добавляет одну правдивую фразу «почему я» из своего опыта; не придумывать компетенции или членов команды. Пробная запись с таймером обязательна: число слов само по себе не гарантирует 2 минуты.
+Этот текст описывает проверенное состояние **10 октября**, не финальную готовность. Актуальный полный вариант — [PITCH-TO-RECORD.md](PITCH-TO-RECORD.md). После проверки владельца и публикации обновить оставшиеся pending-фразы. Пользователь добавляет одну правдивую фразу «почему я» из своего опыта; не придумывать компетенции или членов команды. Пробная запись с таймером обязательна: число слов само по себе не гарантирует 2 минуты.
 
 ## Перед передачей ссылок
 

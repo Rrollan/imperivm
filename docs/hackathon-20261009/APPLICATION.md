@@ -14,11 +14,11 @@ An imperial card battler where crypto culture becomes tactics: read a public spe
 
 IMPERIVM is a browser card battler set in an imperial Rome inspired by crypto culture. Players choose a ruler, build a 30-card deck and try to reduce the rival Treasury from 30 health to zero. Orders limit what can be played each turn. Some spells act immediately; delayed edicts enter a public queue, creating a visible opportunity to respond. Garrisoning a fighter trades its attack for extra resources. DeFi, NFT, DePIN and meme factions reward different sequences and formations.
 
-The current playable build contains 99 cards and nine rulers, with 49 free base cards, 50 pack-exclusive characters, five free rulers and four case rulers. Training works without a wallet. The deck workshop, rarity frames, pack reveals and Babylon.js arena are available in the public demo. The repository includes an authoritative WebSocket service for free online 1v1.
+The current playable build contains 99 cards and nine rulers, with 49 free base cards, 50 pack-exclusive characters, five free rulers and four case rulers. Training works without a wallet. The deck workshop, rarity frames, pack reveals and Babylon.js arena are available in the public demo. Free private duels and random matchmaking use an authoritative WebSocket service and have been tested on the iDos domain with two independent clients.
 
-Solana integration currently includes Phantom wallet support, Ed25519 verification of signed match-participation messages and devnet Metaplex Core first-victory badge code. These participation messages are off-chain; AI wins remain self-reported and are not trustless competitive results. A successful live badge mint has not yet been verified.
+Solana integration includes Phantom/iDos wallet identity and server-side reading of the real mainnet IMP token balance. Phantom holdings and the deposited iDos game balance are shown separately. Training needs no additional match signature or SOL. Experimental Ed25519 match-participation and Metaplex Core devnet badge code are disabled by default; a live badge mint has not been verified.
 
-iDos Title SI4IPS8B is configured and the current game has been uploaded as a staged platform test build. The founder launched the IMP SPL token on Solana mainnet; its mint and six decimals have been verified through read-only RPC. Packs and ruler cases are configured to use that token, but purchases are blocked until iDos corrects a protected Main currency definition that reports zero decimals. Catalog deployment, owner wallet testing, live payments and platform PvP remain pending. Demo IMP is separate local test currency.
+iDos Title SI4IPS8B is configured and v13 is uploaded as a staged platform test build. The founder launched IMP on Solana mainnet; its mint, six decimals and wallet balance have been verified read-only. iDos has corrected Main currency decimals to six. Packs and ruler cases are configured for IMP, but purchases remain disabled pending an owner payment test. Catalog release, owner wallet testing and live payments remain pending; wager-based PvP is not implemented. Demo IMP is separate local test currency.
 
 Play: https://imperivm.onrender.com
 
@@ -32,13 +32,13 @@ Code: https://github.com/Rrollan/imperivm
 
 IMPERIVM — браузерная карточная игра в сеттинге имперского Рима и криптокультуры. Игрок выбирает правителя, собирает колоду из 30 карт и сражается за казну с 30 здоровьем. Приказы ограничивают действия за ход. Мгновенные заклинания работают сразу, отложенные указы попадают в видимую обоим игрокам очередь. Гарнизон приносит ресурс, но лишает бойца атаки. Фракции DeFi, NFT, DePIN и мемов позволяют строить разные комбинации.
 
-Рабочая версия содержит 99 карт и 9 правителей. Бесплатная база — 49 карт и 5 правителей; ещё 50 персонажей и 4 правителя связаны с паками и кейсами. Без кошелька доступны тренировки. В демо работают конструктор колод, анимированное раскрытие паков и новая Babylon.js арена; в репозитории есть авторитетный WS-сервер бесплатного PvP.
+Рабочая версия содержит 99 карт и 9 правителей. Бесплатная база — 49 карт и 5 правителей; ещё 50 персонажей и 4 правителя связаны с паками и кейсами. Без кошелька доступны тренировки. Работают конструктор колод, анимированное раскрытие демо-паков и новая Babylon.js арена. Бесплатные дуэли с другом и случайный подбор используют авторитетный WS-сервер; матч двух независимых клиентов проверен на домене iDos.
 
-В коде реализованы Phantom, проверяемая подпись сообщения об участии в матче и devnet NFT-бейдж первой победы на Metaplex Core. Подпись не является on-chain результатом боя; победы с ИИ self-reported. Успешный live mint ещё не проверен. Title SI4IPS8B настроен, текущая игра загружена в тестовую версию iDos. Выпущенный основателем SPL $IMP проверен в mainnet. Паки и кейсы привязаны к токену, но покупки блокируются до исправления Main.Decimals на платформе (0 вместо 6). Публикация, вход владельца, оплата и платформенный PvP ещё требуют проверки.
+Реализованы Phantom/iDos вход и серверное чтение реального mainnet IMP. Токены кошелька и внесённый игровой баланс разделены. Для тренировки дополнительная подпись матча и SOL не нужны. Экспериментальный proof/NFT путь выключен по умолчанию; успешный devnet mint не подтверждён. Title SI4IPS8B настроен, v13 загружена в Staged. SPL $IMP и 6 decimals проверены; iDos исправил Main.Decimals на 6. Паки и кейсы привязаны к токену, покупки выключены до теста владельца. Публикация, пользовательский вход и оплата ещё требуют проверки; денежный PvP не реализован.
 
 ## Technology / integration field
 
-Next.js, React, TypeScript, Babylon.js, authoritative Node.js WebSocket server; Solana wallet identity and off-chain Ed25519 participation signatures; Metaplex Core first-win badge code on Solana devnet; iDos Games SDK with configured Title SI4IPS8B and a staged static build; verified Solana mainnet SPL IMP mint. Live purchases are blocked by the iDos Main decimals mismatch; local demo IMP is separate.
+Next.js, React, TypeScript, Babylon.js, authoritative Node.js WebSocket server for private duels and random matchmaking; Solana wallet identity and exact mainnet IMP balance reading; iDos Games SDK with Title SI4IPS8B and staged static v13. Experimental off-chain participation signatures and Metaplex Core devnet badge code are disabled by default. iDos Main decimals are six; live purchases remain disabled pending an owner test. Local demo IMP is separate.
 
 ## Development history field
 
@@ -50,8 +50,9 @@ The inspected repository history starts on 3 October 2026, within the Crypto Wor
 | --- | --- |
 | GitHub | https://github.com/Rrollan/imperivm — repository, not profile |
 | Browser demo | https://imperivm.onrender.com |
+| iDos staged test | https://si4ips8b.idos.games/v/bldbbb1a6017a044791951e56be0a8b0d5a/index.html |
 | iDos catalog URL | Copy only after actual publication and launch check |
-| Mainnet token | [Verified mint](https://explorer.solana.com/address/7nfdxHzxab9UBhsZd8RCbWqDN45xJMuX33Pkpibeidos); live usage pending decimals fix and wallet test |
+| Mainnet token | [Verified mint](https://explorer.solana.com/address/7nfdxHzxab9UBhsZd8RCbWqDN45xJMuX33Pkpibeidos); balance reading tested, payment usage pending owner test |
 | Demo video | Public/unlisted working-product recording, ≤3 minutes |
 | Pitch video | ≤2 minutes in the inspected live form; founder on camera or voice with clear identity |
 | Deck | Export/share the reviewed PPTX after final integration-status update |
@@ -78,7 +79,7 @@ An imperial card battler where crypto culture becomes tactics. Read a public spe
 
 ### What are you building?
 
-IMPERIVM is a browser card battler for card-game players and crypto communities. Choose a ruler, build a 30-card deck and reduce the rival Treasury from 30 health to zero. Orders limit actions; instant spells resolve immediately, while delayed edicts enter a public queue and give the opponent time to respond. Garrisoning a fighter earns resources but gives up its attack. DeFi, NFT, DePIN and meme factions support conditional combinations. The playable build has 99 cards, nine rulers, free starter decks, a collection workshop, sequential pack reveals and an imperial Babylon.js arena. AI training works without a wallet; the repository also contains an authoritative WebSocket service for free online 1v1.
+IMPERIVM is a browser card battler for card-game players and crypto communities. Choose a ruler, build a 30-card deck and reduce the rival Treasury from 30 health to zero. Orders limit actions; instant spells resolve immediately, while delayed edicts enter a public queue and give the opponent time to respond. Garrisoning a fighter earns resources but gives up its attack. DeFi, NFT, DePIN and meme factions support conditional combinations. The playable build has 99 cards, nine rulers, free starter decks, a collection workshop, sequential pack reveals and an imperial Babylon.js arena. AI training works without a wallet. Free private duels and random matchmaking use an authoritative WebSocket service and have been tested on iDos with two independent clients.
 
 ### Why are you building this?
 
@@ -86,12 +87,12 @@ We are building a card game that is enjoyable before players connect a wallet. C
 
 ### Technologies
 
-Next.js, React, TypeScript, Tailwind CSS, Babylon.js, Node.js WebSocket server; Solana web3.js, Phantom and wallet-standard APIs; Ed25519 message verification; Metaplex Core devnet badge code; @idosgames/core and @idosgames/wallet adapters. AI-assisted code and artwork with Codex and Google Flow. Current demo hosted on Render.
+Next.js, React, TypeScript, Tailwind CSS, Babylon.js, Node.js WebSocket server; Solana web3.js, Phantom and wallet-standard APIs; exact mainnet token balance reading; @idosgames/core and @idosgames/wallet adapters. Experimental Ed25519 participation and Metaplex Core devnet badge code are disabled by default. AI-assisted code and artwork with Codex and Google Flow. Public demo on Render; staged v13 on iDos.
 
 ### Solana usage
 
-Phantom support and Ed25519 match-participation messages are implemented. Signatures are off-chain; AI wins are self-reported. Metaplex Core first-win badge code uses devnet; live mint is unverified. iDos Title SI4IPS8B and staged game build are configured. The founder launched SPL IMP on mainnet; its mint and six decimals were verified read-only. Pack/case token charges are blocked until iDos corrects Main.Decimals from zero to six. Live wallet/payment testing and game deployment remain pending. Demo IMP is local test currency.
+Phantom/iDos wallet identity and exact mainnet IMP balance reading are implemented. Training needs no additional match signature or SOL. The founder launched SPL IMP on mainnet; its mint, six decimals and token balance were verified read-only. iDos Main decimals have been corrected to six. v13 is staged on iDos. Owner wallet/payment testing and catalog release remain pending; purchases are disabled. Experimental participation signatures and devnet badge code are disabled by default; NFT mint is unverified. Demo IMP is local test currency.
 
 ### Additional context for judges
 
-The current playable game is on Render; GitHub main contains the new imperial arena. Repository history begins 3 Oct 2026. Game blocks are local turns, not chain transactions. iDos Title SI4IPS8B and staged build are ready; mainnet IMP mint is verified. Live wallet tests, platform decimals correction, WS origins and game deployment remain pending. [Current test and integration status](https://github.com/Rrollan/imperivm/blob/main/docs/idos/SI4IPS8B-integration.md). This is an in-progress hackathon draft; no SOL prize pool, live bonding-curve game or verified NFT mint is claimed.
+The playable demo is on Render and the current staged test is on iDos; GitHub main contains the new imperial arena. Repository history begins 3 Oct 2026. Game blocks are local turns, not chain transactions. Mainnet IMP mint, six decimals and read-only balance are verified. Free random PvP was tested on the iDos domain with the production server. Owner wallet/payment tests and catalog release remain pending. [Current test and integration status](https://github.com/Rrollan/imperivm/blob/main/docs/idos/SI4IPS8B-integration.md). This is an in-progress hackathon draft; wager-based PvP is not implemented and NFT mint is unverified.

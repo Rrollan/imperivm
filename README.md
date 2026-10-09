@@ -11,7 +11,7 @@ A Hearthstone-style card battler set in imperial Rome — on Solana. Read the me
 ![Next.js](https://img.shields.io/badge/Next.js-14-0B0A14?logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-3B1F6B?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3B1F6B?logo=typescript&logoColor=white)
-![Solana](https://img.shields.io/badge/Solana-devnet-14F195?logo=solana&logoColor=0B0A14)
+![Solana](https://img.shields.io/badge/Solana-mainnet_IMP-14F195?logo=solana&logoColor=0B0A14)
 ![License](https://img.shields.io/badge/License-MIT-2C784C)
 ![i18n](https://img.shields.io/badge/UI-RU_/_EN-D4A24C)
 
@@ -28,6 +28,8 @@ A Hearthstone-style card battler set in imperial Rome — on Solana. Read the me
 *The current Babylon.js arena in a real training match, captured on 9 October 2026. The main branch contains this interface.*
 
 [Play](https://imperivm.onrender.com/arena) · [Build a deck](https://imperivm.onrender.com/collection) · [Open demo packs](https://imperivm.onrender.com/packs)
+
+[Current iDos test build (v13)](https://si4ips8b.idos.games/v/bldbbb1a6017a044791951e56be0a8b0d5a/index.html#/arena) — AI training, private duels and random matchmaking. Staged; catalog release is pending.
 
 ---
 
@@ -160,13 +162,13 @@ readme/             Screenshots & GIFs for this README
 | Layer | Status |
 | --- | --- |
 | **Local game** | ✅ Full AI matches, 9 rulers, 99 cards, demo packs, owned deck builder |
-| **Solana** | 🧪 Devnet only. Phantom connect, proof-of-play signatures |
-| **NFTs** | 🧪 Metaplex Core collection + Candy Machine coded, not yet live-minted |
-| **iDos** | 🧪 Title SI4IPS8B configured; current game uploaded as a staged test build, not deployed |
-| **PvP** | ✅ Authoritative free online 1v1; paid entitlements require configured iDos |
-| **Mainnet checkout** | 🧪 SPL IMP mint verified; purchases blocked until iDos corrects Main decimals from 0 to 6 |
+| **Solana** | ✅ Mainnet SPL IMP mint and exact wallet balance read verified; owner login test pending |
+| **NFTs** | 🧪 Metaplex Core devnet badge code; mint unverified and match-proof flow disabled by default |
+| **iDos** | 🧪 Title SI4IPS8B configured; v13 staged test build, catalog release pending |
+| **PvP** | ✅ Authoritative free private duels and random matchmaking tested on iDos; wager mode not implemented |
+| **Mainnet checkout** | 🧪 iDos Main decimals corrected to 6; purchases remain disabled until an owner payment test |
 
-> Local demo IMP has no cash value. Live $IMP is the verified Solana mainnet SPL token bound to iDos `Main`. The current arena is available in an iDos test build; real purchases are blocked by a platform decimals mismatch and wallet/payment testing is pending. See the [current iDos setup and test link](docs/idos/SI4IPS8B-integration.md) and [contest checklist](docs/hackathon-20261009/README.md).
+> Local demo IMP has no cash value. Live $IMP is the verified Solana mainnet SPL token bound to iDos `Main`. Phantom holdings and the deposited iDos game balance are separate. The current arena is available in an iDos test build; purchases remain disabled pending owner wallet/payment testing. AI training needs no extra match signature or SOL. See the [current iDos setup and test link](docs/idos/SI4IPS8B-integration.md) and [contest checklist](docs/hackathon-20261009/README.md).
 
 ---
 

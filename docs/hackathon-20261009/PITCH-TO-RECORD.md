@@ -14,9 +14,9 @@
 
 В рабочей версии уже девяносто девять карт, девять правителей, конструктор колод, открытие паков и новая арена. Пять правителей и базовый набор карт бесплатны. Можно открыть игру в браузере и сразу начать тренировку без кошелька. В демо мы показываем именно этот работающий продукт.
 
-Для Solana реализованы поддержка Phantom и проверка подписи участия в матче. Такая подпись находится вне блокчейна; она не доказывает результат боя. Код коллекционного бейджа первой победы использует Metaplex Core в devnet, но живой выпуск ещё нужно проверить.
+Для Solana реализованы вход через Phantom и чтение реального баланса IMP. Токены в кошельке и внесённый игровой баланс показаны отдельно. Тренировка не требует дополнительной подписи матча или SOL. Экспериментальный NFT-бейдж пока выключен: подтверждённого выпуска ещё нет.
 
-Тестовая версия уже загружена на iDos. Токен IMP выпущен в Solana mainnet, его адрес и параметры проверены. Покупки паков пока закрыты до исправления настройки токена платформой. Дальше — проверка кошелька и публикация. В демо используются отдельные тестовые IMP.
+Тестовая версия уже загружена на iDos. Бесплатный случайный PvP проверен с двумя игроками. Токен IMP выпущен в Solana mainnet, его адрес и параметры проверены. Настройка токена платформой исправлена; покупки паков закрыты до пользовательского теста оплаты. Дальше — проверка кошелька и публикация. В демо используются отдельные тестовые IMP.
 
 Я собираю и проверяю игру итерациями: от читаемых карт и удобной колоды до понятных тактических решений на арене. Для этого хакатона моя цель — показать честный, работающий продукт с понятной интеграцией Solana.
 
@@ -32,9 +32,9 @@ You choose a ruler, build a thirty-card deck, and try to empty your opponent's T
 
 The playable build has ninety-nine cards, nine rulers, a deck workshop, pack reveals, and our new imperial arena. You can open the game in your browser and start training without a wallet.
 
-For Solana, we have implemented Phantom support and verification of signed match-participation messages. These signatures are off-chain; they do not prove a battle result. First-victory collectible code uses Metaplex Core on devnet, but a live mint still needs verification.
+For Solana, we have implemented Phantom identity and real IMP balance reading. Wallet holdings and the deposited game balance are shown separately. Training needs no extra match signature or SOL. Experimental NFT badges are disabled; a live mint is unverified.
 
-A test build is uploaded to iDos. IMP is launched on Solana mainnet, with its mint and parameters verified. Pack purchases are blocked until the platform corrects its token definition. Wallet testing and publication are next. Demo IMP is separate test currency.
+A test build is uploaded to iDos, and free random PvP has been tested with two players. IMP is launched on Solana mainnet, with its mint and parameters verified. The platform token definition is corrected; pack purchases remain disabled pending an owner payment test. Wallet testing and publication are next. Demo IMP is separate test currency.
 
 I'm testing each iteration, from deck tools to tactical decisions. My goal for this hackathon is a working game with an honest, understandable Solana integration.
 
