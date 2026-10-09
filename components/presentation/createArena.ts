@@ -12,6 +12,7 @@ import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
 import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import { Texture } from '@babylonjs/core/Materials/Textures/texture';
+import {DynamicTexture} from '@babylonjs/core/Materials/Textures/dynamicTexture';
 import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';
 import { DirectionalLight } from '@babylonjs/core/Lights/directionalLight';
 import { SceneInstrumentation } from '@babylonjs/core/Instrumentation/sceneInstrumentation';
@@ -42,6 +43,7 @@ import {validatorPayout} from './validatorInvestment';
 import {combatStyle} from './combatStyle';
 import {ArenaAttackEffects} from './ArenaAttackEffects';
 import {hapticContact} from '../../lib/haptics';
+import {arenaViewport} from './arenaViewport';
 
 export type ArenaTarget = { kind: 'hand' | 'minion' | 'hero' | 'power' | 'command' | 'gas' | 'block' | 'deck' | 'scroll' | 'queue'; uid: string; owner: 0 | 1; cardId?: string };
 export interface ArenaMetrics { meshes: number; triangles: number; drawCalls: number; renderScale: number; renderWidth: number; renderHeight: number; models: number; failedModels: number; frames: number; frameMedianMs: number; frameP95Ms: number; renderP95Ms: number; gpu: string; pending: string[] }
@@ -81,7 +83,6 @@ type Entity = {
 };
 
 // One artwork coordinate system for the board, every socket, piece and hit target.
-const point = (x: number, y: number, z = 0) => new Vector3((x - 800) / 50, (500 - y) / 50, z);
 
 export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   if (!Engine.isSupported()) throw new Error('WebGL is unavailable');
@@ -109,14 +110,17 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   let shown: GameState | null = null, selected: string | null = null;
   let hovered: string | null = null, reportedHover: string | null = null, overlayOpen=false;
   let activeBatch: PresentationBatch | null = null;
-  const rowY=(owner:number)=>fighterRow(1,owner,portrait).y;
+  let compact=false,yScale=1;
+  const point=(x:number,y:number,z=0)=>new Vector3((x-800)/50,(500-y)*yScale/50,z);
+  const row=(count:number,owner:number)=>fighterRow(count,owner,portrait,compact);
+  const rowY=(owner:number)=>row(1,owner).y;
   // Measured recess centers in the delivered artwork. Portrait pixels map to
   // x=350+.9*px, y=-130+.9*py; landscape uses its 1600×1000 pixels directly.
   const heroX=(owner=0)=>rulerSocket(owner,portrait).x;
-  const heroY=(owner:number)=>rulerSocket(owner,portrait).y;
+  const heroY=(owner:number)=>compact&&owner===0?610:rulerSocket(owner,portrait).y;
   const queueX=()=>queueSlot(0,portrait).x;
   const queueY=(owner:number)=>queueSlot(owner,portrait).y;
-  const handY=()=>portrait?1030:865;
+  const handY=()=>portrait?1030:compact?835:865;
   const ordersFace=(state:GameState):Face=>({kind:'orders',gas:state.players[0].gas,max:state.players[0].maxGas,portrait});
   const entities = new Map<string, Entity>();
   let heldArrival: Entity | null = null;
@@ -143,6 +147,19 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     materials.set(name, mat); return mat;
   }
   const bronze = material('aged-bronze', '#87633a', .3);
+  const marker=(oval:boolean)=>{
+    const texture=new DynamicTexture(oval?'laurel target':'ready corners',512,scene,false);texture.hasAlpha=true;
+    const ctx=texture.getContext() as unknown as CanvasRenderingContext2D;
+    ctx.clearRect(0,0,512,512);ctx.strokeStyle='#ffffff';ctx.fillStyle='#ffffff';ctx.lineWidth=5;ctx.lineCap='round';
+    if(oval){
+      for(let i=0;i<4;i++){ctx.save();ctx.translate(256,256);ctx.rotate(i*Math.PI/2);ctx.beginPath();ctx.moveTo(-19,-230);ctx.lineTo(0,-248);ctx.lineTo(19,-230);ctx.stroke();ctx.beginPath();ctx.arc(0,0,226,-Math.PI/2+.16,-Math.PI/2+.48);ctx.stroke();ctx.restore();}
+    }else{
+      for(const [x,y,sx,sy] of [[19,19,1,1],[493,19,-1,1],[19,493,1,-1],[493,493,-1,-1]]){ctx.beginPath();ctx.moveTo(x,y+sy*66);ctx.lineTo(x,y);ctx.lineTo(x+sx*66,y);ctx.stroke();}
+      ctx.beginPath();ctx.moveTo(232,9);ctx.lineTo(256,28);ctx.lineTo(280,9);ctx.stroke();
+    }
+    texture.update();return texture;
+  };
+  const ovalMarker=marker(true),cardMarker=marker(false);
   const board = MeshBuilder.CreatePlane('painted Roman arena', { width: 32, height: 20 }, scene);
   board.position.z = 1.7; board.isPickable = false;
   const boardMaterial = material('painted arena surface', '#ffffff', 0);
@@ -187,7 +204,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         const x=width/known.width,y=height/known.height;
         for(const mesh of [known.face,known.backing]){mesh.scaling.x*=x;mesh.scaling.y*=y;}
         known.halo.scaling.x*=x;
-        if(known.data.kind==='hero'||known.data.kind==='power')known.halo.scaling.z*=y;else known.halo.scaling.y*=y;
+        known.halo.scaling.y*=y;
         known.width=width;known.height=height;
       }
       return known;
@@ -204,9 +221,9 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const texture = textures.make(`${keyId}-ink`, face);
     const mat = new StandardMaterial(`${keyId}-material`, scene); mat.diffuseTexture = texture.texture; mat.emissiveTexture = texture.texture; mat.emissiveColor = Color3.White(); mat.diffuseColor = Color3.Black(); mat.disableLighting = true; mat.specularColor = Color3.Black(); mat.useAlphaFromDiffuseTexture = true;
     faceMesh.parent = root; faceMesh.position.z = -.01; faceMesh.material = mat; faceMesh.metadata = data;
-    const halo = oval ? MeshBuilder.CreateTorus(`${keyId}-halo`, { diameter: 1, thickness: .045, tessellation: 48 }, scene) : MeshBuilder.CreateTube(`${keyId}-halo`, {path:[new Vector3(-width*.49,-height*.485,0),new Vector3(width*.49,-height*.485,0),new Vector3(width*.49,height*.485,0),new Vector3(-width*.49,height*.485,0),new Vector3(-width*.49,-height*.485,0)],radius:.025,tessellation:6},scene);
-    if (oval) { halo.rotation.x = Math.PI / 2; halo.scaling.set(width * .89, 1, height * .89); }
+    const halo = MeshBuilder.CreatePlane(`${keyId}-engraved-marker`,{width:width*1.08,height:height*1.06},scene);
     const haloMat = new StandardMaterial(`${keyId}-halo-material`, scene); haloMat.diffuseColor = Color3.Black(); haloMat.emissiveColor = Color3.FromHexString('#427650'); haloMat.alpha = oval ? .9 : .22; haloMat.disableLighting = true;
+    haloMat.diffuseTexture=oval?ovalMarker:cardMarker;haloMat.emissiveTexture=haloMat.diffuseTexture;haloMat.useAlphaFromDiffuseTexture=true;
     halo.parent = root; halo.position.z = -.03; halo.material = haloMat; halo.isPickable = false; halo.setEnabled(false);
     const hitArea=['command','power','gas','block','deck','scroll'].includes(data.kind)
       ? MeshBuilder.CreatePlane(`${keyId}-touch-target`,{size:1,sideOrientation:Mesh.DOUBLESIDE},scene) : null;
@@ -218,7 +235,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   function destroy(entry: Entity) { entry.root.dispose(false, false); entry.texture.dispose(); entry.material.dispose(); entry.haloMaterial.dispose(); }
 
   function highlights() {
-    const legal = shown ? legalActions(shown) : [];
+    const legal = shown ? (shown as GameState & {presentationActions?:Action[]}).presentationActions??legalActions(shown) : [];
     const targets = legal.filter(a => a.type === 'attack' && a.attackerUid === selected).map(a => a.type === 'attack' ? a.target : '');
     entities.forEach(entry => {
       const ready = shown?.turn === 0 && legal.some(a => a.type === 'attack' && a.attackerUid === entry.data.uid);
@@ -226,9 +243,9 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       const target = entry.data.owner === 1 && targets.includes(entry.data.kind === 'hero' ? 'hero' : entry.data.uid);
       const active = selected === entry.data.uid;
       entry.halo.setEnabled(!activeBatch && (ready || powerReady || target || active));
-      const color = target ? '#ff8750' : active ? '#fff0bc' : '#c29c59';
+      const color = target ? '#f5d593' : active ? '#fff0bc' : '#7adccc';
       entry.haloMaterial.emissiveColor = Color3.FromHexString(color);
-      entry.haloMaterial.alpha = target || active ? 1 : .5;
+      entry.haloMaterial.alpha = target || active ? 1 : .85;
       entry.hoverTarget=!overlayOpen&&!activeBatch&&entry.data.kind==='hand'&&entry.data.owner===0&&hovered===entry.data.uid?1:0;
     });
     updateAim();
@@ -265,13 +282,14 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     state.players.forEach((player,index)=>{
       const owner = index as 0|1;
       const socket=rulerSocket(owner,portrait);
-      keep(`hero-${owner}`,{kind:'hero',uid:`hero-${owner}`,owner},{kind:'hero',heroId:player.heroId,treasury:player.treasury,aspect:socket.width/socket.height},socket.width*384/312,socket.height*384/312,heroX(owner),heroY(owner),-1.6);
-      const row=fighterRow(player.board.length,owner,portrait);
-      player.board.forEach((m,i)=>keep(m.uid,{kind:'minion',uid:m.uid,owner,cardId:m.cardId},{kind:'minion',minion:m,ready:readyAttackers.has(m.uid),readiness:fighterReadiness(state,owner,m,stateActions)},row.width,row.height,row.center+(i-(player.board.length-1)/2)*row.spacing,row.y,-.15));
+      const heroScale=compact?(owner===0?.72:.82):1;
+      keep(`hero-${owner}`,{kind:'hero',uid:`hero-${owner}`,owner},{kind:'hero',heroId:player.heroId,treasury:player.treasury,aspect:socket.width/socket.height,framed:compact},socket.width*384/312*heroScale,socket.height*384/312*heroScale,heroX(owner),heroY(owner),-1.6);
+      const formation=row(player.board.length,owner);
+      player.board.forEach((m,i)=>keep(m.uid,{kind:'minion',uid:m.uid,owner,cardId:m.cardId},{kind:'minion',minion:m,ready:readyAttackers.has(m.uid),readiness:fighterReadiness(state,owner,m,stateActions),compact},formation.width,formation.height,formation.center+(i-(player.board.length-1)/2)*formation.spacing,formation.y,-.15));
     });
     const hand = state.players[0].hand;
     const spacing = Math.min(portrait?116:130,(portrait?670:900)/Math.max(1,hand.length-1));
-    hand.forEach((c,i)=>{const x=800+(i-(hand.length-1)/2)*spacing,h=portrait?196:234;keep(c.uid,{kind:'hand',uid:c.uid,owner:0,cardId:c.cardId},{kind:'card',cardId:c.cardId,playable:playableCards.has(c.uid)},h*CARD_FACE.ratio,h,x,handY()+Math.abs(x-800)*.024,-1-i*.015);});
+    hand.forEach((c,i)=>{const x=800+(i-(hand.length-1)/2)*spacing,h=compact?240:portrait?196:234;keep(c.uid,{kind:'hand',uid:c.uid,owner:0,cardId:c.cardId},{kind:'card',cardId:c.cardId,playable:playableCards.has(c.uid)},h*CARD_FACE.ratio,h,x,handY()+Math.abs(x-800)*.024,-1-i*.015);});
     const backs = Math.min(8,state.players[1].hand.length);
     for(let i=0;i<backs;i++){const e=keep(`back-${i}`,{kind:'hand',uid:`back-${i}`,owner:1},{kind:'back'},50,70,800+(i-(backs-1)/2)*40,portrait?-93:35,.5);e.face.isPickable=false;}
     for(const owner of [0,1] as const){
@@ -282,12 +300,12 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         e.face.metadata=e.data;e.face.alphaIndex=3-i;
       });
     }
-    const native = (id:string,kind:ArenaTarget['kind'],face:Face,w:number,h:number,x:number,y:number)=>keep(id,{kind,uid:id,owner:0},face,w,h,x,y,-.5);
+    const native = (id:string,kind:ArenaTarget['kind'],face:Face,w:number,h:number,x:number,y:number)=>keep(id,{kind,uid:id,owner:0},face,w,compact&&face.kind!=='power'?h*yScale:h,x,y,-.5);
     const me=state.players[0];
     const turn=turnSocket(portrait);
-    native('turn-command','command',{kind:'command',state:activeBatch?'busy':battleCommand(state,stateActions),engraved:true,portrait},turn.width,turn.height,turn.x,turn.y);
+    native('turn-command','command',{kind:'command',state:activeBatch?'busy':battleCommand(state,stateActions),engraved:true,portrait,compact},turn.width,turn.height,turn.x,turn.y);
     const power=powerSocket(portrait);
-    native('hero-power','power',{kind:'power',heroId:me.heroId,cost:effectivePowerCost(state,0),available:state.turn===0&&stateActions.some(a=>a.type==='hero-power'),aspect:power.width/power.height},power.width*384/322,power.height*384/322,power.x,power.y);
+    native('hero-power','power',{kind:'power',heroId:me.heroId,cost:effectivePowerCost(state,0),available:state.turn===0&&stateActions.some(a=>a.type==='hero-power'),aspect:power.width/power.height},power.width*384/322,power.height*384/322,power.x,compact?610:power.y);
     const orders=ordersLayout(portrait);
     native('gas-counter','gas',ordersFace(state),orders.width,orders.height,orders.x,orders.y);
     native('block-counter','block',{kind:'block',block:state.block},60,78,portrait?446:234,portrait?70:220);
@@ -394,16 +412,22 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
   function resize() {
     engine.setHardwareScalingLevel(1/pixelRatio(canvas.clientWidth,canvas.clientHeight,window.devicePixelRatio,options.quality??'auto'));
     engine.resize(); const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight);
-    portrait=aspect<1.1;
+    const viewport=arenaViewport(canvas.clientWidth,canvas.clientHeight);
+    const changedLayout=portrait!==viewport.portrait||compact!==viewport.compact||Math.abs(yScale-viewport.yScale)>.001;
+    // A phone rotation changes the projection of every contact. Settle the
+    // already-authoritative result instead of continuing a flight in old coordinates.
+    const settled=changedLayout?activeBatch?.after:undefined;
+    portrait=viewport.portrait;compact=viewport.compact;yScale=viewport.yScale;
+    canvas.parentElement?.setAttribute('data-compact-arena',String(compact));
     if(portrait&&!portraitPainting){portraitPainting=new Texture('/ui/arena-lab/roman-board-integrated-portrait.webp',scene,false,true,Texture.TRILINEAR_SAMPLINGMODE,request,request);portraitPainting.wrapU=Texture.CLAMP_ADDRESSMODE;portraitPainting.wrapV=Texture.CLAMP_ADDRESSMODE;}
-    board.scaling.set(portrait?18/32:1,portrait?25.2/20:1,1);
+    board.scaling.set(portrait?18/32:1,portrait?25.2/20:yScale,1);
     boardMaterial.diffuseTexture=portrait?portraitPainting!:painting;boardMaterial.emissiveTexture=boardMaterial.diffuseTexture;
-    const height=portrait?Math.max(12.6,9/aspect):Math.max(10.2,16.3/aspect);
+    const height=viewport.halfHeight;
     camera.orthoTop=height;camera.orthoBottom=-height;camera.orthoLeft=-height*aspect;camera.orthoRight=height*aspect;
     const menu=point(portrait?1175:1515,portrait?1070:915);
     canvas.parentElement?.style.setProperty('--arena-menu-x',`${(menu.x/(height*aspect)+1)*canvas.clientWidth/2}px`);
     canvas.parentElement?.style.setProperty('--arena-menu-y',`${(1-menu.y/height)*canvas.clientHeight/2}px`);
-    if(shown&&!activeBatch)sync(shown);request();
+    if(settled){cancel();sync(settled);}else if(shown&&!activeBatch)sync(shown);request();
   }
   const resizeObserver = new ResizeObserver(resize); resizeObserver.observe(canvas);
   const visibility = () => {
@@ -473,7 +497,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
 
   async function present(batch: PresentationBatch, impact: () => void) {
     scheduler.cancel(); releaseArrival();releaseDraws();layoutMoves=[]; activeBatch = batch; options.onHover(null); hovered = null; selected = null; highlights();
-    const command = entities.get('turn-command'); if (command) paint(command, { kind: 'command', state: 'busy', engraved: true, portrait });
+    const command = entities.get('turn-command'); if (command) paint(command, { kind: 'command', state: 'busy', engraved: true, portrait,compact });
     const attack = batch.action.type === 'attack' ? batch.action : null;
     const attacker = attack ? entities.get(attack.attackerUid) : null;
     const combat = combatStyle(attacker?.data.cardId);
@@ -500,7 +524,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const owner = batch.before.turn;
     const added = batch.after.players[owner].board.find(m => !batch.before.players[owner].board.some(old=>old.uid===m.uid));
     const boardSize = batch.after.players[owner].board.length;
-    const boardRow=fighterRow(boardSize,owner,portrait);
+    const boardRow=row(boardSize,owner);
     const addedIndex = added ? batch.after.players[owner].board.findIndex(m=>m.uid===added.uid) : 0;
     const pending = mempoolOf(batch.after, owner), pendingIndex = Math.min(5,pending.length-1);
     const immediate=batch.events?.spellImmediate;
@@ -508,7 +532,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const affected=directTargets.flatMap(t=>{const entry=entities.get(t.uid);return entry?[entry.root.position]:[];});
     const spell=immediate?CARDS[immediate.cardId].spell:undefined;
     const effectOwner=spell?.kind==='damage-all-enemy-minions'||spell?.kind==='weaken-random-enemy'?1-owner:owner;
-    const spellRow=fighterRow(1,effectOwner,portrait);
+    const spellRow=row(1,effectOwner);
     const instantTarget=affected.length?affected.reduce((sum,p)=>sum.add(p),Vector3.Zero()).scale(1/affected.length):point(spellRow.center,spellRow.y,-1);
     const target = defender?.root.position.clone() ?? (immediate?instantTarget:batch.action.type === 'cast-spell'
       ? point(queueX()+Math.min(2,pendingIndex)*7,queueY(owner)-Math.min(2,pendingIndex)*7,-1)
@@ -541,8 +565,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       const key=timeline.windows.filter(w=>elapsedMs>=w.contactMs).map(w=>w.key).join(':')+(elapsedMs>=timeline.tailMs?':final':'');
       if(key===frameKey)return;frameKey=key;
       const frame=effectFrame(batch,timeline,elapsedMs);
-      frame.fighters.forEach(minion=>{const entry=entities.get(minion.uid);if(entry&&!entry.root.isDisposed())paint(entry,{kind:'minion',minion,ready:false});});
-      batch.after.players.forEach((player,p)=>{const entry=entities.get(`hero-${p}`);if(entry)paint(entry,{kind:'hero',heroId:player.heroId,treasury:frame.treasuries[p],aspect:rulerSocket(p,portrait).width/rulerSocket(p,portrait).height});});
+      frame.fighters.forEach(minion=>{const entry=entities.get(minion.uid);if(entry&&!entry.root.isDisposed())paint(entry,{kind:'minion',minion,ready:false,compact});});
+      batch.after.players.forEach((player,p)=>{const entry=entities.get(`hero-${p}`);if(entry)paint(entry,{kind:'hero',heroId:player.heroId,treasury:frame.treasuries[p],aspect:rulerSocket(p,portrait).width/rulerSocket(p,portrait).height,framed:compact});});
       if(investmentPayout?.owner===0)paintOrdersFrame(elapsedMs>=timeline.tailMs||timeline.windows.some(w=>w.key==='aftermath'&&elapsedMs>=w.contactMs));
     };
     const contactMs=options.reducedMotion?72:Math.max(spec.duration*spec.contact,(batch.events?.spellResolved?.length??0)*75+90);
@@ -556,11 +580,11 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     const locate=(uid:string)=>{
       if(immediate&&uid===immediate.fromHandUid)return target.clone();
       if(uid==='arena-center')return Vector3.Zero();
-      if(uid==='row-0'||uid==='row-1')return point(fighterRow(1,0,portrait).center,rowY(uid==='row-0'?0:1));
+      if(uid==='row-0'||uid==='row-1')return point(row(1,0).center,rowY(uid==='row-0'?0:1));
       if(uid==='gas-counter')return gasRack.position.clone();
       // Plays reflow the row: feedback belongs at the final socket, including
       // the new fighter which has no entity until the contact callback.
-      for(const p of [0,1]){const board=batch.after.players[p].board,index=board.findIndex(m=>m.uid===uid);if(index>=0){const row=fighterRow(board.length,p,portrait);return point(row.center+(index-(board.length-1)/2)*row.spacing,row.y);}}
+      for(const p of [0,1]){const board=batch.after.players[p].board,index=board.findIndex(m=>m.uid===uid);if(index>=0){const formation=row(board.length,p);return point(formation.center+(index-(board.length-1)/2)*formation.spacing,formation.y);}}
       const existing=entities.get(uid);if(existing)return existing.base.clone();
       const queued=queueAnchor(uid,[batch.after,batch.before],portrait);if(queued)return point(queued.x,queued.y,-1);
     };
@@ -570,8 +594,8 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       for(const owner of [0,1]){
         const board=batch.after.players[owner].board;
         if(board.some(m=>m.uid===uid)){
-          const row=fighterRow(board.length,owner,portrait);
-          return {width:row.width/50,height:row.height/50,spacing:row.spacing/50};
+          const formation=row(board.length,owner);
+          return {width:formation.width/50,height:formation.height/50,spacing:formation.spacing/50};
         }
       }
     };
@@ -666,7 +690,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       hapticContact(batch.action.type);
       videoEffects.trigger(timeline?cues.filter(c=>!c.wave):cues,locateSprite,options.reducedMotion,undefined,cueBounds);
       const authoredLanding=cues.find(cue=>isSurfaceLanding(cue.id)&&cue.anchor===added?.uid);
-      if(batch.events?.play&&!(authoredLanding&&videoEffects.ready(authoredLanding.id)))deployments.begin(batch.events.play.cardId,target,{width:boardRow.width/50,height:boardRow.height/50,spacing:boardRow.spacing/50},options.reducedMotion,added?()=>entities.get(added.uid)?.root.position:undefined);
+      if((batch.events?.play||added)&&!(authoredLanding&&videoEffects.ready(authoredLanding.id)))deployments.begin(batch.events?.play?.cardId??added!.cardId,target,{width:boardRow.width/50,height:boardRow.height/50,spacing:boardRow.spacing/50},options.reducedMotion,added?()=>entities.get(added.uid)?.root.position:undefined);
       if(handUid){
         // Replace the arriving card with its battlefield/queue form at the same position,
         // at contact rather than after a return to the hand or a blank frame.
@@ -676,10 +700,11 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
         deadObjects.forEach(entry=>entities.set(entry.data.uid,entry));
         landed=added?entities.get(added.uid):!immediate&&pending.length?entities.get(`queued-${pending[pending.length-1].uid}`):undefined;
         if(landed&&!options.reducedMotion){landed.material.alpha=0;landed.backing.visibility=0;}else releaseArrival();
-      }else if(drawn.length||resolving.length){
+      }else if(drawn.length||resolving.length||added){
         // Retain doomed pieces until their death phase, while real hand/queue changes commit.
         const retained=[...deadObjects,...(timeline?resolving.map(r=>r.entry):[])];
         retained.forEach(entry=>entities.delete(entry.data.uid));sync(batch.after);retained.forEach(entry=>entities.set(entry.data.uid,entry));
+        if(added){landed=entities.get(added.uid);if(landed&&!options.reducedMotion){landed.material.alpha=0;landed.backing.visibility=0;}}
       }
       drawn.forEach((c,i)=>{
         let entry=c.owner===0?entities.get(c.uid):c.index<8?entities.get(`back-${c.index}`):undefined;
@@ -695,12 +720,12 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
       deadObjects.forEach(entry=>{
         if(entry.root.isDisposed()||entry.data.kind!=='minion')return;
         const previous=batch.before.players[entry.data.owner].board.find(m=>m.uid===entry.data.uid);
-        if(previous)paint(entry,{kind:'minion',minion:{...previous,health:0},ready:false});
+        if(previous)paint(entry,{kind:'minion',minion:{...previous,health:0},ready:false,compact});
       });
       batch.after.players.forEach((player, owner) => {
         const hero = entities.get(`hero-${owner}`);
-        if (hero) paint(hero,{ kind: 'hero', heroId: player.heroId, treasury: player.treasury,aspect:rulerSocket(owner,portrait).width/rulerSocket(owner,portrait).height });
-        player.board.forEach(minion => { const entry = entities.get(minion.uid); if (entry) paint(entry, { kind: 'minion', minion,readiness:fighterReadiness(batch.after,owner as 0|1,minion) }); });
+        if (hero) paint(hero,{ kind: 'hero', heroId: player.heroId, treasury: player.treasury,aspect:rulerSocket(owner,portrait).width/rulerSocket(owner,portrait).height,framed:compact });
+        player.board.forEach(minion => { const entry = entities.get(minion.uid); if (entry) paint(entry, { kind: 'minion', minion,readiness:fighterReadiness(batch.after,owner as 0|1,minion),compact }); });
       });
       paintOrdersFrame(!timeline||investmentPayout?.owner!==0);
       const clock = entities.get('block-counter'); if (clock) paint(clock, { kind: 'block', block: batch.after.block });

@@ -141,3 +141,10 @@ export const DECKS: Record<string, string[]> = {
     'audit',
   ],
 };
+
+// New rulers start from proven faction curves; no existing card is removed.
+DECKS.strategist=[...DECKS.builder];
+DECKS.athena=[...DECKS.builder];
+DECKS.hermes=[...DECKS.validator];
+DECKS.hephaestus=[...DECKS.validator];
+DECKS.poseidon=[...DECKS.whale];

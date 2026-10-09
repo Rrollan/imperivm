@@ -103,13 +103,13 @@ async function main() {
       const presentation = game.dispatch(choice)!;
       if(choice.type==='hero-power'){
         const id=videoCues(presentation)[0]?.id;
-        const expected={'heal-treasury':'02-builder-heal','damage-random-enemy':'03-whale-impact','draw-burn':'04-degen-draw','gain-gas':'05-validator-gas'}[HEROES[presentation.before.players[presentation.before.turn].heroId].power];
+        const expected={'heal-treasury':'02-builder-heal','damage-random-enemy':'03-whale-impact','draw-burn':'04-degen-draw','gain-gas':undefined,'rally-squire':'08-spell-buff','athena-aegis':'19-diamond-phalanx','hermes-relay':'04-degen-draw','hephaestus-forge':'08-spell-buff','poseidon-tide':'07-spell-impact'}[HEROES[presentation.before.players[presentation.before.turn].heroId].power];
         if(presentation.after.winner===null)assert.equal(id,expected,'Hero accents must follow actual ownership and power semantics');
         checkedPower ||= presentation.before.players[presentation.before.turn].heroId === hero;
         const native=abilityCues(presentation)[0];
         assert.ok(native,'Every real hero power must have a native accent even without a video');
-        if(HEROES[presentation.before.players[presentation.before.turn].heroId].power==='gain-gas')assert.equal(native.to,presentation.before.turn===0?'gas-counter':'hero-1');
-        if(HEROES[presentation.before.players[presentation.before.turn].heroId].power==='heal-treasury')assert.equal(native.to,`hero-${presentation.before.turn}`);
+        if(HEROES[presentation.before.players[presentation.before.turn].heroId].power==='gain-gas')assert.equal(native.to,`hero-${presentation.before.turn}`);
+        if(HEROES[presentation.before.players[presentation.before.turn].heroId].power==='heal-treasury')assert.ok(native.to===`hero-${presentation.before.turn}`||presentation.after.players[presentation.before.turn].board.some(m=>m.uid===native.to&&m.health>(presentation.before.players[presentation.before.turn].board.find(old=>old.uid===m.uid)?.health??m.health)));
       }
       assert.deepEqual(game.snapshot().state, state);
       game.impact(presentation.id); game.complete(presentation.id);

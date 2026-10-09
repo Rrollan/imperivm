@@ -92,7 +92,7 @@ for (const [hid, [name, title, power]] of Object.entries(expected)) {
   const h = HEROES[hid];
   if (!h) continue;
   failIf(h.name !== name || h.title !== title || h.power !== power, `${hid}: identity mismatch`);
-  failIf(h.powerCost !== 2, `${hid}: powerCost != 2`);
+  failIf(!Number.isInteger(h.powerCost)||h.powerCost<1||h.powerCost>4, `${hid}: invalid power cost`);
   failIf(!h.powerName || !h.powerText, `${hid}: missing power text`);
 }
 

@@ -14,10 +14,10 @@ import {TURN_INLAY_OUTLINE,PORTRAIT_TURN_INLAY_OUTLINE} from './boardSockets';
 
 export type Face =
   | { kind: 'card'; cardId: string; playable?:boolean }
-  | { kind: 'minion'; minion: Minion; ready?: boolean;readiness?:FighterReadiness }
-  | { kind: 'hero'; heroId: string; treasury: number; aspect?:number; model?: boolean }
+  | { kind: 'minion'; minion: Minion; ready?: boolean;readiness?:FighterReadiness;compact?:boolean }
+  | { kind: 'hero'; heroId: string; treasury: number; aspect?:number; framed?:boolean; model?: boolean }
   | { kind: 'power'; heroId: string; cost: number; available: boolean; aspect?: number; model?: boolean }
-  | { kind: 'command'; state: BattleCommand; engraved?: boolean; portrait?: boolean }
+  | { kind: 'command'; state: BattleCommand; engraved?: boolean; portrait?: boolean; compact?:boolean }
   | { kind: 'gas'; gas: number; max: number; engraved?: boolean }
   | { kind: 'orders'; gas: number; max: number; portrait: boolean }
   | { kind: 'queued'; cardId:string; owner:0|1; count:number; ordinal:number }
@@ -86,10 +86,10 @@ export class ArenaTextures {
       ctx.clearRect(0, 0, size.width, size.height);
       if (face.kind === 'back') this.drawBack(ctx,size.height);
       else if (face.kind === 'card') this.drawCard(ctx, face.cardId,face.playable);
-      else if (face.kind === 'minion') this.drawMinion(ctx, face.minion, face.ready,face.readiness);
-      else if (face.kind === 'hero') this.drawHero(ctx, face.heroId, face.treasury,face.aspect??1);
+      else if (face.kind === 'minion') face.compact?this.drawCompactMinion(ctx,face.minion,face.ready,face.readiness):this.drawMinion(ctx, face.minion, face.ready,face.readiness);
+      else if (face.kind === 'hero') this.drawHero(ctx, face.heroId, face.treasury,face.aspect??1,face.framed);
       else if (face.kind === 'power') this.drawPower(ctx, face);
-      else if (face.kind === 'command') this.drawCommand(ctx, face.state, face.engraved, face.portrait);
+      else if (face.kind === 'command') this.drawCommand(ctx, face.state, face.engraved, face.portrait,face.compact);
       else if (face.kind === 'gas') this.drawGas(ctx, face.gas, face.max, face.engraved);
       else if(face.kind==='orders')this.drawOrders(ctx,face);
       else if(face.kind==='queued')this.drawQueued(ctx,face);
@@ -173,26 +173,37 @@ export class ArenaTextures {
     if(view.bonus){ctx.font=`750 38px ${this.font}`;const label=`+${view.bonus} ${this.locale==='ru'?'бонус':'bonus'}`;ctx.fillStyle='#f3c67c';ctx.strokeText(label,1136,146);ctx.fillText(label,1136,146);}
   }
 
+  /** Phone court pieces prioritise the portrait, attack and health. Tap for full rules. */
+  private drawCompactMinion(ctx:CanvasRenderingContext2D,minion:Minion,ready=false,readiness?:FighterReadiness){
+    ctx.save();ctx.scale(1,CARD_FACE.height/384);
+    rounded(ctx,9,9,366,366,56);ctx.fillStyle='#392419';ctx.fill();ctx.save();ctx.clip();
+    const art=this.image(cardArtPath(minion.cardId));if(art)cover(ctx,art,17,17,350,350);
+    const shade=ctx.createLinearGradient(0,220,0,375);shade.addColorStop(0,'#20120b00');shade.addColorStop(1,'#20120bed');ctx.fillStyle=shade;ctx.fillRect(9,220,366,155);ctx.restore();
+    rounded(ctx,9,9,366,366,56);ctx.strokeStyle=ready?'#8fe5d6':minion.taunt?'#efd295':'#ba8d4e';ctx.lineWidth=12;ctx.stroke();
+    const label=CARDS[minion.cardId].faction;ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`700 48px ${this.font}`;ctx.lineWidth=5;ctx.strokeStyle='#20120b';ctx.fillStyle='#fff0ce';ctx.strokeText(label,192,267,250);ctx.fillText(label,192,267,250);
+    this.badge(ctx,String(minion.attack),61,327,'#ab832e',46);this.badge(ctx,String(Math.max(0,minion.health)),323,327,'#a8322f',46);
+    const symbol:RomanSymbol=minion.staked?'lock':ready?'gladius':readiness==='fresh'?'hourglass':'spent';
+    this.badge(ctx,'',322,61,ready?'#16766a':'#453226',38);drawRomanSymbol(ctx,symbol,322,61,48,ready?'#ddfff5':'#edce91');
+    if(minion.taunt)drawRomanSymbol(ctx,'shield',192,329,49,'#edce91');ctx.restore();
+  }
+
   private drawMinion(ctx: CanvasRenderingContext2D, minion: Minion, ready=false,readiness?:FighterReadiness) {
     paintCardFace(ctx,minion.cardId,this.locale,this.font,this.image(cardArtPath(minion.cardId)),ready,{attack:minion.attack,health:minion.health},this.image(cardFramePath(CARDS[minion.cardId].rarity)),'battlefield');
     const symbol:RomanSymbol=minion.staked?'lock':ready||readiness==='ready'||readiness==='rush'?'gladius':readiness==='fresh'?'hourglass':'spent';
-    this.badge(ctx,'',323,61,minion.staked?'#315e59':ready?'#8b632d':'#514335',29);
-    drawRomanSymbol(ctx,symbol,323,61,40,minion.staked?'#a8e2da':'#f4dda7');
-    if(minion.taunt){
-      drawRomanSymbol(ctx,'shield',192,CARD_FRAME_LAYOUT[CARDS[minion.cardId].rarity].statsY,42,'#3e6665');
-    }
+    this.badge(ctx,'',323,61,minion.staked?'#315e59':ready?'#17796b':'#514335',33);
+    drawRomanSymbol(ctx,symbol,323,61,44,minion.staked?'#a8e2da':ready?'#e2fff1':'#f4dda7');
     if(minion.lifesteal){
       this.badge(ctx,'',312,420,'#632d29',24);drawRomanSymbol(ctx,'drop',312,420,30,'#f0c8a9');
     }
   }
 
-  private drawHero(ctx: CanvasRenderingContext2D, id: string, treasury: number, aspect=1) {
+  private drawHero(ctx: CanvasRenderingContext2D, id: string, treasury: number, aspect=1, framed=false) {
     const art=this.image(heroPortraitPath(id));
     // Use only the inner relief. The painting supplies the single physical rim.
     const bounds:Record<string,number[]>={builder:[44,37,1164,1164],degen:[34,37,1186,1177],validator:[31,35,1189,1185],whale:[40,38,1173,1172]};
     ctx.save();ctx.beginPath();ctx.arc(192,192,156,0,Math.PI*2);ctx.clip();
     if(art){const [x,y,w,h]=bounds[id]??[0,0,1254,1254];const inset=.1;ctx.drawImage(art,(x+w*inset)/1254*art.naturalWidth,(y+h*inset)/1254*art.naturalHeight,w*(1-inset*2)/1254*art.naturalWidth,h*(1-inset*2)/1254*art.naturalHeight,36,36,312,312);}
-    ctx.restore();ctx.save();ctx.translate(319,303);ctx.scale(1,aspect);
+    ctx.restore();if(framed){ctx.strokeStyle='#50301a';ctx.lineWidth=17;ctx.beginPath();ctx.arc(192,192,157,0,Math.PI*2);ctx.stroke();ctx.strokeStyle='#dcba72';ctx.lineWidth=5;ctx.stroke();}ctx.save();ctx.translate(319,303);ctx.scale(1,aspect);
     this.badge(ctx,`${Math.max(0,treasury)}`,0,0,'#a8322f',46);ctx.restore();
   }
 
@@ -203,7 +214,7 @@ export class ArenaTextures {
     if (face.model) {
       ctx.beginPath(); ctx.arc(192,182,153,0,Math.PI*2);
       ctx.strokeStyle = '#d3b074'; ctx.lineWidth = 10; ctx.stroke();
-    } else if (atlas) {
+    } else if (atlas&&index>=0) {
       // Measured alpha bounds; generated atlas spacing is not assumed to be exact.
       const regions = [[.049924,.003361,.43646,.484874],[.515885,.005042,.434191,.482353],[.044629,.481092,.440242,.489076],[.515129,.481513,.440242,.489076]];
       const [x,y,w,h] = regions[Math.max(0,index)];
@@ -212,29 +223,30 @@ export class ArenaTextures {
       ctx.drawImage(atlas, (x+w*.1)*atlas.naturalWidth, (y+h*.1)*atlas.naturalHeight, w*.8*atlas.naturalWidth, h*.8*atlas.naturalHeight, 27, 27, 330, 330);
     } else {
       this.badge(ctx, '', 192, 190, '#785b36', 140);
-      ctx.strokeStyle = '#e5c08b'; ctx.lineWidth = 18;
-      ctx.beginPath(); ctx.moveTo(127,242); ctx.lineTo(243,117); ctx.moveTo(188,105); ctx.lineTo(264,174); ctx.stroke();
+      const symbol:RomanSymbol=face.heroId==='athena'?'shield':face.heroId==='hermes'?'scroll':face.heroId==='hephaestus'?'hammer':face.heroId==='poseidon'?'drop':'standard';
+      drawRomanSymbol(ctx,symbol,192,185,175,'#f3d591');
     }
     ctx.restore();ctx.save();ctx.translate(295,295);ctx.scale(1,face.aspect??1);
     this.badge(ctx, `${face.cost}`, 0, 0, '#246784', 48);ctx.restore();
   }
 
-  private drawCommand(ctx: CanvasRenderingContext2D, state: Extract<Face, { kind: 'command' }>['state'], engraved = false, portrait = false) {
+  private drawCommand(ctx: CanvasRenderingContext2D, state: Extract<Face, { kind: 'command' }>['state'], engraved = false, portrait = false,compact=false) {
     const available=state==='own'||state==='done';
     // Clip the generated material to the measured opening, including its perspective skew.
     // The board artwork continues to own the entire outer bronze frame.
     ctx.save();ctx.beginPath();(portrait?PORTRAIT_TURN_INLAY_OUTLINE:TURN_INLAY_OUTLINE).forEach(([x,y],i)=>{if(i)ctx.lineTo(x*768,y*336);else ctx.moveTo(x*768,y*336);});ctx.closePath();ctx.clip();
     const leather=ctx.createLinearGradient(0,0,0,336);leather.addColorStop(0,available?'#862d20':'#4c241e');leather.addColorStop(.5,available?'#662119':'#361a16');leather.addColorStop(1,'#29130f');
     ctx.fillStyle=leather;ctx.fillRect(0,0,768,336);
-    const insert=this.image('/ui/arena-lab/native/turn-insert-v3.webp');
-    if(insert)ctx.drawImage(insert,0,0,768,336);
+    // The aperture already belongs to the painted board. A second illustrated
+    // button adds a second perspective and never seats correctly in its recess.
+    ctx.strokeStyle='#c8a05938';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(126,48);ctx.lineTo(642,48);ctx.moveTo(126,288);ctx.lineTo(642,288);ctx.stroke();
     if(!available){ctx.fillStyle='#170f0bcc';ctx.fillRect(0,0,768,336);}
     // Inset shading seats the material under the existing rim instead of drawing another rim.
     ctx.strokeStyle=state==='done'?'#eec77f80':'#1c0a08a6';ctx.lineWidth=16;ctx.stroke();
-    const labels=available?(this.locale==='ru'?['КОНЕЦ','ХОДА']:['END','TURN']):state==='enemy'?(this.locale==='ru'?['ХОД','СОПЕРНИКА']:['OPPONENT',"TURN"]):state==='busy'?(this.locale==='ru'?['ИДЁТ','БОЙ']:['RESOLVING']):(this.locale==='ru'?['БОЙ','ОКОНЧЕН']:['BATTLE','OVER']);
+    const labels=compact?[available?(this.locale==='ru'?'КОНЕЦ':'END TURN'):state==='enemy'?(this.locale==='ru'?'СОПЕРНИК':'OPPONENT'):state==='busy'?(this.locale==='ru'?'БОЙ':'RESOLVING'):(this.locale==='ru'?'ИТОГ':'RESULT')]:available?(this.locale==='ru'?['КОНЕЦ','ХОДА']:['END','TURN']):state==='enemy'?(this.locale==='ru'?['ХОД','СОПЕРНИКА']:['OPPONENT',"TURN"]):state==='busy'?(this.locale==='ru'?['ИДЁТ','БОЙ']:['RESOLVING']):(this.locale==='ru'?['БОЙ','ОКОНЧЕН']:['BATTLE','OVER']);
     const roman=getComputedStyle(document.body).getPropertyValue('--font-roman').trim()||this.font;
     ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle='#25100b';ctx.lineWidth=6;ctx.fillStyle=state==='done'?'#fff5c5':available?'#f8e5b8':'#cbbda3';
-    labels.forEach((label,i)=>{ctx.font=`800 92px ${roman}`;const size=Math.min(92,92*492/Math.max(1,ctx.measureText(label).width));ctx.font=`800 ${size}px ${roman}`;const y=labels.length===1?166:119+i*94,x=portrait?384:395;ctx.strokeText(label,x,y);ctx.fillText(label,x,y);});
+    labels.forEach((label,i)=>{const base=compact?146:92;ctx.font=`800 ${base}px ${roman}`;const size=Math.min(base,base*(compact?590:492)/Math.max(1,ctx.measureText(label).width));ctx.font=`800 ${size}px ${roman}`;const y=labels.length===1?166:119+i*94,x=portrait?384:395;ctx.strokeText(label,x,y);ctx.fillText(label,x,y);});
     ctx.restore();
   }
 

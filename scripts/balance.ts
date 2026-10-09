@@ -3,6 +3,7 @@ import {mkdirSync,writeFileSync,readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {resolve} from 'node:path';
+import {FREE_DECKS} from '../lib/collection/starterDecks';
 import {DECKS} from '../lib/decks';
 import {CARDS} from '../lib/cards';
 import {HEROES} from '../lib/heroes';
@@ -17,9 +18,9 @@ const rulesetFlag=process.argv.indexOf('--ruleset');
 const ruleset=(rulesetFlag===-1?'classic-v1':process.argv[rulesetFlag+1]) as RulesetId;
 if(ruleset!=='classic-v1'&&ruleset!=='validator-investment-v1')throw new Error('Unknown --ruleset');
 const out=process.argv.includes('--out')?resolve(process.argv[process.argv.indexOf('--out')+1]):resolve(`docs/balance/${ruleset==='classic-v1'?'baseline':'validator-investment'}-20261006.json`);
-const heroes=Object.keys(HEROES);
+const heroes=Object.keys(HEROES),pool=process.argv.includes('--free')?FREE_DECKS:DECKS;
 interface PairResult {a:string;b:string;wins:number;losses:number;draws:number;incomplete:number;winRate:number;interval95:number[]}
-for(const hero of heroes)if(deckError(DECKS[hero]))throw new Error(`${hero}: invalid deck`);
+for(const hero of heroes)if(deckError(pool[hero]))throw new Error(`${hero}: invalid deck`);
 const suites=[
   {id:'starters-greedy',sameDeck:false,policies:['greedy','greedy'] as [ProbePolicy,ProbePolicy]},
   {id:'starters-pressure',sameDeck:false,policies:['pressure','pressure'] as [ProbePolicy,ProbePolicy]},
@@ -38,7 +39,7 @@ const results=suites.map(suite=>{
     const count={a,b,wins:0,losses:0,draws:0,incomplete:0,winRate:0,interval95:[0,0]};
     for(let i=0;i<seeds;i++){
       const seed=(104729+7919*i)|0;
-      const game=probeMatch(a,DECKS[suite.sameDeck?'builder':a],b,DECKS[suite.sameDeck?'builder':b],seed,suite.policies,ruleset);
+      const game=probeMatch(a,pool[suite.sameDeck?'builder':a],b,pool[suite.sameDeck?'builder':b],seed,suite.policies,ruleset);
       if(game.winner===0){count.wins++;firstWins++;}else if(game.winner===1)count.losses++;
       else if(game.winner==='draw'){count.draws++;draws++;}else{count.incomplete++;incomplete++;}
       if(game.winner!==null)blocks.push(game.blocks);
@@ -60,6 +61,6 @@ const results=suites.map(suite=>{
   return {...suite,matches,firstWins,firstWinRate:Number((100*firstWins/(matches-draws-incomplete)).toFixed(1)),draws,incomplete,blocks:{p10:quantile(blocks,.1),median:quantile(blocks,.5),p90:quantile(blocks,.9)},casts,counters,stakes,factionRefunds:refunds,powers,heroRates,cells};
 });
 const sourceDigest=createHash('sha256');
-for(const path of ['lib/engine/engine.ts','lib/engine/ruleset.ts','lib/engine/spellTiming.ts','lib/engine/types.ts','lib/cards.ts','lib/heroes.ts','lib/decks.ts','lib/ai.ts','lib/balance/simulation.ts'])sourceDigest.update(path+'\0').update(readFileSync(path));
-const report={schema:1,ruleset,sourceDigest:sourceDigest.digest('hex'),engineCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),seedsPerOrderedPair:seeds,seedFormula:'104729 + 7919 * i; i = 0..seeds-1',mulligan:true,scope:'All 16 ordered pairs including mirrors. Both seats are counted. Shared-deck suite uses Builder deck for every hero. No hidden-state lookahead. Automated policies are probes, not estimates of human PvP win rates. Wilson intervals are descriptive per cell; hero aggregate samples include correlated same-match seats.',cardCount:Object.keys(CARDS).length,mechanicalTwins:mechanicalTwins(),results};
+for(const path of ['lib/engine/engine.ts','lib/engine/ruleset.ts','lib/engine/spellTiming.ts','lib/engine/types.ts','lib/cards.ts','lib/heroes.ts','lib/decks.ts','lib/collection/starterDecks.ts','lib/ai.ts','lib/balance/simulation.ts'])sourceDigest.update(path+'\0').update(readFileSync(path));
+const report={schema:1,ruleset,deckPool:process.argv.includes('--free')?'free':'all-owned',sourceDigest:sourceDigest.digest('hex'),engineCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),seedsPerOrderedPair:seeds,seedFormula:'104729 + 7919 * i; i = 0..seeds-1',mulligan:true,scope:'All 81 ordered pairs including mirrors. Both seats are counted. Shared-deck suite uses Builder deck for every hero. No hidden-state lookahead. Automated policies are probes, not estimates of human PvP win rates. Wilson intervals are descriptive per cell; hero aggregate samples include correlated same-match seats.',cardCount:Object.keys(CARDS).length,mechanicalTwins:mechanicalTwins(),results};
 mkdirSync(resolve(out,'..'),{recursive:true});writeFileSync(out,JSON.stringify(report,null,2)+'\n');console.log(`Saved ${out}`);

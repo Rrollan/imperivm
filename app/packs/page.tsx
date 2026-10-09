@@ -20,6 +20,7 @@ import {PackOpening} from '../../components/home/PackOpening';
 import {RomanIcon} from '../../components/presentation/RomanIcon';
 import {useIDos} from '../../components/IDosContext';
 import {PaintedIcon} from '../../components/PaintedIcon';
+import {RulerCase} from '../../components/home/RulerCase';
 import RugShop from '../../components/RugShop';
 
 export default function PacksPage() {
@@ -103,6 +104,7 @@ export default function PacksPage() {
         <details className={styles.optionalNft}><summary>{t('Коллекционные NFT · devnet (необязательно)', 'Collectible NFTs · devnet (optional)')}</summary><WalletBar /><NftPack /></details>
 
 
+        <RulerCase/>
       </main>
       <SiteFooter />
       {inspected && <CardDialog id={inspected} onClose={() => setInspected(null)} />}

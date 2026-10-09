@@ -60,9 +60,14 @@ export const CARD_RU: Record<string, { name: string; text: string }> = {
 
 const HERO_RU: Record<string, { name: string; title: string; powerName: string; powerText: string }> = {
   whale: { name: 'Кит', title: 'Властелин рынка', powerName: 'Обвал рынка', powerText: 'Наносит 2 урона случайному вражескому существу, а если их нет — вражеской казне. Рынок даёт, а Кит забирает.' },
-  builder: { name: 'Строитель', title: 'Мастер релизов', powerName: 'Выпустить патч', powerText: 'Восстанавливает 3 здоровья вашей казне. Выпускай исправления, а не оправдания.' },
+  builder: { name: 'Строитель', title: 'Мастер релизов', powerName: 'Выпустить патч', powerText: 'Восстанавливает 2 здоровья казне и 1 самому раненому бойцу.' },
   degen: { name: 'Деген', title: 'Безрассудный инвестор', powerName: 'Влететь на всё', powerText: 'Возьмите карту и получите 2 урона. Анализ — для трусов.' },
-  validator: { name: 'Валидатор', title: 'Хранитель блоков', powerName: 'Подтвердить блок', powerText: 'Даёт 2 приказа на этот ход. Сеть помнит верных.' },
+  validator: { name: 'Валидатор', title: 'Хранитель блоков', powerName: 'Подтвердить блок', powerText: 'В начале следующего своего хода даёт +2 приказа сверх запаса.' },
+  strategist:{name:'Стратег',title:'Маршал легиона',powerName:'Сбор легиона',powerText:'Призывает Пиксельного оруженосца 1/1.'},
+  athena:{name:'Афина',title:'Алмазная стратегиня',powerName:'Алмазная эгида',powerText:'Бойцу с наименьшим здоровьем +1/+1 и Провокация. Если рядом другой подготовленный союзник NFT — +1/+2.'},
+  hermes:{name:'Гермес',title:'Ретранслятор альфы',powerName:'Доставка альфы',powerText:'Добор за 3 здоровья. После карты DePIN — без урона.'},
+  hephaestus:{name:'Гефест',title:'Кузнец протокола',powerName:'Кузница резерва',powerText:'Призыв 2/2. Если другой подготовленный союзник в стейкинге — 3/3.'},
+  poseidon:{name:'Посейдон',title:'Глубокая ликвидность',powerName:'Волна ликвидаций',powerText:'1 урон всем врагам. После двух карт DeFi — 2 урона.'},
 };
 export const KEYWORD_RU: Record<string, string> = { Ultimate: 'Ультимейт', Formation: 'Строй', Gas: 'Приказы', Treasury: 'Казна', Mempool: 'Указы', Priority: 'Приоритет', Staking: 'Стейкинг', Halving: 'Халвинг', Taunt: 'Провокация', Rush: 'Натиск', Lifesteal: 'Похищение жизни', Pavilion: 'Павильон', Comeback: 'Возвращение', Mulligan: 'Замена стартовых карт', 'RUG PULL': 'РАГПУЛ', Audit: 'Аудит', Fatigue: 'Истощение', Battlecry: 'Боевой клич' };
 export const MECHANICS_RU: Record<string, string> = {

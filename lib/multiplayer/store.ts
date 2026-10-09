@@ -1,7 +1,8 @@
 import {createHash, randomBytes, randomInt} from 'node:crypto';
 import {applyAction, createGame, effectivePowerCost, legalActions, mempoolOf, mulliganAvailable} from '../engine/engine';
+import {boardCapacity} from '../engine/tactics';
 import {FREE_DECKS as DECKS} from '../collection/starterDecks';
-import {HEROES} from '../heroes';
+import {HEROES,isFreeHero} from '../heroes';
 import {cardName, heroName, powerName} from '../locale';
 import type {Action, GameState, PlayerId} from '../engine/types';
 import type {OnlineCommand, OnlinePlayer, OnlineRoom, OnlineSession} from './types';
@@ -68,8 +69,9 @@ export class MultiplayerStore {
       for (const key of room.seats) if (key) {const guest = this.sessions.get(key); if (guest?.roomId === id) guest.roomId = null;}
     }
   }
-  private hero(heroId: string) {
+  private hero(heroId: string, verifiedHero?: string) {
     if (!Object.hasOwn(HEROES, heroId) || !DECKS[heroId]) fail(400, 'hero', 'Выберите одного из доступных предводителей.');
+    if(!isFreeHero(heroId)&&verifiedHero!==heroId)fail(403,'hero-locked','Правитель из кейса требует подтверждённой коллекции iDos.');
   }
   private clearFinished(guest: Guest) {
     if (!guest.roomId) return;
@@ -123,7 +125,7 @@ export class MultiplayerStore {
     const opponentPresent = !!foeGuest && now - foeGuest.seenAt < 10_000;
     const game = room.game;
     const players = game?.players.map((p, index): OnlinePlayer => ({id: p.id, heroId: p.heroId, treasury: p.treasury, gas: p.gas,
-      maxGas: p.maxGas, fatigue: p.fatigue, heroPowerUsed: p.heroPowerUsed, reinforcementUsed: !!p.reinforcementUsed, powerCost: effectivePowerCost(game, index as PlayerId), handCount: p.hand.length, deckCount: p.deck.length,
+      maxGas: p.maxGas, boardCapacity:boardCapacity(p), factionPlaysThisTurn:{...p.factionPlaysThisTurn},pavilionBonuses:[...(p.pavilionBonuses??[])],...(p.powerIncome?{powerIncome:p.powerIncome}:{}), fatigue: p.fatigue, heroPowerUsed: p.heroPowerUsed, reinforcementUsed: !!p.reinforcementUsed, powerCost: effectivePowerCost(game, index as PlayerId), handCount: p.hand.length, deckCount: p.deck.length,
       board: p.board.map(m => ({uid: m.uid, cardId: m.cardId, name: m.name, attack: m.attack, health: m.health, maxHealth: m.maxHealth,
         canAttack: m.canAttack, staked: m.staked, taunt: !!m.taunt, rush: !!m.rush, lifesteal: !!m.lifesteal, fresh: !!m.fresh})),
       edicts: mempoolOf(game, index as PlayerId).map(e => ({...e})), ...(index === seat ? {hand: p.hand.map(h => ({...h}))} : {})})) as [OnlinePlayer, OnlinePlayer] | undefined;
@@ -136,7 +138,7 @@ export class MultiplayerStore {
         mulliganOpen: game.turn === seat && mulliganAvailable(game), turnDeadline: room.turnDeadline} : null}};
   }
   status(token: string): OnlineSession {const [key, guest, now] = this.guest(token, false); return this.view(key, guest, now);}
-  command(token: string, command: OnlineCommand): OnlineSession {
+  command(token: string, command: OnlineCommand, verifiedHero?: string): OnlineSession {
     const [key, guest, now] = this.guest(token, true);
     if (command.type === 'session') return this.view(key, guest, now);
     if (command.type === 'cancel') {
@@ -145,7 +147,7 @@ export class MultiplayerStore {
       return this.view(key, guest, now);
     }
     if (command.type === 'create' || command.type === 'queue' || command.type === 'join') {
-      this.hero(command.heroId);
+      this.hero(command.heroId,verifiedHero);
       if (command.type === 'join' && guest.roomId === command.roomId) return this.view(key, guest, now);
       this.clearFinished(guest);
       if (command.type === 'create') this.createRoom(key, guest, command.heroId, 'friend', now);

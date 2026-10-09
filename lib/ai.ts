@@ -183,9 +183,11 @@ export function chooseAiAction(state: GameState): Action {
   const hp = acts.find(a => a.type === 'hero-power');
   if (hp !== undefined) {
     const power = HEROES[me.heroId]?.power;
-    const suicidal = power === 'draw-burn' && me.treasury <= 2;
-    const wastedHeal = power === 'heal-treasury' && me.treasury >= 30;
-    const wastedDraw = power === 'draw-burn' && (me.deck.length === 0 || me.hand.length >= 10);
+    const drawPower=power==='draw-burn'||power==='hermes-relay';
+    const burn=power==='hermes-relay'?((me.factionPlaysThisTurn?.DePIN??0)>0?0:3):2;
+    const suicidal = drawPower && me.treasury <= burn;
+    const wastedHeal = power === 'heal-treasury' && me.treasury >= 30&&!me.board.some(m=>m.health<m.maxHealth);
+    const wastedDraw = drawPower && (me.deck.length === 0 || me.hand.length >= 10);
     if (!suicidal && !wastedHeal && !wastedDraw) return hp;
     // package 4A: if the discounted cost makes the power affordable
     // while the base 2-gas cost blocked it earlier, legalActions

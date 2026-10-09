@@ -70,7 +70,7 @@ IDOS_COLLECTION_ID=IMPERIVM_AGORA
 # IDOS_BUILD_KEY=<only if required by this Title; server only>
 ```
 
-Фронт и WS deploy **вместе**. Server-only Title выбирает фиксированный API endpoint iDos; клиент передаёт только transient userID/sessionTicket при первоначальном создании/входе с платной колодой. Сервер проверяет backend OwnedCollectibles и правила числа копий. Credential не попадает в opponent snapshot, лог, ссылку приглашения или browser sessionStorage. Бесплатная колода не зависит от доступности iDos. Возврат по секрету места продолжает уже проверенную, неизменную колоду без повторного логина. Случайный режим текущего HTTP-прототипа использует только бесплатные стартовые колоды.
+Фронт и WS deploy **вместе**. Server-only Title выбирает фиксированный API endpoint iDos; клиент передаёт только transient userID/sessionTicket при первоначальном создании/входе с платной колодой. Сервер проверяет backend OwnedCollectibles и правила числа копий. Credential не попадает в opponent snapshot, лог, ссылку приглашения или browser sessionStorage. Бесплатная колода не зависит от доступности iDos. Возврат по секрету места продолжает уже проверенную, неизменную колоду без повторного логина. Случайный режим текущего HTTP-прототипа использует бесплатные стартовые карты. Правитель из кейса требует той же серверной проверки коллекции, даже с бесплатной колодой.
 
 До изменения flag на `true`: настроить Title, решить обмен повторов, проверить актуальные production зависимости (существующий Next 14.2.35 имеет advisory; см. `docs/idos-colosseum-handoff.md`), затем владелец выполняет один согласованный платный тест в iDos. В этой работе Title не настроен и такой платный тест не выполнен.
 
@@ -84,7 +84,7 @@ IDOS_COLLECTION_ID=IMPERIVM_AGORA
 
 ## Приёмка
 
-Локальные проверки без средств: `npm run test:integrations`, `npm test --prefix server`, `npm run build --prefix server`, `npm run smoke`, `npm run build`. Есть проверки 49/50, четырёх колод, migration, session isolation, server entitlements, строгих assets mainnet, decimal balances, изменения price, receipt mismatch и pending recovery. Сетевая проверка включает полный матч и настоящий десятисекундный обрыв.
+Локальные проверки без средств: `npm run test:integrations`, `npm test --prefix server`, `npm run build --prefix server`, `npm run smoke`, `npm run build`. Есть проверки 49/50, девяти колод и правителей, migration, session isolation, server entitlements, строгих assets mainnet, decimal balances, изменения price, receipt mismatch и pending recovery. Сетевая проверка включает полный матч и настоящий десятисекундный обрыв.
 
 Ручной тест настроенного Title: чистый аккаунт получает 49 free и 0 live IMP; нужная криптовалюта читается; нет funds — нет списания; один подтверждённый SOL/USDC offer даёт ровно заявленные IMP; отмена не списывает; пак списывает 50 и показывает ровно 5 pulls, дубликаты не удваиваются; коллекция доступна на другом устройстве; forged/unowned deck отклонён WS; reconnect работает без утечки ticket.
 
@@ -94,3 +94,8 @@ API сверены с [iDos MCP](https://idosgames.com/mcp/), официальн
 ## Переименование в $IMP
 
 С 8 октября интерфейс и новые определения iDos используют IMP: VirtualCurrencyID/PriceOptionID `IMP`, StoreID `IMPERIVM_IMP`. Токен на блокчейне этим изменением не создаётся и не переименовывается. `CollectionSnapshot.rug`, ключи локальной коллекции и защиты от повторного платежа оставлены совместимыми: существующие карты, тестовый баланс и незавершённые чеки сохраняются. Для уже настроенного Title старые ID можно явно оставить через env; новый `NEXT_PUBLIC_IDOS_IMP_STORE_ID` поддерживает старый `NEXT_PUBLIC_IDOS_RUG_STORE_ID` как резервный. Прежде чем менять существующий платёжный каталог, оператор должен завершить ожидающие покупки и подтвердить перенос валюты на стороне iDos. Реальные покупки в этой итерации не выполнялись.
+
+
+## Кейсы предводителей
+
+Пять правителей доступны бесплатно; четыре отдельными коллекционными предметами. Локальный кейс стоит 200 demo IMP, повтор даёт 100 валюты коллекции. Реальный кейс по умолчанию отключён. См. [конфигурацию и условия активации](design/arena-refresh-20261009/IDOS-RULER-CASES.md): оператор должен подтвердить поддержку rarity 5 и равные шансы четырёх предметов до включения. Эта работа не создаёт Title и не проводит платежи.

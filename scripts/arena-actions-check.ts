@@ -131,7 +131,7 @@ function passTurn(game:GameSession,label:string){
 {
   const state=fixture('builder');state.players[0].gas=5;state.players[0].maxGas=5;state.players[0].treasury=20;
   const batch=dispatch(session(state),'Builder heal-treasury power',actionType('hero-power'));
-  assert.equal(batch.after.players[0].treasury,23);
+  assert.equal(batch.after.players[0].treasury,22);
   assert.deepEqual(cueIds(batch),[{id:'02-builder-heal',anchor:'hero-0'}]);
   assert.deepEqual(abilityCues(batch).map(c=>[c.kind,c.to]),[['heal','hero-0']]);
 }
@@ -155,18 +155,17 @@ function passTurn(game:GameSession,label:string){
 {
   const state=fixture('validator');state.players[0].gas=3;state.players[0].maxGas=5;
   const batch=dispatch(session(state),'Validator gain-orders power',actionType('hero-power'));
-  assert.equal(batch.after.players[0].gas,3,'Power cost 2 and gain 2 both apply');
-  assert.deepEqual(cueIds(batch),[{id:'05-validator-gas',anchor:'gas-counter'}]);
-  assert.deepEqual(abilityCues(batch).map(c=>[c.kind,c.to]),[['seal','gas-counter']]);
+  assert.equal(batch.after.players[0].gas,2,'One order is paid now; income is reserved for the next owner turn');
+  assert.equal(batch.after.players[0].powerIncome,2);
+  assert.deepEqual(cueIds(batch),[],'Reserved orders must not show an immediate crystal payout');
+  assert.deepEqual(abilityCues(batch).map(c=>[c.kind,c.to]),[['seal','hero-0']]);
 }
 {
-  const state=fixture('builder');state.players[0].gas=5;state.players[0].maxGas=5;state.players[0].treasury=30;
-  const batch=dispatch(session(state),'Builder power at treasury cap (no-op probe)',actionType('hero-power'));
-  assert.equal(batch.after.players[0].treasury,30,'Capped healing makes no state change');
-  const observed=cues(batch);
-  if(observed.native.some(c=>c.kind==='heal')||observed.video.some(c=>c.id==='02-builder-heal')){
-    gaps.push('Builder power at 30 treasury still emits heal cues although the capped action restores 0. BattleEvents has no treasury-delta field to let the cue adapter distinguish this no-op.');
-  }
+  const state=fixture('builder',[],[fighter('wounded-ally','pixel-squire',{health:1,maxHealth:2})]);state.players[0].gas=5;state.players[0].maxGas=5;state.players[0].treasury=30;
+  const batch=dispatch(session(state),'Builder heals ally at treasury cap',actionType('hero-power'));
+  assert.equal(batch.after.players[0].treasury,30);
+  assert.equal(batch.after.players[0].board[0].health,2);
+  assert.deepEqual(cueIds(batch),[{id:'02-builder-heal',anchor:'wounded-ally'}]);
 }
 
 // cast-spell is delayed: casting only queues it and produces no effect cue;
@@ -316,7 +315,7 @@ function mulliganGame(seed:number){
 const required:Action['type'][]=['play-minion','cast-spell','attack','hero-power','buy-card','stake','unstake','end-turn','mulligan'];
 const coveredTypes=Array.from(new Set(coverage.map(item=>item.type)));
 assert.deepEqual(new Set(coveredTypes),new Set(required),'Every Action variant must be exercised through a legal GameSession dispatch');
-assert.equal(coverage.filter(item=>item.type==='hero-power').length,5,'The four powers plus the capped-heal no-op probe must run');
+assert.equal(coverage.filter(item=>item.type==='hero-power').length,5,'The four original powers plus fighter-only healing must run');
 assert.ok(coverage.some(item=>item.label==='attack enemy fighter')&&coverage.some(item=>item.label==='attack enemy ruler'));
 assert.ok(coverage.some(item=>item.label==='P0 mulligan keep')&&coverage.some(item=>item.label==='P0 mulligan swap'));
 assert.ok(coverage.some(item=>item.label==='P1 mulligan swap closes opening window'));

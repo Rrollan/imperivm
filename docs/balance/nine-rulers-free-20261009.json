@@ -1,0 +1,3594 @@
+{
+  "schema": 1,
+  "ruleset": "classic-v1",
+  "deckPool": "free",
+  "sourceDigest": "ea8271b03af1b9c5cb9f252719ca6a72c448c38f731f3387ebfb2a58b85a3ff8",
+  "engineCommit": "20745f75bf858a163b7c85b211ab08fb18f28729",
+  "seedsPerOrderedPair": 24,
+  "seedFormula": "104729 + 7919 * i; i = 0..seeds-1",
+  "mulligan": true,
+  "scope": "All 81 ordered pairs including mirrors. Both seats are counted. Shared-deck suite uses Builder deck for every hero. No hidden-state lookahead. Automated policies are probes, not estimates of human PvP win rates. Wilson intervals are descriptive per cell; hero aggregate samples include correlated same-match seats.",
+  "cardCount": 99,
+  "mechanicalTwins": [
+    {
+      "cards": [
+        {
+          "id": "lending-legionnaire",
+          "cost": 1,
+          "faction": "DeFi"
+        },
+        {
+          "id": "pixel-squire",
+          "cost": 1,
+          "faction": "NFT"
+        },
+        {
+          "id": "antenna-auxilia",
+          "cost": 1,
+          "faction": "DePIN"
+        }
+      ],
+      "differentCost": false
+    },
+    {
+      "cards": [
+        {
+          "id": "amm-centurion",
+          "cost": 2,
+          "faction": "DeFi"
+        },
+        {
+          "id": "pepito",
+          "cost": 3,
+          "faction": "Meme"
+        }
+      ],
+      "differentCost": true
+    },
+    {
+      "cards": [
+        {
+          "id": "floor-sweeper",
+          "cost": 3,
+          "faction": "NFT"
+        },
+        {
+          "id": "relay-runner",
+          "cost": 3,
+          "faction": "DePIN"
+        }
+      ],
+      "differentCost": false
+    },
+    {
+      "cards": [
+        {
+          "id": "hotspot-hoplite",
+          "cost": 4,
+          "faction": "DePIN"
+        },
+        {
+          "id": "bagholder-donkey",
+          "cost": 3,
+          "faction": "Meme"
+        }
+      ],
+      "differentCost": true
+    }
+  ],
+  "results": [
+    {
+      "id": "starters-greedy",
+      "sameDeck": false,
+      "policies": [
+        "greedy",
+        "greedy"
+      ],
+      "matches": 1944,
+      "firstWins": 1127,
+      "firstWinRate": 58,
+      "draws": 0,
+      "incomplete": 0,
+      "blocks": {
+        "p10": 15,
+        "median": 22,
+        "p90": 36
+      },
+      "casts": 11651,
+      "counters": 0,
+      "stakes": 4739,
+      "factionRefunds": 8430,
+      "powers": {
+        "whale": {
+          "uses": 1766,
+          "neutral": 0
+        },
+        "builder": {
+          "uses": 1466,
+          "neutral": 0
+        },
+        "degen": {
+          "uses": 996,
+          "neutral": 0
+        },
+        "validator": {
+          "uses": 2633,
+          "neutral": 281
+        },
+        "strategist": {
+          "uses": 1169,
+          "neutral": 0
+        },
+        "athena": {
+          "uses": 1164,
+          "neutral": 0
+        },
+        "hermes": {
+          "uses": 1084,
+          "neutral": 0
+        },
+        "hephaestus": {
+          "uses": 1120,
+          "neutral": 0
+        },
+        "poseidon": {
+          "uses": 1612,
+          "neutral": 0
+        }
+      },
+      "heroRates": [
+        {
+          "hero": "whale",
+          "wins": 198,
+          "losses": 234,
+          "winRate": 45.8
+        },
+        {
+          "hero": "builder",
+          "wins": 220,
+          "losses": 212,
+          "winRate": 50.9
+        },
+        {
+          "hero": "degen",
+          "wins": 233,
+          "losses": 199,
+          "winRate": 53.9
+        },
+        {
+          "hero": "validator",
+          "wins": 204,
+          "losses": 228,
+          "winRate": 47.2
+        },
+        {
+          "hero": "strategist",
+          "wins": 209,
+          "losses": 223,
+          "winRate": 48.4
+        },
+        {
+          "hero": "athena",
+          "wins": 243,
+          "losses": 189,
+          "winRate": 56.3
+        },
+        {
+          "hero": "hermes",
+          "wins": 220,
+          "losses": 212,
+          "winRate": 50.9
+        },
+        {
+          "hero": "hephaestus",
+          "wins": 184,
+          "losses": 248,
+          "winRate": 42.6
+        },
+        {
+          "hero": "poseidon",
+          "wins": 233,
+          "losses": 199,
+          "winRate": 53.9
+        }
+      ],
+      "cells": [
+        {
+          "a": "whale",
+          "b": "whale",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "builder",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "degen",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "validator",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "strategist",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "athena",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "hermes",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "hephaestus",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "poseidon",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "whale",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "builder",
+          "wins": 9,
+          "losses": 15,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 37.5,
+          "interval95": [
+            21.2,
+            57.3
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "degen",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "validator",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "strategist",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "athena",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "hermes",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "hephaestus",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "poseidon",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "whale",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "builder",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "degen",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "validator",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "strategist",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "athena",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "hermes",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "hephaestus",
+          "wins": 20,
+          "losses": 4,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 83.3,
+          "interval95": [
+            64.1,
+            93.3
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "poseidon",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "whale",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "builder",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "degen",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "validator",
+          "wins": 9,
+          "losses": 15,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 37.5,
+          "interval95": [
+            21.2,
+            57.3
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "strategist",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "athena",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "hermes",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "hephaestus",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "poseidon",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "whale",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "builder",
+          "wins": 10,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 41.7,
+          "interval95": [
+            24.5,
+            61.2
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "degen",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "validator",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "strategist",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "athena",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "hermes",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "hephaestus",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "poseidon",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "whale",
+          "wins": 18,
+          "losses": 6,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 75,
+          "interval95": [
+            55.1,
+            88
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "builder",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "degen",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "validator",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "strategist",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "athena",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "hermes",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "hephaestus",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "poseidon",
+          "wins": 18,
+          "losses": 6,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 75,
+          "interval95": [
+            55.1,
+            88
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "whale",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "builder",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "degen",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "validator",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "strategist",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "athena",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "hermes",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "hephaestus",
+          "wins": 19,
+          "losses": 5,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 79.2,
+          "interval95": [
+            59.5,
+            90.8
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "poseidon",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "whale",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "builder",
+          "wins": 9,
+          "losses": 15,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 37.5,
+          "interval95": [
+            21.2,
+            57.3
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "degen",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "validator",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "strategist",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "athena",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "hermes",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "hephaestus",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "poseidon",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "whale",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "builder",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "degen",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "validator",
+          "wins": 18,
+          "losses": 6,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 75,
+          "interval95": [
+            55.1,
+            88
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "strategist",
+          "wins": 18,
+          "losses": 6,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 75,
+          "interval95": [
+            55.1,
+            88
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "athena",
+          "wins": 10,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 41.7,
+          "interval95": [
+            24.5,
+            61.2
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "hermes",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "hephaestus",
+          "wins": 19,
+          "losses": 5,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 79.2,
+          "interval95": [
+            59.5,
+            90.8
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "poseidon",
+          "wins": 18,
+          "losses": 6,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 75,
+          "interval95": [
+            55.1,
+            88
+          ]
+        }
+      ]
+    },
+    {
+      "id": "starters-pressure",
+      "sameDeck": false,
+      "policies": [
+        "pressure",
+        "pressure"
+      ],
+      "matches": 1944,
+      "firstWins": 1142,
+      "firstWinRate": 58.7,
+      "draws": 0,
+      "incomplete": 0,
+      "blocks": {
+        "p10": 13,
+        "median": 15,
+        "p90": 19
+      },
+      "casts": 7890,
+      "counters": 0,
+      "stakes": 4193,
+      "factionRefunds": 3939,
+      "powers": {
+        "whale": {
+          "uses": 429,
+          "neutral": 0
+        },
+        "builder": {
+          "uses": 503,
+          "neutral": 0
+        },
+        "degen": {
+          "uses": 415,
+          "neutral": 0
+        },
+        "validator": {
+          "uses": 1387,
+          "neutral": 29
+        },
+        "strategist": {
+          "uses": 185,
+          "neutral": 0
+        },
+        "athena": {
+          "uses": 294,
+          "neutral": 0
+        },
+        "hermes": {
+          "uses": 458,
+          "neutral": 0
+        },
+        "hephaestus": {
+          "uses": 55,
+          "neutral": 0
+        },
+        "poseidon": {
+          "uses": 328,
+          "neutral": 0
+        }
+      },
+      "heroRates": [
+        {
+          "hero": "whale",
+          "wins": 221,
+          "losses": 211,
+          "winRate": 51.2
+        },
+        {
+          "hero": "builder",
+          "wins": 245,
+          "losses": 187,
+          "winRate": 56.7
+        },
+        {
+          "hero": "degen",
+          "wins": 176,
+          "losses": 256,
+          "winRate": 40.7
+        },
+        {
+          "hero": "validator",
+          "wins": 249,
+          "losses": 183,
+          "winRate": 57.6
+        },
+        {
+          "hero": "strategist",
+          "wins": 217,
+          "losses": 215,
+          "winRate": 50.2
+        },
+        {
+          "hero": "athena",
+          "wins": 257,
+          "losses": 175,
+          "winRate": 59.5
+        },
+        {
+          "hero": "hermes",
+          "wins": 182,
+          "losses": 250,
+          "winRate": 42.1
+        },
+        {
+          "hero": "hephaestus",
+          "wins": 172,
+          "losses": 260,
+          "winRate": 39.8
+        },
+        {
+          "hero": "poseidon",
+          "wins": 225,
+          "losses": 207,
+          "winRate": 52.1
+        }
+      ],
+      "cells": [
+        {
+          "a": "whale",
+          "b": "whale",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "builder",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "degen",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "validator",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "strategist",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "athena",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "hermes",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "hephaestus",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "poseidon",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "whale",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "builder",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "degen",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "validator",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "strategist",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "athena",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "hermes",
+          "wins": 19,
+          "losses": 5,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 79.2,
+          "interval95": [
+            59.5,
+            90.8
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "hephaestus",
+          "wins": 20,
+          "losses": 4,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 83.3,
+          "interval95": [
+            64.1,
+            93.3
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "poseidon",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "whale",
+          "wins": 10,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 41.7,
+          "interval95": [
+            24.5,
+            61.2
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "builder",
+          "wins": 10,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 41.7,
+          "interval95": [
+            24.5,
+            61.2
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "degen",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "validator",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "strategist",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "athena",
+          "wins": 10,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 41.7,
+          "interval95": [
+            24.5,
+            61.2
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "hermes",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "hephaestus",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "poseidon",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "whale",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "builder",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "degen",
+          "wins": 19,
+          "losses": 5,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 79.2,
+          "interval95": [
+            59.5,
+            90.8
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "validator",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "strategist",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "athena",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "hermes",
+          "wins": 18,
+          "losses": 6,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 75,
+          "interval95": [
+            55.1,
+            88
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "hephaestus",
+          "wins": 20,
+          "losses": 4,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 83.3,
+          "interval95": [
+            64.1,
+            93.3
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "poseidon",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "whale",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "builder",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "degen",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "validator",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "strategist",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "athena",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "hermes",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "hephaestus",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "poseidon",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "whale",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "builder",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "degen",
+          "wins": 18,
+          "losses": 6,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 75,
+          "interval95": [
+            55.1,
+            88
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "validator",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "strategist",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "athena",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "hermes",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "hephaestus",
+          "wins": 20,
+          "losses": 4,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 83.3,
+          "interval95": [
+            64.1,
+            93.3
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "poseidon",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "whale",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "builder",
+          "wins": 9,
+          "losses": 15,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 37.5,
+          "interval95": [
+            21.2,
+            57.3
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "degen",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "validator",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "strategist",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "athena",
+          "wins": 10,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 41.7,
+          "interval95": [
+            24.5,
+            61.2
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "hermes",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "hephaestus",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "poseidon",
+          "wins": 10,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 41.7,
+          "interval95": [
+            24.5,
+            61.2
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "whale",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "builder",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "degen",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "validator",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "strategist",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "athena",
+          "wins": 10,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 41.7,
+          "interval95": [
+            24.5,
+            61.2
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "hermes",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "hephaestus",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "poseidon",
+          "wins": 10,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 41.7,
+          "interval95": [
+            24.5,
+            61.2
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "whale",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "builder",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "degen",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "validator",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "strategist",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "athena",
+          "wins": 10,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 41.7,
+          "interval95": [
+            24.5,
+            61.2
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "hermes",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "hephaestus",
+          "wins": 17,
+          "losses": 7,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 70.8,
+          "interval95": [
+            50.8,
+            85.1
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "poseidon",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shared-deck-greedy",
+      "sameDeck": true,
+      "policies": [
+        "greedy",
+        "greedy"
+      ],
+      "matches": 1944,
+      "firstWins": 1033,
+      "firstWinRate": 53.1,
+      "draws": 0,
+      "incomplete": 0,
+      "blocks": {
+        "p10": 15,
+        "median": 20,
+        "p90": 32
+      },
+      "casts": 11115,
+      "counters": 0,
+      "stakes": 4796,
+      "factionRefunds": 8028,
+      "powers": {
+        "whale": {
+          "uses": 1077,
+          "neutral": 0
+        },
+        "builder": {
+          "uses": 1362,
+          "neutral": 0
+        },
+        "degen": {
+          "uses": 933,
+          "neutral": 0
+        },
+        "validator": {
+          "uses": 2387,
+          "neutral": 217
+        },
+        "strategist": {
+          "uses": 977,
+          "neutral": 0
+        },
+        "athena": {
+          "uses": 1036,
+          "neutral": 0
+        },
+        "hermes": {
+          "uses": 971,
+          "neutral": 0
+        },
+        "hephaestus": {
+          "uses": 673,
+          "neutral": 0
+        },
+        "poseidon": {
+          "uses": 837,
+          "neutral": 0
+        }
+      },
+      "heroRates": [
+        {
+          "hero": "whale",
+          "wins": 222,
+          "losses": 210,
+          "winRate": 51.4
+        },
+        {
+          "hero": "builder",
+          "wins": 208,
+          "losses": 224,
+          "winRate": 48.1
+        },
+        {
+          "hero": "degen",
+          "wins": 209,
+          "losses": 223,
+          "winRate": 48.4
+        },
+        {
+          "hero": "validator",
+          "wins": 225,
+          "losses": 207,
+          "winRate": 52.1
+        },
+        {
+          "hero": "strategist",
+          "wins": 203,
+          "losses": 229,
+          "winRate": 47
+        },
+        {
+          "hero": "athena",
+          "wins": 229,
+          "losses": 203,
+          "winRate": 53
+        },
+        {
+          "hero": "hermes",
+          "wins": 217,
+          "losses": 215,
+          "winRate": 50.2
+        },
+        {
+          "hero": "hephaestus",
+          "wins": 197,
+          "losses": 235,
+          "winRate": 45.6
+        },
+        {
+          "hero": "poseidon",
+          "wins": 234,
+          "losses": 198,
+          "winRate": 54.2
+        }
+      ],
+      "cells": [
+        {
+          "a": "whale",
+          "b": "whale",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "builder",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "degen",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "validator",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "strategist",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "athena",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "hermes",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "hephaestus",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "whale",
+          "b": "poseidon",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "whale",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "builder",
+          "wins": 9,
+          "losses": 15,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 37.5,
+          "interval95": [
+            21.2,
+            57.3
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "degen",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "validator",
+          "wins": 9,
+          "losses": 15,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 37.5,
+          "interval95": [
+            21.2,
+            57.3
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "strategist",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "athena",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "hermes",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "hephaestus",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "builder",
+          "b": "poseidon",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "whale",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "builder",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "degen",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "validator",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "strategist",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "athena",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "hermes",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "hephaestus",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "degen",
+          "b": "poseidon",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "whale",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "builder",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "degen",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "validator",
+          "wins": 8,
+          "losses": 16,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 33.3,
+          "interval95": [
+            18,
+            53.3
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "strategist",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "athena",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "hermes",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "hephaestus",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "validator",
+          "b": "poseidon",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "whale",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "builder",
+          "wins": 10,
+          "losses": 14,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 41.7,
+          "interval95": [
+            24.5,
+            61.2
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "degen",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "validator",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "strategist",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "athena",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "hermes",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "hephaestus",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "strategist",
+          "b": "poseidon",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "whale",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "builder",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "degen",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "validator",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "strategist",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "athena",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "hermes",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "hephaestus",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "athena",
+          "b": "poseidon",
+          "wins": 16,
+          "losses": 8,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 66.7,
+          "interval95": [
+            46.7,
+            82
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "whale",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "builder",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "degen",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "validator",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "strategist",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "athena",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "hermes",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "hephaestus",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "hermes",
+          "b": "poseidon",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "whale",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "builder",
+          "wins": 9,
+          "losses": 15,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 37.5,
+          "interval95": [
+            21.2,
+            57.3
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "degen",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "validator",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "strategist",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "athena",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "hermes",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "hephaestus",
+          "wins": 12,
+          "losses": 12,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 50,
+          "interval95": [
+            31.4,
+            68.6
+          ]
+        },
+        {
+          "a": "hephaestus",
+          "b": "poseidon",
+          "wins": 11,
+          "losses": 13,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 45.8,
+          "interval95": [
+            27.9,
+            64.9
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "whale",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "builder",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "degen",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "validator",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "strategist",
+          "wins": 18,
+          "losses": 6,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 75,
+          "interval95": [
+            55.1,
+            88
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "athena",
+          "wins": 13,
+          "losses": 11,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 54.2,
+          "interval95": [
+            35.1,
+            72.1
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "hermes",
+          "wins": 14,
+          "losses": 10,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 58.3,
+          "interval95": [
+            38.8,
+            75.5
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "hephaestus",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        },
+        {
+          "a": "poseidon",
+          "b": "poseidon",
+          "wins": 15,
+          "losses": 9,
+          "draws": 0,
+          "incomplete": 0,
+          "winRate": 62.5,
+          "interval95": [
+            42.7,
+            78.8
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,12 @@
 import { deckError } from '../engine/deckValidation';
 import { needsCollection, parseCollectionAuth, cleanOwned, configuredTitle, deckCardCounts } from './access';
+import {isFreeHero,HEROES} from '../heroes';
+import {heroesFromCollectibles} from './heroAccess';
 
 /** Server-only read of iDos entitlements. URL and Title are controlled by deployment, never by a player. */
-export async function authorizeCollectionDeck(deck: readonly string[], credential?: unknown, fetcher: typeof fetch = fetch): Promise<void> {
-  if (!needsCollection(deck)) return;
+export async function authorizeCollectionDeck(deck: readonly string[], credential?: unknown, fetcher: typeof fetch = fetch,hero='builder'): Promise<void> {
+  if(!Object.hasOwn(HEROES,hero))throw new Error('Неизвестный правитель.');
+  if (!needsCollection(deck)&&isFreeHero(hero)) return;
   const title = configuredTitle(process.env.IDOS_TITLE_ID);
   const auth = parseCollectionAuth(credential);
   if (!title || !auth) throw new Error('Карты из паков в сетевой игре требуют входа в iDos. Бесплатная колода доступна всегда.');
@@ -23,4 +26,5 @@ export async function authorizeCollectionDeck(deck: readonly string[], credentia
   if (data.CollectionID !== (process.env.IDOS_COLLECTION_ID || 'IMPERIVM_AGORA')) throw new Error('Коллекция iDos не соответствует этому выпуску карт.');
   const problem = deckError(deck, deckCardCounts(cleanOwned(data.OwnedCollectibles)));
   if (problem) throw new Error('В колоде есть карты или копии, которых нет в вашей коллекции iDos.');
+  if(!heroesFromCollectibles(data.OwnedCollectibles).includes(hero))throw new Error('Этот правитель ещё не получен из кейса iDos.');
 }

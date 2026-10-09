@@ -49,8 +49,8 @@ export function startServer(options: ServiceOptions = {}) {
         if ((message.type === 'create' || message.type === 'join') && !(message.type === 'join' && message.resumeToken)) {
           if (registrationPending || checkingCollections >= 32) throw new ProtocolError('collection-busy', 'Коллекция проверяется. Подождите несколько секунд.');
           registrationPending = true; checkingCollections++;
-          try {await (options.authorizeDeck ? options.authorizeDeck(message) : authorizeCollectionDeck(message.deckList, message.collectionAuth));}
-          catch {throw new ProtocolError('collection-access', 'Не удалось подтвердить все карты колоды в iDos. Войдите в iDos или выберите бесплатную колоду.');}
+          try {await (options.authorizeDeck ? options.authorizeDeck(message) : authorizeCollectionDeck(message.deckList, message.collectionAuth,fetch,message.heroId??'builder'));}
+          catch {throw new ProtocolError('collection-access', 'Не удалось подтвердить карты колоды или правителя в iDos. Войдите в iDos или выберите бесплатную колоду.');}
           finally {registrationPending = false; checkingCollections--;}
         }
         if (socket.readyState === WebSocket.OPEN) rooms.handle(socket, message);

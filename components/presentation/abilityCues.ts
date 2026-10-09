@@ -26,10 +26,17 @@ export function abilityCues(batch:PresentationBatch):AbilityCue[]{
   const add=(kind:AccentKind,from:string,to:string,phase:AbilityCue['phase']='contact',delay=0,wave?:string)=>cues.push({kind,from,to,phase,delay,...(wave?{wave}:{})});
   if(batch.action.type==='hero-power'){
     switch(HEROES[batch.before.players[owner].heroId].power){
-      case 'heal-treasury':if(batch.after.players[owner].treasury>batch.before.players[owner].treasury)add('heal',owner===0?'hero-power':hero,hero);break;
-      case 'gain-gas':add('seal',owner===0?'hero-power':hero,rulesetOf(batch.before)==='validator-investment-v1'?hero:gas(owner));break;
+      case 'heal-treasury':{
+        if(batch.after.players[owner].treasury>batch.before.players[owner].treasury)add('heal',owner===0?'hero-power':hero,hero);
+        batch.after.players[owner].board.filter(m=>m.health>(batch.before.players[owner].board.find(old=>old.uid===m.uid)?.health??m.health)).forEach(m=>add('heal',hero,m.uid));break;
+      }
+      case 'gain-gas':add('seal',owner===0?'hero-power':hero,hero);break;
       case 'draw-burn':add('dice',owner===0?'hero-power':hero,hero);break;
       case 'damage-random-enemy':add('steel',hero,enemy(owner));break;
+      case 'hermes-relay':add('dice',owner===0?'hero-power':hero,hero);break;
+      case 'rally-squire':case 'hephaestus-forge':batch.after.players[owner].board.filter(m=>!batch.before.players[owner].board.some(old=>old.uid===m.uid)).forEach(m=>add('buff',hero,m.uid));break;
+      case 'athena-aegis':batch.after.players[owner].board.filter(m=>m.maxHealth>(batch.before.players[owner].board.find(old=>old.uid===m.uid)?.maxHealth??m.maxHealth)).forEach(m=>add('buff',hero,m.uid));break;
+      case 'poseidon-tide':batch.events?.damages?.filter(d=>batch.before.players[1-owner].board.some(m=>m.uid===d.uid)&&d.prevHealth>d.health).forEach((d,i)=>add('steel',hero,d.uid,'contact',i*.025));break;
     }
   }
   const effect=(kind:EffectKind,p:number,from:string,multiple=false,delay=0)=>{

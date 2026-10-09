@@ -42,6 +42,7 @@ export function gameSnapshot(state: GameState, seat: PlayerId, turnDeadline: num
     id: p.id, heroId: p.heroId, treasury: p.treasury, gas: p.gas, maxGas: p.maxGas,
     fatigue: p.fatigue, heroPowerUsed: p.heroPowerUsed, powerCost: effectivePowerCost(state, index as PlayerId),
     reinforcementUsed: !!p.reinforcementUsed,
+    ...(p.powerIncome?{powerIncome:p.powerIncome}:{}),
     handCount: p.hand.length, deckCount: p.deck.length,
     boardCapacity: boardCapacity(p), factionPlaysThisTurn: {...p.factionPlaysThisTurn}, pavilionBonuses: [...(p.pavilionBonuses??[])],
     board: p.board.map(m => ({uid: m.uid, cardId: m.cardId, name: m.name, attack: m.attack, health: m.health,

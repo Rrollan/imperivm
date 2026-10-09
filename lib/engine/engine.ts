@@ -497,12 +497,16 @@ function completeTurnStart(s: EngineGame): void {
   // 3. Gas refill: maxGas grows, staked minions add +1 gas each.
   me.maxGas = Math.min(10, me.maxGas + 1);
   me.gas = me.maxGas + me.board.filter(m => m.staked).length + queuedOrders;
+  // One opening order compensates the second seat's lost tempo. It expires
+  // at refill and neither increases capacity nor creates a collectible card.
+  if(s.block===2&&s.turn===1&&me.maxGas===1){me.gas+=1;pushLog(s,'P1 receives 1 opening order');}
   const investment=pendingValidatorOrders(s,s.turn);
   if(investment>0){
     me.gas+=investment;
     delete me.validatorIncome;
     pushLog(s,`P${s.turn} validator investment pays ${investment} gas`);
   }
+  if(me.powerIncome){me.gas+=me.powerIncome;pushLog(s,`P${s.turn} reserved power pays ${me.powerIncome} gas`);delete me.powerIncome;}
   me.heroPowerUsed = false;
   me.reinforcementUsed = false;
 
@@ -533,7 +537,7 @@ function closeMulligan(s: EngineGame): void {
 
 /**
  * Effective hero power cost for `pid` after comeback discount.
- * Base cost is heroDef.powerCost (always 2 today). Discount of -1 gas
+ * Base cost comes from heroDef.powerCost. A power always costs at least 1. Discount of -1 gas
  * when the player's treasury is materially lower than the enemy's.
  */
 export function effectivePowerCost(state: GameState, pid: PlayerId): number {
@@ -543,7 +547,7 @@ export function effectivePowerCost(state: GameState, pid: PlayerId): number {
   const base = HEROES[p.heroId]?.powerCost ?? 2;
   const discount =
     p.treasury <= COMEBACK_HP_THRESHOLD && f.treasury - p.treasury >= COMEBACK_GAP ? 1 : 0;
-  return Math.max(0, base - discount);
+  return Math.max(1, base - discount);
 }
 
 /** Return the package 4A keywords carried by a card. */
@@ -750,7 +754,10 @@ export function legalActions(state: GameState): Action[] {
 
   // package 4A: hero power uses comeback-discounted cost.
   const pc = effectivePowerCost(s, s.turn);
-  if (me.gas >= pc && !me.heroPowerUsed) acts.push({ type: 'hero-power' });
+  const power=heroDef(me.heroId).power;
+  const hasRoom=me.board.length<boardCapacity(me);
+  const useful=power==='rally-squire'||power==='hephaestus-forge'?hasRoom:power==='athena-aegis'?me.board.length>0:power==='poseidon-tide'?foe.board.length>0:power==='heal-treasury'?me.treasury<30||me.board.some(m=>m.health<m.maxHealth):true;
+  if (me.gas >= pc && !me.heroPowerUsed&&useful) acts.push({ type: 'hero-power' });
   if (canBuyCard(state)) acts.push({ type: 'buy-card' });
 
   for (const m of me.board) {
@@ -960,20 +967,21 @@ export function applyAction(state: GameState, action: Action): GameState {
     }
 
     case 'hero-power': {
-      // package 4A: comeback discount applies; base cost is still 2.
+      // package 4A: comeback discount applies; base cost comes from the ruler definition.
       const pc = effectivePowerCost(s, s.turn);
       if (me.gas < pc) throw new Error(`hero power costs ${pc}, have ${me.gas}`);
       me.gas -= pc;
       me.heroPowerUsed = true;
       if (s.mulliganPhase[s.turn]) s.mulliganPhase[s.turn] = false;
       const hero = heroDef(me.heroId);
-      pushLog(s, `P${s.turn} hero power: ${hero.powerName}${pc === 1 ? ' (comeback)' : ''}`);
+      pushLog(s, `P${s.turn} hero power: ${hero.powerName}${pc < hero.powerCost ? ' (comeback)' : ''}`);
       switch (hero.power) {
         case 'damage-random-enemy':
           applyEffect(s, s.turn, { kind: 'damage-random-enemy', amount: 2 });
           break;
         case 'heal-treasury':
-          applyEffect(s, s.turn, { kind: 'heal-treasury', amount: 3 });
+          applyEffect(s, s.turn, { kind: 'heal-treasury', amount: 2 });
+          {const wounded=[...me.board].filter(m=>m.health<m.maxHealth).sort((a,b)=>(b.maxHealth-b.health)-(a.maxHealth-a.health))[0];if(wounded)wounded.health=Math.min(wounded.maxHealth,wounded.health+1);}
           break;
         case 'draw-burn':
           drawCards(s, s.turn, 1);
@@ -986,10 +994,31 @@ export function applyAction(state: GameState, action: Action): GameState {
             me.validatorIncome=(me.validatorIncome??0)+2;
             pushLog(s,`P${s.turn} reserves 2 gas for next own turn`);
           }else{
-            me.gas += 2;
-            pushLog(s, `P${s.turn} gains 2 gas`);
+            me.powerIncome=(me.powerIncome??0)+2;
+            pushLog(s, `P${s.turn} reserves 2 orders for next own turn`);
           }
           break;
+        case 'rally-squire':
+          applyEffect(s,s.turn,{kind:'summon',cardId:'pixel-squire'});break;
+        case 'athena-aegis': {
+          const ally=[...me.board].sort((a,b)=>a.health-b.health)[0];
+          if(!ally)throw new Error('Aegis requires a friendly fighter');
+          const health=me.board.some(m=>m.uid!==ally.uid&&!m.fresh&&CARDS[m.cardId].faction==='NFT')?2:1;
+          ally.attack+=1;ally.health+=health;ally.maxHealth+=health;ally.taunt=true;
+          pushLog(s,`P${s.turn} gives ${ally.name} +1/+${health} and Taunt`);break;
+        }
+        case 'hermes-relay': {
+          const burn=(me.factionPlaysThisTurn?.DePIN??0)>0?0:3;
+          drawCards(s,s.turn,1);me.treasury-=burn;pushLog(s,`P${s.turn} relay draws a card, takes ${burn} damage`);checkWinner(s);break;
+        }
+        case 'hephaestus-forge': {
+          const prepared=me.board.some(m=>m.staked&&!m.fresh);
+          applyEffect(s,s.turn,{kind:'summon',cardId:'lending-legionnaire'});
+          {const forged=me.board[me.board.length-1];forged.attack+=1;forged.health+=1;forged.maxHealth+=1;if(prepared){forged.attack+=1;forged.health+=1;forged.maxHealth+=1;}}
+          break;
+        }
+        case 'poseidon-tide':
+          applyEffect(s,s.turn,{kind:'damage-all-enemy-minions',amount:(me.factionPlaysThisTurn?.DeFi??0)>=2?2:1});break;
       }
       return s;
     }

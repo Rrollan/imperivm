@@ -121,9 +121,9 @@ test('Pavilion exactly second faction play, resets and does not count resolves',
 });
 test('Comeback boundaries and once-per-turn power', () => {
   let s = fixture(); s.players[0].treasury = 12; s.players[1].treasury = 24;
-  assert.equal(effectivePowerCost(s, 0), 1); s.players[1].treasury = 23; assert.equal(effectivePowerCost(s, 0), 2);
-  s.players[0].treasury = 13; s.players[1].treasury = 30; assert.equal(effectivePowerCost(s, 0), 2);
-  s.players[0].treasury = 12; s.players[0].gas = 1; s = applyAction(s, { type: 'hero-power' });
+  assert.equal(effectivePowerCost(s, 0), 2); s.players[1].treasury = 23; assert.equal(effectivePowerCost(s, 0), 3);
+  s.players[0].treasury = 13; s.players[1].treasury = 30; assert.equal(effectivePowerCost(s, 0), 3);
+  s.players[0].treasury = 12; s.players[0].gas = 2; s = applyAction(s, { type: 'hero-power' });
   assert.equal(s.players[0].gas, 0); assert.equal(s.players[0].heroPowerUsed, true);
   s.players[0].gas = 10; assert.throws(() => applyAction(s, { type: 'hero-power' }));
 });
@@ -139,7 +139,7 @@ test('Mulligan all subsets/keep, validates selection and closes one-shot window'
   assert.throws(() => applyAction(s, { type: 'mulligan', uids: [] }));
   s = end(s); assert.equal(s.block, 2); assert.equal(s.players[1].gas, 0); assert.equal(s.players[1].hand.length, 4);
   assert.equal(legalActions(s).length, 16); s = applyAction(s, { type: 'mulligan', uids: [s.players[1].hand[0].uid] });
-  assert.equal(s.block, 2); assert.equal(s.turn, 1); assert.equal(s.players[1].gas, 1);
+  assert.equal(s.block, 2); assert.equal(s.turn, 1); assert.equal(s.players[1].gas, 2); // One temporary opening order compensates the second seat.
   assert.equal(s.players[1].hand.length, 5); assert.equal(s.players[1].deck.length, 25);
   s = end(s); assert.equal(s.block, 3); assert.equal(s.players[0].gas, 2);
   s = createGame('whale', DECKS.whale, 'builder', DECKS.builder, { enableMulligan: true, mulliganCount: 2 }, 1);

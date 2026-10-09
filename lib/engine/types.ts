@@ -75,7 +75,12 @@ export type HeroPowerKind =
   | 'damage-random-enemy' // Whale: 2 dmg random enemy minion else treasury
   | 'heal-treasury' // Builder: restore 3 treasury
   | 'draw-burn' // Degen: draw 1, take 2 damage
-  | 'gain-gas'; // Validator: +2 gas this turn
+  | 'gain-gas' // Validator: two orders on next own turn
+  | 'rally-squire'
+  | 'athena-aegis'
+  | 'hermes-relay'
+  | 'hephaestus-forge'
+  | 'poseidon-tide';
 
 export interface HeroDef {
   id: string;
@@ -83,8 +88,11 @@ export interface HeroDef {
   title: string; // 'The Market Mover'
   powerName: string;
   powerText: string;
-  powerCost: 2;
+  powerCost: number;
   power: HeroPowerKind;
+  access: 'free' | 'case';
+  faction: Faction;
+  style: [string,string];
 }
 
 export interface HandCard {
@@ -135,6 +143,7 @@ export interface PlayerState {
   factionPlaysThisTurn?: Partial<Record<Faction, number>>;
   pavilionBonuses?: Faction[];
   boardCapacity?: number; // default five; expansion cards can raise it to seven
+  powerIncome?: number; // committed, public orders paid at next own turn
 }
 
 export interface GameState {

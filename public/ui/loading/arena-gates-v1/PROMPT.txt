@@ -1,0 +1,6 @@
+IMPERIVM — ARENA GATES / OMNI FLASH
+Настройки: 16:9, 1 вариант, Omni Flash. START = START.png, END = END.png (тот же кадр для бесшовного цикла). Длительность 6 секунд. Только видео, без звука.
+
+Animate this exact premium Roman/Greek game loading illustration into a seamless 6-second loop. Locked camera, zero zoom, zero pan, no parallax. Keep all architecture, the open bronze gates, stairs, framing, golden laurel emblem and burgundy banners exactly unchanged. Animate only the existing orange braziers with soft natural flame and a few small amber sparks; animate the existing teal brazier with very subtle magical flame; let a few tiny dust motes float in the warm light. Keep the movement quiet, elegant and physically grounded. The central arena entrance must remain readable and stable. Preserve the dark uncluttered bottom quarter for our real UI tips. No people, no new objects, no explosions, no morphing, no text, no logo, no numbers, no UI, no camera movement. Match the end frame perfectly to the start frame. Rich amber and teal but restrained brightness, no exposure flicker. This is a native game loading backdrop, not a battle effect.
+
+Вернуть: MP4 или WebM, без текста/музыки; код добавляет логотип, подсказки и индикатор сам.

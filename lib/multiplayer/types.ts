@@ -1,3 +1,4 @@
+import type {CollectionAuth} from '../collection/access';
 import type {Action, HandCard, MempoolEntry, Minion, PlayerId, PlayerState} from '../engine/types';
 
 /** Deliberate wire allowlist. Never send GameState, hidden decks, RNG, or guest credentials. */
@@ -11,6 +12,7 @@ export interface OnlinePlayer {
   heroPowerUsed: boolean;
   reinforcementUsed?: boolean;
   powerCost: number;
+  powerIncome?:number;
   handCount: number;
   deckCount: number;
   board: Minion[];
@@ -49,9 +51,9 @@ export interface OnlineSession {
 }
 export type OnlineCommand =
   | {type: 'session'}
-  | {type: 'create'; heroId: string}
-  | {type: 'join'; roomId: string; heroId: string}
-  | {type: 'queue'; heroId: string}
+  | {type: 'create'; heroId: string; collectionAuth?: CollectionAuth}
+  | {type: 'join'; roomId: string; heroId: string; collectionAuth?: CollectionAuth}
+  | {type: 'queue'; heroId: string; collectionAuth?: CollectionAuth}
   | {type: 'cancel'}
   | {type: 'action'; roomId: string; revision: number; action: Action}
   | {type: 'concede'; roomId: string; revision: number};

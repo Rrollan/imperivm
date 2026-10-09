@@ -81,6 +81,12 @@ export function paintCardFace(ctx:CanvasRenderingContext2D,id:string,locale:Loca
       const radius=37;
       paintBadge(ctx,font,`${stats?.attack??def.attack}`,64,layout.statsY,stats&&stats.attack>(def.attack??0)?'#6e8040':'#b38637',radius);
       paintBadge(ctx,font,`${stats?.health??def.health}`,320,layout.statsY,'#b7483c',radius);
+      // The central parchment is a useful two-line seal, never an empty bar.
+      // Keep full rules in inspection; these are fast battlefield identifiers.
+      const ru=locale==='ru';
+      const tag=def.ultimate?(ru?'УЛЬТИМЕЙТ':'ULTIMATE'):def.taunt?(ru?'ПРОВОКАЦИЯ':'TAUNT'):def.rush?(ru?'НАТИСК':'RUSH'):def.lifesteal?(ru?'ВАМПИРИЗМ':'LIFESTEAL'):def.priority?(ru?'ПРИОРИТЕТ':'PRIORITY'):def.halvingPeriod?(ru?`РОСТ / ${def.halvingPeriod}`:`GROW / ${def.halvingPeriod}`):def.battlecry?(ru?'ПРИ ВЫХОДЕ':'ON ARRIVAL'):(ru?'ЛЕГИОНЕР':'LEGIONARY');
+      ctx.fillStyle='#684525';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`800 22px ${font}`;ctx.fillText(def.faction.toUpperCase(),192,layout.statsY-13,164);
+      ctx.fillStyle='#352418';ctx.font=`800 21px ${font}`;ctx.fillText(tag,192,layout.statsY+15,164);
     }else if(variant!=='queued'){
       ctx.font=`750 29px ${font}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#70502b';ctx.fillText(isInstantSpell(def)?(locale==='ru'?'МГНОВЕННО':'INSTANT'):(locale==='ru'?'УКАЗ':'EDICT'),192,layout.statsY,270);
     }

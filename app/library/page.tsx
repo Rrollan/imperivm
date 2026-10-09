@@ -58,7 +58,7 @@ export default function LibraryPage() {
   return <div className={styles.shell}>
     <SiteHeader active="library" />
     <main className={`${styles.main} ${styles.libraryMain}`}>
-      <header className={styles.libraryHeading}><div><p className={styles.kicker}>{t('Знай свой легион', 'Know your legion')}</p><h1>{t('Библиотека', 'The library')}</h1><p>{t('Нажми на карту — изучи способности.', 'Tap a card to explore its abilities.')}</p></div><Link href="/arena?hero=builder" className={styles.secondaryButton}>{t('На арену', 'To the arena')} <RomanIcon name="duel" size={22}/></Link></header>
+      <header className={styles.libraryHeading}><div><p className={styles.kicker}>{t('Знай свой легион', 'Know your legion')}</p><h1>{t('Библиотека', 'The library')}</h1><p>{t('Нажми на карту — изучи способности.', 'Tap a card to explore its abilities.')}</p></div><Link href="/arena?hero=builder" className={styles.secondaryButton}>{t('На арену', 'To the arena')} <PaintedIcon name="play" size={38}/></Link></header>
       <div className={styles.libraryTabs} role="group" aria-label={t('Раздел библиотеки', 'Library section')}>{(['cards', 'rulers', 'rules'] as const).map(value => <button key={value} type="button" aria-pressed={value === section} onClick={() => selectSection(value)}><PaintedIcon name={value==='cards'?'cards':value==='rulers'?'heroes':'rules'} size={34}/>{value === 'cards' ? t('Карты', 'Cards') : value === 'rulers' ? t('Правители', 'Rulers') : t('Правила', 'Rules')}<small>{value === 'cards' ? ALL_CARDS.length : value === 'rulers' ? 4 : 'I–III'}</small></button>)}</div>
 
       {section === 'cards' && <section aria-label={t('Каталог карт', 'Card catalogue')}>

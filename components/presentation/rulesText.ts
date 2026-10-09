@@ -68,9 +68,14 @@ export function retaliationRules(attack:number,locale:Locale){
 export function powerRules(id: string, locale: Locale,ruleset:RulesetId='classic-v1') {
   const ru = locale === 'ru';
   switch (HEROES[id].power) {
-    case 'heal-treasury': return ru ? 'Восстанавливает 3 здоровья вашей казне.' : 'Restore 3 health to your treasury.';
-    case 'gain-gas': return ruleset==='validator-investment-v1'?(ru?'Потратьте приказы сейчас. В начале следующего своего хода получите +2 приказа сверх запаса, после исполнения указов.':'Spend orders now. Gain +2 orders above capacity at the start of your next turn, after edicts resolve.'):(ru ? 'Даёт 2 приказа в этом ходу.' : 'Gain 2 orders this turn.');
+    case 'heal-treasury': return ru ? 'Восстанавливает 2 здоровья казне и 1 самому раненому своему бойцу. При равенстве — первому в строю.' : 'Restore 2 treasury health and 1 to your most wounded fighter; formation order breaks ties.';
+    case 'gain-gas': return ru?'Потратьте приказы сейчас. В начале следующего своего хода получите +2 приказа сверх запаса, после исполнения указов.':'Spend orders now. Gain +2 orders above capacity at the start of your next turn, after edicts resolve.';
     case 'draw-burn': return ru ? 'Добирает карту. Ваша казна получает 2 урона.' : 'Draw a card. Your treasury takes 2 damage.';
     case 'damage-random-enemy': return ru ? '2 урона случайному бойцу противника. Если бойцов нет — казне.' : 'Deal 2 damage to a random enemy fighter, or the treasury if none remain.';
+    case 'rally-squire':return ru?'Призывает Пиксельного оруженосца 1/1 в свободное место. Он сможет атаковать со следующего своего хода.':'Summon a Pixel Squire 1/1 in an empty slot. It can attack next own turn.';
+    case 'athena-aegis':return ru?'Своему бойцу с наименьшим текущим здоровьем +1/+1 и Провокация. Если другой свой NFT-боец пережил ход соперника — +1/+2. При равенстве — первому в строю. Нужен свой боец.':'Give your lowest-health fighter +1/+1 and Taunt; +1/+2 if another established NFT ally stands. Formation order breaks ties. Requires a fighter.';
+    case 'hermes-relay':return ru?'Добирает карту и наносит 3 урона вашей казне. Если ранее в этом ходу разыграна карта DePIN — без этого урона.':'Draw a card and take 3 treasury damage. After playing a DePIN card this turn, take no burn damage instead.';
+    case 'hephaestus-forge':return ru?'Призывает Легионера кредитов 2/2. Если другой ваш боец пережил ход соперника и находится в стейкинге — призыв 3/3. Нужен свободный слот.':'Summon a Lending Legionnaire 2/2, or 3/3 if another established friendly fighter is staked. Requires an empty slot.';
+    case 'poseidon-tide':return ru?'1 урон всем бойцам врага. Если ранее в этом ходу разыграны две карты DeFi — 2 урона. Нужен боец противника.':'Deal 1 damage to every enemy fighter, or 2 after playing two DeFi cards this turn. Requires an enemy fighter.';
   }
 }

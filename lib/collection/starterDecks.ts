@@ -1,4 +1,4 @@
-/** Four permanent free 30-card decks. Paid Agora recipes live separately in lib/decks.ts. */
+/** Nine permanent free 30-card deck recipes. Five rulers are available initially. Paid Agora recipes live separately in lib/decks.ts. */
 export const FREE_DECKS: Record<string, string[]> = {
   whale: [
     'lending-legionnaire',
@@ -129,3 +129,27 @@ export const FREE_DECKS: Record<string, string[]> = {
     'zeus-liquidator',
   ],
 };
+
+// New rulers start from proven faction curves; no existing card is removed.
+FREE_DECKS.strategist=[...FREE_DECKS.builder];
+FREE_DECKS.athena=[...FREE_DECKS.builder];
+FREE_DECKS.hermes=[...FREE_DECKS.validator];
+FREE_DECKS.hephaestus=[...FREE_DECKS.validator];
+FREE_DECKS.poseidon=[...FREE_DECKS.whale];
+
+/** Equal opening curves: six one-order fighters, counterplay and a real
+ * finisher. The former recipes above remain in source; saved user decks
+ * are never rewritten. Faction substitutions share cost and copy limits. */
+const balancedStarter=[
+  'lending-legionnaire','lending-legionnaire','antenna-auxilia','antenna-auxilia','gm-greeter','gm-greeter',
+  'amm-centurion','amm-centurion','mesh-messenger','mesh-messenger','profile-pic-phalanx','profile-pic-phalanx',
+  'relay-runner','relay-runner','yield-farmer','yield-farmer','floor-sweeper','floor-sweeper',
+  'hotspot-hoplite','hotspot-hoplite','gps-gladiator','gps-gladiator','firmware-phalanx','firmware-phalanx',
+  'flash-loan','flash-loan','agora-expansion','solar-sapper','diamond-aegis','imperator-liquidus',
+];
+const swaps:Record<string,Record<string,string>>={
+  whale:{'floor-sweeper':'liquidation-officer'},builder:{'yield-farmer':'node-sentinel'},degen:{'mesh-messenger':'dogen'},
+  validator:{'floor-sweeper':'hermes-relayer'},strategist:{'yield-farmer':'node-sentinel'},athena:{'yield-farmer':'node-sentinel'},
+  hermes:{'floor-sweeper':'hermes-relayer'},hephaestus:{'hotspot-hoplite':'staking-pool'},poseidon:{'floor-sweeper':'liquidation-officer'},
+};
+for(const [hero,substitutions] of Object.entries(swaps))FREE_DECKS[hero]=balancedStarter.map(id=>substitutions[id]??id);

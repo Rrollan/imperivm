@@ -1,3 +1,4 @@
+import {parseCollectionAuth} from '../collection/access';
 import type {Action} from '../engine/types';
 import type {OnlineCommand} from './types';
 import {OnlineError} from './store';
@@ -31,8 +32,13 @@ export function parseCommand(input: unknown): OnlineCommand {
   const value = object(input);
   switch (value.type) {
     case 'session': case 'cancel': keys(value, ['type']); return {type: value.type};
-    case 'create': case 'queue': keys(value, ['type', 'heroId']); return {type: value.type, heroId: uid(value.heroId)};
-    case 'join': keys(value, ['type', 'heroId', 'roomId']); return {type: 'join', heroId: uid(value.heroId), roomId: roomId(value.roomId)};
+    case 'create': case 'queue': case 'join': {
+      keys(value, ['type', 'heroId', ...(value.type==='join'?['roomId']:[]), ...(Object.hasOwn(value,'collectionAuth')?['collectionAuth']:[])]);
+      const auth=Object.hasOwn(value,'collectionAuth')?parseCollectionAuth(value.collectionAuth):null;
+      if(Object.hasOwn(value,'collectionAuth')&&!auth)return invalid();
+      const registration={heroId:uid(value.heroId),...(auth?{collectionAuth:auth}:{})};
+      return value.type==='join'?{type:'join',roomId:roomId(value.roomId),...registration}:{type:value.type,...registration};
+    }
     case 'action': keys(value, ['type', 'roomId', 'revision', 'action']); return {type: 'action', roomId: roomId(value.roomId), revision: revision(value.revision), action: parseAction(value.action)};
     case 'concede': keys(value, ['type', 'roomId', 'revision']); return {type: 'concede', roomId: roomId(value.roomId), revision: revision(value.revision)};
     default: return invalid();

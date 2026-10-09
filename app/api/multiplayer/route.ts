@@ -1,6 +1,8 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {multiplayer, OnlineError} from '../../../lib/multiplayer/store';
 import {parseCommand} from '../../../lib/multiplayer/validation';
+import {authorizeCollectionDeck} from '../../../lib/collection/authority';
+import {FREE_DECKS} from '../../../lib/collection/starterDecks';
 import {multiplayerOrigin} from '../../../lib/multiplayer/origin';
 
 export const runtime = 'nodejs';
@@ -40,7 +42,14 @@ export async function POST(request: NextRequest) {
       if (command.type !== 'session') throw new OnlineError(401, 'session-expired', 'Подключитесь к игре заново.');
       token = multiplayer.createSession(); fresh = true;
     }
-    const response = NextResponse.json(multiplayer.command(token, command), {headers});
+    let verifiedHero:string|undefined;
+    if(command.type==='create'||command.type==='queue'||command.type==='join'){
+      const deck=FREE_DECKS[command.heroId];
+      if(!deck)throw new OnlineError(400,'hero','Неизвестный предводитель.');
+      try{await authorizeCollectionDeck(deck,command.collectionAuth,fetch,command.heroId);verifiedHero=command.heroId;}
+      catch(cause){throw new OnlineError(403,'collection',cause instanceof Error?cause.message:'Коллекция не подтверждена.');}
+    }
+    const response = NextResponse.json(multiplayer.command(token, command,verifiedHero), {headers});
     if (fresh) response.cookies.set(COOKIE, token, {httpOnly: true, sameSite: 'strict', secure: allowedOrigin.startsWith('https://'), path: '/', maxAge: 6 * 60 * 60});
     return response;
   } catch (error) {return errorResponse(error);}

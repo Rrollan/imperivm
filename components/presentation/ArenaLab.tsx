@@ -1,4 +1,5 @@
 'use client';
+import {ArenaLoading} from './ArenaLoading';
 import {ArenaFeedbackSettings} from './ArenaFeedbackSettings';
 import {ArenaOrientationHint} from './ArenaOrientationHint';
 
@@ -243,7 +244,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
 
 
 
-    {!ready && !failure && <div className={styles.loading} role="status"><div>IV</div><p>{locale.t('Открываем врата арены…', 'Opening the arena gates…')}</p></div>}
+    {!ready && !failure && <ArenaLoading/>}
     {showMulligan&&<div className={styles.modalBackdrop}><section ref={mulliganPanel} className={styles.mulligan} role="dialog" aria-modal="true" aria-labelledby="opening-hand-title"><OpeningHand hand={view.state.players[0].hand} selected={mulliganUids} locale={locale.locale} onToggle={uid=>setMulliganUids(previous=>previous.includes(uid)?previous.filter(value=>value!==uid):[...previous,uid])} onConfirm={()=>dispatch({type:'mulligan',uids:mulliganUids})}/></section></div>}
     {failure && <div className={styles.error} role="alert">{failure === 'webgl' || failure === 'load' ? <><strong>{locale.t('Не удалось открыть новую арену', 'Could not open the new arena')}</strong><span>{locale.t('Проверьте поддержку WebGL и обновите страницу.', 'Check WebGL support and reload the page.')}</span><Link href="/game">{locale.t('Открыть текущую игру', 'Open current game')}</Link></> : failure === 'context-lost' ? locale.t('Восстанавливаем графику. Матч сохранён.', 'Restoring graphics. Match preserved.') : failure === 'presentation' ? locale.t('Действие выполнено. Обновите страницу для восстановления графики.', 'Action completed. Reload to restore graphics.') : failure}<button onClick={() => setFailure('')} aria-label={locale.t('Закрыть сообщение', 'Dismiss message')}><RomanIcon name="close"/></button></div>}
 

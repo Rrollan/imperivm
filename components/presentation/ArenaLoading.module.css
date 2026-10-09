@@ -1,0 +1,17 @@
+.loading{position:absolute;z-index:15;inset:0;overflow:hidden;background:#251510;color:#ffedc6;display:flex;align-items:flex-end;justify-content:center;isolation:isolate;font-family:var(--font-sans);}
+.scene{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;}
+.loading::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 30%,#210c0655 55%,#1b0c09f5);z-index:-1;}
+.copy{width:min(560px,90%);padding:25px 12px 34px;text-align:center;}
+.logo{width:240px;max-width:60%;height:70px;object-fit:contain;filter:drop-shadow(0 2px 8px #160803);}
+.label{margin:4px 0 14px;color:#fff0d2;font-size:17px;font-weight:750;}
+.progress{display:block;position:relative;width:180px;height:3px;overflow:hidden;margin:auto;background:#ae80554d;border-radius:4px;}
+.progress::after{content:'';position:absolute;width:65%;height:100%;background:linear-gradient(90deg,transparent,#f2d693,transparent);animation:gateProgress 1.9s ease-in-out infinite;}
+.tip{min-height:44px;margin:17px 0 0;font-size:16px;line-height:1.4;color:#f1d9ae;animation:tipAppear .3s ease-out both;}
+.motes{position:absolute;inset:0;pointer-events:none;}.motes i{position:absolute;width:3px;height:3px;border-radius:50%;background:#ffe4a0;box-shadow:0 0 12px #ffb53b;bottom:35%;left:20%;animation:gateMote 6s linear infinite;}.motes i:nth-child(2){left:78%;animation-delay:-2s}.motes i:nth-child(3){left:74%;animation-delay:-4s}.motes i:nth-child(4){left:23%;animation-delay:-1s}.motes i:nth-child(5){left:51%;animation-delay:-3s}
+@keyframes gateProgress{from{transform:translateX(-100%)}to{transform:translateX(230%)}}@keyframes gateMote{0%{opacity:0;transform:translateY(0)}20%{opacity:.7}100%{opacity:0;transform:translate(12px,-90px)}}@keyframes tipAppear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(max-height:540px){.copy{padding:12px 10px 18px}.logo{width:175px;height:48px}.label{font-size:15px;margin-bottom:10px}.tip{font-size:14px;min-height:32px;margin-top:12px}.scene{object-position:center 40%}}
+@media(prefers-reduced-motion:reduce){.progress::after,.motes i,.tip{animation:none}.motes{display:none}.progress::after{width:100%}}
+
+.loading[data-reduced=true] .motes{display:none}.loading[data-reduced=true] .progress::after,.loading[data-reduced=true] .tip{animation:none}
+.logo{display:block;margin-inline:auto;}
+@media(max-height:540px){.tip{font-size:16px;min-height:44px;}}

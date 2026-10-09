@@ -158,7 +158,7 @@ const powerBefore=fixture('delayed-fixture-senate-censure');powerBefore.players[
 const powerAfter=applyAction(powerBefore,{type:'hero-power'});
 assert.ok(soundsForEvents({}, {action:{type:'hero-power'},before:powerBefore,after:powerAfter}).includes('heal'),'Actual ruler healing has audio even without a fighter delta');
 const cappedBefore=fixture('delayed-fixture-senate-censure');
-assert.equal(soundsForEvents({}, {action:{type:'hero-power'},before:cappedBefore,after:applyAction(cappedBefore,{type:'hero-power'})}).includes('heal'),false,'A full ruler still has activation feedback without a false heal');
+assert.throws(()=>applyAction(cappedBefore,{type:'hero-power'}),/illegal action/,'A full Builder without a wounded ally cannot spend orders on an empty heal');
 const garrisonBefore=fixture('delayed-fixture-senate-censure');garrisonBefore.players[0].board=[minion('garrison')];
 const garrisonAfter=applyAction(garrisonBefore,{type:'stake',uid:'garrison'});
 assert.deepEqual(soundsForEvents({}, {action:{type:'stake',uid:'garrison'},before:garrisonBefore,after:garrisonAfter}),['stake'],'Garrison actions retain feedback without a BattleEvents envelope');

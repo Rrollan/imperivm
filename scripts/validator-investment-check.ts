@@ -14,12 +14,13 @@ import {effectTimeline} from '../components/presentation/effectTimeline';
 const classic=createGame('validator',DECKS.validator,'degen',DECKS.degen,42);
 assert.deepEqual(classic,createGame('validator',DECKS.validator,'degen',DECKS.degen,{ruleset:'classic-v1'},42));
 classic.players[0].gas=2;
-assert.equal(applyAction(classic,{type:'hero-power'}).players[0].gas,2,'Legacy Validator remains an immediate refund');
+assert.equal(applyAction(classic,{type:'hero-power'}).players[0].gas,1,'Validator reserves orders instead of an immediate refund');
+assert.equal(applyAction(classic,{type:'hero-power'}).players[0].powerIncome,2);
 assert.equal(rulesetOf(classic),'classic-v1');
 
 const experiment=()=>createGame('validator',DECKS.validator,'degen',DECKS.degen,{ruleset:'validator-investment-v1'},42);
 const batch=(before:GameState,action:Action):PresentationBatch=>{const after=applyAction(before,action);return {id:1,revision:1,action,before,after,events:diffAction(before,after,action)};};
-let state=experiment();state.players[0].gas=4;state.players[0].maxGas=2;
+let state=experiment();state.players[0].gas=3;state.players[0].maxGas=2;
 state.players[0].hand=[{uid:'fee',cardId:'priority-fee'},{uid:'income',cardId:'amm-centurion'}];
 state=applyAction(state,{type:'cast-spell',uid:'fee'});
 state=applyAction(state,{type:'play-minion',uid:'income'});

@@ -48,9 +48,16 @@ export function videoCues(batch: PresentationBatch): VideoCue[] {
   }
   if(action.type==='hero-power'){
     switch(HEROES[batch.before.players[owner].heroId].power){
-      case 'heal-treasury':return batch.after.players[owner].treasury>batch.before.players[owner].treasury?[{id:'02-builder-heal',anchor:hero,width:5}]:[];
-      case 'gain-gas':return rulesetOf(batch.before)==='validator-investment-v1'?[]:[{id:'05-validator-gas',anchor:owner===0?'gas-counter':hero,width:5}];
+      case 'heal-treasury':{
+        const healed=batch.after.players[owner].board.find(m=>m.health>(batch.before.players[owner].board.find(old=>old.uid===m.uid)?.health??m.health));
+        return batch.after.players[owner].treasury>batch.before.players[owner].treasury?[{id:'02-builder-heal',anchor:hero,width:5}]:healed?[{id:'02-builder-heal',anchor:healed.uid,width:2.8}]:[];
+      }
+      case 'gain-gas':return [];
       case 'draw-burn':return [{id:'04-degen-draw',anchor:hero,width:4}];
+      case 'hermes-relay':return [{id:'04-degen-draw',anchor:hero,width:4}];
+      case 'rally-squire':case 'hephaestus-forge':return batch.after.players[owner].board.filter(m=>!batch.before.players[owner].board.some(old=>old.uid===m.uid)).map(m=>({id:'08-spell-buff' as VideoId,anchor:m.uid,width:2.8}));
+      case 'athena-aegis':return batch.after.players[owner].board.filter(m=>m.maxHealth>(batch.before.players[owner].board.find(old=>old.uid===m.uid)?.maxHealth??m.maxHealth)).map(m=>({id:'19-diamond-phalanx' as VideoId,anchor:m.uid,width:3}));
+      case 'poseidon-tide':return batch.events?.damages?.filter(d=>batch.before.players[1-owner].board.some(m=>m.uid===d.uid)&&d.prevHealth>d.health).map(d=>({id:'07-spell-impact' as VideoId,anchor:d.uid,width:2.6}))??[];
       case 'damage-random-enemy':{
         const target=batch.events?.damages?.find(d=>batch.before.players[1-owner].board.some(m=>m.uid===d.uid))?.uid ?? `hero-${1-owner}`;
         return [{id:'03-whale-impact',anchor:target,width:4}];
