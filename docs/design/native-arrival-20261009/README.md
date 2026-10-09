@@ -6,7 +6,7 @@ This iteration replaces the prominent laurel markers and the authored arrival ov
 
 Readiness uses light along the existing frame and the existing crimson/gold weapon badge. Eligible enemies do not acquire decorations. A hovered legal target has measured bronze brackets: rectangular clamps for cards, circular arcs for rulers with the lower-right health area left open. Brackets are geometry, rather than an image stretched to different aspect ratios. Their pulse is less than one percent and disabled for reduced motion.
 
-The aiming lance retains the board's bronze and crimson enamel. Short lanes launch from the upper attacker artwork. Target padding no longer reserves the head a second time. The head remains 36–44 board pixels before the lane safety clamp; the compact row regression fixtures require at least 32 pixels after that clamp. The shaft stops inside the spearhead socket and the point stays outside the enemy artwork. Targeting, legal actions and server-authoritative moves are unchanged.
+The aiming lance retains the board's bronze and crimson enamel. Short lanes launch from the upper attacker artwork. Target padding no longer reserves the head a second time. The head remains 36–44 board pixels before the lane safety clamp; the compact row regression fixtures require at least 32 pixels after that clamp. Shaft thickness no longer shrinks with lane length, keeping its bevel continuous on close targets. The shaft stops inside the spearhead socket and the point stays outside the enemy artwork. Targeting, legal actions and server-authoritative moves are unchanged.
 
 ## Native arrivals
 

@@ -48,7 +48,7 @@ export class ArenaAim3D {
     // The shaft reaches the socket under the head, not through its enamel face.
     const shaftPoints=Curve3.CreateQuadraticBezier(points[0],new Vector3(path.control.x,path.control.y,path.control.z),neck,48).getPoints();
     const edges=[[],[]] as [Vector3[],Vector3[]],shadows=[[],[]] as [Vector3[],Vector3[]];
-    shaftPoints.forEach((p,i)=>{const d=shaftPoints[Math.min(48,i+1)].subtract(shaftPoints[Math.max(0,i-1)]),length=Math.max(.001,Math.hypot(d.x,d.y)),width=Math.min(.115,Math.max(.055,path.lane*.04))*(1-i/190),side=new Vector3(-d.y/length*width,d.x/length*width,0);edges[0].push(p.add(side));edges[1].push(p.subtract(side));const shade=p.add(new Vector3(.035,-.045,1.4));shadows[0].push(shade.add(side.scale(1.2)));shadows[1].push(shade.subtract(side.scale(1.2)));});
+    shaftPoints.forEach((p,i)=>{const d=shaftPoints[Math.min(48,i+1)].subtract(shaftPoints[Math.max(0,i-1)]),length=Math.max(.001,Math.hypot(d.x,d.y)),width=.135*(1-i/190),side=new Vector3(-d.y/length*width,d.x/length*width,0);edges[0].push(p.add(side));edges[1].push(p.subtract(side));const shade=p.add(new Vector3(.035,-.045,1.4));shadows[0].push(shade.add(side.scale(1.2)));shadows[1].push(shade.subtract(side.scale(1.2)));});
     MeshBuilder.CreateRibbon('carved bronze targeting lance',{pathArray:edges,instance:this.shaft});MeshBuilder.CreateRibbon('targeting lance shadow',{pathArray:shadows,instance:this.shadow});
     this.head.position.copyFrom(end.subtract(direction.scale(headHeight*.5)));this.head.position.z=-8;this.head.rotation.z=Math.atan2(direction.y,direction.x)-Math.PI/2;this.head.scaling.set(headHeight*.62,headHeight,1);
     this.shaftMaterial.alpha=valid?1:.94;
