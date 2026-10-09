@@ -21,11 +21,13 @@ A Hearthstone-style card battler set in imperial Rome — on Solana. Read the me
 
 ---
 
-## 🎮 Gameplay
+## 🎮 Current arena
 
-![IMPERIVM gameplay](readme/gameplay.gif)
+![Current IMPERIVM arena — training match](readme/current/battle.jpg)
 
-*Real autoplay match — minions clash on the marble battlefield*
+*The current Babylon.js arena in a real training match, captured on 9 October 2026. The main branch contains this interface.*
+
+[Play](https://imperivm.onrender.com/arena) · [Build a deck](https://imperivm.onrender.com/collection) · [Open demo packs](https://imperivm.onrender.com/packs)
 
 ---
 
@@ -53,21 +55,23 @@ Olympus adds six cards with public preparation and conditional arrival effects. 
 
 All eight Olympus effects are installed; see the [import and validation report](docs/olympus-vfx/IMPORT-20261008.md). The [Agora After Hours expansion](docs/character-expansion-20261008.md) adds 50 pack-exclusive characters with immediate arrival abilities and conditional synergies. Everyone receives 49 free base cards and legal 30-card starters for all nine rulers; expansion deck recipes unlock as cards are collected. Inspect their cards and build decks at `/collection` → **New characters**. Original 49 cards and the separate Genesis NFT manifest are preserved.
 
-Deployment contacts now match the card plane and battlefield spacing. All twelve videos from [VFX pack 26–37](docs/arrival-vfx-26-37/00-START-HERE.md) have been imported: seven landings and two ranged impacts are used in battle; three character appearances are reserved for future cards. See the [import report](docs/arrival-vfx-26-37/IMPORT-20261008.md). Preview/download at `/ui/arena-lab/imperivm-arrival-vfx-26-37/index.html`.
+Deployment uses rigid card motion and contact effects aligned with the court. Legendary landings add temporary ground cracks and a bounded camera shake. The earlier [VFX pack 26–37](docs/arrival-vfx-26-37/00-START-HERE.md) remains available for reference; its import report describes the earlier implementation. See the [current arena implementation](docs/design/arena-refresh-20261009/README.md).
 
 
-Hearthstone-grade card anatomy: blue mana crystal, oval art portrait, gold name ribbon, parchment rules text, gold attack orb, red health drop. Rarity frames from silver to dragon-claw legendary.
+Cards use painted rarity frames, large character art, a name plate, attack/health medallions and a compact ability hint. On the court, drawn status badges distinguish fresh, ready, spent and garrisoned fighters. Inspect a card to read its full rules.
 
-![Battlefield](readme/game.png)
+### Deck workshop
 
-*Unified marble battlefield — no blocks, no panels. Just the game.*
+![Current deck workshop](readme/current/deck-builder.jpg)
+
+*Owned-card filters, search, starter recipes, a persistent deck list, cost curve and copy limits. Save a legal 30-card deck for the selected ruler.*
 
 ### Heroes — the Wallets
 
 | Ruler | Access | Orders | Power |
 | --- | --- | --- | --- |
 | **Whale** | Free | 3 | 2 damage to a random enemy fighter, or the rival Treasury if its board is empty. |
-| **Builder** | Free | 2 | Heal Treasury 2 and the most wounded friendly fighter 1. Requires useful healing. |
+| **Builder** | Free | 2 | Heal Treasury 2 and the most wounded friendly fighter 2. Requires useful healing. |
 | **Degen** | Free | 2 | Draw 1, take 2 damage. |
 | **Validator** | Free | 1 | Reserve 2 orders for the start of the next own turn, above capacity. |
 | **Strategist** | Free | 2 | Summon a fresh Pixel Squire 1/1 in an empty slot; no arrival effect. |
@@ -82,13 +86,23 @@ Phone battles use **landscape**: full-width scenery, portrait court tiles with a
 
 See [implementation, measurements and remaining limits](docs/design/arena-refresh-20261009/README.md). The [Flow loading-background kit](public/ui/loading/imperivm-arena-loading-flow.zip) contains START/END/PROMPT. Preview at `/arena-lab/loading-preview`.
 
-![Choose your hero](readme/landing.png)
+### Main menu
+
+![Current main menu](readme/current/home.jpg)
 
 ### Arena
 
-![Arena gates](readme/arena.png)
+![Current arena mode selection](readme/current/arena-lobby.jpg)
 
 *Training and free online 1v1 share the imperial arena. Private rooms and matchmaking use the authoritative WS service; see [server/README.md](server/README.md).*
+
+### Packs
+
+![Current demo pack screen](readme/current/packs.jpg)
+
+*Five cards per pack, one-at-a-time reveals and separate ruler cases. This capture shows the free local demo, with payments disabled.*
+
+Screenshot sources and capture details are recorded in [the current media ledger](readme/current/README.md). Earlier interface captures are kept in the [historical archive](readme/archive-20261004/README.md).
 
 ---
 
