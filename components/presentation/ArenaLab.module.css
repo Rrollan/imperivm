@@ -77,6 +77,8 @@
 
 /* Keep the painted menu medallion on the table when the camera changes aspect. */
 .shell .header{inset:auto;left:var(--arena-menu-x,calc(100% - 46px));top:var(--arena-menu-y,calc(100% - 46px));transform:translate(-50%,-50%);}
+/* Leave room for the platform badge on short or portrait iDos viewports. */
+:global(body.idos-build) .shell .header{top:min(var(--arena-menu-y,calc(100% - 46px)),calc(100% - 86px));}
 .shell .settingsButton{border:0;padding:0;background:transparent url('/ui/arena-lab/native/settings-medallion.webp') center/contain no-repeat !important;box-shadow:none;}
 .settingsButton svg{display:none;}
 
