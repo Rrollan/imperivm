@@ -1,5 +1,6 @@
 .loading{position:absolute;z-index:15;inset:0;overflow:hidden;background:#251510;color:#ffedc6;display:flex;align-items:flex-end;justify-content:center;isolation:isolate;font-family:var(--font-sans);}
 .scene{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;}
+.video{opacity:0;pointer-events:none;}.video[data-playing=true]{opacity:1;}
 .loading::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 30%,#210c0655 55%,#1b0c09f5);z-index:-1;}
 .copy{width:min(560px,90%);padding:25px 12px 34px;text-align:center;}
 .logo{width:240px;max-width:60%;height:70px;object-fit:contain;filter:drop-shadow(0 2px 8px #160803);}

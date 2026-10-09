@@ -235,18 +235,22 @@ export class ArenaTextures {
     // Clip the generated material to the measured opening, including its perspective skew.
     // The board artwork continues to own the entire outer bronze frame.
     ctx.save();ctx.beginPath();(portrait?PORTRAIT_TURN_INLAY_OUTLINE:TURN_INLAY_OUTLINE).forEach(([x,y],i)=>{if(i)ctx.lineTo(x*768,y*336);else ctx.moveTo(x*768,y*336);});ctx.closePath();ctx.clip();
-    const leather=ctx.createLinearGradient(0,0,0,336);leather.addColorStop(0,available?'#862d20':'#4c241e');leather.addColorStop(.5,available?'#662119':'#361a16');leather.addColorStop(1,'#29130f');
-    ctx.fillStyle=leather;ctx.fillRect(0,0,768,336);
-    // The aperture already belongs to the painted board. A second illustrated
-    // button adds a second perspective and never seats correctly in its recess.
-    ctx.strokeStyle='#c8a05938';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(126,48);ctx.lineTo(642,48);ctx.moveTo(126,288);ctx.lineTo(642,288);ctx.stroke();
-    if(!available){ctx.fillStyle='#170f0bcc';ctx.fillRect(0,0,768,336);}
-    // Inset shading seats the material under the existing rim instead of drawing another rim.
-    ctx.strokeStyle=state==='done'?'#eec77f80':'#1c0a08a6';ctx.lineWidth=16;ctx.stroke();
+    const art=this.image('/ui/arena-lab/native/turn-button-v2/context.webp');
+    if(art){
+      // The illustration was generated in the actual arena screenshot. Sample
+      // only its pressure plate; the measured socket still owns the outer rim.
+      ctx.filter=available?'none':'saturate(0.55) brightness(0.72)';
+      ctx.drawImage(art,art.naturalWidth*.278,art.naturalHeight*.254,art.naturalWidth*.566,art.naturalHeight*.371,0,0,768,336);
+      ctx.filter='none';
+    }else{
+      const leather=ctx.createLinearGradient(0,0,0,336);leather.addColorStop(0,'#7c241c');leather.addColorStop(.5,'#5a1814');leather.addColorStop(1,'#29130f');
+      ctx.fillStyle=leather;ctx.fillRect(0,0,768,336);
+    }
     const labels=compact?[available?(this.locale==='ru'?'КОНЕЦ':'END TURN'):state==='enemy'?(this.locale==='ru'?'СОПЕРНИК':'OPPONENT'):state==='busy'?(this.locale==='ru'?'БОЙ':'RESOLVING'):(this.locale==='ru'?'ИТОГ':'RESULT')]:available?(this.locale==='ru'?['КОНЕЦ','ХОДА']:['END','TURN']):state==='enemy'?(this.locale==='ru'?['ХОД','СОПЕРНИКА']:['OPPONENT',"TURN"]):state==='busy'?(this.locale==='ru'?['ИДЁТ','БОЙ']:['RESOLVING']):(this.locale==='ru'?['БОЙ','ОКОНЧЕН']:['BATTLE','OVER']);
     const roman=getComputedStyle(document.body).getPropertyValue('--font-roman').trim()||this.font;
-    ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle='#25100b';ctx.lineWidth=6;ctx.fillStyle=state==='done'?'#fff5c5':available?'#f8e5b8':'#cbbda3';
-    labels.forEach((label,i)=>{const base=compact?146:92;ctx.font=`800 ${base}px ${roman}`;const size=Math.min(base,base*(compact?590:492)/Math.max(1,ctx.measureText(label).width));ctx.font=`800 ${size}px ${roman}`;const y=labels.length===1?166:119+i*94,x=portrait?384:395;ctx.strokeText(label,x,y);ctx.fillText(label,x,y);});
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    const gold=ctx.createLinearGradient(0,72,0,265);gold.addColorStop(0,available?'#fff4cb':'#dfd0b1');gold.addColorStop(.48,available?'#f5d995':'#c8b58e');gold.addColorStop(.52,available?'#c3944e':'#a58c64');gold.addColorStop(1,available?'#ffe5ab':'#d6c39d');
+    labels.forEach((label,i)=>{const base=compact?138:92;ctx.font=`800 ${base}px ${roman}`;const size=Math.min(base,base*(compact?490:450)/Math.max(1,ctx.measureText(label).width));ctx.font=`800 ${size}px ${roman}`;const y=labels.length===1?166:119+i*94,x=384;ctx.fillStyle='#260a08';ctx.shadowColor='#160604';ctx.shadowBlur=6;ctx.shadowOffsetY=5;ctx.fillText(label,x,y+3);ctx.shadowBlur=0;ctx.shadowOffsetY=0;ctx.fillStyle=gold;ctx.fillText(label,x,y);});
     ctx.restore();
   }
 

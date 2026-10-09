@@ -23,9 +23,9 @@ These automated policies do not plan every conditional power setup and cannot es
 
 ## Loading art and generation
 
-Painted arena gates replace the blank IV loader, with restrained braziers/motes, a real wordmark and rotating readable tips. Reduced-motion settings stop decorative motion. Current background movement is native CSS; no generated video is claimed installed.
+Painted arena gates replace the blank IV loader, with a real wordmark and rotating readable tips. On 9 October the user's four-second animated gate clip was integrated as a silent inline looping background (H.264, 1280×720, about 743 KB). The painted image stays underneath until playback begins and on errors; reduced-motion users keep the static version. The loader never blocks on video playback. Native CSS motes are only a fallback, not a second layer over the playing clip.
 
-[Download the Flow kit](../../../public/ui/loading/imperivm-arena-loading-flow.zip): START.png, END.png and PROMPT.txt. Use Omni Flash, 16:9, one variant, six seconds; attach both endpoints. Locked camera, animate only existing flames and dust, no text/audio. Return the clip for integration. `/arena-lab/loading-preview` shows the live composition.
+[Download the Flow kit](../../../public/ui/loading/imperivm-arena-loading-flow.zip): START.png, END.png and PROMPT.txt. The kit remains available for further variants. The user's returned four-second clip is already installed; `/arena-lab/loading-preview` shows it with the live composition.
 
 The five additional coin portraits and loading backdrop were generated with the built-in image generator. Portraits are transparent gold profile reliefs with a beaded rim: Strategist, Athena, Hermes, Hephaestus, Poseidon. Existing four portraits remain their original files. Runtime WebP coins are 210–243 KB each instead of approximately 3 MB PNG originals; the loading backdrop is 170 KB. Original PNGs and Flow endpoints are preserved. Reproduction recipes: [ART-PROMPTS.md](ART-PROMPTS.md).
 
