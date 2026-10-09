@@ -446,6 +446,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     scheduler.tick(delta);
     videoEffects.tick(delta);
     deployments.tick(delta);
+    const shake=deployments.shake;camera.position.x=shake.x;camera.position.y=shake.y;
     layoutMoves=layoutMoves.filter(move=>{
       if(move.entry.root.isDisposed()||move.entry.root===press?.entity.root)return false;
       move.elapsed+=delta;
@@ -783,7 +784,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     setPaused: (value:boolean) => {if(paused===value)return;paused=value;scheduler.setPaused(value);if(value){engine.stopRenderLoop(render);running=false;}else request();},
     setLocale: (locale: Locale) => textures.setLocale(locale),
     setQuality: (quality: RenderQuality) => {options.quality=quality;resize();},
-    setReducedMotion: (reduced: boolean) => { options.reducedMotion = reduced; if(reduced){videoEffects.cancel();deployments.clear();} },
+    setReducedMotion: (reduced: boolean) => { options.reducedMotion = reduced; if(reduced){videoEffects.cancel();deployments.clear();camera.position.x=camera.position.y=0;} },
     present,
     cancel,
     dispose: () => {

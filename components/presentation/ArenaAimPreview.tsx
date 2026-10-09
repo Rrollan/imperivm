@@ -16,6 +16,7 @@ import {ArenaAim3D} from './ArenaAim3D';
 import {ArenaDeploymentEffects} from './ArenaDeploymentEffects';
 import {deploymentDrop,deploymentContact} from './deploymentMotion';
 import {deploymentReframe} from './deploymentReframe';
+import {LEGENDARY_CONTACT_MS} from './legendaryContact';
 import {targetingEdge,targetingInsets} from './targetingGeometry';
 import {readinessInk} from './arenaMarks';
 import {ArenaTextures,type Face} from './ArenaTextures';
@@ -26,7 +27,7 @@ import {CARDS} from '../../lib/cards';
 import {cardName} from '../../lib/locale';
 import {useReducedMotion} from '../../lib/prefersReducedMotion';
 
-const landingIds=['firmware-phalanx','hotspot-hoplite','zeus-liquidator','athena-diamond-guard','hades-rugkeeper'];
+const landingIds=['firmware-phalanx','hotspot-hoplite','node-sentinel','relay-runner','zeus-liquidator','athena-diamond-guard','hades-rugkeeper'];
 /** Exact native effect modules, with frame controls; this lab never issues game actions. */
 export function ArenaAimPreview(){
  const drop=useRef<(id:string)=>void>(()=>{}),reset=useRef<()=>void>(()=>{}),[landing,setLanding]=useState('firmware-phalanx'),[slow,setSlow]=useState(false),[freeze,setFreeze]=useState(false),[air,setAir]=useState(false),[debug,setDebug]=useState('');
@@ -71,7 +72,8 @@ export function ArenaAimPreview(){
   engine.runRenderLoop(()=>{
     const now=performance.now(),pauseAt=state.current.air?duration*.80:state.current.freeze?duration+90:Infinity;
     let dt=Math.min(50,now-last)*(state.current.slow?.25:1);if(dropping)dt=Math.max(0,Math.min(dt,pauseAt-arrival));last=now;
-    fx.tick(dt,state.current.still);contacts.tick(dt);
+    fx.tick(dt,state.current.still);if(state.current.still)contacts.clear();else contacts.tick(dt);
+    const shake=contacts.shake;camera.position.x=shake.x;camera.position.y=shake.y;
     if(dropping){
       arrival+=dt;
       if(arrival<duration&&!state.current.still){
@@ -82,7 +84,7 @@ export function ArenaAimPreview(){
       }else{
         if(!contacted){contacted=true;source.scaling.setAll(1);backing.scaling.setAll(1);face.update(fighterFace(activeId,false));sourceRoot.getChildMeshes().forEach(m=>m.renderingGroupId=0);contacts.begin(activeId,sourceBase,bounds,state.current.still);}
         const pose=deploymentContact(arrival-duration,heavy);sourceRoot.position.copyFrom(sourceBase);sourceRoot.position.z-=state.current.still?0:pose.lift;sourceRoot.scaling.setAll(1);sourceRoot.rotation.set(state.current.still?0:pose.tiltX,0,0);
-        if(arrival>duration+700&&!state.current.freeze){dropping=false;contacts.clear();}
+        if(arrival>duration+(CARDS[activeId].rarity==='legendary'?LEGENDARY_CONTACT_MS:700)&&!state.current.freeze){dropping=false;contacts.clear();}
       }
     }
     if(now-debugAt>250){debugAt=now;setDebug(dropping?`Движок · ${contacted?'контакт':'полёт'} · ${Math.round(arrival)} мс`:'Движок · готов к проверке');}

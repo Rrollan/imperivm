@@ -193,19 +193,24 @@ export class ArenaTextures {
     ctx.font=`800 64px ${this.font}`;const nameSize=Math.min(64,64*284/Math.max(1,ctx.measureText(label).width));
     ctx.font=`800 ${nameSize}px ${this.font}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff5df';ctx.fillText(label,192,266);
     this.badge(ctx,String(minion.attack),61,327,'#ab832e',46);this.badge(ctx,String(Math.max(0,minion.health)),323,327,'#a8322f',46);
-    const symbol:RomanSymbol=minion.staked?'lock':ready?'gladius':readiness==='fresh'?'hourglass':'spent';
-    this.badge(ctx,'',322,61,ready?'#773222':'#453226',38);drawRomanSymbol(ctx,symbol,322,61,48,ready?'#fff0bd':'#edce91');
+    this.drawStatus(ctx,minion,ready,readiness,46);
     if(minion.taunt)drawRomanSymbol(ctx,'shield',192,329,49,'#edce91');ctx.restore();
   }
 
   private drawMinion(ctx: CanvasRenderingContext2D, minion: Minion, ready=false,readiness?:FighterReadiness) {
-    paintCardFace(ctx,minion.cardId,this.locale,this.font,this.image(cardArtPath(minion.cardId)),ready,{attack:minion.attack,health:minion.health},this.image(cardFramePath(CARDS[minion.cardId].rarity)),'battlefield');
-    const symbol:RomanSymbol=minion.staked?'lock':ready||readiness==='ready'||readiness==='rush'?'gladius':readiness==='fresh'?'hourglass':'spent';
-    this.badge(ctx,'',323,61,minion.staked?'#315e59':ready?'#773222':'#514335',33);
-    drawRomanSymbol(ctx,symbol,323,61,44,minion.staked?'#a8e2da':ready?'#fff0bd':'#f4dda7');
+    paintCardFace(ctx,minion.cardId,this.locale,this.font,this.image(cardArtPath(minion.cardId)),ready,minion,this.image(cardFramePath(CARDS[minion.cardId].rarity)),'battlefield');
+    this.drawStatus(ctx,minion,ready,readiness,43);
     if(minion.lifesteal){
       this.badge(ctx,'',312,270,'#632d29',24);drawRomanSymbol(ctx,'drop',312,270,30,'#f0c8a9');
     }
+  }
+
+  private drawStatus(ctx:CanvasRenderingContext2D,minion:Minion,ready:boolean,readiness:FighterReadiness|undefined,radius:number){
+    const available=ready||readiness==='ready'||readiness==='rush';
+    const symbol:RomanSymbol=minion.staked?'lock':available?'gladius':readiness==='fresh'||readiness==='waiting'||readiness==='no-target'?'hourglass':'spent';
+    const atlas=this.image('/ui/cards/status-v2/action-medallions.webp'),index=symbol==='gladius'?0:symbol==='hourglass'?1:symbol==='spent'?2:3;
+    if(atlas){const w=atlas.naturalWidth/2,h=atlas.naturalHeight/2,size=radius*2.2;ctx.drawImage(atlas,index%2*w,Math.floor(index/2)*h,w,h,323-size/2,61-size/2,size,size);}
+    else{this.badge(ctx,'',323,61,minion.staked?'#315e59':available?'#773222':'#514335',radius);drawRomanSymbol(ctx,symbol,323,61,radius*1.4,available?'#fff0bd':'#edce91');}
   }
 
   private drawHero(ctx: CanvasRenderingContext2D, id: string, treasury: number, aspect=1, framed=false) {

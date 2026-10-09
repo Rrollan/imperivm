@@ -25,7 +25,7 @@ for(const targetHeight of [BATTLE_FACE.height,384]){
 }
 
 // Exercise the actual shared painter: changing the crop must never substitute
-// an ability label for the faction or stretch the illustration.
+// remove the faction identity or stretch the illustration.
 const texts:string[]=[],images:number[][]=[];
 const gradient={addColorStop:()=>{}};
 const ctx={save:()=>{},restore:()=>{},beginPath:()=>{},closePath:()=>{},moveTo:()=>{},lineTo:()=>{},quadraticCurveTo:()=>{},arc:()=>{},clip:()=>{},fill:()=>{},stroke:()=>{},fillRect:()=>{},
@@ -38,9 +38,9 @@ const art={naturalWidth:1024,naturalHeight:1536} as HTMLImageElement;
 const frame={naturalWidth:768,naturalHeight:1344} as HTMLImageElement;
 for(const rarity of Object.keys(CARD_FRAME_LAYOUT) as Rarity[]){
  const card=Object.values(CARDS).find(c=>c.type==='minion'&&c.rarity===rarity);assert(card);
- for(const height of [672,640,592,544,512,384]){
+ for(const height of [672,640,592,544,BATTLE_FACE.height,512,384]){
   texts.length=0;images.length=0;
-  paintCardFace(ctx,card.id,'ru','sans-serif',art,true,undefined,frame,height===512?'battlefield':'card',height);
+  paintCardFace(ctx,card.id,'ru','sans-serif',art,true,undefined,frame,height===BATTLE_FACE.height?'battlefield':'card',height);
   assert(texts.includes(card.faction.toUpperCase()),'Hand, reframe and field retain identical faction text');
   const artwork=images[0];assert(Math.abs(artwork[2]/artwork[3]-art.naturalWidth/art.naturalHeight)<1e-10,'Art uses an isotropic cover crop');
   if(height!==672){assert.equal(images[1][7],112);assert.equal(images[3][7],CARD_FACE.height-(CARD_FRAME_LAYOUT[rarity].art.y+CARD_FRAME_LAYOUT[rarity].art.h),'Engraved corners and panels retain their original height');}

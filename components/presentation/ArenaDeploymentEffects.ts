@@ -7,13 +7,15 @@ import type {Scene} from '@babylonjs/core/scene';
 import type {Mesh} from '@babylonjs/core/Meshes/mesh';
 import {CARDS} from '../../lib/cards';
 import type {FighterBounds} from './deploymentGeometry';
+import {legendaryContact,LEGENDARY_CONTACT_MS} from './legendaryContact';
 
 type Particle={mesh:Mesh;kind:'dust'|'chip'|'spark';x:number;y:number;vx:number;vy:number;vz:number;delay:number;life:number;size:number;spin:number};
-type Contact={at:Vector3;bounds:FighterBounds;elapsed:number;duration:number;heavy:boolean;follow?:()=>Vector3|undefined};
+type Contact={at:Vector3;bounds:FighterBounds;elapsed:number;duration:number;heavy:boolean;legendary:boolean;follow?:()=>Vector3|undefined};
 
 /** Pooled physical debris and a live cast shadow, lit in the table's coordinate system. */
 export class ArenaDeploymentEffects {
   private shadow:Mesh;private shadowMaterial:StandardMaterial;
+  private cracks:Mesh;private crackMaterial:StandardMaterial;
   private particles:Particle[]=[];private materials:StandardMaterial[]=[];private textures:DynamicTexture[]=[];
   private accent:StandardMaterial;private current:Contact|null=null;private airborne=false;
   constructor(scene:Scene,private invalidate:()=>void){
@@ -21,6 +23,25 @@ export class ArenaDeploymentEffects {
     const unlit=(name:string,texture?:DynamicTexture,color='#ffffff')=>{const m=new StandardMaterial(name,scene);m.disableLighting=true;m.diffuseColor=Color3.Black();m.emissiveColor=Color3.FromHexString(color);if(texture){m.diffuseTexture=texture;m.emissiveTexture=texture;m.useAlphaFromDiffuseTexture=true;}this.materials.push(m);return m;};
     const shadowInk=ink('soft card shadow',256,c=>{for(let i=18;i>0;i--){c.beginPath();c.roundRect(26-i,22-i,204+i*2,212+i*2,17+i);c.fillStyle=`rgba(33,19,10,${.024*(1-i/22)})`;c.fill();}});
     this.shadowMaterial=unlit('card contact shadow',shadowInk);this.shadow=MeshBuilder.CreatePlane('live card shadow',{size:1},scene);this.shadow.material=this.shadowMaterial;this.shadow.isPickable=false;this.shadow.renderingGroupId=0;this.shadow.setEnabled(false);
+    const crackInk=ink('temporary fractured marble',1024,c=>{
+      c.scale(2,2);
+      c.lineCap='round';c.lineJoin='round';
+      // Irregular branching fissures, with a lit lip on one side. The middle
+      // is covered by the card; only fractures in the real table remain visible.
+      for(let i=0;i<7;i++){
+        const angle=i*2.39996,radius=204+(i%3)*12,points:Array<[number,number]>=[];
+        for(let j=0;j<=7;j++){const d=j/7*radius,a=angle+(j?Math.sin(i*4.7+j*2.3)*.17:0);points.push([256+Math.cos(a)*d,256+Math.sin(a)*d]);}
+        const line=(pts:Array<[number,number]>,width:number)=>{
+          const lip:Array<[number,number]>=[],edge:Array<[number,number]>=[];
+          pts.forEach(([x,y],j)=>{const next=pts[Math.min(j+1,pts.length-1)],prev=pts[Math.max(0,j-1)],dx=next[0]-prev[0],dy=next[1]-prev[1],length=Math.hypot(dx,dy)||1,w=(.5+width*(1-j/(pts.length-1))**1.6)/2;lip.push([x-dy/length*w,y+dx/length*w]);edge.push([x+dy/length*w,y-dx/length*w]);});
+          c.beginPath();[...lip,...edge.reverse()].forEach(([x,y],j)=>{if(j)c.lineTo(x,y);else c.moveTo(x,y);});c.closePath();c.fillStyle='#50321ddf';c.fill();
+          c.beginPath();lip.forEach(([x,y],j)=>{if(j)c.lineTo(x-1,y+1);else c.moveTo(x-1,y+1);});c.lineWidth=1.2;c.strokeStyle='#fae4c0a0';c.stroke();
+        };
+        line(points,15+i%3*3);
+        for(const j of [4,6]){const [x,y]=points[j],a=angle+(i%2?.7:-.7),d=26+i%4*7;line([[x,y],[x+Math.cos(a)*d*.65,y+Math.sin(a)*d*.65],[x+Math.cos(a+.18)*d,y+Math.sin(a+.18)*d]],3.5);}
+      }
+    });
+    this.crackMaterial=unlit('recessed marble fissures',crackInk);this.cracks=MeshBuilder.CreatePlane('legendary marble contact',{size:1},scene);this.cracks.material=this.crackMaterial;this.cracks.position.z=.9;this.cracks.isPickable=false;this.cracks.renderingGroupId=0;this.cracks.setEnabled(false);
     const dustInk=ink('surface dust puff',128,c=>{const g=c.createRadialGradient(64,64,2,64,64,62);g.addColorStop(0,'rgba(178,132,76,.24)');g.addColorStop(.4,'rgba(187,146,96,.12)');g.addColorStop(1,'rgba(187,146,96,0)');c.fillStyle=g;c.fillRect(0,0,128,128);});
     const dust=unlit('warm marble dust',dustInk),spark=unlit('bronze glint',undefined,'#ffe7b0');this.accent=unlit('faction contact glint',undefined,'#ffe7b0');
     const bronze=new StandardMaterial('contact bronze fragments',scene);bronze.diffuseColor=Color3.FromHexString('#a77a36');bronze.specularColor=Color3.FromHexString('#ffe2a1');bronze.specularPower=48;this.materials.push(bronze);
@@ -31,9 +52,10 @@ export class ArenaDeploymentEffects {
       mesh.isPickable=false;mesh.renderingGroupId=kind==='dust'?0:1;mesh.setEnabled(false);
       this.particles.push({mesh,kind,x:0,y:0,vx:0,vy:0,vz:0,delay:0,life:0,size:0,spin:0});
     }
-    this.materials.forEach(m=>{const mesh=m===this.shadowMaterial?this.shadow:this.particles.find(p=>p.mesh.material===m)?.mesh;if(mesh)void m.forceCompilationAsync(mesh).then(invalidate).catch(()=>{});});
+    this.materials.forEach(m=>{const mesh=m===this.shadowMaterial?this.shadow:m===this.crackMaterial?this.cracks:this.particles.find(p=>p.mesh.material===m)?.mesh;if(mesh)void m.forceCompilationAsync(mesh).then(invalidate).catch(()=>{});});
   }
   get active(){return this.current!==null||this.airborne;}
+  get shake(){return this.current?.legendary?legendaryContact(this.current.elapsed,this.current.bounds):{x:0,y:0};}
   flight(at:Vector3,bounds:FighterBounds,lift:number){
     this.airborne=true;this.shadow.setEnabled(true);
     const height=Math.max(0,lift),spread=1+Math.min(2,height)*.12;
@@ -43,8 +65,8 @@ export class ArenaDeploymentEffects {
   }
   begin(id:string,at:Vector3,bounds:FighterBounds,reduced:boolean,follow?:()=>Vector3|undefined){
     this.clear();if(reduced)return;
-    const card=CARDS[id],heavy=!!card&&(card.cost>=6||card.rarity==='legendary');
-    this.current={at:at.clone(),bounds,elapsed:0,duration:heavy?680:460,heavy,follow};this.shadow.setEnabled(true);
+    const card=CARDS[id],legendary=card?.rarity==='legendary',heavy=!!card&&(card.cost>=6||legendary);
+    this.current={at:at.clone(),bounds,elapsed:0,duration:legendary?LEGENDARY_CONTACT_MS:heavy?680:460,heavy,legendary,follow};this.shadow.setEnabled(true);
     this.accent.emissiveColor=Color3.FromHexString(card?.faction==='DePIN'?'#9dd7dd':card?.faction==='NFT'?'#dbc1ed':card?.faction==='Meme'?'#ffc581':'#ffe7b0');
     const seed=Array.from(id).reduce((n,c)=>n+c.charCodeAt(0),0)*.01;
     this.particles.forEach((p,i)=>{
@@ -61,6 +83,8 @@ export class ArenaDeploymentEffects {
   tick(delta:number){const c=this.current;if(!c)return;c.elapsed+=delta;if(c.elapsed>=c.duration){this.clear();return;}const at=c.follow?.();if(at)c.at.copyFrom(at);this.paint(c);}
   private paint(c:Contact){
     const age=c.elapsed/c.duration;
+    const scar=legendaryContact(c.elapsed,c.bounds);this.cracks.setEnabled(c.legendary&&scar.opacity>0);
+    if(c.legendary){this.cracks.position.set(c.at.x,c.at.y,.9);this.cracks.scaling.set(scar.width,scar.height,1);this.crackMaterial.alpha=scar.opacity;}
     this.shadow.position.set(c.at.x+.035,c.at.y-.06,.5);this.shadow.scaling.set(c.bounds.width*1.15,c.bounds.height*1.13,1);this.shadowMaterial.alpha=.62*(1-age)**1.5;
     this.particles.forEach((p,i)=>{
       const t=(c.elapsed-p.delay)/p.life,enabled=t>=0&&t<1&&(c.heavy||i%3!==2);p.mesh.setEnabled(enabled);if(!enabled)return;
@@ -72,6 +96,6 @@ export class ArenaDeploymentEffects {
       else {p.mesh.scaling.set(p.size*.24,p.size*(1-t*.35),1);p.mesh.rotation.z=p.spin-Math.PI/2;}
     });
   }
-  clear(){this.airborne=false;this.current=null;this.shadow.setEnabled(false);this.particles.forEach(p=>p.mesh.setEnabled(false));}
-  dispose(){this.clear();this.shadow.dispose();this.particles.forEach(p=>p.mesh.dispose());this.materials.forEach(m=>m.dispose());this.textures.forEach(t=>t.dispose());}
+  clear(){this.airborne=false;this.current=null;this.shadow.setEnabled(false);this.cracks.setEnabled(false);this.particles.forEach(p=>p.mesh.setEnabled(false));}
+  dispose(){this.clear();this.shadow.dispose();this.cracks.dispose();this.particles.forEach(p=>p.mesh.dispose());this.materials.forEach(m=>m.dispose());this.textures.forEach(t=>t.dispose());}
 }

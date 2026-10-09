@@ -2,11 +2,12 @@ import {isInstantSpell} from '../../lib/engine/spellTiming';
 import {CARDS} from '../../lib/cards';
 import {cardName,type Locale} from '../../lib/locale';
 import type {Rarity} from '../../lib/engine/types';
+import {cardHint,type CardFaceStats} from './cardHint';
 
 export const CARD_FACE={width:384,height:672,ratio:384/672};
 // A wider court piece leaves room for readable names without covering the rulers.
 // Only the artwork aperture becomes shorter; engraved panels keep their proportions.
-export const BATTLE_FACE={width:384,height:512,ratio:384/512};
+export const BATTLE_FACE={width:384,height:536,ratio:384/536};
 export const FACE_TEXTURE_SCALE=2;
 export function cardFramePath(rarity:Rarity){return `/ui/cards/rarity-v1/${rarity}.png`;}
 // Measured against the transparent aperture and engraved panels of each painting.
@@ -101,7 +102,7 @@ export function paintBadge(ctx: CanvasRenderingContext2D,font:string, value: str
 
 
 /** The hand and inspection share one card face; portrait art is never fitted into a square. */
-export function paintCardFace(ctx:CanvasRenderingContext2D,id:string,locale:Locale,font:string,art:HTMLImageElement|null,playable?:boolean,stats?:{attack:number;health:number},frame?:HTMLImageElement|null,variant:'card'|'battlefield'|'queued'='card',reframeHeight?:number){
+export function paintCardFace(ctx:CanvasRenderingContext2D,id:string,locale:Locale,font:string,art:HTMLImageElement|null,playable?:boolean,stats?:CardFaceStats,frame?:HTMLImageElement|null,variant:'card'|'battlefield'|'queued'='card',reframeHeight?:number){
     const def = CARDS[id];
     const battlefield=variant==='battlefield',height=reframeHeight??(battlefield?BATTLE_FACE.height:CARD_FACE.height);
     const layout=cardFaceLayout(def.rarity,battlefield,height),{x,y,w,h}=layout.art;
@@ -116,12 +117,19 @@ export function paintCardFace(ctx:CanvasRenderingContext2D,id:string,locale:Loca
       const radius=37;
       paintBadge(ctx,font,`${stats?.attack??def.attack}`,64,layout.statsY,stats&&stats.attack>(def.attack??0)?'#6e8040':'#b38637',radius);
       paintBadge(ctx,font,`${stats?.health??def.health}`,320,layout.statsY,'#b7483c',radius);
-      // Identity never changes when a card enters the court. Status has its
-      // own engraved pictogram, and the inspector carries the complete rules.
-      const seal=def.faction.toUpperCase();
-      ctx.fillStyle='#302016';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`800 38px ${font}`;
-      if(ctx.measureText(seal).width>168)ctx.font=`800 34px ${font}`;
-      ctx.fillText(seal,192,layout.statsY);
+      // A restrained inset carries faction identity on both hand and court.
+      // Cost, rarity gem and readiness each retain their own clear socket.
+      ctx.save();rounded(ctx,116,43,152,34,8);ctx.fillStyle='#302016e8';ctx.fill();
+      ctx.lineWidth=2;ctx.strokeStyle='#bc9458';ctx.stroke();
+      ctx.fillStyle='#f5dfb4';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`800 26px ${font}`;
+      ctx.fillText(def.faction.toUpperCase(),192,60);ctx.restore();
+      const hint=cardHint(def,locale,stats);
+      ctx.fillStyle='#302016';ctx.textAlign='center';ctx.textBaseline='middle';
+      for(const [text,y,size] of [[hint.title,layout.statsY-15,34],[hint.detail,layout.statsY+18,30]] as const){
+        let fit=size;ctx.font=`800 ${fit}px ${font}`;
+        while(fit>24&&ctx.measureText(text).width>180){fit--;ctx.font=`800 ${fit}px ${font}`;}
+        ctx.fillText(text,192,y);
+      }
     }else if(variant!=='queued'){
       ctx.font=`750 29px ${font}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#70502b';ctx.fillText(isInstantSpell(def)?(locale==='ru'?'МГНОВЕННО':'INSTANT'):(locale==='ru'?'УКАЗ':'EDICT'),192,layout.statsY,270);
     }
