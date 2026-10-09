@@ -1,1 +1,167 @@
-PGRpdiBhbGlnbj0iY2VudGVyIj4KCiMg8J+Pm++4jyBJTVBFUklWTQoKKipWZW5pLiBWaWRpLiBSdWdpLioqCgpBIEhlYXJ0aHN0b25lLXN0eWxlIGNhcmQgYmF0dGxlciBzZXQgaW4gaW1wZXJpYWwgUm9tZSDigJQgb24gU29sYW5hLiBSZWFkIHRoZSBtZW1wb29sLiBCdWlsZCB5b3VyIGxlZ2lvbi4gRW1wdHkgdGhlIHJpdmFsJ3MgVHJlYXN1cnkuCgpbIVtMaXZlIERlbW9dKGh0dHBzOi8vaW1nLnNoaWVsZHMuaW8vYmFkZ2Uv8J+Orl9MaXZlX0RlbW8tUGxheV9Ob3ctRDRBMjRDP3N0eWxlPWZvci10aGUtYmFkZ2UpXShodHRwczovL2ltcGVyaXZtLm9ucmVuZGVyLmNvbSkKWyFbQ29sb3NzZXVtXShodHRwczovL2ltZy5zaGllbGRzLmlvL2JhZGdlL0NvbG9zc2V1bS0yMDI2LTE0RjE5NSldKGh0dHBzOi8vY29sb3NzZXVtLm9yZykKIVtOZXh0LmpzXShodHRwczovL2ltZy5zaGllbGRzLmlvL2JhZGdlL05leHQuanMtMTQtMEIwQTE0P2xvZ289bmV4dGRvdGpzJmxvZ29Db2xvcj13aGl0ZSkKIVtSZWFjdF0oaHR0cHM6Ly9pbWcuc2hpZWxkcy5pby9iYWRnZS9SZWFjdC0xOC0zQjFGNkI/bG9nbz1yZWFjdCZsb2dvQ29sb3I9d2hpdGUpCiFbVHlwZVNjcmlwdF0oaHR0cHM6Ly9pbWcuc2hpZWxkcy5pby9iYWRnZS9UeXBlU2NyaXB0LTUtM0IxRjZCP2xvZ289dHlwZXNjcmlwdCZsb2dvQ29sb3I9d2hpdGUpCiFbU29sYW5hXShodHRwczovL2ltZy5zaGllbGRzLmlvL2JhZGdlL1NvbGFuYS1kZXZuZXQtMTRGMTk1P2xvZ289c29sYW5hJmxvZ29Db2xvcj0wQjBBMTQpCiFbTGljZW5zZV0oaHR0cHM6Ly9pbWcuc2hpZWxkcy5pby9iYWRnZS9MaWNlbnNlLU1JVC0yQzc4NEMpCiFbaTE4bl0oaHR0cHM6Ly9pbWcuc2hpZWxkcy5pby9iYWRnZS9VSS1SVV8vX0VOLUQ0QTI0QykKCioqOTkgY2FyZHMgwrcgOSBydWxlcnMgKDUgZnJlZSAvIDQgZnJvbSBjYXNlcykgwrcgTm8gd2FsbGV0IHJlcXVpcmVkIGZvciB0cmFpbmluZyoqCgo8L2Rpdj4KCi0tLQoKIyMg8J+OriBHYW1lcGxheQoKIVtJTVBFUklWTSBnYW1lcGxheV0ocmVhZG1lL2dhbWVwbGF5LmdpZikKCipSZWFsIGF1dG9wbGF5IG1hdGNoIOKAlCBtaW5pb25zIGNsYXNoIG9uIHRoZSBtYXJibGUgYmF0dGxlZmllbGQqCgotLS0KCiMjIOKalO+4jyBUaGUgY2hhaW4gaXMgdGhlIGJvYXJkCgpFdmVyeSB0dXJuIGNyZWF0ZXMgYSBibG9jay4gVGFjdGljYWwgKippbnN0YW50IHNwZWxscyoqIGFjdCBpbW1lZGlhdGVseTsgKiplZGljdHMqKiB3YWl0IGluIGEgcHVibGljIG1lbXBvb2wgdW50aWwgeW91ciBuZXh0IHR1cm4sIGdpdmluZyB0aGUgb3Bwb25lbnQgYSByZXNwb25zZSB3aW5kb3cuCgp8IE1lY2hhbmljIHwgV2hhdCBpdCBkb2VzIHwKfCAtLS0gfCAtLS0gfAp8ICoqTWVtcG9vbCoqIHwgQ2FzdCBzcGVsbHMgcmVzb2x2ZSBhdCB0aGUgc3RhcnQgb2YgeW91ciBuZXh0IHR1cm4sIGluIGNhc3Qgb3JkZXIuIEJvdGggcGxheWVycyBzZWUgdGhlIHF1ZXVlLiB8CnwgKipPcmRlcnMgLyDQn9GA0LjQutCw0LfRiyoqIHwgTWFuYSBjcnlzdGFscywgMeKGkjEwLiBHcm93cyBlYWNoIHR1cm4uIFN0YWtlZCBjcmVhdHVyZXMgYWRkIGdhcy4gfAp8ICoqUHJpb3JpdHkqKiB8IEluc3RhbnRseSBjb3VudGVycyB0aGUgbW9zdCBleHBlbnNpdmUgZW5lbXkgcXVldWVkIHNwZWxsLiBGcm9udHJ1bm5pbmcgYXMgZ2FtZXBsYXkuIHwKfCAqKlN0YWtpbmcqKiB8IEEgY3JlYXR1cmUgZWFybnMgKzEgZ2FzIGVhY2ggdHVybiBidXQgY2Fubm90IGF0dGFjay4gU3RpbGwgYXR0YWNrYWJsZS4gfAp8ICoqSGFsdmluZyoqIHwgQ3JlYXR1cmVzIGdhaW4gKzEvKzEgYXQgYmxvY2sgaW50ZXJ2YWxzLiBCb3RoIGJvYXJkcyB0aWNrLiB8CnwgKipSVUcgUFVMTCoqIHwgVGhlIHRyYXAgY2FyZC4gQ2xlYXJzIGJvdGggYm9hcmRzIG9uIHJlc29sdXRpb24uIEhvbGQgaXQgbG9uZyBlbm91Z2gg4oCUIG9yIHdhdGNoICoqQXVkaXQqKiBjYW5jZWwgaXQuIHwKfCAqKlRhdW50IC8gUnVzaCAvIExpZmVzdGVhbCoqIHwgUHJvdGVjdCB0aGUgVHJlYXN1cnkuIFN0cmlrZSBvbiBzdW1tb24gdHVybi4gSGVhbCBmcm9tIGNvbWJhdCBkYW1hZ2UuIHwKCkRlY2sgKiozMCoqIMK3IGhhbmQgKioxMCoqIMK3IGJvYXJkICoqNSoqLCBleHBhbmRhYmxlIHRvICoqNyoqIHdpdGggQWdvcmEgRXhwYW5zaW9uLiBUcmVhc3VyaWVzIHN0YXJ0IGF0ICoqMzAgSFAqKi4gUmVkdWNlIHRoZSByaXZhbCdzIHRvIHplcm8uCgotLS0KCiMjIPCfg48gQ2FyZHMgJiBIZXJvZXMKCk9seW1wdXMgYWRkcyBzaXggY2FyZHMgd2l0aCBwdWJsaWMgcHJlcGFyYXRpb24gYW5kIGNvbmRpdGlvbmFsIGFycml2YWwgZWZmZWN0cy4gQWxsIHByZXZpb3VzIGNhcmRzIHJlbWFpbiBhdmFpbGFibGUuIFNlZSBbZGVzaWduLCByZXNlYXJjaCBhbmQgdmFsaWRhdGlvbl0oZG9jcy9yZXNlYXJjaC9vbHltcHVzLWRlc2lnbi0yMDI2MTAwNy5tZCkgYW5kIFtPbW5pIEZsYXNoIHBhY2sgMTjigJMyNV0oZG9jcy9vbHltcHVzLXZmeC8wMC1TVEFSVC1IRVJFLm1kKS4KCkFsbCBlaWdodCBPbHltcHVzIGVmZmVjdHMgYXJlIGluc3RhbGxlZDsgc2VlIHRoZSBbaW1wb3J0IGFuZCB2YWxpZGF0aW9uIHJlcG9ydF0oZG9jcy9vbHltcHVzLXZmeC9JTVBPUlQtMjAyNjEwMDgubWQpLiBUaGUgW0Fnb3JhIEFmdGVyIEhvdXJzIGV4cGFuc2lvbl0oZG9jcy9jaGFyYWN0ZXItZXhwYW5zaW9uLTIwMjYxMDA4Lm1kKSBhZGRzIDUwIHBhY2stZXhjbHVzaXZlIGNoYXJhY3RlcnMgd2l0aCBpbW1lZGlhdGUgYXJyaXZhbCBhYmlsaXRpZXMgYW5kIGNvbmRpdGlvbmFsIHN5bmVyZ2llcy4gRXZlcnlvbmUgcmVjZWl2ZXMgNDkgZnJlZSBiYXNlIGNhcmRzIGFuZCBsZWdhbCAzMC1jYXJkIHN0YXJ0ZXJzIGZvciBhbGwgbmluZSBydWxlcnM7IGV4cGFuc2lvbiBkZWNrIHJlY2lwZXMgdW5sb2NrIGFzIGNhcmRzIGFyZSBjb2xsZWN0ZWQuIEluc3BlY3QgdGhlaXIgY2FyZHMgYW5kIGJ1aWxkIGRlY2tzIGF0IGAvY29sbGVjdGlvbmAg4oaSICoqTmV3IGNoYXJhY3RlcnMqKi4gT3JpZ2luYWwgNDkgY2FyZHMgYW5kIHRoZSBzZXBhcmF0ZSBHZW5lc2lzIE5GVCBtYW5pZmVzdCBhcmUgcHJlc2VydmVkLgoKRGVwbG95bWVudCBjb250YWN0cyBub3cgbWF0Y2ggdGhlIGNhcmQgcGxhbmUgYW5kIGJhdHRsZWZpZWxkIHNwYWNpbmcuIEFsbCB0d2VsdmUgdmlkZW9zIGZyb20gW1ZGWCBwYWNrIDI24oCTMzddKGRvY3MvYXJyaXZhbC12ZngtMjYtMzcvMDAtU1RBUlQtSEVSRS5tZCkgaGF2ZSBiZWVuIGltcG9ydGVkOiBzZXZlbiBsYW5kaW5ncyBhbmQgdHdvIHJhbmdlZCBpbXBhY3RzIGFyZSB1c2VkIGluIGJhdHRsZTsgdGhyZWUgY2hhcmFjdGVyIGFwcGVhcmFuY2VzIGFyZSByZXNlcnZlZCBmb3IgZnV0dXJlIGNhcmRzLiBTZWUgdGhlIFtpbXBvcnQgcmVwb3J0XShkb2NzL2Fycml2YWwtdmZ4LTI2LTM3L0lNUE9SVC0yMDI2MTAwOC5tZCkuIFByZXZpZXcvZG93bmxvYWQgYXQgYC91aS9hcmVuYS1sYWIvaW1wZXJpdm0tYXJyaXZhbC12ZngtMjYtMzcvaW5kZXguaHRtbGAuCgoKSGVhcnRoc3RvbmUtZ3JhZGUgY2FyZCBhbmF0b215OiBibHVlIG1hbmEgY3J5c3RhbCwgb3ZhbCBhcnQgcG9ydHJhaXQsIGdvbGQgbmFtZSByaWJib24sIHBhcmNobWVudCBydWxlcyB0ZXh0LCBnb2xkIGF0dGFjayBvcmIsIHJlZCBoZWFsdGggZHJvcC4gUmFyaXR5IGZyYW1lcyBmcm9tIHNpbHZlciB0byBkcmFnb24tY2xhdyBsZWdlbmRhcnkuCgohW0JhdHRsZWZpZWxkXShyZWFkbWUvZ2FtZS5wbmcpCgoqVW5pZmllZCBtYXJibGUgYmF0dGxlZmllbGQg4oCUIG5vIGJsb2Nrcywgbm8gcGFuZWxzLiBKdXN0IHRoZSBnYW1lLioKCiMjIyBIZXJvZXMg4oCUIHRoZSBXYWxsZXRzCgp8IFJ1bGVyIHwgQWNjZXNzIHwgT3JkZXJzIHwgUG93ZXIgfAp8IC0tLSB8IC0tLSB8IC0tLSB8IC0tLSB8CnwgKipXaGFsZSoqIHwgRnJlZSB8IDMgfCAyIGRhbWFnZSB0byBhIHJhbmRvbSBlbmVteSBmaWdodGVyLCBvciB0aGUgcml2YWwgVHJlYXN1cnkgaWYgaXRzIGJvYXJkIGlzIGVtcHR5LiB8CnwgKipCdWlsZGVyKiogfCBGcmVlIHwgMiB8IEhlYWwgVHJlYXN1cnkgMiBhbmQgdGhlIG1vc3Qgd291bmRlZCBmcmllbmRseSBmaWdodGVyIDEuIFJlcXVpcmVzIHVzZWZ1bCBoZWFsaW5nLiB8CnwgKipEZWdlbioqIHwgRnJlZSB8IDIgfCBEcmF3IDEsIHRha2UgMiBkYW1hZ2UuIHwKfCAqKlZhbGlkYXRvcioqIHwgRnJlZSB8IDEgfCBSZXNlcnZlIDIgb3JkZXJzIGZvciB0aGUgc3RhcnQgb2YgdGhlIG5leHQgb3duIHR1cm4sIGFib3ZlIGNhcGFjaXR5LiB8CnwgKipTdHJhdGVnaXN0KiogfCBGcmVlIHwgMiB8IFN1bW1vbiBhIGZyZXNoIFBpeGVsIFNxdWlyZSAxLzEgaW4gYW4gZW1wdHkgc2xvdDsgbm8gYXJyaXZhbCBlZmZlY3QuIHwKfCAqKkF0aGVuYSoqIHwgQ2FzZSB8IDMgfCBMb3dlc3QtaGVhbHRoIGFsbHkgZ2V0cyArMS8rMSBhbmQgVGF1bnQ7ICsxLysyIHdpdGggYW5vdGhlciBlc3RhYmxpc2hlZCBORlQgYWxseS4gfAp8ICoqSGVybWVzKiogfCBDYXNlIHwgMiB8IERyYXcgMSwgdGFrZSAzIGRhbWFnZTsgbm8gZGFtYWdlIGFmdGVyIHBsYXlpbmcgYSBEZVBJTiBjYXJkIHRoaXMgdHVybi4gfAp8ICoqSGVwaGFlc3R1cyoqIHwgQ2FzZSB8IDMgfCBTdW1tb24gYSBMZWdpb25uYWlyZSAyLzIsIG9yIDMvMyB3aXRoIGFuIGVzdGFibGlzaGVkIHN0YWtlZCBhbGx5LiB8CnwgKipQb3NlaWRvbioqIHwgQ2FzZSB8IDQgfCBEYW1hZ2UgYWxsIGVuZW15IGZpZ2h0ZXJzIDEsIG9yIDIgYWZ0ZXIgdHdvIERlRmkgcGxheXMgdGhpcyB0dXJuLiB8CgpBbGwgcG93ZXJzIGFyZSBvbmNlIHBlciB0dXJuLiBBbGwgcnVsZXJzIHN0YXJ0IGF0IDMwIEhQIHdpdGggdGhlIHNhbWUgZm9ybWF0aW9uIGxpbWl0LiBUaWVkIHRhcmdldHMgdXNlIGZvcm1hdGlvbiBvcmRlci4gVGhlIHNlY29uZCBwbGF5ZXIgcmVjZWl2ZXMgb25lIHRlbXBvcmFyeSBleHRyYSBvcmRlciBpbiB0aGVpciBmaXJzdCB0dXJuOyBpdCBkb2VzIG5vdCBpbmNyZWFzZSBjYXBhY2l0eS4gRXhpc3Rpbmcgc2F2ZWQgZGVja3MgYW5kIGFsbCA5OSBjYXJkIGRlZmluaXRpb25zIGFyZSBwcmVzZXJ2ZWQuCgpQaG9uZSBiYXR0bGVzIHVzZSAqKmxhbmRzY2FwZSoqOiBmdWxsLXdpZHRoIHNjZW5lcnksIHBvcnRyYWl0IGNvdXJ0IHRpbGVzIHdpdGggYXR0YWNrL2hlYWx0aCBhbmQgcmVhZGluZXNzLCBhbmQgbGFyZ2VyIGhhbmQgY2FyZHMuIFRhcCB0byBpbnNwZWN0IGZ1bGwgcnVsZXMsIHRhcCBhIHJlYWR5IGZpZ2h0ZXIgdGhlbiBhIHRhcmdldCwgb3IgZHJhZy4gSW4gcG9ydHJhaXQgdGhlIHJvdGF0aW9uIHByb21wdCBjb3ZlcnMgdGhlIGJhdHRsZWZpZWxkLiBgL2FyZW5hLWxhYi9lbWJlZC1wcmV2aWV3YCBwcm92aWRlcyBhIHJlYWwgMTI4MHB4IGlmcmFtZSBoYXJuZXNzOyBgP3NjcmVlbj1waG9uZWAgdXNlcyA4NDTDlzM5MC4KClNlZSBbaW1wbGVtZW50YXRpb24sIG1lYXN1cmVtZW50cyBhbmQgcmVtYWluaW5nIGxpbWl0c10oZG9jcy9kZXNpZ24vYXJlbmEtcmVmcmVzaC0yMDI2MTAwOS9SRUFETUUubWQpLiBUaGUgW0Zsb3cgbG9hZGluZy1iYWNrZ3JvdW5kIGtpdF0ocHVibGljL3VpL2xvYWRpbmcvaW1wZXJpdm0tYXJlbmEtbG9hZGluZy1mbG93LnppcCkgY29udGFpbnMgU1RBUlQvRU5EL1BST01QVC4gUHJldmlldyBhdCBgL2FyZW5hLWxhYi9sb2FkaW5nLXByZXZpZXdgLgoKIVtDaG9vc2UgeW91ciBoZXJvXShyZWFkbWUvbGFuZGluZy5wbmcpCgojIyMgQXJlbmEKCiFbQXJlbmEgZ2F0ZXNdKHJlYWRtZS9hcmVuYS5wbmcpCgoqVHJhaW5pbmcgYW5kIGZyZWUgb25saW5lIDF2MSBzaGFyZSB0aGUgaW1wZXJpYWwgYXJlbmEuIFByaXZhdGUgcm9vbXMgYW5kIG1hdGNobWFraW5nIHVzZSB0aGUgYXV0aG9yaXRhdGl2ZSBXUyBzZXJ2aWNlOyBzZWUgW3NlcnZlci9SRUFETUUubWRdKHNlcnZlci9SRUFETUUubWQpLioKCi0tLQoKIyMg8J+Pm++4jyBDb2xvc3NldW0gc3VibWlzc2lvbgoKQnVpbHQgZm9yIHRoZSAqKkNyeXB0byBXb3JsZCdzIEZhaXIgSGFja2F0aG9uKiogKENvbG9zc2V1bSwgMjAyNikg4oCUIGVudGVyaW5nIHRoZSAqKlN1cGVydGVhbSBLYXpha2hzdGFuKiogYW5kICoqaURvcyBHYW1lcyoqIHNpZGUgdHJhY2tzLgoKfCBOYW1lIHwgUm9sZSB8IENvbnRhY3QgfAp8LS0tLS0tfC0tLS0tLXwtLS0tLS0tLS18CnwgUm9sbGFuIFJvZ296aGluIHwgRm91bmRlciAmIERldmVsb3BlciB8IFtHaXRIdWJdKGh0dHBzOi8vZ2l0aHViLmNvbS9Scm9sbGFuKSB8CgotLS0KCiMjIPCfmoAgUXVpY2sgc3RhcnQKCioqTm9kZS5qcyAyMCsqKgoKYGBgc2gKbnBtIGNpCm5wbSBydW4gZGV2CmBgYAoKT3BlbiAqKmh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCoqIOKAlCBubyB3YWxsZXQsIG5vIGVudiBmaWxlLCBubyBzZXR1cC4gUGljayBhIGhlcm8gYW5kIHBsYXkuCgpgYGBzaApucG0gcnVuIGJ1aWxkICAgICMgcHJvZHVjdGlvbiBidWlsZApucG0gc3RhcnQgICAgICAgICMgc2VydmUgcHJvZHVjdGlvbgpucG0gcnVuIHNtb2tlICAgICMgZnVsbCBBSSBtYXRjaCwgMjU2IHJlZ3Jlc3Npb24gZ3JvdXBzIGFuZCBwcmVzZW50YXRpb24gY2hlY2tzCmBgYAoKLS0tCgojIyDwn4+X77iPIFByb2plY3Qgc3RydWN0dXJlCgpgYGB0ZXh0CmFwcC8gICAgICAgICAgICAgICAgUm91dGVzIOKAlCBsYW5kaW5nLCBhcmVuYSwgZ2FtZSwgY29sbGVjdGlvbiwgcGFja3MKY29tcG9uZW50cy8gICAgICAgICBDYXJkcywgYm9hcmQsIGVmZmVjdHMsIGRpYWxvZ3MsIHdhbGxldCBVSQpjb21wb25lbnRzLzNkLyAgICAgIExhenkgR0xCIGFjY2VudHMgKGNvaW5zLCB0cm9waHksIGNvbHVtbikgd2l0aCAyRCBmYWxsYmFja3MKbGliL2VuZ2luZS8gICAgICAgICBQdXJlIFR5cGVTY3JpcHQgZ2FtZSBydWxlcyDigJQgZGV0ZXJtaW5pc3RpYywgdGVzdGVkCmxpYi9zb2xhbmEvICAgICAgICAgRGV2bmV0IGd1YXJkcywgcHJvb2YgdmVyaWZpY2F0aW9uLCBORlQgZmxvd3MKbGliL2NvbGxlY3Rpb24vICAgICBpRG9zIGdhdGV3YXkgKyBsb2NhbCBicm93c2VyIGZhbGxiYWNrCnB1YmxpYy8gICAgICAgICAgICAgQ2FyZCBhcnQsIGhlcm8gY29pbnMsIG1hcmJsZSBiYXR0bGVmaWVsZHMKc2NyaXB0cy8gICAgICAgICAgICBTbW9rZSB0ZXN0cywgY29udGVudCB2YWxpZGF0aW9uLCByZWdyZXNzaW9ucwpyZWFkbWUvICAgICAgICAgICAgIFNjcmVlbnNob3RzICYgR0lGcyBmb3IgdGhpcyBSRUFETUUKYGBgCgotLS0KCiMjIPCfjJAgRGVtbyAmIGNoYWluIHN0YXR1cwoKKirwn46uIFtQbGF5IHRoZSBsaXZlIGRlbW9dKGh0dHBzOi8vaW1wZXJpdm0ub25yZW5kZXIuY29tKSoqIOKAlCBubyBsb2dpbiBuZWVkZWQuIE9ubGluZSAxdjEgdmlhIGB3c3M6Ly9pbXBlcml2bS13cy5vbnJlbmRlci5jb21gLgoKfCBMYXllciB8IFN0YXR1cyB8CnwgLS0tIHwgLS0tIHwKfCAqKkxvY2FsIGdhbWUqKiB8IOKchSBGdWxsIEFJIG1hdGNoZXMsIDkgcnVsZXJzLCA5OSBjYXJkcywgZGVtbyBwYWNrcywgb3duZWQgZGVjayBidWlsZGVyIHwKfCAqKlNvbGFuYSoqIHwg8J+nqiBEZXZuZXQgb25seS4gUGhhbnRvbSBjb25uZWN0LCBwcm9vZi1vZi1wbGF5IHNpZ25hdHVyZXMgfAp8ICoqTkZUcyoqIHwg8J+nqiBNZXRhcGxleCBDb3JlIGNvbGxlY3Rpb24gKyBDYW5keSBNYWNoaW5lIGNvZGVkLCBub3QgeWV0IGxpdmUtbWludGVkIHwKfCAqKmlEb3MqKiB8IPCfp6ogVHlwZWQgYWRhcHRlciByZWFkeSwgbm8gVGl0bGUgY3JlYXRlZCB5ZXQgfAp8ICoqUHZQKiogfCDinIUgQXV0aG9yaXRhdGl2ZSBmcmVlIG9ubGluZSAxdjE7IHBhaWQgZW50aXRsZW1lbnRzIHJlcXVpcmUgY29uZmlndXJlZCBpRG9zIHwKfCAqKk1haW5uZXQgY2hlY2tvdXQqKiB8IPCfp6ogUHJlcGFyZWQsIGRpc2FibGVkIHVudGlsIGNvbmZpZ3VyZWQgYW5kIHZlcmlmaWVkIHwKCj4gTG9jYWwgZGVtbyBJTVAgaGFzIG5vIGNhc2ggdmFsdWUuIExpdmUgSU1QIGlzIGEgY2xvc2VkLWxvb3AgaURvcyB2aXJ0dWFsIGN1cnJlbmN5LCBub3QgYW4gU1BMIHRva2VuLiBTT0wvVVNEQyB0b3AtdXAgY29kZSBpcyBwcmVwYXJlZCwgZGlzYWJsZWQgdW50aWwgdGhlIFRpdGxlIGFuZCBsaXZlIGNoZWNrb3V0IGFyZSB2ZXJpZmllZC4gU2VlIHRoZSBbZWNvbm9teSBzZXR1cF0oZG9jcy9lY29ub215LWlkb3MtcnVnLm1kKS4KCi0tLQoKIyMg8J+TnCBMaWNlbnNlCgpbTUlUXShMSUNFTlNFKSDigJQgYnVpbHQgZm9yIHRoZSBDcnlwdG8gV29ybGQncyBGYWlyIEhhY2thdGhvbi4KCjxkaXYgYWxpZ249ImNlbnRlciI+CgoqKlZlbmkuIFZpZGkuIFJ1Z2kuKiog8J+Pm++4jwoKKlRoZSBmb3J1bSB3aWxsIHJlbWVtYmVyLioKCjwvZGl2Pgo=
+<div align="center">
+
+# 🏛️ IMPERIVM
+
+**Veni. Vidi. Rugi.**
+
+A Hearthstone-style card battler set in imperial Rome — on Solana. Read the mempool. Build your legion. Empty the rival's Treasury.
+
+[![Live Demo](https://img.shields.io/badge/🎮_Live_Demo-Play_Now-D4A24C?style=for-the-badge)](https://imperivm.onrender.com)
+[![Colosseum](https://img.shields.io/badge/Colosseum-2026-14F195)](https://colosseum.org)
+![Next.js](https://img.shields.io/badge/Next.js-14-0B0A14?logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-18-3B1F6B?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3B1F6B?logo=typescript&logoColor=white)
+![Solana](https://img.shields.io/badge/Solana-devnet-14F195?logo=solana&logoColor=0B0A14)
+![License](https://img.shields.io/badge/License-MIT-2C784C)
+![i18n](https://img.shields.io/badge/UI-RU_/_EN-D4A24C)
+
+**99 cards · 9 rulers (5 free / 4 from cases) · No wallet required for training**
+
+</div>
+
+---
+
+## 🎮 Gameplay
+
+![IMPERIVM gameplay](readme/gameplay.gif)
+
+*Real autoplay match — minions clash on the marble battlefield*
+
+---
+
+## ⚔️ The chain is the board
+
+Every turn creates a block. Tactical **instant spells** act immediately; **edicts** wait in a public mempool until your next turn, giving the opponent a response window.
+
+| Mechanic | What it does |
+| --- | --- |
+| **Mempool** | Cast spells resolve at the start of your next turn, in cast order. Both players see the queue. |
+| **Orders / Приказы** | Mana crystals, 1→10. Grows each turn. Staked creatures add gas. |
+| **Priority** | Instantly counters the most expensive enemy queued spell. Frontrunning as gameplay. |
+| **Staking** | A creature earns +1 gas each turn but cannot attack. Still attackable. |
+| **Halving** | Creatures gain +1/+1 at block intervals. Both boards tick. |
+| **RUG PULL** | The trap card. Clears both boards on resolution. Hold it long enough — or watch **Audit** cancel it. |
+| **Taunt / Rush / Lifesteal** | Protect the Treasury. Strike on summon turn. Heal from combat damage. |
+
+Deck **30** · hand **10** · board **5**, expandable to **7** with Agora Expansion. Treasuries start at **30 HP**. Reduce the rival's to zero.
+
+---
+
+## 🃏 Cards & Heroes
+
+Olympus adds six cards with public preparation and conditional arrival effects. All previous cards remain available. See [design, research and validation](docs/research/olympus-design-20261007.md) and [Omni Flash pack 18–25](docs/olympus-vfx/00-START-HERE.md).
+
+All eight Olympus effects are installed; see the [import and validation report](docs/olympus-vfx/IMPORT-20261008.md). The [Agora After Hours expansion](docs/character-expansion-20261008.md) adds 50 pack-exclusive characters with immediate arrival abilities and conditional synergies. Everyone receives 49 free base cards and legal 30-card starters for all nine rulers; expansion deck recipes unlock as cards are collected. Inspect their cards and build decks at `/collection` → **New characters**. Original 49 cards and the separate Genesis NFT manifest are preserved.
+
+Deployment contacts now match the card plane and battlefield spacing. All twelve videos from [VFX pack 26–37](docs/arrival-vfx-26-37/00-START-HERE.md) have been imported: seven landings and two ranged impacts are used in battle; three character appearances are reserved for future cards. See the [import report](docs/arrival-vfx-26-37/IMPORT-20261008.md). Preview/download at `/ui/arena-lab/imperivm-arrival-vfx-26-37/index.html`.
+
+
+Hearthstone-grade card anatomy: blue mana crystal, oval art portrait, gold name ribbon, parchment rules text, gold attack orb, red health drop. Rarity frames from silver to dragon-claw legendary.
+
+![Battlefield](readme/game.png)
+
+*Unified marble battlefield — no blocks, no panels. Just the game.*
+
+### Heroes — the Wallets
+
+| Ruler | Access | Orders | Power |
+| --- | --- | --- | --- |
+| **Whale** | Free | 3 | 2 damage to a random enemy fighter, or the rival Treasury if its board is empty. |
+| **Builder** | Free | 2 | Heal Treasury 2 and the most wounded friendly fighter 1. Requires useful healing. |
+| **Degen** | Free | 2 | Draw 1, take 2 damage. |
+| **Validator** | Free | 1 | Reserve 2 orders for the start of the next own turn, above capacity. |
+| **Strategist** | Free | 2 | Summon a fresh Pixel Squire 1/1 in an empty slot; no arrival effect. |
+| **Athena** | Case | 3 | Lowest-health ally gets +1/+1 and Taunt; +1/+2 with another established NFT ally. |
+| **Hermes** | Case | 2 | Draw 1, take 3 damage; no damage after playing a DePIN card this turn. |
+| **Hephaestus** | Case | 3 | Summon a Legionnaire 2/2, or 3/3 with an established staked ally. |
+| **Poseidon** | Case | 4 | Damage all enemy fighters 1, or 2 after two DeFi plays this turn. |
+
+All powers are once per turn. All rulers start at 30 HP with the same formation limit. Tied targets use formation order. The second player receives one temporary extra order in their first turn; it does not increase capacity. Existing saved decks and all 99 card definitions are preserved.
+
+Phone battles use **landscape**: full-width scenery, portrait court tiles with attack/health and readiness, and larger hand cards. Tap to inspect full rules, tap a ready fighter then a target, or drag. In portrait the rotation prompt covers the battlefield. `/arena-lab/embed-preview` provides a real 1280px iframe harness; `?screen=phone` uses 844×390.
+
+See [implementation, measurements and remaining limits](docs/design/arena-refresh-20261009/README.md). The [Flow loading-background kit](public/ui/loading/imperivm-arena-loading-flow.zip) contains START/END/PROMPT. Preview at `/arena-lab/loading-preview`.
+
+![Choose your hero](readme/landing.png)
+
+### Arena
+
+![Arena gates](readme/arena.png)
+
+*Training and free online 1v1 share the imperial arena. Private rooms and matchmaking use the authoritative WS service; see [server/README.md](server/README.md).*
+
+---
+
+## 🏛️ Colosseum submission
+
+Built for the **Crypto World's Fair Hackathon** (Colosseum, 2026) — entering the **Superteam Kazakhstan** and **iDos Games** side tracks.
+
+| Name | Role | Contact |
+|------|------|---------|
+| Rollan Rogozhin | Founder & Developer | [GitHub](https://github.com/Rrollan) |
+
+---
+
+## 🚀 Quick start
+
+**Node.js 20+**
+
+```sh
+npm ci
+npm run dev
+```
+
+Open **http://localhost:3000** — no wallet, no env file, no setup. Pick a hero and play.
+
+```sh
+npm run build    # production build
+npm start        # serve production
+npm run smoke    # full AI match, 256 regression groups and presentation checks
+```
+
+---
+
+## 🏗️ Project structure
+
+```text
+app/                Routes — landing, arena, game, collection, packs
+components/         Cards, board, effects, dialogs, wallet UI
+components/3d/      Lazy GLB accents (coins, trophy, column) with 2D fallbacks
+lib/engine/         Pure TypeScript game rules — deterministic, tested
+lib/solana/         Devnet guards, proof verification, NFT flows
+lib/collection/     iDos gateway + local browser fallback
+public/             Card art, hero coins, marble battlefields
+scripts/            Smoke tests, content validation, regressions
+readme/             Screenshots & GIFs for this README
+```
+
+---
+
+## 🌐 Demo & chain status
+
+**🎮 [Play the live demo](https://imperivm.onrender.com)** — no login needed. Online 1v1 via `wss://imperivm-ws.onrender.com`.
+
+| Layer | Status |
+| --- | --- |
+| **Local game** | ✅ Full AI matches, 9 rulers, 99 cards, demo packs, owned deck builder |
+| **Solana** | 🧪 Devnet only. Phantom connect, proof-of-play signatures |
+| **NFTs** | 🧪 Metaplex Core collection + Candy Machine coded, not yet live-minted |
+| **iDos** | 🧪 Typed adapter ready, no Title created yet |
+| **PvP** | ✅ Authoritative free online 1v1; paid entitlements require configured iDos |
+| **Mainnet checkout** | 🧪 Prepared, disabled until configured and verified |
+
+> Local demo IMP has no cash value. Live IMP is a closed-loop iDos virtual currency, not an SPL token. SOL/USDC top-up code is prepared, disabled until the Title and live checkout are verified. See the [economy setup](docs/economy-idos-rug.md).
+
+---
+
+## 📜 License
+
+[MIT](LICENSE) — built for the Crypto World's Fair Hackathon.
+
+<div align="center">
+
+**Veni. Vidi. Rugi.** 🏛️
+
+*The forum will remember.*
+
+</div>
