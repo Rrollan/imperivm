@@ -1,4 +1,5 @@
 'use client';
+import ActionForm from './ActionForm';
 import {useCallback, useEffect, useId, useRef, useState} from 'react';
 import {useIDos} from './IDosContext';
 import {useCollection} from './CollectionContext';
@@ -83,11 +84,11 @@ export function ImpWalletPanel({walletBalance, onBalanceChanged}: {walletBalance
         {direction === 'deposit' && <p className={styles.fee}>{t('Комиссия приоритета ≤ 0,001 SOL. Полную комиссию сети проверьте в Phantom.', 'Priority fee ≤ 0.001 SOL. Review the total network fee in Phantom.')}</p>}
         {direction === 'withdraw' && <p className={styles.fee}>{config?.withdrawalFeePercent !== null && config?.withdrawalFeePercent !== undefined ? t(`Комиссия вывода iDos: ${config.withdrawalFeePercent}%.`, `iDos withdrawal fee: ${config.withdrawalFeePercent}%.`) : t('Размер комиссии определяется iDos. Проверьте итог в запросе Phantom.', 'iDos sets the withdrawal fee. Review the final amount in the Phantom prompt.')}</p>}
         <div className={styles.actions}><button className={`${styles.button} ${styles.primary}`} disabled={busy} onClick={() => void execute()}>{busy ? t('Проверяем перевод…', 'Checking transfer…') : t('Подтвердить в Phantom', 'Confirm in Phantom')}</button><button className={styles.button} disabled={busy} onClick={() => setReview(null)}>{t('Изменить сумму', 'Edit amount')}</button></div>
-      </div> : <form className={styles.form} onSubmit={event => {event.preventDefault(); void prepare();}}>
+      </div> : <ActionForm className={styles.form} onAction={() => {void prepare();}}>
         <label htmlFor={amountId}>{t('Сумма перевода', 'Transfer amount')}</label><div className={styles.inputRow}><input id={amountId} autoComplete="off" inputMode="decimal" placeholder="0" value={amount} disabled={busy || !config} onChange={event => {setAmount(event.target.value); setReview(null);}}/><span>IMP</span></div>
         <p className={styles.hint}>{direction === 'deposit' ? t('Переведите только нужную сумму.', 'Deposit only the amount you need.') : t('Phantom получит сумму после комиссии iDos.', 'Phantom receives the amount after the iDos fee.')}</p>
         <div className={styles.actions}><button type="submit" className={`${styles.button} ${styles.primary}`} disabled={busy || !config || !amount}>{busy ? t('Проверяем настройки…', 'Checking settings…') : t('Проверить перевод', 'Review transfer')}</button>{!config && <button type="button" className={styles.button} disabled={busy} onClick={() => void load()}>{t('Повторить', 'Retry')}</button>}</div>
-      </form>}
+      </ActionForm>}
       <p className={styles.footnote}>{t('Solana mainnet · покупка пака оплачивается отдельно.', 'Solana mainnet · packs are purchased separately.')}</p>
     </>}
     {progress && <div className={styles.progress} role="status"><span className={styles.spinner}/><div><strong>{progress.phase === 'wallet' ? t('Подтвердите перевод в Phantom', 'Confirm deposit in Phantom') : progress.phase === 'confirming' ? t('Перевод отправлен · ждём Solana', 'Transfer sent · waiting for Solana') : progress.phase === 'crediting' ? t('Solana подтвердила · зачисляем в iDos', 'Solana confirmed · crediting iDos') : t('Проверяем настройки перевода', 'Checking transfer settings')}</strong><p>{progress.hash ? t('Чек сохранён. Повторный перевод заблокирован.', 'Receipt saved. A duplicate transfer is blocked.') : t('Ожидаем подтверждение Phantom.', 'Waiting for Phantom confirmation.')}</p>{progress.hash && <a href={`https://explorer.solana.com/tx/${progress.hash}`} target="_blank" rel="noopener noreferrer">{t('Открыть чек ↗', 'Open receipt ↗')}</a>}</div></div>}

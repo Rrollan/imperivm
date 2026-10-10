@@ -12,7 +12,7 @@ const walletChain = () => playProofEnabled() ? DEVNET_CHAIN : 'solana:mainnet';
 type Phantom = Omit<Wallet, 'features'> & { features: Wallet['features'] & StandardConnectFeature & StandardEventsFeature & Partial<StandardDisconnectFeature> & Partial<SolanaSignMessageFeature> & Partial<SolanaSignTransactionFeature> };
 type WalletState = {
   owner: string | null; balance: number | null; installed: boolean; busy: boolean; error: string | null;
-  connect: () => Promise<string | null>; disconnect: () => Promise<void>; refresh: () => Promise<void>;
+  restore: () => Promise<string | null>; connect: () => Promise<string | null>; disconnect: () => Promise<void>; refresh: () => Promise<void>;
   signMessage: (message: Uint8Array, expectedOwner: string) => Promise<Uint8Array>;
   signPlay: (matchId: string, heroId: string) => Promise<PlayProof>;
   signTransaction: (bytes: Uint8Array, expectedOwner: string) => Promise<Uint8Array>;
@@ -33,9 +33,24 @@ export default function WalletContext({ children }: { children: React.ReactNode 
   const lock = useRef(false);
   const liveWallet = useRef<Phantom | null>(null);
   const liveAccount = useRef(account); liveAccount.current = account;
+  const restoring = useRef<Promise<string | null> | null>(null);
+  const restore = useCallback((): Promise<string | null> => {
+    if (liveAccount.current) return Promise.resolve(liveAccount.current.address);
+    if (restoring.current) return restoring.current;
+    if (lock.current) return Promise.resolve(null);
+    const candidate = getWallets().get().find(w => w.name.toLowerCase() === 'phantom' && 'standard:connect' in w.features && 'standard:events' in w.features) as Phantom | undefined;
+    if (!candidate) return Promise.resolve(null);
+    lock.current = true;
+    restoring.current = candidate.features['standard:connect'].connect({silent: true}).then(result => {
+      const selected = result.accounts.find(a => a.chains.includes(walletChain())) ?? null;
+      if (selected) {liveWallet.current = candidate; liveAccount.current = selected; setWallet(candidate); setAccount(selected);}
+      return selected?.address ?? null;
+    }).catch(() => null).finally(() => {lock.current = false; restoring.current = null;});
+    return restoring.current;
+  }, []);
   useEffect(() => {
     const registry = getWallets();
-    const discover = () => setInstalled(registry.get().some(w => w.name.toLowerCase() === 'phantom' && 'standard:connect' in w.features));
+    const discover = () => {setInstalled(registry.get().some(w => w.name.toLowerCase() === 'phantom' && 'standard:connect' in w.features));};
     discover();
     const offRegister = registry.on('register', discover), offUnregister = registry.on('unregister', discover);
     return () => { offRegister(); offUnregister(); };
@@ -57,6 +72,7 @@ export default function WalletContext({ children }: { children: React.ReactNode 
   }, []);
   useEffect(() => { setBalance(null); if (owner && playProofEnabled()) void refresh(); }, [owner, refresh]);
   async function connect() {
+    if (restoring.current) await restoring.current;
     if (lock.current) return null;
     lock.current = true; setBusy(true); setError(null);
     try {
@@ -119,5 +135,5 @@ export default function WalletContext({ children }: { children: React.ReactNode 
       return result.signedTransaction;
     } finally { lock.current = false; setBusy(false); }
   }
-  return <Context.Provider value={{ owner, balance, installed, busy, error, connect, disconnect, refresh, signPlay, signMessage, signTransaction }}>{children}</Context.Provider>;
+  return <Context.Provider value={{ owner, balance, installed, busy, error, restore, connect, disconnect, refresh, signPlay, signMessage, signTransaction }}>{children}</Context.Provider>;
 }

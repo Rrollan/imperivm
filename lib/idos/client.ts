@@ -6,6 +6,8 @@ import {IMPERIVM_TITLE} from './title';
 import {validateImpToken} from './token';
 import type {CollectionAuth} from '../collection/access';
 import {WalletProfileService, type ProfileIdentity, type ProfileAvatar} from './profile';
+import {WalletSessionMemory, solanaAddress} from './session';
+import {browserLocks} from '../browserLocks';
 
 export type IDosSession = { status: 'demo' | 'connecting' | 'guest' | 'wallet' | 'restricted' | 'error'; owner: string | null; userId: string | null; error: string | null; revision: number };
 export type IDosStandings = { board: GetLeaderboardResponse; ownScore: number };
@@ -15,10 +17,12 @@ export class IDosRuntime {
   private readonly queue = new SessionQueue();
   private listeners = new Set<() => void>();
   private session: IDosSession = { status: 'demo', owner: null, userId: null, error: null, revision: 0 };
-  constructor(title: string) {
-    this.client = createIDosGamesClient({ titleID: title, platform: new BrowserPlatformAdapter(), debugLogging: false });
-    // Session credentials stay in this tab. A different Phantom account never inherits a remembered login.
-    this.client.auth.setRememberSession(false);
+  private memory: WalletSessionMemory;
+  constructor(title: string, client?: IDosGamesClient, memory?: WalletSessionMemory) {
+    this.client = client ?? createIDosGamesClient({ titleID: title, platform: new BrowserPlatformAdapter(), debugLogging: false });
+    this.memory = memory ?? new WalletSessionMemory(title, IDOS_CONFIG.network);
+    // Official SDK refresh tokens restore the authenticated account without replaying a wallet signature.
+    this.client.auth.setRememberSession(true);
     this.client.on('playAccess:required', () => this.publish({ ...this.session, status: 'restricted' }));
     this.client.on('playAccess:changed', pass => {
       if (pass?.Granted === false) this.publish({ ...this.session, status: 'restricted' });
@@ -32,6 +36,7 @@ export class IDosRuntime {
       this.queue.change();
       this.publish({ status: 'connecting', owner: null, userId: null, error: null, revision: this.queue.revision });
       this.client.auth.logout();
+      this.memory.clear();
       this.embeddedOwner = null;
       try {
         await login();
@@ -44,6 +49,7 @@ export class IDosRuntime {
         }
         const pass = this.client.auth.playAccess;
         const address = owner ?? this.embeddedOwner;
+        if (address && this.client.auth.context?.userID) this.memory.save(address, this.client.auth.context.userID);
         this.publish({ status: pass?.Granted === false ? 'restricted' : address ? 'wallet' : 'guest', owner: address,
           userId: this.client.auth.context?.userID ?? null, error: pass?.Granted === false ? pass.Error ?? 'iDos play access is required.' : null, revision: this.queue.revision });
       } catch (error) {
@@ -72,7 +78,45 @@ export class IDosRuntime {
   }
   private embeddedOwner: string | null = null;
   private starting: Promise<void> | null = null;
-  start() { return this.starting ??= this.guest(); }
+  start(currentOwner: () => Promise<string | null> = async () => null) {
+    if (this.starting) return this.starting;
+    if (['wallet', 'guest', 'restricted'].includes(this.session.status)) return Promise.resolve();
+    const restore = () => this.queue.run(async () => {
+      this.queue.change();
+      this.publish({status: 'connecting', owner: null, userId: null, error: null, revision: this.queue.revision});
+      try {
+        const remembered = this.memory.read(), authType = this.client.auth.lastAuthType;
+        // Do not logout before autoLogin: logout deletes the very refresh token we need.
+        idosResult(await this.client.auth.autoLogin());
+        const userId = this.client.auth.context?.userID;
+        if (!userId) throw new Error('iDos did not restore the account.');
+        let owner: string | null = null;
+        if (authType === 'Wallet') {
+          if (remembered && remembered.userId !== userId) throw new Error('iDos restored a different account. Sign in again.');
+          const state = this.client.data.user.state?.Blockchain;
+          const verifiedOwner = state?.LastWalletLogin?.NetworkID === IDOS_CONFIG.network ? solanaAddress(state.LastWalletLogin.Address) : null;
+          owner = verifiedOwner ?? remembered?.owner ?? null;
+          if (!owner || remembered && verifiedOwner && verifiedOwner !== remembered.owner) throw new Error('Sign in with your wallet to restore this account.');
+          const connected = await currentOwner();
+          if (connected && connected !== owner) {
+            this.client.auth.logout(); this.memory.clear();
+            idosResult(await this.client.auth.loginWithDeviceID());
+            owner = null;
+          } else this.memory.save(owner, userId);
+        }
+        const pass = this.client.auth.playAccess;
+        this.publish({status: pass?.Granted === false ? 'restricted' : owner ? 'wallet' : 'guest', owner,
+          userId: this.client.auth.context?.userID ?? null, error: pass?.Granted === false ? pass.Error ?? 'iDos play access is required.' : null, revision: this.queue.revision});
+      } catch (error) {
+        // A temporary network error must not erase a valid remembered login.
+        this.publish({status: 'error', owner: null, userId: null, error: error instanceof Error ? error.message : 'iDos login unavailable.', revision: this.queue.revision});
+        throw error;
+      }
+    });
+    const locks = browserLocks();
+    this.starting = (locks ? locks.request(`imperivm.auth:${this.client.titleID}`, restore) : restore()).finally(() => {this.starting = null;});
+    return this.starting;
+  }
   async disconnect() { await this.authenticate(null, async () => idosResult(await this.client.auth.loginWithDeviceID())); }
   withAccount<T>(work: (client: IDosGamesClient) => Promise<T>) {
     return this.queue.forAccount(async () => {

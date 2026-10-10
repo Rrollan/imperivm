@@ -14,7 +14,7 @@ import styles from './AccountPanel.module.css';
 
 export function AccountPanel({onClose}: {onClose: () => void}) {
   const {t, errorText, locale} = useLocale(), wallet = useImperivmWallet(), idos = useIDos(), collection = useCollection();
-  const owner = idos.embedded ? idos.session.owner ?? wallet.owner : wallet.owner;
+  const owner = idos.session.owner ?? wallet.owner;
   const signedIn = !!idos.profileIdentity;
   const [revision, setRevision] = useState(0);
   const [fundingOpened, setFundingOpened] = useState(false);

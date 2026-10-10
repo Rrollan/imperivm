@@ -1,187 +1,174 @@
-<div align="center">
+# IMPERIVM
 
-# 🏛️ IMPERIVM
+[![CI](https://github.com/Rrollan/imperivm/actions/workflows/ci.yml/badge.svg?branch=rebirth)](https://github.com/Rrollan/imperivm/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Solana](https://img.shields.io/badge/Solana-mainnet_IMP-14F195)](https://explorer.solana.com/address/7nfdxHzxab9UBhsZd8RCbWqDN45xJMuX33Pkpibeidos)
 
-**Veni. Vidi. Rugi.**
+An imperial browser card battler where crypto culture becomes tactics. Read a public spell queue, build faction combinations and defeat the rival Treasury. Training is free and works without a wallet.
 
-A Hearthstone-style card battler set in imperial Rome — on Solana. Read the mempool. Build your legion. Empty the rival's Treasury.
+**[Play](https://idosgames.com/app/SI4IPS8B/) · [Demo video](https://youtu.be/qCE7RaiwSAQ) · [Founder pitch](https://youtu.be/EQX3xrAf2e4) · [Documentation](docs/product.md) · [Colosseum submission](https://colosseum.com/arena/projects/pichat)**
 
-[![Live Demo](https://img.shields.io/badge/🎮_Live_Demo-Play_Now-D4A24C?style=for-the-badge)](https://idosgames.com/app/SI4IPS8B/)
-[![Colosseum](https://img.shields.io/badge/Colosseum-2026-14F195)](https://colosseum.org)
-![Next.js](https://img.shields.io/badge/Next.js-14-0B0A14?logo=nextdotjs&logoColor=white)
-![React](https://img.shields.io/badge/React-18-3B1F6B?logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3B1F6B?logo=typescript&logoColor=white)
-![Solana](https://img.shields.io/badge/Solana-mainnet_IMP-14F195?logo=solana&logoColor=0B0A14)
-![License](https://img.shields.io/badge/License-MIT-2C784C)
-![i18n](https://img.shields.io/badge/UI-RU_/_EN-D4A24C)
+![IMPERIVM training match](readme/current/battle.jpg)
 
-**99 cards · 9 rulers (5 free / 4 from cases) · No wallet required for training**
+## Hackathon submission
 
-</div>
+Built for the 2026 Crypto World's Fair Hackathon and the Superteam Kazakhstan × iDos Games side track. Colosseum submission is **Submitted**; the Superteam application is submitted and its Colosseum answer has been updated to Yes. iDos displays the entry as accepted in its leaderboard. These are submission states, not judging results.
 
----
-
-## 🎮 Current arena
-
-![Current IMPERIVM arena — training match](readme/current/battle.jpg)
-
-*The current Babylon.js arena in a real training match, captured on 9 October 2026. The main branch contains this interface.*
-
-[Play](https://idosgames.com/app/SI4IPS8B/) · [Build a deck](https://si4ips8b.idos.games/#/collection) · [Packs](https://si4ips8b.idos.games/#/packs)
-
-[Public iDos release (v26)](https://idosgames.com/app/SI4IPS8B/) — Live for all players. Native IMP pack purchases, ruler cases and the card marketplace are enabled at the owner's request. Agora packs cost **100,000 IMP** for five cards; the paid legendary chance is **0.0001% per whole pack**. Wallet profiles, free AI training, private duels, random matchmaking, transfers and SOL → IMP purchase through Jupiter are included. The owner confirmed a real deposit and persistence after reload. Live pack settlement, two-wallet sales and withdrawals remain unverified financial operations; SDK integration tests pass. [Release evidence and limits](docs/idos/public-release-20261010.md).
-
-Compact WebP artwork for all 99 cards and four frames uses 4.8 MB instead of 26.6 MB of originals. Visible previews get download priority, catalogue canvases use four times fewer pixels, and detailed inspection upgrades to the original painting. v26 reuses exact-hash resources from v4/v23/v24; its ZIP is about 1 MB. TypeScript, 19 integration groups and both production builds pass; the public catalog iframe launches the actual game. [Artwork validation](docs/design/card-loading-20261010/README.md).
-
----
-
-## ⚔️ The chain is the board
-
-Every turn advances a local game block. Tactical **instant spells** act immediately; **edicts** wait in a public mempool until your next turn, giving the opponent a response window. These are game rules; turns do not submit Solana transactions.
-
-| Mechanic | What it does |
-| --- | --- |
-| **Mempool** | Cast spells resolve at the start of your next turn, in cast order. Both players see the queue. |
-| **Orders / Приказы** | Mana crystals, 1→10. Grows each turn. Staked creatures add gas. |
-| **Priority** | Instantly counters the most expensive enemy queued spell. Frontrunning as gameplay. |
-| **Staking** | A creature earns +1 gas each turn but cannot attack. Still attackable. |
-| **Halving** | Creatures gain +1/+1 at block intervals. Both boards tick. |
-| **RUG PULL** | The trap card. Clears both boards on resolution. Hold it long enough — or watch **Audit** cancel it. |
-| **Taunt / Rush / Lifesteal** | Protect the Treasury. Strike on summon turn. Heal from combat damage. |
-
-Deck **30** · hand **10** · board **5**, expandable to **7** with Agora Expansion. Treasuries start at **30 HP**. Reduce the rival's to zero.
-
----
-
-## 🃏 Cards & Heroes
-
-Olympus adds six cards with public preparation and conditional arrival effects. All previous cards remain available. See [design, research and validation](docs/research/olympus-design-20261007.md) and [Omni Flash pack 18–25](docs/olympus-vfx/00-START-HERE.md).
-
-All eight Olympus effects are installed; see the [import and validation report](docs/olympus-vfx/IMPORT-20261008.md). The [Agora After Hours expansion](docs/character-expansion-20261008.md) adds 50 pack-exclusive characters with immediate arrival abilities and conditional synergies. Everyone receives 49 free base cards and legal 30-card starters for all nine rulers; expansion deck recipes unlock as cards are collected. Inspect their cards and build decks at `/collection` → **New characters**. Original 49 cards and the separate Genesis NFT manifest are preserved.
-
-Deployment uses rigid card motion and contact effects aligned with the court. Legendary landings add temporary ground cracks and a bounded camera shake. The earlier [VFX pack 26–37](docs/arrival-vfx-26-37/00-START-HERE.md) remains available for reference; its import report describes the earlier implementation. See the [current arena implementation](docs/design/arena-refresh-20261009/README.md).
-
-
-Cards use painted rarity frames, large character art, a name plate, attack/health medallions and a compact ability hint. On the court, drawn status badges distinguish fresh, ready, spent and garrisoned fighters. Inspect a card to read its full rules.
-
-### Deck workshop
-
-![Current deck workshop](readme/current/deck-builder.jpg)
-
-*Owned-card filters, search, starter recipes, a persistent deck list, cost curve and copy limits. Save a legal 30-card deck for the selected ruler.*
-
-### Heroes — the Wallets
-
-| Ruler | Access | Orders | Power |
-| --- | --- | --- | --- |
-| **Whale** | Free | 3 | 2 damage to a random enemy fighter, or the rival Treasury if its board is empty. |
-| **Builder** | Free | 2 | Heal Treasury 2 and the most wounded friendly fighter 2. Requires useful healing. |
-| **Degen** | Free | 2 | Draw 1, take 2 damage. |
-| **Validator** | Free | 1 | Reserve 2 orders for the start of the next own turn, above capacity. |
-| **Strategist** | Free | 2 | Summon a fresh Pixel Squire 1/1 in an empty slot; no arrival effect. |
-| **Athena** | Case | 3 | Lowest-health ally gets +1/+1 and Taunt; +1/+2 with another established NFT ally. |
-| **Hermes** | Case | 2 | Draw 1, take 3 damage; no damage after playing a DePIN card this turn. |
-| **Hephaestus** | Case | 3 | Summon a Legionnaire 2/2, or 3/3 with an established staked ally. |
-| **Poseidon** | Case | 4 | Damage all enemy fighters 1, or 2 after two DeFi plays this turn. |
-
-All powers are once per turn. All rulers start at 30 HP with the same formation limit. Tied targets use formation order. The second player receives one temporary extra order in their first turn; it does not increase capacity. Existing saved decks and all 99 card definitions are preserved.
-
-Phone battles use **landscape**: full-width scenery, portrait court tiles with attack/health and readiness, and larger hand cards. Tap to inspect full rules, tap a ready fighter then a target, or drag. In portrait the rotation prompt covers the battlefield. `/arena-lab/embed-preview` provides a real 1280px iframe harness; `?screen=phone` uses 844×390.
-
-See [implementation, measurements and remaining limits](docs/design/arena-refresh-20261009/README.md). The [Flow loading-background kit](public/ui/loading/imperivm-arena-loading-flow.zip) contains START/END/PROMPT. Preview at `/arena-lab/loading-preview`.
-
-### Main menu
-
-![Current main menu](readme/current/home.jpg)
-
-### Arena
-
-![Current arena mode selection](readme/current/arena-lobby.jpg)
-
-*Training and free online 1v1 share the imperial arena. Private rooms and matchmaking use the authoritative WS service; see [server/README.md](server/README.md).*
-
-### Packs
-
-![Current demo pack screen](readme/current/packs.jpg)
-
-*Five cards per pack, one-at-a-time reveals and separate ruler cases. This capture shows the free local demo, with payments disabled.*
-
-Screenshot sources and capture details are recorded in [the current media ledger](readme/current/README.md). Earlier interface captures are kept in the [historical archive](readme/archive-20261004/README.md).
-
----
-
-## 🏛️ Colosseum submission
-
-Built for the **Crypto World's Fair Hackathon** (Colosseum, 2026), targeting the **Superteam Kazakhstan × iDos Games** side track. Submission and eligibility acceptance are not yet verified. The separate general KZ track has its own registration requirements.
-
-See the [hackathon preparation packet](docs/hackathon-20261009/README.md) for application copy, recording scripts, the current-interface deck and remaining iDos/mainnet checks.
+**Current source: [`rebirth`](https://github.com/Rrollan/imperivm/tree/rebirth).** This repository follows the documentation structure of the [Colosseum example](https://github.com/Marakaya/colosseum_example), retaining its working Next.js application and separate Node service.
 
 | Name | Role | Contact |
-|------|------|---------|
+| --- | --- | --- |
 | Rollan Rogozhin | Founder & Developer | [GitHub](https://github.com/Rrollan) |
 
----
+[Application packet and verified status](docs/hackathon-20261009/APPLICATION.md)
 
-## 🚀 Quick start
+## Problem and solution
 
-**Node.js 20+**
+- Wallet setup can interrupt a player's first experience. IMPERIVM offers a complete free training match before sign-in.
+- Collectible games need useful gameplay beyond collection. Public delayed edicts, immediate spells and faction combinations give players tactical decisions.
+- Wallet holdings and in-game balances are easy to confuse. The interface labels Phantom IMP and deposited iDos IMP separately; buying tokens and depositing are explicit actions.
+- A shared card market needs reliable pricing evidence. Completed iDos sales provide weighted reference prices, with verified history stored in Supabase.
+
+## Why Solana
+
+IMPERIVM uses Solana for wallet identity and its mainnet SPL token, **IMP**, with six decimals. The iDos SDK handles native deposits, withdrawals, paid packs and marketplace settlement. Players can buy IMP with SOL through Jupiter; the purchased tokens first arrive in Phantom.
+
+Mint: [`7nfdxHzxab9UBhsZd8RCbWqDN45xJMuX33Pkpibeidos`](https://explorer.solana.com/address/7nfdxHzxab9UBhsZd8RCbWqDN45xJMuX33Pkpibeidos).
+
+Game turns and the spell queue are game mechanics: they do not send chain transactions. Free matches have no wager. Experimental Metaplex Core devnet badges are disabled by default and have no verified live mint.
+
+## Features
+
+- **99 cards:** 49 free base cards and 50 pack-exclusive characters; DeFi, NFT, DePIN and meme factions.
+- **Nine rulers:** five free, four from cases; tested powers and legal starter decks.
+- **30-card deck workshop:** ownership filters, search, copy limits, cost curve and saved decks.
+- **Imperial Babylon.js arena:** landscape phone support, targeting, fighter readiness and compact card previews.
+- **Free multiplayer:** private duels and random matchmaking, with authoritative server rules and reconnect support.
+- **Wallet account:** nickname and avatar, server-authenticated session restoration without replaying a signature on every visit.
+- **IMP economy:** five-card packs cost **100,000 IMP**, ruler cases **900,000 IMP**. The paid legendary chance is **0.0001% per whole pack** (one in a million); demo probabilities and currency are separate.
+- **Card marketplace:** native iDos listings, buying, cancellation, ownership reservation and completed-sale price history.
+- **Russian / English interface.**
+
+![Deck workshop](readme/current/deck-builder.jpg)
+
+## Verification and limits
+
+The owner confirmed wallet sign-in, SOL → IMP purchase, a real deposit that persists after reload, and opening a paid pack. Free PvP was checked with two independent clients. Automated integration tests cover account isolation, exact token amounts, uncertain-payment recovery and native marketplace contracts.
+
+Two-wallet marketplace settlement and withdrawals have **not** been confirmed in a live owner test. The iframe listing-button fix has been verified in a sandbox without `allow-forms`; session restoration has regression tests. Actual wallet signing and financial confirmations remain player actions. [Release evidence](docs/idos/public-release-20261010.md).
+
+Local demo IMP is browser test currency with no cash value. Mainnet IMP in Phantom and the deposited iDos game balance are separate. Check the current iDos withdrawal waiting period and fees before depositing.
+
+## Tech stack
+
+| Layer | Technology |
+| --- | --- |
+| Web UI | Next.js 14, React 18, TypeScript, CSS modules / Tailwind |
+| Arena | Babylon.js; painted WebP card previews and detailed artwork |
+| Rules | Deterministic TypeScript engine shared by client and server |
+| Multiplayer | Node.js 22, WebSocket authority on Render |
+| Wallet / economy | Wallet Standard, Phantom, Solana web3.js, iDos SDK, Jupiter |
+| Persistent sale history | Supabase; server-side verification of completed iDos deals |
+| Delivery | Next.js production build and Vite static game hosted on iDos |
+
+## Architecture
+
+```text
+Browser game ── game actions ──> Node WebSocket authority
+     │                                 │
+     │ official SDK                    │ verified sale history
+     ▼                                 ▼
+ iDos identity, Items, market       Supabase
+     │
+     └── confirmed transfers ──> Solana mainnet IMP
+
+Phantom ── player-approved Jupiter swap ──> IMP in Phantom
+```
+
+The server validates gameplay and pack-card ownership. iDos owns the money ledger and native market contracts. Supabase stores sale statistics, not a replacement balance ledger. [Architecture](docs/architecture.md) · [API](docs/api.md).
+
+## Quick start
+
+Requires **Node.js 22+** and npm. From the repository root:
 
 ```sh
 npm ci
-npm run dev
+NEXT_PUBLIC_IDOS_TITLE_ID=YOUR_TITLE_ID npm run dev
 ```
 
-Open **http://localhost:3000** — no wallet, no env file, no setup. Pick a hero and play.
+Open **http://localhost:3000**. The placeholder Title ID explicitly selects local demo mode; no wallet or backend credentials are needed. Local demo packs cost 50 demo IMP and cases cost 200.
+
+For a configured integration, copy [.env.example](.env.example) to `.env.local`, edit public configuration IDs and restart. Server secrets belong only on the server. See [iDos setup](docs/idos/SI4IPS8B-integration.md).
+
+For local multiplayer, use two terminals:
 
 ```sh
-npm run build    # production build
-npm start        # serve production
-npm run smoke    # full AI match, 256 regression groups and presentation checks
+npm ci --prefix server
+npm run dev --prefix server
 ```
 
----
+```sh
+NEXT_PUBLIC_IDOS_TITLE_ID=YOUR_TITLE_ID NEXT_PUBLIC_WS_URL=ws://127.0.0.1:3102 npm run dev -- -p 3101
+```
 
-## 🏗️ Project structure
+Open **http://127.0.0.1:3101/play?mode=friend** in two independent tabs. [Server setup and protocol](server/README.md).
+
+### Build and checks
+
+```sh
+npx tsc --noEmit
+npm run smoke
+npm run test:integrations
+npm run build
+npm start
+```
+
+`npm run build:idos` creates the static game in `dist/idos`; it does not publish automatically. Production upload uses official iDos build tooling and retained asset manifests. [Deployment notes](docs/idos/public-release-20261010.md).
+
+```sh
+npm run test --prefix server
+npm run build --prefix server
+```
+
+## Repository structure
 
 ```text
-app/                Routes — landing, arena, game, collection, packs
-components/         Cards, board, effects, dialogs, wallet UI
-components/3d/      Lazy GLB accents (coins, trophy, column) with 2D fallbacks
-lib/engine/         Pure TypeScript game rules — deterministic, tested
-lib/solana/         Devnet guards, proof verification, NFT flows
-lib/collection/     iDos gateway + local browser fallback
-public/             Card art, hero coins, marble battlefields
-scripts/            Smoke tests, content validation, regressions
-readme/             Screenshots & GIFs for this README
+app/                 Next.js pages and API routes
+components/          Arena, cards, market, profiles and wallet UI
+lib/engine/          Shared deterministic rules
+lib/idos/            Auth, Items, transfers, marketplace and receipt recovery
+lib/solana/          Token reading, signatures and disabled devnet experiments
+server/              Authoritative rooms, RPC relay and verified market history
+supabase/migrations/ Sale-history schema
+platform/idos/       Static entry point and retained asset manifests
+public/              Artwork, audio and native UI assets
+scripts/             Builds and regression checks
+readme/              Current screenshots and historical captures
+docs/                Product, architecture, API, roadmap and submission evidence
 ```
 
----
+## Roadmap
 
-## 🌐 Demo & chain status
+- [x] Free AI training, nine rulers and 99 cards.
+- [x] Deck workshop, free private duels and random matchmaking.
+- [x] Mainnet IMP balance, swap, deposit and paid pack verified by owner.
+- [x] Native card-market integration and persistent completed-sale statistics.
+- [ ] Verify listing, purchase and settlement with two independent wallets.
+- [ ] Verify withdrawal and recovery with an eligible iDos account.
+- [ ] Continue performance and accessibility checks on lower-powered phones.
 
-**🎮 [Play the live demo](https://imperivm.onrender.com)** — no login needed. Online 1v1 via `wss://imperivm-ws.onrender.com`.
+[Detailed roadmap](docs/roadmap.md) · [Contributing](CONTRIBUTING.md)
 
-| Layer | Status |
-| --- | --- |
-| **Local game** | ✅ Full AI matches, 9 rulers, 99 cards, demo packs, owned deck builder |
-| **Solana** | ✅ Mainnet SPL IMP mint and exact wallet balance read verified; owner login test pending |
-| **NFTs** | 🧪 Metaplex Core devnet badge code; mint unverified and match-proof flow disabled by default |
-| **iDos** | 🧪 Title SI4IPS8B configured; v22 staged with compact native card market and shared wallet profiles; Supabase connected to Render; owner deposit/settlement verification pending |
-| **PvP** | ✅ Authoritative free private duels and random matchmaking tested on iDos; wager mode not implemented |
-| **Mainnet checkout** | 🧪 iDos Main decimals corrected to 6; purchases remain disabled until an owner payment test |
+## Resources
 
-> Local demo IMP has no cash value. Live $IMP is the verified Solana mainnet SPL token bound to iDos `Main`. Phantom holdings and the deposited iDos game balance are separate. Explicit deposits/withdrawals use the iDos pool with player confirmation and receipt recovery; live transfers still need owner verification. Real packs cost 225,000 IMP and ruler cases 900,000 IMP; demo costs remain 50/200. The current arena is available in an iDos test build; purchases remain disabled pending owner wallet/payment testing. AI training needs no extra match signature or SOL. See the [current iDos setup and test link](docs/idos/SI4IPS8B-integration.md) and [contest checklist](docs/hackathon-20261009/README.md).
+- [Public game](https://idosgames.com/app/SI4IPS8B/)
+- [Demo walkthrough](https://youtu.be/qCE7RaiwSAQ) and [founder pitch](https://youtu.be/EQX3xrAf2e4)
+- [Colosseum project](https://colosseum.com/arena/projects/pichat)
+- [Superteam side track](https://superteam.fun/earn/listing/superteam-kazakhstan-x-idos-games-side-track)
+- [iDos contest leaderboard](https://idosgames.com/contest/solana-superteam-kz/?tab=leaderboard#row-SI4IPS8B)
+- [Artwork loading verification](docs/design/card-loading-20261010/README.md)
+- [Rules](docs/mechanics.md) and [ruler / expansion design](docs/character-expansion-20261008.md)
 
----
+## License
 
-## 📜 License
-
-[MIT](LICENSE) — built for the Crypto World's Fair Hackathon.
-
-<div align="center">
-
-**Veni. Vidi. Rugi.** 🏛️
-
-*The forum will remember.*
-
-</div>
+[MIT](LICENSE). AI-assisted code and artwork are documented in the project media and design notes.

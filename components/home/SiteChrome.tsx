@@ -17,7 +17,7 @@ export function SiteHeader({ active = 'home' }: { active?: 'home' | 'library' | 
   const { t, locale, setLocale } = useLocale();
   const wallet = useImperivmWallet(), idos = useIDos();
   const [accountOpen, setAccountOpen] = useState(false);
-  const owner = idos.embedded ? idos.session.owner ?? wallet.owner : wallet.owner;
+  const owner = idos.session.owner ?? wallet.owner;
   const profile = idos.profile;
   const accountLabel = profile?.nickname || (owner ? `${owner.slice(0, 4)}…${owner.slice(-4)}` : t('Аккаунт', 'Account'));
   return <><header className={styles.header}>

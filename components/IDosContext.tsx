@@ -17,7 +17,7 @@ export default function IDosContext({ children }: { children: React.ReactNode })
   const lock = useRef(false), currentWallet = useRef(wallet); currentWallet.current = wallet;
   const [profileStore] = useState(() => new WalletProfileStore());
   const profileState = useSyncExternalStore(profileStore.subscribe, profileStore.getSnapshot, profileStore.getServerSnapshot);
-  const profileScope: WalletProfileScope | null = session.status === 'wallet' && session.owner && session.userId && (embedded || session.owner === wallet.owner)
+  const profileScope: WalletProfileScope | null = session.status === 'wallet' && session.owner && session.userId && (!wallet.owner || session.owner === wallet.owner || embedded)
     ? {owner: session.owner, userId: session.userId, revision: session.revision} : null;
   const profileKey = profileScope ? JSON.stringify([profileScope.owner, profileScope.userId, profileScope.revision]) : '';
   const currentProfileKey = useRef(profileKey); currentProfileKey.current = profileKey;
@@ -38,6 +38,14 @@ export default function IDosContext({ children }: { children: React.ReactNode })
     window.addEventListener('imperivm:profile-changed', changed);
     return () => window.removeEventListener('imperivm:profile-changed', changed);
   }, [refreshProfile]);
+  const restoreOwner = useCallback(async () => {
+    const {isEmbeddedInPlatform, PLATFORM_WALLET_MESSAGES} = await import('@idosgames/wallet');
+    if (isEmbeddedInPlatform()) {
+      const [{askPlatformPage}, {readPlatformSolanaWallet}] = await Promise.all([import('@idosgames/core'), import('../lib/idos/auth')]);
+      try {return await readPlatformSolanaWallet({titleID: IDOS_CONFIG.title ?? '', messages: PLATFORM_WALLET_MESSAGES, ask: askPlatformPage});} catch {return null;}
+    }
+    return currentWallet.current.owner ?? await currentWallet.current.restore();
+  }, []);
   useEffect(() => {
     if (!IDOS_CONFIG.title) return;
     let cancelled = false, off = () => {}, platformOff = () => {};
@@ -46,7 +54,7 @@ export default function IDosContext({ children }: { children: React.ReactNode })
       const client = getIDosRuntime(); if (!client) return;
       setRuntime(client); setSession(client.getSnapshot());
       off = client.subscribe(() => { if (!cancelled) setSession(client.getSnapshot()); });
-      void client.start().catch(() => { /* backend error is visible; demo remains available */ });
+      void client.start(restoreOwner).catch(() => { /* backend error is visible; demo remains available */ });
     }).catch(() => { if (!cancelled) setSession({ status: 'error', error: 'iDos SDK unavailable. Choose local demo.', owner: null, userId: null, revision: 0 }); });
     void import('@idosgames/wallet').then(({ isEmbeddedInPlatform, onWalletBalanceChanged }) => {
       if (!cancelled) setEmbedded(isEmbeddedInPlatform());
@@ -54,9 +62,11 @@ export default function IDosContext({ children }: { children: React.ReactNode })
       if (!cancelled) platformOff = onWalletBalanceChanged(() => window.dispatchEvent(new Event('imperivm:idos-balance')));
     }).catch(() => { /* Standalone Phantom login remains available if the platform bridge fails. */ });
     return () => { cancelled = true; off(); platformOff(); };
-  }, []);
+  }, [restoreOwner]);
+  const previousOwner = useRef<string | null>(null);
   useEffect(() => {
-    if (runtime?.getSnapshot().owner && !embedded && wallet.owner !== runtime.getSnapshot().owner && !lock.current) void runtime.disconnect().catch(() => {});
+    const previous = previousOwner.current; previousOwner.current = wallet.owner;
+    if (runtime?.getSnapshot().owner && !embedded && ((wallet.owner && wallet.owner !== runtime.getSnapshot().owner) || (previous && !wallet.owner)) && !lock.current) void runtime.disconnect().catch(() => {});
   }, [wallet.owner, runtime, embedded]);
   async function login() {
     if (!runtime || lock.current) return;
@@ -79,7 +89,7 @@ export default function IDosContext({ children }: { children: React.ReactNode })
     try { await runtime.disconnect(); } catch { /* guest access may be disabled by the title */ }
     finally { lock.current = false; setBusy(false); }
   }
-  async function retry() { if (runtime) try { await runtime.guest(); } catch {} }
+  async function retry() { if (runtime) try { await runtime.start(restoreOwner); } catch {} }
   const matchingProfile = profileStore.matches(profileScope);
   return <Context.Provider value={{ runtime, session, embedded, configured: !!IDOS_CONFIG.title, busy: busy || session.status === 'connecting', login, logout, retry,
     profile: matchingProfile ? profileState.profile : null, profileIdentity: profileScope,

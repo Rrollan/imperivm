@@ -1,4 +1,5 @@
 'use client';
+import ActionForm from './ActionForm';
 import {useEffect, useRef, useState} from 'react';
 import {useIDos} from './IDosContext';
 import {useLocale} from './LocaleContext';
@@ -69,10 +70,10 @@ export function WalletProfilePanel() {
       <button type="button" className={styles.toggle} disabled={!!busy || reading} aria-expanded={expanded} aria-controls="wallet-profile-editor" onClick={() => setExpanded(value => !value)}>{expanded ? t('Готово', 'Done') : t('Профиль', 'Edit profile')}</button>
     </div>
     {expanded && active && <div className={styles.editor} id="wallet-profile-editor">
-      <form onSubmit={event => {event.preventDefault(); void save('nickname');}} className={styles.nicknameForm}>
+      <ActionForm onAction={() => {void save('nickname');}} className={styles.nicknameForm}>
         <label htmlFor="wallet-profile-nickname">{t('Никнейм', 'Nickname')}<input id="wallet-profile-nickname" autoComplete="nickname" value={nickname} onChange={event => {setNickname(event.target.value); setNotice(''); setError('');}} minLength={3} maxLength={24} required disabled={disabled} placeholder={t('Как вас узнают на арене?', 'How will the arena know you?')}/></label>
         <button className={styles.primary} disabled={disabled || nickname === active.nickname} type="submit">{busy === 'nickname' ? t('Сохраняем…', 'Saving…') : t('Сохранить ник', 'Save nickname')}</button>
-      </form>
+      </ActionForm>
       <p className={styles.hint}>{t('3–24 символа · вход только кошельком', '3–24 characters · wallet sign-in only')}</p>
       <fieldset className={styles.avatars} disabled={disabled}><legend>{t('Аватарка', 'Avatar')}</legend><div className={styles.portraits}>{PROFILE_PORTRAITS.map(id => <button key={id} type="button" title={heroName(id)} aria-label={heroName(id)} aria-pressed={avatar.kind === 'portrait' && avatar.id === id} onClick={() => {setAvatar({version: 1, kind: 'portrait', id}); setNotice('');}}><img src={heroPortraitPath(id)} alt="" width={48} height={48}/></button>)}</div></fieldset>
       <div className={styles.avatarActions}><div className={styles.preview}><img src={avatarSource(avatar)} alt={t('Выбранная аватарка', 'Selected avatar')} width={56} height={56}/><div><label className={styles.uploadLabel} htmlFor="wallet-profile-avatar-file">{t('Загрузить своё фото', 'Upload your photo')}</label><input ref={fileInput} id="wallet-profile-avatar-file" type="file" accept="image/png,image/jpeg,image/webp" disabled={disabled} onChange={event => void upload(event.target.files?.[0])}/><small>{t('PNG, JPG, WebP · до 5 МБ', 'PNG, JPG, WebP · under 5 MB')}</small></div></div><button className={styles.primary} type="button" disabled={disabled || sameAvatar(avatar, active.avatar)} onClick={() => void save('avatar')}>{busy === 'avatar' ? t('Сохраняем…', 'Saving…') : busy === 'image' ? t('Готовим фото…', 'Preparing photo…') : t('Сохранить аву', 'Save avatar')}</button></div>
