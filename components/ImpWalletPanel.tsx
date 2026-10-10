@@ -14,6 +14,7 @@ export function ImpWalletPanel({walletBalance, onBalanceChanged}: {walletBalance
   const idos = useIDos(), collection = useCollection(), {t, locale, errorText} = useLocale();
   const amountId = useId();
   const [buy, setBuy] = useState(false), [swapActive, setSwapActive] = useState(false);
+  const [recoveryChecked, setRecoveryChecked] = useState(false);
   const [progress, setProgress] = useState<TransferProgress | null>(null), [completed, setCompleted] = useState<{amount: string; direction: TransferDirection; hash?: string} | null>(null);
   const [open, setOpen] = useState(false), [direction, setDirection] = useState<TransferDirection>('deposit');
   const [amount, setAmount] = useState(''), [review, setReview] = useState<string | null>(null);
@@ -28,7 +29,7 @@ export function ImpWalletPanel({walletBalance, onBalanceChanged}: {walletBalance
     catch (error) {if (captured === scope.current) setNotice(error instanceof Error ? error.message : (locale === 'ru' ? 'Кошелёк iDos временно недоступен.' : 'iDos wallet is temporarily unavailable.'));}
     finally {if (captured === scope.current) {locked.current = false; setBusy(false);}}
   }, [idos.runtime, locale]);
-  useEffect(() => {scope.current++; locked.current = false; setOpen(false); setConfig(null); setReview(null); setAmount(''); setNotice(''); setBusy(false); setProgress(null); setCompleted(null); setBuy(false);}, [idos.session.owner, idos.session.userId]);
+  useEffect(() => {scope.current++; locked.current = false; setOpen(false); setConfig(null); setReview(null); setAmount(''); setNotice(''); setBusy(false); setProgress(null); setCompleted(null); setRecoveryChecked(false); setBuy(false);}, [idos.session.owner, idos.session.userId]);
   useEffect(() => {if (open && signedIn && !idos.embedded) void load();}, [open, signedIn, idos.embedded, load]);
   useEffect(() => {const changed = () => {onBalanceChanged?.(); if (open && signedIn && !idos.embedded) void load();}; window.addEventListener('imperivm:idos-balance', changed); return () => window.removeEventListener('imperivm:idos-balance', changed);}, [onBalanceChanged, open, signedIn, idos.embedded, load]);
   function refreshBalances() {window.dispatchEvent(new Event('imperivm:idos-balance')); void collection.refresh();}
@@ -52,11 +53,11 @@ export function ImpWalletPanel({walletBalance, onBalanceChanged}: {walletBalance
   async function execute(recovery = false) {
     const runtime = idos.runtime, captured = scope.current, confirmed = review;
     if (!runtime || locked.current || swapActive || (!recovery && !confirmed)) return;
-    locked.current = true; setBusy(true); setNotice(''); setCompleted(null); setProgress({phase: 'preparing'});
+    locked.current = true; setBusy(true); setNotice(''); setCompleted(null); setRecoveryChecked(false); setProgress({phase: 'preparing'});
     const track = (value: TransferProgress) => {if (captured === scope.current) {setProgress(value); if (value.phase === 'complete') setCompleted({amount: confirmed ?? config?.pending?.amount ?? '', direction: recovery ? config?.pending?.direction ?? direction : direction, hash: value.hash});}};
     try {
       await runtime.withImpTransfers(service => recovery ? service.recover() : service.transfer(direction, confirmed!, direction === 'withdraw' ? config?.withdrawalFeePercent : undefined, track));
-      if (captured === scope.current) {setReview(null); setAmount(''); setNotice(recovery ? t('Статус перевода обновлён. Балансы проверяются.', 'Transfer status updated. Refreshing balances.') : t('Перевод подтверждён. Балансы проверяются.', 'Transfer confirmed. Refreshing balances.'));}
+      if (captured === scope.current) {setReview(null); setAmount(''); setNotice(''); setRecoveryChecked(recovery);}
       refreshBalances();
     } catch (error) {if (captured === scope.current) {setReview(null); setNotice(error instanceof Error ? error.message : t('Перевод ещё проверяется.', 'The transfer is still being checked.'));}}
     finally {
@@ -90,6 +91,7 @@ export function ImpWalletPanel({walletBalance, onBalanceChanged}: {walletBalance
     </>}
     {progress && <div className={styles.progress} role="status"><span className={styles.spinner}/><div><strong>{progress.phase === 'wallet' ? t('Подтвердите перевод в Phantom', 'Confirm deposit in Phantom') : progress.phase === 'confirming' ? t('Перевод отправлен · ждём Solana', 'Transfer sent · waiting for Solana') : progress.phase === 'crediting' ? t('Solana подтвердила · зачисляем в iDos', 'Solana confirmed · crediting iDos') : t('Проверяем настройки перевода', 'Checking transfer settings')}</strong><p>{progress.hash ? t('Чек сохранён. Повторный перевод заблокирован.', 'Receipt saved. A duplicate transfer is blocked.') : t('IMP ещё не отправлены.', 'IMP have not been sent yet.')}</p>{progress.hash && <a href={`https://explorer.solana.com/tx/${progress.hash}`} target="_blank" rel="noopener noreferrer">{t('Открыть чек ↗', 'Open receipt ↗')}</a>}</div></div>}
     {completed && <div className={styles.success} role="status"><span aria-hidden="true">✓</span><div><strong>{formatImpAmount(completed.amount, locale)} IMP {completed.direction === 'deposit' ? t('зачислено в игру', 'credited in game') : t('выведено в Phantom', 'withdrawn to Phantom')}</strong><p>{t('Перевод подтверждён. Баланс обновляется.', 'Transfer confirmed. Balance refreshing.')}</p>{completed.hash && <a href={`https://explorer.solana.com/tx/${completed.hash}`} target="_blank" rel="noopener noreferrer">{t('Чек перевода ↗', 'Transfer receipt ↗')}</a>}</div></div>}
+    {recoveryChecked && <p className={styles.hint} role="status">{t('Статус перевода обновлён. Балансы проверяются; возврат можно увидеть в истории iDos.', 'Transfer status updated. Refreshing balances; refunds appear in iDos history.')}</p>}
     {notice && <p className={styles.notice} role="status">{errorText(notice)}</p>}
     {signedIn && !idos.embedded && open && <a className={styles.platformLink} href={IMPERIVM_TITLE.appUrl} target="_blank" rel="noopener noreferrer">{t('История и кошелёк на iDos', 'History and wallet on iDos')} ↗</a>}
     </div>
