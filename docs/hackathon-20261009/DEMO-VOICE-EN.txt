@@ -1,0 +1,15 @@
+This is IMPERIVM, a browser card battler where imperial Rome meets crypto culture. You can play it directly on iDos Games.
+
+The game includes ninety-nine cards and nine rulers. Five rulers and the starter cards are free. Here I choose the Strategist and customize a thirty-card deck.
+
+I can train against AI, create a private duel with a friend, or search for a random opponent. Training works without connecting a wallet.
+
+The goal is to destroy the enemy Treasury. Orders limit what I can play. I deploy a fighter, end my turn, and attack when it becomes ready. The targeting arrow guides my attack, and the board shows the damage.
+
+Each ruler has a special ability. Here, my Strategist spends two orders to summon an extra fighter, giving me another tactical option.
+
+Solana powers wallet login and the mainnet IMP token. My profile has a nickname and avatar. Phantom holdings and the deposited game balance are separate. Login alone does not transfer tokens. I tested a real deposit: the balance remained after reloading.
+
+Players can exchange SOL for IMP through Jupiter, then deposit tokens into the game. Five-card packs cost one hundred thousand IMP. The marketplace includes buying, selling, and trade history.
+
+IMPERIVM is available to play now on iDos Games. The current source code is on GitHub in the rebirth branch.
