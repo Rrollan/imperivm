@@ -21,6 +21,7 @@ import {powerRules} from '../presentation/rulesText';
 import {RomanIcon} from '../presentation/RomanIcon';
 import {OnlineBoard} from './OnlineBoard';
 import styles from './CustomLobby.module.css';
+import profileStyles from '../WalletProfilePanel.module.css';
 
 function actionIntent(action: Action): GameIntent {
   switch (action.type) {
@@ -48,24 +49,17 @@ export function CustomLobby({random = false}: {random?: boolean}) {
   useEffect(() => {const deck = loadCustomDeck(hero); setCustomDeck(deck); setDeckSource('starter');}, [hero]);
   useEffect(() => {if (net.identity) {setName(net.identity.playerName); if (net.identity.heroId && Object.hasOwn(HEROES, net.identity.heroId)) setHero(net.identity.heroId);}}, [net.identity]);
   useEffect(() => {
-    const nextAccount = `${idos.session.owner ?? ''}:${idos.session.userId ?? ''}`;
+    const nextAccount = idos.profileIdentity ? `${idos.profileIdentity.owner}:${idos.profileIdentity.userId}:${idos.session.revision}` : '';
     if (!net.identity && profileAccount.current !== nextAccount) {
       const automaticName = profilePrefill.current;
       setName(previous => previous === automaticName ? '' : previous);
       profilePrefill.current = ''; profileAccount.current = nextAccount;
     }
-    if (!idos.runtime || idos.session.status !== 'wallet' || !idos.session.owner || !idos.session.userId || net.identity) return;
-    let cancelled = false;
-    const runtime = idos.runtime, expected = {owner: idos.session.owner, userId: idos.session.userId};
-    const loadName = () => void runtime.profile(expected).then(profile => {
-      if (!cancelled) {
-        const previousProfileName = profilePrefill.current; profilePrefill.current = profile.nickname;
-        setName(previous => !previous || previous === previousProfileName ? profile.nickname : previous);
-      }
-    }).catch(() => { /* Profile loading must not block a free match. */ });
-    loadName(); window.addEventListener('imperivm:profile-changed', loadName);
-    return () => {cancelled = true; window.removeEventListener('imperivm:profile-changed', loadName);};
-  }, [idos.runtime, idos.session.owner, idos.session.userId, idos.session.status, net.identity]);
+    if (!idos.profile || net.identity) return;
+    const previousProfileName = profilePrefill.current;
+    profilePrefill.current = idos.profile.nickname;
+    setName(previous => !previous || previous === previousProfileName ? idos.profile!.nickname : previous);
+  }, [idos.profile, idos.session.owner, idos.session.userId, idos.session.status, net.identity]);
   const busy = net.status === 'connecting' || net.status === 'reconnecting';
   const waiting = net.snapshot?.status === 'waiting', locked = busy || !!net.queue || !!net.identity || !!net.snapshot;
   const [now, setNow] = useState(Date.now);
@@ -105,7 +99,7 @@ export function CustomLobby({random = false}: {random?: boolean}) {
         <button type="button" className={styles.secondary} onClick={() => void net.leave()}>{random ? t('Отменить поиск', 'Cancel search') : t('Закрыть комнату', 'Close room')}</button>
       </section> : <form onSubmit={event => {event.preventDefault(); void submit();}}>
         {!random && <div className={styles.tabs} aria-label={t('Создание или вход в комнату', 'Create or join a room')}><button type="button" aria-pressed={tab === 'create'} onClick={() => setTab('create')}>{t('Создать комнату', 'Create room')}</button><button type="button" aria-pressed={tab === 'join'} onClick={() => setTab('join')}>{t('Войти по коду', 'Join by code')}</button></div>}
-        <div className={styles.fields}><label>{t('Ваше имя за столом', 'Your name at the table')}<input autoComplete="nickname" name="playerName" required minLength={1} maxLength={32} value={name} onChange={event => setName(event.target.value)} placeholder={t('Например, Марк', 'For example, Marcus')}/><small>{t('Имя видно только сопернику.', 'Your opponent will see this name.')}</small></label>{!random && tab === 'join' && <label>{t('Код комнаты', 'Room code')}<input name="roomCode" required minLength={6} maxLength={6} value={code} onChange={event => setCode(normalizeRoomCode(event.target.value).replace(/[^A-Z0-9]/g, ''))} autoCapitalize="characters" autoComplete="off" spellCheck={false} placeholder="ABC234" className={styles.codeInput}/><small>{t('6 букв и цифр из приглашения.', '6 letters and numbers from your invitation.')}</small></label>}</div>
+        <div className={styles.fields}><label><span className={profileStyles.lobbyLabel}>{idos.profile && <img className={profileStyles.lobbyAvatar} src={idos.profile.avatar.kind === 'image' ? idos.profile.avatar.dataURL : heroPortraitPath(idos.profile.avatar.id)} width={28} height={28} alt=""/>}{t('Ваше имя за столом', 'Your name at the table')}</span><input autoComplete="nickname" name="playerName" required minLength={1} maxLength={32} value={name} onChange={event => setName(event.target.value)} placeholder={t('Например, Марк', 'For example, Marcus')}/><small>{t('Имя видно только сопернику.', 'Your opponent will see this name.')}</small></label>{!random && tab === 'join' && <label>{t('Код комнаты', 'Room code')}<input name="roomCode" required minLength={6} maxLength={6} value={code} onChange={event => setCode(normalizeRoomCode(event.target.value).replace(/[^A-Z0-9]/g, ''))} autoCapitalize="characters" autoComplete="off" spellCheck={false} placeholder="ABC234" className={styles.codeInput}/><small>{t('6 букв и цифр из приглашения.', '6 letters and numbers from your invitation.')}</small></label>}</div>
         <div className={styles.sectionHeading}><h2>{t('Выберите правителя', 'Choose your ruler')}</h2><span>{t('У каждого своя сила и колода', 'Each has a power and a deck')}</span></div>
         <div className={styles.heroes}>{Object.keys(HEROES).map(id => <button type="button" key={id} className={styles.hero} disabled={!isFreeHero(id)&&!collection.snapshot?.heroes?.includes(id)} aria-pressed={hero === id} onClick={() => setHero(id)}><img src={heroPortraitPath(id)} alt=""/><span><strong>{heroName(id)}</strong><small>{heroTitle(id)}</small></span></button>)}</div>
         <div className={styles.power}><RomanIcon name="laurel"/><div><strong>{powerName(hero)} · {HEROES[hero].powerCost} {t('приказа', 'orders')}</strong><p>{powerRules(hero, locale)} {t('Один раз за ход.', 'Once per turn.')}</p></div></div>

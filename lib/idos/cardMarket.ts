@@ -1,4 +1,4 @@
-import type {IDosGamesClient, MarketplaceOfferView, MarketplaceHistoryEntryView, ResourceBundle, ItemDefinitions} from '@idosgames/core';
+import type {IDosGamesClient, MarketplaceOfferView, MarketplaceHistoryEntryView, ResourceBundle, ItemDefinitions, CurrencyDefinitions, MarketplaceGetDefinitionsResponse} from '@idosgames/core';
 import type {IDosRuntime} from './client';
 import {idosResult} from './auth';
 import {COMMERCE_CONFIG,cryptoAffordable} from './commerce';
@@ -66,12 +66,15 @@ export class CardMarketService {
   private begin(pending:Pending){if(!this.storage)throw new Error('Разрешите сохранение статуса сделки в браузере.');if(this.pending())throw new Error('Предыдущая сделка не подтверждена. Обновите рынок и проверьте историю.');this.storage.setItem(this.key(),JSON.stringify(pending));if(!this.pending())throw new Error('Не удалось сохранить статус сделки.');}
   private async withAccount<T>(work:(client:IDosGamesClient)=>Promise<T>):Promise<T>{this.assertIdentity();return this.runtime.withAccount(async client=>{this.assertIdentity();if(client.auth.context?.userID!==this.identity.userId)throw new Error('Аккаунт iDos изменился.');const r=await work(client);this.assertIdentity();return r;});}
   private async capability(client:IDosGamesClient):Promise<{ready:boolean;reason?:string;tradeFeePercent:number}> {
-    const currency=idosResult(await client.title.getCurrencyDefinitions());validateImpToken(currency);
+    const [currency,config,defs]=await Promise.all([client.title.getCurrencyDefinitions(),client.marketplace.getDefinitions(),client.title.getItemDefinitions()]);
+    return this.validateCapability(idosResult(currency),idosResult(config),idosResult(defs));
+  }
+  private validateCapability(currency:CurrencyDefinitions,config:MarketplaceGetDefinitionsResponse,defs:ItemDefinitions):{ready:boolean;reason?:string;tradeFeePercent:number} {
+    validateImpToken(currency);
     const fee=Number(currency.CryptoCurrencies?.Main?.PlayerTradeFeePercent??0);
     if(!Number.isFinite(fee)||fee<0||fee>50)throw new Error('Некорректная комиссия рынка iDos.');
-    const config=idosResult(await client.marketplace.getDefinitions());
     if(!config.Definitions?.Enabled||!config.Definitions.Listings?.Enabled||config.IsOpenNow===false||config.GatePassed===false)return {ready:false,reason:'Рынок карт ещё не включён на iDos.',tradeFeePercent:fee};
-    const defs=idosResult(await client.title.getItemDefinitions());validateCardItemDefinitions(defs);
+    validateCardItemDefinitions(defs);
     const policy=config.Definitions.PricePolicy,allowed=policy?.Allowed,commission=config.Definitions.Commission,tradability=config.Definitions.Tradability;
     const zero=(value:unknown)=>value==null||value===0;
     if(!zero(commission?.Percent)||!zero(commission?.MinPerPosition)||Object.values(commission?.PerCatalogOverrides??{}).some(row=>!zero(row.Percent)||!zero(row.MinPerPosition))||fee!==0)
@@ -82,14 +85,22 @@ export class CardMarketService {
     return {ready:true,tradeFeePercent:fee};
   }
   async load():Promise<CardMarketSnapshot>{return this.withAccount(async client=>{
-    const gate=await this.capability(client),inventory=idosResult(await client.user.getUserInventory());
+    // Independent reads share one round trip window. Never reuse this snapshot
+    // to authorize a later payment: mutate() still checks fresh definitions.
+    const [currencyResponse,configResponse,itemResponse,inventoryResponse]=await Promise.all([
+      client.title.getCurrencyDefinitions(),client.marketplace.getDefinitions(),client.title.getItemDefinitions(),client.user.getUserInventory(),
+    ]);
+    const config=idosResult(configResponse),itemDefinitions=idosResult(itemResponse),inventory=idosResult(inventoryResponse);
+    const gate=this.validateCapability(idosResult(currencyResponse),config,itemDefinitions);
     const balance=client.data.user.getCryptoCurrencyAmount('Main');if(!/^\d+(?:\.\d{1,6})?$/.test(balance))throw new Error('iDos вернул некорректный баланс IMP.');
-    let owned:Record<string,number>={};const itemDefinitions:ItemDefinitions=idosResult(await client.title.getItemDefinitions());if(itemDefinitions.Catalogs?.[CARD_ITEM_CATALOG_ID]){validateCardItemDefinitions(itemDefinitions);owned=cardItemCounts(inventory);}
+    let owned:Record<string,number>={};if(itemDefinitions.Catalogs?.[CARD_ITEM_CATALOG_ID]){validateCardItemDefinitions(itemDefinitions);owned=cardItemCounts(inventory);}
     const empty:CardMarketSnapshot={...gate,balance,inventory:owned,groups:[],myOffers:[],history:[],stats:{},pending:!!this.pending(),tradeFeePercent:gate.tradeFeePercent};
     // Read views remain available even when local money operations are disabled.
-    const config=idosResult(await client.marketplace.getDefinitions());if(!config.Definitions?.Enabled)return empty;
-    const groups=idosResult(await client.marketplace.getGroupedOffers());const my=idosResult(await client.marketplace.getMyState(undefined,{forceRefresh:true}));
-    const historyResponse=idosResult(await client.marketplace.getHistory(undefined,100,'Deals'));
+    if(!config.Definitions?.Enabled)return empty;
+    const [groupsResponse,myResponse,tradesResponse]=await Promise.all([
+      client.marketplace.getGroupedOffers(),client.marketplace.getMyState(undefined,{forceRefresh:true}),client.marketplace.getHistory(undefined,100,'Deals'),
+    ]);
+    const groups=idosResult(groupsResponse),my=idosResult(myResponse),historyResponse=idosResult(tradesResponse);
     const history=(historyResponse.Entries??[]).map(cardMarketTrade).filter((x):x is CardMarketTrade=>!!x);
     const own=Array.from(new Map([...(my.MyOffers??[]),...(my.Claimables??[])].map(row=>[row.OfferID,row])).values());
     return {...empty,groups:(groups.Groups??[]).filter(x=>x.GoodsCatalogID===CARD_ITEM_CATALOG_ID&&x.GoodsItemID&&Object.hasOwn(CARDS,x.GoodsItemID)).map(x=>x.GoodsItemID!),myOffers:own.map(cardMarketListing).filter((x):x is CardMarketListing=>!!x&&x.sellerUserId===this.identity.userId),history,stats:cardMarketStats(history)};

@@ -8,10 +8,10 @@ import styles from '../../components/CardMarketPanel.module.css';
 
 export default function MarketPage() {
   const {t} = useLocale();
-  return <div className={shell.shell}>
+  return <div className={`${shell.shell} ${styles.marketShell}`}>
     <SiteHeader active="market"/>
     <main className={`${shell.hubMain} ${styles.main}`}>
-      <header className={shell.pageTitle}><span className={shell.kicker}>AGORA · CARD EXCHANGE</span><h1>{t('Рынок карт', 'Card market')}</h1><p>{t('Собирайте колоду. Находите редкости. Торгуйте с игроками за IMP.', 'Build a deck. Discover rare cards. Trade with players for IMP.')}</p></header>
+      <header className={`${shell.pageTitle} ${styles.pageHeading}`}><span className={shell.kicker}>AGORA</span><h1>{t('Рынок карт', 'Card market')}</h1><p>{t('Покупайте и продавайте карты за IMP.', 'Buy and sell cards with IMP.')}</p></header>
       <CardMarketPanel/>
     </main>
     <SiteFooter/>

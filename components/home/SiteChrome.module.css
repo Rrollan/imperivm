@@ -1,0 +1,4 @@
+.accountAvatar {flex: 0 0 30px; width: 30px; height: 30px; object-fit: cover; border: 1px solid #bd9659; border-radius: 50%; background: #302017;}
+.accountName {display: block; min-width: 0; max-width: 136px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+@media (max-width: 600px) {.accountName {max-width: 200px;}}
+@media (min-width: 700px) and (max-height: 550px) {.accountName {max-width: 95px;}}

@@ -97,6 +97,11 @@ async function main() {
       (tx:Transaction)=>{tx.instructions[1]=ComputeBudgetProgram.setComputeUnitPrice({microLamports:10001});},
       (tx:Transaction)=>{tx.instructions[1]=ComputeBudgetProgram.setComputeUnitPrice({microLamports:2440000});tx.instructions.push(guard());assert.equal(tx.instructions[2].data.readBigUInt64LE(8),BigInt('100000000'));},
       (tx:Transaction)=>{tx.instructions.push(guard());},
+      (tx:Transaction)=>{tx.instructions.push(guard(tx.instructions[2].programId));}, // read-only program assertion is allowed
+      (tx:Transaction)=>{tx.instructions.unshift(guard());},
+      (tx:Transaction)=>{tx.instructions.splice(1,0,guard());},
+      (tx:Transaction)=>{tx.instructions.splice(2,0,guard());},
+      (tx:Transaction)=>{tx.instructions=[tx.instructions[2],guard(),tx.instructions[0],tx.instructions[1]];},
     ]) {const before:number=broadcasts;modify=change;await deposit('100');assert.equal(broadcasts,before+1);assert(log.read()?.hash);log.clear();}
     const beforeRejected=broadcasts;
     const forbidden: ((tx:Transaction)=>void)[] = [
@@ -130,7 +135,8 @@ async function main() {
       tx=>{const extra=guard();extra.programId=Keypair.generate().publicKey;tx.instructions.push(extra);},
       tx=>{const extra=guard();extra.keys.push({pubkey:signer.publicKey,isSigner:false,isWritable:false});tx.instructions.push(extra);},
       tx=>{const extra=guard(tx.instructions[2].keys[2].pubkey);extra.keys[0].isWritable=true;tx.instructions.push(extra);}, // elevates mint privilege
-      tx=>{tx.instructions.unshift(guard());}, // assertions may only follow the original operation
+      tx=>{const extra=guard(tx.instructions[2].programId);extra.keys[0].isWritable=true;tx.instructions.push(extra);}, // executable pool program privilege
+      tx=>{const extra=guard(ComputeBudgetProgram.programId);extra.keys[0].isWritable=true;tx.instructions.unshift(extra);}, // original budget program privilege
       tx=>{tx.instructions.push(...Array.from({length:17},()=>guard()));},
       tx=>{tx.instructions[1]=ComputeBudgetProgram.setComputeUnitPrice({microLamports:3333334});}, // ceil > 0.001 SOL
     ];
@@ -144,15 +150,22 @@ async function main() {
     const invalidSignature=Transaction.from(originalTx.serialize({requireAllSignatures:false,verifySignatures:false}));invalidSignature.sign(signer);invalidSignature.signatures[0].signature=Buffer.alloc(64,1);assert.throws(()=>assertSignedImpTransfer(originalTx,invalidSignature,'deposit'),/signature/);
     const changedPayer=Keypair.generate(), payerTx=Transaction.from(originalTx.serialize({requireAllSignatures:false,verifySignatures:false}));payerTx.feePayer=changedPayer.publicKey;payerTx.sign(changedPayer,signer);assert.throws(()=>assertSignedImpTransfer(originalTx,Transaction.from(payerTx.serialize()),'deposit'),/signers/);
     const immutableGuard=Transaction.from(originalTx.serialize({requireAllSignatures:false,verifySignatures:false}));immutableGuard.instructions.push(guard());immutableGuard.sign(signer);assert.doesNotThrow(()=>assertSignedImpTransfer(originalTx,Transaction.from(immutableGuard.serialize()),'immutable'));
+    for(const position of [0,1,2]) {const guardedVoucher=Transaction.from(originalTx.serialize({requireAllSignatures:false,verifySignatures:false}));guardedVoucher.instructions.splice(position,0,guard());guardedVoucher.sign(signer);assert.throws(()=>assertSignedImpTransfer(originalTx,Transaction.from(guardedVoucher.serialize()),'immutable'),/guard-order|voucher-instructions/);}
     const immutableReordered=Transaction.from(originalTx.serialize({requireAllSignatures:false,verifySignatures:false}));immutableReordered.instructions=[immutableReordered.instructions[2],immutableReordered.instructions[0],immutableReordered.instructions[1]];immutableReordered.sign(signer);assert.throws(()=>assertSignedImpTransfer(originalTx,Transaction.from(immutableReordered.serialize()),'immutable'),/voucher-instructions/);
     // Legacy transactions without an explicit budget still support bounded Phantom enhancements.
     const legacy = () => Transaction.from(new Transaction({feePayer:signer.publicKey,recentBlockhash:Keypair.generate().publicKey.toBase58()}).add(SystemProgram.transfer({fromPubkey:signer.publicKey,toPubkey:Keypair.generate().publicKey,lamports:1})).serialize({requireAllSignatures:false,verifySignatures:false}));
     for (const position of ['prepend','append'] as const) {const expected=legacy();const enhanced=Transaction.from(expected.serialize({requireAllSignatures:false,verifySignatures:false}));if(position==='prepend')enhanced.instructions.unshift(...budget());else enhanced.instructions.push(...budget());enhanced.sign(signer);assert.doesNotThrow(()=>assertSignedImpTransfer(expected,Transaction.from(enhanced.serialize())));}
     const expected=legacy(), expensive=Transaction.from(expected.serialize({requireAllSignatures:false,verifySignatures:false}));expensive.instructions.unshift(ComputeBudgetProgram.setComputeUnitLimit({units:300000}),ComputeBudgetProgram.setComputeUnitPrice({microLamports:3333334}));expensive.sign(signer);assert.throws(()=>assertSignedImpTransfer(expected,Transaction.from(expensive.serialize())),/Комиссия приоритета/);
+    // Assertions never permit reordering, changing or adding financial instructions.
+    const twoPayments=new Transaction({feePayer:signer.publicKey,recentBlockhash:Keypair.generate().publicKey.toBase58()}).add(SystemProgram.transfer({fromPubkey:signer.publicKey,toPubkey:Keypair.generate().publicKey,lamports:1}),SystemProgram.transfer({fromPubkey:signer.publicKey,toPubkey:Keypair.generate().publicKey,lamports:2}));
+    const twoExpected=Transaction.from(twoPayments.serialize({requireAllSignatures:false,verifySignatures:false}));
+    const between=Transaction.from(twoPayments.serialize({requireAllSignatures:false,verifySignatures:false}));between.instructions.splice(1,0,guard());between.sign(signer);assert.doesNotThrow(()=>assertSignedImpTransfer(twoExpected,Transaction.from(between.serialize()),'deposit'));
+    const reordered=Transaction.from(twoPayments.serialize({requireAllSignatures:false,verifySignatures:false}));reordered.instructions=[guard(),reordered.instructions[1],reordered.instructions[0]];reordered.sign(signer);assert.throws(()=>assertSignedImpTransfer(twoExpected,Transaction.from(reordered.serialize()),'deposit'),/payment-0/);
+    const changedWithGuard=Transaction.from(twoPayments.serialize({requireAllSignatures:false,verifySignatures:false}));changedWithGuard.instructions[0].data=Buffer.from(changedWithGuard.instructions[0].data);changedWithGuard.instructions[0].data.writeBigUInt64LE(BigInt(3),4);changedWithGuard.instructions.unshift(guard());changedWithGuard.sign(signer);assert.throws(()=>assertSignedImpTransfer(twoExpected,Transaction.from(changedWithGuard.serialize()),'deposit'),/payment-0/);
     // Losing a send response must retain the exact signed receipt; never send a fresh transaction automatically.
     modify=()=>{};Connection.prototype.sendRawTransaction=async bytes=>{broadcasts++;const signed=Transaction.from(bytes);assert(signed.signature);assert.equal(log.read()?.hash,signatureBase58(signed.signature));throw Error('RPC response lost');};
     await assert.rejects(deposit(),/RPC response lost/);assert.equal(broadcasts,beforeRejected+1);assert(log.read()?.hash);assert.equal(log.read()?.lastValidBlockHeight,99);log.clear();
   } finally {disconnect();Object.assign(Connection.prototype,original);}
-  console.log('IMP transfer checks passed: exact six decimals, durable receipts and phases, single credit/debit, explicit deposit budget, bounded legacy Phantom fees, 12 rejected financial/fee mutations, 16 rejected enhancement mutations, bounded deposit budget rewrites plus suffix assertions, and protected withdrawal vouchers. No external transactions.');
+  console.log('IMP transfer checks passed: exact six decimals, durable receipts and phases, single credit/debit, explicit deposit budget, bounded legacy Phantom fees, rejected financial/fee/privilege mutations, pure deposit assertions before/between/after instructions, exact financial ordering, and protected withdrawal vouchers. No external transactions.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

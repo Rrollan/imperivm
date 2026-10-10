@@ -9,13 +9,17 @@ import { useLocale } from '../LocaleContext';
 import {PaintedIcon} from '../PaintedIcon';
 import {ImperivmLogo} from '../ImperivmLogo';
 import {RomanIcon} from '../presentation/RomanIcon';
+import {heroPortraitPath} from '../presentation/heroPortrait';
+import chrome from './SiteChrome.module.css';
 import styles from './Home.module.css';
 
 export function SiteHeader({ active = 'home' }: { active?: 'home' | 'library' | 'packs' | 'collection' | 'play' | 'market' }) {
   const { t, locale, setLocale } = useLocale();
   const wallet = useImperivmWallet(), idos = useIDos();
   const [accountOpen, setAccountOpen] = useState(false);
-  const owner = idos.session.owner ?? wallet.owner;
+  const owner = idos.embedded ? idos.session.owner ?? wallet.owner : wallet.owner;
+  const profile = idos.profile;
+  const accountLabel = profile?.nickname || (owner ? `${owner.slice(0, 4)}…${owner.slice(-4)}` : t('Аккаунт', 'Account'));
   return <><header className={styles.header}>
     <Link href="/" className={styles.wordmark} aria-label={t('IMPERIVM — главная', 'IMPERIVM — home')}><ImperivmLogo/></Link>
     <nav className={styles.navigation} aria-label={t('Основная навигация', 'Main navigation')}>
@@ -25,7 +29,7 @@ export function SiteHeader({ active = 'home' }: { active?: 'home' | 'library' | 
       <Link href="/packs" aria-current={active === 'packs' ? 'page' : undefined}><PaintedIcon name="pack" size={36}/><span>{t('Паки', 'Packs')}</span></Link>
       <Link href="/market" aria-current={active === 'market' ? 'page' : undefined}><PaintedIcon name="rug" size={36}/><span>{t('Рынок', 'Market')}</span></Link>
       <Link href="/arena" className={styles.navPlay} aria-current={active === 'play' ? 'page' : undefined}><PaintedIcon name="play" size={36}/><span>{t('Играть', 'Play')}</span></Link>
-      <button type="button" className={styles.accountButton} onClick={() => setAccountOpen(true)} aria-label={t('Открыть аккаунт и кошелёк', 'Open account and wallet')}><PaintedIcon name="wallet" size={30}/>{owner ? `${owner.slice(0, 4)}…${owner.slice(-4)}` : t('Аккаунт', 'Account')}</button>
+      <button type="button" className={styles.accountButton} onClick={() => setAccountOpen(true)} title={profile?.nickname || owner || undefined} aria-label={t(`Открыть аккаунт: ${accountLabel}`, `Open account: ${accountLabel}`)}>{profile ? <img className={chrome.accountAvatar} src={profile.avatar.kind === 'image' ? profile.avatar.dataURL : heroPortraitPath(profile.avatar.id)} alt="" width={30} height={30}/> : <PaintedIcon name="wallet" size={30}/>}<span className={chrome.accountName}>{accountLabel}</span></button>
       <button type="button" onClick={() => setLocale(locale === 'ru' ? 'en' : 'ru')} aria-label={t('Переключить язык на английский', 'Switch language to Russian')} className={styles.language}>{locale.toUpperCase()} <span aria-hidden="true">/ {locale === 'ru' ? 'EN' : 'RU'}</span></button>
     </nav>
   </header>{accountOpen && <AccountPanel onClose={() => setAccountOpen(false)}/>}</>;

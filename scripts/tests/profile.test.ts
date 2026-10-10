@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import type {OperationResult, SetUserCustomDataResponse} from '@idosgames/core';
 import {DEFAULT_PROFILE_AVATAR, PROFILE_AVATAR_KEY, PROFILE_AVATAR_MAX_BYTES, WalletProfileService, normalizeNickname, readProfileAvatar, validateProfileAvatar, type ProfileAvatar, type ProfileIdentity} from '../../lib/idos/profile';
+import {WalletProfileStore, type WalletProfileScope} from '../../lib/idos/profileState';
 
 async function main() {
   assert.equal(normalizeNickname('  Марк   Аврелий  '), 'Марк Аврелий');
@@ -64,6 +65,33 @@ async function main() {
   await assert.rejects(service.load(), /PROFILE_ACCOUNT_CHANGED/);
   assert.equal(reads, readBoundary + 1, 'Identity switches stop before the next SDK read');
   current = null; await assert.rejects(service.load(), /PROFILE_ACCOUNT_CHANGED/);
-  console.log('wallet profile: server persistence, owner switches, nickname validation and bounded raster avatars PASS');
+  const aliceScope: WalletProfileScope = {...alice, revision: 1}, bobScope: WalletProfileScope = {...bob, revision: 2};
+  const aliceProfile = {...alice, nickname: 'Alice Caesar', avatar: photo};
+  const bobProfile = {...bob, nickname: 'Bob', avatar: DEFAULT_PROFILE_AVATAR};
+  const store = new WalletProfileStore();
+  store.activate(aliceScope);
+  await store.load(aliceScope, async () => aliceProfile);
+  assert.equal(store.getSnapshot().profile?.nickname, 'Alice Caesar');
+  let finishStale!: (value: typeof aliceProfile) => void;
+  const staleRead = store.load(aliceScope, () => new Promise(resolve => {finishStale = resolve;}));
+  assert.equal(store.confirm(aliceScope, {...aliceProfile, nickname: 'New confirmed nickname'}), true);
+  finishStale(aliceProfile); await staleRead;
+  assert.equal(store.getSnapshot().profile?.nickname, 'New confirmed nickname', 'Header/lobby keep the confirmed save even if an older read finishes later');
+  assert.equal(store.confirm(aliceScope, {...aliceProfile, avatar: {version: 1, kind: 'portrait', id: 'poseidon'}}), true);
+  assert.deepEqual(store.getSnapshot().profile?.avatar, {version: 1, kind: 'portrait', id: 'poseidon'}, 'Avatar saves publish the same shared profile immediately');
+  const oldWalletRead = store.load(aliceScope, () => new Promise(resolve => {finishStale = resolve;}));
+  store.activate(bobScope);
+  assert.equal(store.getSnapshot().profile, null, 'Switching a wallet removes its nickname and avatar immediately');
+  await store.load(bobScope, async () => bobProfile);
+  finishStale(aliceProfile); await oldWalletRead;
+  assert.deepEqual(store.getSnapshot().profile, bobProfile);
+  assert.equal(store.confirm(aliceScope, aliceProfile), false, 'An old editor cannot publish another wallet profile');
+  store.activate(null);
+  assert.equal(store.getSnapshot().profile, null);
+  const aliceNewLogin = {...aliceScope, revision: 3}; store.activate(aliceNewLogin);
+  assert.equal(store.confirm(aliceScope, aliceProfile), false, 'A new login is isolated even when wallet and user ID are unchanged');
+  await store.load(aliceNewLogin, async () => bobProfile);
+  assert.equal(store.getSnapshot().profile, null); assert.equal(store.getSnapshot().error, 'PROFILE_ACCOUNT_CHANGED');
+  console.log('wallet profile: shared header/lobby state, confirmed edits, persistence, owner switches and bounded raster avatars PASS');
 }
 void main().catch(error => {console.error(error); process.exitCode = 1;});

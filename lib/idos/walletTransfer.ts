@@ -106,6 +106,16 @@ export function assertSignedImpTransfer(expected: Transaction, signed: Transacti
   if (!signed.feePayer?.equals(expected.feePayer!) ||
     signed.signatures.length !== expected.signatures.length || signed.signatures.some((item, index) => !item.publicKey.equals(expected.signatures[index].publicKey)) ||
     expected.signatures.some(item => item.signature)) refused('signers');
+  // Instruction keys omit executable program accounts. Compare the compiled
+  // privileges of EVERY original account, including programs, before allowing
+  // any wallet-added assertion to reference one of them.
+  const originalMessage = expected.compileMessage(), signedMessage = signed.compileMessage();
+  const signedPositions = new Map(signedMessage.accountKeys.map((key, index) => [key.toBase58(), index]));
+  originalMessage.accountKeys.forEach((key, index) => {
+    const position = signedPositions.get(key.toBase58());
+    if (position == null || originalMessage.isAccountSigner(index) !== signedMessage.isAccountSigner(position) ||
+      originalMessage.isAccountWritable(index) !== signedMessage.isAccountWritable(position)) refused('account-privileges');
+  });
   const originalBudget = expected.instructions.filter(ix => ix.programId.toBase58() === computeBudgetProgram);
   const added = signed.instructions.filter(ix => ix.programId.toBase58() === computeBudgetProgram);
   const guards = signed.instructions.filter(ix => ix.programId.toBase58() === lighthouseProgram);
@@ -119,8 +129,8 @@ export function assertSignedImpTransfer(expected: Transaction, signed: Transacti
   });
   // Guards may only inspect accounts already involved in the original operation.
   // Single-target assertions 2/3/5..14/17 and zero-account clock assertion 15
-  // are read-only; delta, memory, compression/CPI instructions are excluded.
-  const accounts = new Set(expected.compileMessage().accountKeys.map(key => key.toBase58()));
+  // are read-only; delta, memory, compression and state-changing CPI are excluded.
+  const accounts = new Set(originalMessage.accountKeys.map(key => key.toBase58()));
   if (guards.length > 16) refused('guard-count');
   let guardSeen = false;
   for (const ix of signed.instructions) {
@@ -129,8 +139,12 @@ export function assertSignedImpTransfer(expected: Transaction, signed: Transacti
       const kind = ix.data[0], count = kind === 15 ? 0 : 1;
       // Borsh stores the LogLevel variant ordinal (0..6), not its Rust repr.
       if (![2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17].includes(kind) || ix.data.length < 3 || ix.data.length > 1024 || ix.data[1] > 6 || ix.keys.length !== count || ix.keys.some(key => !accounts.has(key.pubkey.toBase58()))) refused(`guard-${kind ?? 'empty'}`);
-    } else if (guardSeen) refused('guard-order');
+    } else if (guardSeen && policy !== 'deposit') refused('guard-order');
   }
+  // A deposit has no index-sensitive signature voucher. Pure, whitelisted
+  // assertions can run before or between its unchanged instructions: they can
+  // only inspect existing accounts or fail the transaction. Phantom need not
+  // place them last. All other policies retain the original ordered prefix.
   // Withdrawal vouchers include index-sensitive signature instructions. Neither
   // their budget nor the ordered original instruction prefix may be changed.
   if (policy === 'immutable' || policy === 'legacy' && originalBudget.length) {

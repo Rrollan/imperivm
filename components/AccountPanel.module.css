@@ -1,42 +1,55 @@
 .dialog.dialog {
-  width: min(680px, calc(100vw - 28px)); max-width: 680px; max-height: calc(100dvh - 36px);
-  padding: 26px; border: 1px solid #b18b48; border-radius: 20px;
-  color: #eee1c5; background: radial-gradient(ellipse at 0 0, #64503940, transparent 65%), #241a15;
-  box-shadow: 0 28px 100px #0009, inset 0 0 0 4px #281e17, inset 0 0 0 5px #94744945;
+  width: min(580px, calc(100vw - 24px)); max-width: 580px; max-height: calc(100dvh - 28px);
+  padding: 20px; border: 1px solid #b18b48; border-radius: 16px;
+  color: #eee1c5; background: radial-gradient(ellipse at 0 0, #64503930, transparent 65%), #241a15;
+  box-shadow: 0 24px 90px #0009, inset 0 0 0 3px #281e17, inset 0 0 0 4px #94744935;
+  font-family: var(--font-sans), sans-serif;
 }
-.dialog :global(.dialog-heading) {gap: 16px; margin: 0 0 16px; align-items: center;}
-.dialog :global(.dialog-heading h2) {font-size: clamp(24px, 3vw, 30px); line-height: 1.2; margin: 0; color: #ead19b;}
-.identity {display: flex; gap: 12px; align-items: center; padding: 14px 16px; border: 1px solid #ad8b5133; border-radius: 12px; background: #120d0b40;}
-.seal {color: #d3af68; flex-shrink: 0;}
+.dialog :global(.dialog-heading) {gap: 14px; margin: 0 0 14px; align-items: center;}
+.dialog :global(.dialog-heading h2) {font: 700 27px/1.2 var(--font-roman), Georgia, serif; margin: 0; color: #ead19b;}
+.identity {display: flex; gap: 12px; align-items: center; padding: 12px; border-radius: 10px; background: #120d0b50;}
 .identity div {min-width: 0; flex: 1;}
-.identity strong {display: block; font-size: 14px; color: #f2e1bd;}
-.identity p {font-size: 13px; line-height: 1.5; color: #bdb09b; margin: 4px 0 0;}
-.address {display: inline-block; font: 12px ui-monospace, monospace; color: #a9caba; margin-top: 7px; text-decoration: none;}
-.balances {display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0;}
-.balance {min-width: 0; border: 1px solid #9b78484d; border-radius: 14px; padding: 17px 16px; background: linear-gradient(145deg, #45332299, #261d1799);}
-.balance h3 {font-size: 12px; text-transform: uppercase; letter-spacing: .075em; color: #c4b28f; margin: 0 0 10px;}
-.amount {display: flex; align-items: baseline; flex-wrap: wrap; gap: 7px; color: #e8c67c; font-size: 13px;}
-.amount strong {font-size: clamp(19px, 2.1vw, 26px); font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; font-variant-numeric: tabular-nums;}
-.balance p {font-size: 12px; line-height: 1.55; color: #c0b09b; margin: 8px 0 0; min-height: 37px;}
-.actions {display: flex; flex-wrap: wrap; gap: 9px; margin: 16px 0 0;}
-.dialog .button {display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 42px; border: 1px solid #aa884b66; border-radius: 10px; padding: 9px 14px; font: inherit; font-size: 13px; line-height: 1.3; text-decoration: none; color: #e2d4bc; background-image: none !important; background-color: #372a1f; box-shadow: inset 0 1px #fff1; text-shadow: none;}
+.identity strong {display: block; font-size: 16px; color: #f2e1bd;}
+.identity p {font-size: 13px; line-height: 1.5; color: #c8b79c; margin: 4px 0 0;}
+.address {display: inline-block; font: 12px ui-monospace, monospace; color: #a9caba; margin-top: 5px; text-decoration: none;}
+.balances {display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0;}
+.balance {min-width: 0; border: 1px solid #9b78483d; border-radius: 11px; padding: 12px 13px; background: #38291d70;}
+.balanceHeading {display: flex; align-items: center; justify-content: space-between; gap: 6px; min-height: 30px; margin-bottom: 5px;}
+.balance h3 {font-size: 13px; font-weight: 500; color: #d2bd97; margin: 0;}
+.amount {display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px; color: #e8c67c; font-size: 12px;}
+.amount strong {font-size: clamp(20px, 2.1vw, 27px); font-weight: 650; line-height: 1.2; overflow-wrap: anywhere; font-variant-numeric: tabular-nums;}
+.balance p {font-size: 12px; line-height: 1.4; color: #c0b09b; margin: 7px 0 0;}
+.dialog .refresh {display: grid; place-items: center; width: 32px; min-height: 32px; padding: 3px; border: 1px solid #aa884b40; border-radius: 7px; background: #49372255; background-image: none !important; box-shadow: none; text-shadow: none;}
+.dialog .refresh:hover {border-color: #bf995b; background-color: #493722;}
+.dialog .refresh:disabled {opacity: .5; cursor: wait;}
+.actions {display: flex; flex-wrap: wrap; gap: 9px; align-items: center; margin: 12px 0;}
+.dialog .button {display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; border: 1px solid #aa884b66; border-radius: 9px; padding: 9px 14px; font: inherit; font-size: 14px; line-height: 1.3; text-decoration: none; color: #e2d4bc; background-image: none !important; background-color: #372a1f; box-shadow: inset 0 1px #fff1; text-shadow: none;}
 .dialog .primary {background-color: #d1ac60; color: #20150d; border-color: #e5c586; font-weight: 650;}
 .dialog .button:not(:disabled):hover {background-color: #4a3828; border-color: #c09a58;}
 .dialog .primary:not(:disabled):hover {background-color: #e2c17d;}
-.dialog .button:focus-visible, .address:focus-visible {outline: 2px solid #e0bd71; outline-offset: 3px;}
+.dialog :is(button,a,summary):focus-visible {outline: 2px solid #e0bd71; outline-offset: 3px;}
 .dialog .button:disabled {opacity: .5; cursor: wait;}
-.notice {padding: 10px 13px; border-radius: 10px; border: 1px solid #b9694955; color: #ebbaa3; background: #77351a20; font-size: 12px; line-height: 1.5; margin: 12px 0;}
-.note {font-size: 12px; line-height: 1.55; color: #b8a58d; margin: 10px 0 0;}
-.links {display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; padding-top: 16px; border-top: 1px solid #b08d4940;}
-.links a {display: flex; align-items: center; gap: 9px; font-size: 13px; color: #e7d5b2; text-decoration: none;}
+.signInNote {font-size: 12px; color: #c4b18e; margin: 0;}
+.notice {padding: 9px 11px; border-radius: 9px; border: 1px solid #b9694955; color: #ebbaa3; background: #77351a20; font-size: 13px; line-height: 1.5; margin: 10px 0; overflow-wrap: anywhere;}
+.note {font-size: 12px; line-height: 1.55; color: #c9b697; margin: 10px 0;}
+.funding {border-block: 1px solid #b08d4935; margin: 12px 0;}
+.funding > summary {display: flex; align-items: center; gap: 8px; min-height: 44px; cursor: pointer; color: #edd3a0; font-size: 13px; list-style: none;}
+.funding > summary::-webkit-details-marker {display: none;}
+.funding > summary::after {content: ''; width: 7px; height: 7px; border-right: 1.5px solid #d5b076; border-bottom: 1.5px solid #d5b076; transform: rotate(45deg); margin-left: auto; margin-right: 3px; flex-shrink: 0;}
+.funding[open] > summary::after {transform: rotate(225deg);}
+.funding[open] {padding-bottom: 12px;}
+.links {display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;}
+.links a {display: flex; align-items: center; gap: 7px; min-height: 40px; font-size: 13px; color: #e7d5b2; text-decoration: none;}
 .links a:hover {color: #f9df94;}
-.quiet {display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #b08d4926;}
-.dialog .textButton {background-image: none !important; background: transparent; border: 0; border-radius: 4px; box-shadow: none; padding: 3px 0; font: inherit; font-size: 12px; color: #b6a58d; text-decoration: underline; text-underline-offset: 4px;}
+.quiet {display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #b08d4926;}
+.dialog .textButton {min-height: 36px; background-image: none !important; background: transparent; border: 0; border-radius: 4px; box-shadow: none; padding: 4px 0; font: inherit; font-size: 12px; color: #c0ae91; text-decoration: underline; text-underline-offset: 4px;}
 @media (max-width: 520px) {
-  .dialog.dialog {padding: 20px 16px; border-radius: 16px;}
-  .balances {grid-template-columns: 1fr; gap: 9px;}
-  .balance {padding: 13px 14px;}
-  .balance p {min-height: 0;}
-  .links {grid-template-columns: 1fr; gap: 13px;}
+  .dialog.dialog {padding: 16px 13px; border-radius: 14px;}
+  .dialog :global(.dialog-heading h2) {font-size: 25px;}
+  .balances {gap: 8px;}
+  .balance {padding: 10px;}
+  .amount strong {font-size: 20px;}
   .actions .button {flex: 1 1 auto;}
+  .signInNote {width: 100%;}
 }
+@media (max-width: 340px) {.balances {grid-template-columns: 1fr;}}

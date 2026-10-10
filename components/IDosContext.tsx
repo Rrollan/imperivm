@@ -1,10 +1,12 @@
 'use client';
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { IDOS_CONFIG } from '../lib/collection/gateway';
 import type { IDosRuntime, IDosSession } from '../lib/idos/client';
 import { useImperivmWallet } from './WalletContext';
+import type {ProfileIdentity, WalletProfile} from '../lib/idos/profile';
+import {WalletProfileStore, type WalletProfileScope} from '../lib/idos/profileState';
 
-type IDosState = { runtime: IDosRuntime | null; session: IDosSession; embedded: boolean; configured: boolean; busy: boolean; login: () => Promise<void>; logout: () => Promise<void>; retry: () => Promise<void> };
+type IDosState = { runtime: IDosRuntime | null; session: IDosSession; embedded: boolean; configured: boolean; busy: boolean; login: () => Promise<void>; logout: () => Promise<void>; retry: () => Promise<void>; profile: WalletProfile | null; profileIdentity: ProfileIdentity | null; profileLoading: boolean; profileError: string | null; refreshProfile: () => Promise<void>; confirmProfile: (profile: WalletProfile) => void };
 const Context = createContext<IDosState | null>(null);
 export function useIDos() { const value = useContext(Context); if (!value) throw new Error('IDosContext is missing'); return value; }
 export default function IDosContext({ children }: { children: React.ReactNode }) {
@@ -13,6 +15,29 @@ export default function IDosContext({ children }: { children: React.ReactNode })
   const [session, setSession] = useState<IDosSession>({ status: IDOS_CONFIG.title ? 'connecting' : 'demo', owner: null, userId: null, error: null, revision: 0 });
   const [embedded, setEmbedded] = useState(false), [busy, setBusy] = useState(false);
   const lock = useRef(false), currentWallet = useRef(wallet); currentWallet.current = wallet;
+  const [profileStore] = useState(() => new WalletProfileStore());
+  const profileState = useSyncExternalStore(profileStore.subscribe, profileStore.getSnapshot, profileStore.getServerSnapshot);
+  const profileScope: WalletProfileScope | null = session.status === 'wallet' && session.owner && session.userId && (embedded || session.owner === wallet.owner)
+    ? {owner: session.owner, userId: session.userId, revision: session.revision} : null;
+  const profileKey = profileScope ? JSON.stringify([profileScope.owner, profileScope.userId, profileScope.revision]) : '';
+  const currentProfileKey = useRef(profileKey); currentProfileKey.current = profileKey;
+  const refreshProfile = useCallback(async () => {
+    if (!runtime || !profileScope || currentProfileKey.current !== profileKey) return;
+    await profileStore.load(profileScope, identity => runtime.profile(identity));
+  // The key includes owner, account and login revision; old callbacks cannot reactivate an old identity.
+  }, [runtime, profileStore, profileKey]);
+  const confirmProfile = useCallback((profile: WalletProfile) => {
+    if (profileScope && currentProfileKey.current === profileKey) profileStore.confirm(profileScope, profile);
+  }, [profileStore, profileKey]);
+  useEffect(() => {
+    profileStore.activate(profileScope);
+    if (profileScope) void refreshProfile();
+  }, [profileStore, profileKey, refreshProfile]);
+  useEffect(() => {
+    const changed = () => {void refreshProfile();};
+    window.addEventListener('imperivm:profile-changed', changed);
+    return () => window.removeEventListener('imperivm:profile-changed', changed);
+  }, [refreshProfile]);
   useEffect(() => {
     if (!IDOS_CONFIG.title) return;
     let cancelled = false, off = () => {}, platformOff = () => {};
@@ -55,5 +80,8 @@ export default function IDosContext({ children }: { children: React.ReactNode })
     finally { lock.current = false; setBusy(false); }
   }
   async function retry() { if (runtime) try { await runtime.guest(); } catch {} }
-  return <Context.Provider value={{ runtime, session, embedded, configured: !!IDOS_CONFIG.title, busy: busy || session.status === 'connecting', login, logout, retry }}>{children}</Context.Provider>;
+  const matchingProfile = profileStore.matches(profileScope);
+  return <Context.Provider value={{ runtime, session, embedded, configured: !!IDOS_CONFIG.title, busy: busy || session.status === 'connecting', login, logout, retry,
+    profile: matchingProfile ? profileState.profile : null, profileIdentity: profileScope,
+    profileLoading: !!profileScope && (!matchingProfile || profileState.loading), profileError: matchingProfile ? profileState.error : null, refreshProfile, confirmProfile }}>{children}</Context.Provider>;
 }

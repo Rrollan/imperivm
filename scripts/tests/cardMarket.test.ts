@@ -64,6 +64,23 @@ const client={auth:{context:{get userID(){return user;}}},title:{getCurrencyDefi
 const runtime={getSnapshot:()=>({status:'wallet',userId:user,owner:wallet}),withAccount:async<T>(work:(c:IDosGamesClient)=>Promise<T>)=>work(client)} as unknown as IDosRuntime;
 const service=()=>new CardMarketService(runtime,storage,true);
 async function main(){
+ // Simulate slow independent reads: both waves must start together, with no
+ // repeated definitions fetch. Later mutations still validate fresh settings.
+ const firstKeys=['currency','definitions','items','inventory'],secondKeys=['groups','mine','history'];
+ const started:string[]=[],counts=new Map<string,number>();
+ let releaseFirst!:()=>void,releaseSecond!:()=>void;
+ const firstBarrier=new Promise<void>(resolve=>{releaseFirst=resolve;}),secondBarrier=new Promise<void>(resolve=>{releaseSecond=resolve;});
+ const reads=[
+  [client.title,'getCurrencyDefinitions','currency'],[client.marketplace,'getDefinitions','definitions'],[client.title,'getItemDefinitions','items'],[client.user,'getUserInventory','inventory'],
+  [client.marketplace,'getGroupedOffers','groups'],[client.marketplace,'getMyState','mine'],[client.marketplace,'getHistory','history'],
+ ] as const;
+ const restore:(()=>void)[]=[];
+ for(const [target,key,name] of reads){const object=target as unknown as Record<string,(...args:unknown[])=>Promise<unknown>>,original=object[key];object[key]=async(...args)=>{started.push(name);counts.set(name,(counts.get(name)??0)+1);await(firstKeys.includes(name)?firstBarrier:secondBarrier);return original(...args);};restore.push(()=>{object[key]=original;});}
+ try {
+  const loading=service().load();await new Promise(resolve=>setImmediate(resolve));assert.deepEqual(started,firstKeys,'Settings and inventory start without waiting on one another');
+  releaseFirst();await new Promise(resolve=>setImmediate(resolve));assert.deepEqual(started.slice(4),secondKeys,'Offers, own state and history start together');
+  releaseSecond();assert.equal((await loading).ready,true);assert(Array.from(counts.values()).every(count=>count===1),'Each endpoint is read once');
+ }finally{releaseFirst();releaseSecond();restore.forEach(work=>work());}
  assert.equal((await service().load()).ready,true);
  await assert.rejects(service().create(freeId,1,'50'),/продаваемых/);assert.equal(creates,0);
  owned={[id]:3};assert.equal((await service().create(id,1,'50')).quantity,1);assert.equal(creates,1);assert.equal(values.size,0);
