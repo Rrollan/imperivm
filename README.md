@@ -29,7 +29,9 @@ A Hearthstone-style card battler set in imperial Rome — on Solana. Read the me
 
 [Play](https://imperivm.onrender.com/arena) · [Build a deck](https://imperivm.onrender.com/collection) · [Open demo packs](https://imperivm.onrender.com/packs)
 
-[Current iDos test build (v18)](https://si4ips8b.idos.games/v/bld5ecfcd1495c9481b8719f4f9a55fef4a/index.html#/arena) — AI training, private duels, random matchmaking, explicit wallet transfers and SOL → IMP purchase through Jupiter. Staged; live swaps/transfers need owner verification and catalog release is pending.
+[Current iDos test build (v20)](https://si4ips8b.idos.games/v/bld8a63c4dd13ef4279a5f3d1b41b394d84/index.html#/market) — wallet profiles, native card listings and verified sale prices stored in Supabase, plus AI training, private duels, random matchmaking, wallet transfers and SOL → IMP purchase through Jupiter. Staged; pack purchases and trading remain disabled until the owner verifies a real deposit and settlement. [Release checks](docs/idos/card-marketplace-readiness-20261010.md).
+
+Prepared v21 simplifies market/account UI, synchronizes nickname/avatar across views, prioritizes a new purchase over past receipts, parallelizes market reads, and accepts pure Phantom deposit guards in any position while preserving financial instructions. Local builds and 19 integration groups pass; the first iDos upload failed its storage quota. Owner deposit verification is still required.
 
 ---
 
@@ -164,7 +166,7 @@ readme/             Screenshots & GIFs for this README
 | **Local game** | ✅ Full AI matches, 9 rulers, 99 cards, demo packs, owned deck builder |
 | **Solana** | ✅ Mainnet SPL IMP mint and exact wallet balance read verified; owner login test pending |
 | **NFTs** | 🧪 Metaplex Core devnet badge code; mint unverified and match-proof flow disabled by default |
-| **iDos** | 🧪 Title SI4IPS8B configured; v18 staged and purchase/deposit UI tested on the iDos domain, catalog release pending |
+| **iDos** | 🧪 Title SI4IPS8B configured; v20 staged with native card market and wallet profiles; Supabase connected to Render; owner deposit/settlement verification pending |
 | **PvP** | ✅ Authoritative free private duels and random matchmaking tested on iDos; wager mode not implemented |
 | **Mainnet checkout** | 🧪 iDos Main decimals corrected to 6; purchases remain disabled until an owner payment test |
 
