@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {Connection, Keypair, Transaction, PublicKey} from '@solana/web3.js';
+import {ComputeBudgetProgram, Connection, Keypair, SystemProgram, Transaction, TransactionInstruction, PublicKey} from '@solana/web3.js';
 import type {IDosGamesClient, SolanaWithdrawalSignature} from '@idosgames/core';
 import {IMPERIVM_TITLE} from '../../lib/idos/title';
 import {createImpTransferAdapter, ImpTransferService, parseImpTransferAmount, signatureBase58, TransferJournal, type TransferAdapterFactory, type TransferReceipt} from '../../lib/idos/walletTransfer';
@@ -72,16 +72,44 @@ async function main() {
   // Exercise the real Wallet Standard wrapper: a receipt must be durable before any RPC send.
   const {getWallets}=await import('@wallet-standard/app');const registry=getWallets();const original={getAccountInfo:Connection.prototype.getAccountInfo,getLatestBlockhash:Connection.prototype.getLatestBlockhash,sendRawTransaction:Connection.prototype.sendRawTransaction,getSignatureStatuses:Connection.prototype.getSignatureStatuses};
   const account={address:owner,publicKey:signer.publicKey.toBytes(),chains:['solana:mainnet'],features:['solana:signTransaction']};
-  const disconnect=registry.register({version:'1.0.0',name:'Phantom',icon:'data:image/png;base64,AA==',chains:['solana:mainnet'],accounts:[account],features:{'solana:signTransaction':{version:'1.0.0',supportedTransactionVersions:['legacy'],signTransaction:async(input:{transaction:Uint8Array,chain:string})=>{assert.equal(input.chain,'solana:mainnet');const tx=Transaction.from(input.transaction);tx.sign(signer);return [{signedTransaction:tx.serialize()}];}}}} as unknown as Wallet);
+  let modify = (_tx: Transaction) => {}, broadcasts = 0;
+  const disconnect=registry.register({version:'1.0.0',name:'Phantom',icon:'data:image/png;base64,AA==',chains:['solana:mainnet'],accounts:[account],features:{'solana:signTransaction':{version:'1.0.0',supportedTransactionVersions:['legacy'],signTransaction:async(input:{transaction:Uint8Array,chain:string})=>{assert.equal(input.chain,'solana:mainnet');const tx=Transaction.from(input.transaction);modify(tx);tx.sign(signer);return [{signedTransaction:tx.serialize()}];}}}} as unknown as Wallet);
   try {
     const proof=receipt('deposit'), log=journal();log.save(proof);
     Connection.prototype.getAccountInfo=async()=>({owner:new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'),data:Buffer.alloc(1),lamports:1,executable:false,rentEpoch:0});
     Connection.prototype.getLatestBlockhash=async()=>({blockhash:Keypair.generate().publicKey.toBase58(),lastValidBlockHeight:99});
-    Connection.prototype.sendRawTransaction=async bytes=>{const signed=Transaction.from(bytes);assert(signed.signature);const hash=signatureBase58(signed.signature);assert.equal(log.read()?.hash,hash);assert.equal(log.read()?.lastValidBlockHeight,99);return hash;};
+    Connection.prototype.sendRawTransaction=async bytes=>{broadcasts++;const signed=Transaction.from(bytes);assert(signed.signature);const hash=signatureBase58(signed.signature);assert.equal(log.read()?.hash,hash);assert.equal(log.read()?.lastValidBlockHeight,99);return hash;};
     Connection.prototype.getSignatureStatuses=async()=>({context:{slot:1},value:[{slot:1,confirmations:1,err:null,confirmationStatus:'confirmed'}]});
     const {adapter:wrapped}=await createImpTransferAdapter({RewardPoolAddress:programId},proof,log);
     await wrapped.depositSpl({mint:IMPERIVM_TITLE.mint,amountRaw:BigInt('225000000000'),userID:userId,titleID:IMPERIVM_TITLE.id,category:'game_topup'});assert(log.read()?.hash);log.clear();
+    const deposit = async () => {const next=receipt('deposit');log.save(next);const {adapter}=await createImpTransferAdapter({RewardPoolAddress:programId},next,log);return adapter.depositSpl({mint:IMPERIVM_TITLE.mint,amountRaw:BigInt('1000000'),userID:userId,titleID:IMPERIVM_TITLE.id,category:'game_topup'});};
+    const budget = () => [ComputeBudgetProgram.setComputeUnitLimit({units:300000}),ComputeBudgetProgram.setComputeUnitPrice({microLamports:250000})];
+    modify = tx => {tx.instructions.unshift(...budget());};
+    await deposit();assert(log.read()?.hash);assert.equal(broadcasts,2);log.clear();
+    // A real Phantom enhancement may append the fee instead; the payment order is unchanged.
+    modify = tx => {tx.instructions.push(...budget());};await deposit();assert.equal(broadcasts,3);log.clear();
+    const forbidden: ((tx:Transaction)=>void)[] = [
+      tx=>{tx.instructions[0].data=Buffer.from(tx.instructions[0].data);tx.instructions[0].data.writeBigUInt64LE(BigInt('2000000'),8);},
+      tx=>{tx.instructions[0].keys[2].pubkey=Keypair.generate().publicKey;},
+      tx=>{tx.instructions[0].programId=SystemProgram.programId;},
+      tx=>{tx.recentBlockhash=Keypair.generate().publicKey.toBase58();},
+      tx=>{tx.instructions.push(SystemProgram.transfer({fromPubkey:signer.publicKey,toPubkey:Keypair.generate().publicKey,lamports:1}));},
+      tx=>{tx.instructions[0].keys[0].isWritable=!tx.instructions[0].keys[0].isWritable;},
+      tx=>{tx.instructions.unshift(...budget(),ComputeBudgetProgram.setComputeUnitPrice({microLamports:1}));},
+      tx=>{tx.instructions.unshift(ComputeBudgetProgram.requestHeapFrame({bytes:32768}));},
+      tx=>{tx.instructions.unshift(ComputeBudgetProgram.setComputeUnitLimit({units:1400001}));},
+      tx=>{tx.instructions.unshift(ComputeBudgetProgram.setComputeUnitLimit({units:300000}),ComputeBudgetProgram.setComputeUnitPrice({microLamports:3333334}));},
+      tx=>{tx.instructions.unshift(new TransactionInstruction({programId:ComputeBudgetProgram.programId,keys:[],data:Buffer.from([2])}));},
+      tx=>{tx.instructions.unshift(new TransactionInstruction({programId:ComputeBudgetProgram.programId,keys:[{pubkey:signer.publicKey,isSigner:false,isWritable:true}],data:budget()[0].data}));},
+    ];
+    for (const change of forbidden) {modify=change;await assert.rejects(deposit(),/Phantom изменил|Комиссия приоритета/);assert.equal(broadcasts,3,'A changed payment must never reach sendRawTransaction');assert.equal(log.read()?.hash,undefined);log.clear();}
+    // An existing withdrawal budget must remain byte-identical even with a valid wallet signature.
+    const {assertSignedImpTransfer}=await import('../../lib/idos/walletTransfer');
+    const protectedTx=new Transaction({feePayer:signer.publicKey,recentBlockhash:Keypair.generate().publicKey.toBase58()}).add(...budget(),SystemProgram.transfer({fromPubkey:signer.publicKey,toPubkey:signer.publicKey,lamports:1}));
+    const originalTx=Transaction.from(protectedTx.serialize({requireAllSignatures:false,verifySignatures:false}));
+    protectedTx.instructions[1]=ComputeBudgetProgram.setComputeUnitPrice({microLamports:1});protectedTx.sign(signer);assert.throws(()=>assertSignedImpTransfer(originalTx,protectedTx),/Phantom изменил/);
+    const invalid=Transaction.from(originalTx.serialize({requireAllSignatures:false,verifySignatures:false}));assert.throws(()=>assertSignedImpTransfer(originalTx,invalid),/не подписал/);
   } finally {disconnect();Object.assign(Connection.prototype,original);}
-  console.log('IMP transfer checks passed: exact six decimals, account/mint isolation, permission gates, durable receipts, single deposit credit, withdrawal retry without a second debit, ambiguous request lock and official Solana wire layout. No external transactions.');
+  console.log('IMP transfer checks passed: exact six decimals, durable receipts, single credit/debit, bounded Phantom priority fees, 12 rejected transaction mutations and protected withdrawal vouchers. No external transactions.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

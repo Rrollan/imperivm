@@ -1,0 +1,20 @@
+.purchase {padding-bottom:18px; margin-bottom:18px; border-bottom:1px solid #b08d4940; color:#e9dbbf;}
+.heading {display:flex; align-items:center; gap:11px; margin-bottom:12px;}
+.heading img {flex:none;}
+.heading strong {font-size:15px; color:#edd5a0;}
+.heading p,.hint,.success p {font-size:12px; line-height:1.55; color:#bcaa90; margin:5px 0 0;}
+.network {margin-left:auto; font-size:10px; letter-spacing:.06em; text-transform:uppercase; border:1px solid #a6d5bf40; color:#a6d5bf; border-radius:20px; padding:5px 9px;}
+.purchase .button {display:inline-flex; gap:8px; align-items:center; justify-content:center; min-height:44px; padding:10px 15px; background-image:none!important; background-color:#d0ae68; color:#24170e; border:1px solid #e6c582; border-radius:9px; font:650 13px/1.3 var(--font-sans); text-decoration:none; text-shadow:none; box-shadow:inset 0 1px #fff1;}
+.purchase .button:hover {background-color:#e1c281;}
+.purchase .button:disabled {opacity:.55; cursor:wait;}
+.actions {display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:12px;}
+.purchase .quiet {font:500 12px/1.5 var(--font-sans); color:#b9d2bd; background:none!important; border:none; box-shadow:none; padding:5px 0; min-height:34px; text-shadow:none; text-underline-offset:3px; cursor:pointer;}
+.purchase button:focus-visible,.purchase a:focus-visible {outline:2px solid #e8c576; outline-offset:3px;}
+.widget {height:600px; margin-top:14px; border-radius:12px; overflow:hidden; background:#18110e; --jupiter-plugin-primary:208,174,104; --jupiter-plugin-background:24,17,14; --jupiter-plugin-primaryText:233,219,191; --jupiter-plugin-warning:232,190,162; --jupiter-plugin-interactive:57,44,32; --jupiter-plugin-module:35,25,18;}
+.status {font-size:12px; color:#edd5a0;}
+.mint {font-size:10px; color:#a58e6d; margin:12px 0 0; overflow-wrap:anywhere;}
+.mint a {color:#b9d2bd; text-decoration:none;}
+.success,.notice {padding:12px; border-radius:9px; margin-top:12px; font-size:12px; line-height:1.55; overflow-wrap:anywhere;}
+.success {border:1px solid #8bcaa54d; background:#76a48912; color:#b9d2bd;}
+.notice {border:1px solid #b86b474f; background:#71361922; color:#e8bea2;}
+@media(max-width:520px) {.network{display:none}.heading strong{font-size:14px}.purchase .button{width:100%}.widget{height:620px}}

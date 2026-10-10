@@ -91,6 +91,38 @@ export function signatureBase58(bytes: Uint8Array): string {
 export type TransferAdapterFactory = (network: BlockchainNetworkDefinition, receipt: TransferReceipt, journal: TransferJournal) => Promise<{adapter: SolanaProgramAdapter; connection: Connection}>;
 type ReceiptRpc = Pick<Connection, 'getSignatureStatuses' | 'getBlockHeight'>;
 async function receiptRpc(): Promise<ReceiptRpc> {const {Connection} = await import('@solana/web3.js'); return new Connection(impTransactionRpcUrl(), 'confirmed');}
+const computeBudgetProgram = 'ComputeBudget111111111111111111111111111111';
+/** Phantom can add priority-fee instructions. Only these two bounded, account-free
+ * additions are allowed; the transfer, account privileges and blockhash stay exact.
+ * Existing budgets (including iDos withdrawal vouchers) cannot be rewritten. */
+export function assertSignedImpTransfer(expected: Transaction, signed: Transaction): void {
+  const refused = () => {throw new Error('Phantom изменил сумму, получателя или не подписал перевод.');};
+  if (!signed.signature || !signed.verifySignatures()) refused();
+  if (Buffer.from(signed.serializeMessage()).equals(Buffer.from(expected.serializeMessage()))) return;
+  if (!signed.feePayer?.equals(expected.feePayer!) || signed.recentBlockhash !== expected.recentBlockhash ||
+    signed.signatures.length !== expected.signatures.length || signed.signatures.some((item, index) => !item.publicKey.equals(expected.signatures[index].publicKey)) ||
+    expected.instructions.some(ix => ix.programId.toBase58() === computeBudgetProgram) || expected.signatures.some(item => item.signature)) refused();
+  const added = signed.instructions.filter(ix => ix.programId.toBase58() === computeBudgetProgram);
+  const financial = signed.instructions.filter(ix => ix.programId.toBase58() !== computeBudgetProgram);
+  if (!added.length || added.length > 2 || financial.length !== expected.instructions.length) refused();
+  financial.forEach((ix, index) => {
+    const original = expected.instructions[index];
+    if (!ix.programId.equals(original.programId) || !ix.data.equals(original.data) || ix.keys.length !== original.keys.length ||
+      ix.keys.some((key, position) => !key.pubkey.equals(original.keys[position].pubkey) || key.isSigner !== original.keys[position].isSigner || key.isWritable !== original.keys[position].isWritable)) refused();
+  });
+  let limit = BigInt(1_400_000), price = BigInt(0); const seen = new Set<number>();
+  for (const ix of added) {
+    const kind = ix.data[0];
+    if (ix.keys.length || seen.has(kind)) refused();
+    seen.add(kind);
+    if (kind === 2 && ix.data.length === 5) {
+      limit = BigInt(ix.data.readUInt32LE(1)); if (limit < BigInt(1) || limit > BigInt(1_400_000)) refused();
+    } else if (kind === 3 && ix.data.length === 9) price = ix.data.readBigUInt64LE(1);
+    else refused();
+  }
+  // Ceiling in lamports; reject unexpectedly expensive wallet-added priority fees.
+  if ((limit * price + BigInt(999_999)) / BigInt(1_000_000) > BigInt(1_000_000)) throw new Error('Комиссия приоритета выше 0.001 SOL. Уменьшите её в Phantom и повторите перевод.');
+}
 export async function createImpTransferAdapter(network: BlockchainNetworkDefinition, receipt: TransferReceipt, journal: TransferJournal) {
   const [{Connection, Transaction}, {createPlatformPoolAdapter}, {getWallets}] = await Promise.all([import('@solana/web3.js'), import('./platformPool'), import('@wallet-standard/app')]);
   const candidate = getWallets().get().find(wallet => wallet.name.toLowerCase() === 'phantom' && wallet.accounts.some(account => account.address === receipt.owner && account.chains.includes('solana:mainnet')) && 'solana:signTransaction' in wallet.features);
@@ -111,10 +143,12 @@ export async function createImpTransferAdapter(network: BlockchainNetworkDefinit
   const adapter = createPlatformPoolAdapter({connection, owner: receipt.owner, programId: network.RewardPoolAddress!, signTransaction: async (transaction: Transaction) => {
     if (!candidate.accounts.some(current => current.address === receipt.owner)) throw new Error('Кошелёк изменился. Перевод отменён.');
     const bytes = transaction.serialize({requireAllSignatures: false, verifySignatures: false});
+    // Deserialization resolves account privileges exactly as they appear on the wire.
+    const expected = Transaction.from(bytes);
     const [result] = await feature.signTransaction({account, transaction: bytes, chain: 'solana:mainnet'});
     if (!result || !candidate.accounts.some(current => current.address === receipt.owner)) throw new Error('Подпись отменена или кошелёк изменился.');
     const signed = Transaction.from(result.signedTransaction);
-    if (!signed.signature || !signed.verifySignatures() || !Buffer.from(signed.serializeMessage()).equals(Buffer.from(transaction.serializeMessage()))) throw new Error('Phantom изменил или не подписал перевод.');
+    assertSignedImpTransfer(expected, signed);
     return signed;
   }});
   return {adapter, connection};

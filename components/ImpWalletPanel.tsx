@@ -4,6 +4,7 @@ import {useIDos} from './IDosContext';
 import {useCollection} from './CollectionContext';
 import {useLocale} from './LocaleContext';
 import {RomanIcon} from './presentation/RomanIcon';
+import {ImpPurchasePanel} from './ImpPurchasePanel';
 import {formatImpAmount} from '../lib/solana/imp';
 import {IMPERIVM_TITLE} from '../lib/idos/title';
 import type {TransferConfig, TransferDirection} from '../lib/idos/walletTransfer';
@@ -64,6 +65,7 @@ export function ImpWalletPanel({walletBalance, onBalanceChanged}: {walletBalance
     }
   }
   return <section className={styles.panel} aria-label={t('Перевод IMP', 'Transfer IMP')}>
+    <ImpPurchasePanel disabled={busy || !!config?.pending || !!review || collection.busy} onPurchased={received => {setDirection('deposit'); setOpen(true); setReview(null); setAmount(received); setNotice(''); onBalanceChanged?.();}}/>
     <div className={styles.intro}><span className={styles.symbol} aria-hidden="true"><RomanIcon name="laurel" size={22}/></span><div><strong>{t('Phantom → игровой счёт', 'Phantom → game account')}</strong><p>{t('Вход подключает кошелёк. IMP переходят в игру только после отдельного перевода.', 'Sign-in connects your wallet. IMP enters the game only after a separate transfer.')}</p></div></div>
     {!signedIn ? <button className={`${styles.button} ${styles.primary}`} disabled={idos.busy || collection.busy} onClick={() => void idos.login()}>{t('Войти для перевода IMP', 'Sign in to transfer IMP')}</button> : idos.embedded ? <div className={styles.actions}><button className={`${styles.button} ${styles.primary}`} disabled={busy} onClick={() => void platformPanel()}>{t('Перевести IMP в игру', 'Deposit IMP in game')}</button><p className={styles.hint}>{t('Пополнение и вывод подтвердите в кошельке платформы.', 'Confirm deposits and withdrawals in the platform wallet.')}</p></div> : !open ? <button className={`${styles.button} ${styles.primary}`} onClick={() => setOpen(true)}>{t('Перевести IMP в игру', 'Deposit IMP in game')} <span aria-hidden="true">→</span></button> : <>
       <div className={styles.tabs} role="tablist" aria-label={t('Направление перевода', 'Transfer direction')}>{(['deposit', 'withdraw'] as const).map(value => <button key={value} role="tab" aria-selected={direction === value} disabled={busy || !!config?.pending} className={`${styles.tab} ${direction === value ? styles.selected : ''}`} onClick={() => {setDirection(value); setReview(null); setNotice('');}}>{value === 'deposit' ? t('В игру', 'Deposit') : t('В Phantom', 'Withdraw')}</button>)}</div>
