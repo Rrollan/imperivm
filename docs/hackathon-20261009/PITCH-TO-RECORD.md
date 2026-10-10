@@ -1,65 +1,31 @@
-# IMPERIVM — текст питча для записи
+# IMPERIVM — питч для записи, v26
 
-Это черновик с честным статусом на **10 октября 2026**, до завершения iDos и живой проверки кошелька. Цель — **1:40–1:55**, предел проверенной формы — **2:00**. Демо игры и питч — два разных видео.
+Актуально 10 октября 2026. Цель: 1:40–1:55, максимум 2:00 по ранее проверенной форме. Общий FAQ Colosseum говорит 2–3 минуты. Записывай на английском: официальные правила требуют английский язык для всех материалов. Английские субтитры полезны дополнительно, но не считаются автоматически разрешённой заменой английской речи.
 
-Для международных судей предпочтительна английская версия, если удобно говорить. Русская версия ниже подходит для записи с последующими английскими субтитрами. Записывает основатель: камера на уровне глаз, тихая комната, горизонтальный кадр, без музыки. Прочитай пробный дубль с таймером; если он выходит за две минуты, убери предложение про гарнизон и предложение про состав бесплатного набора.
-
-## Русский текст
-
-Привет! Я Роллан Рогожин, основатель IMPERIVM.
-
-Я делаю браузерную карточную игру, где имперский Рим встречается с криптокультурой. Моя идея — сначала дать человеку интересный бой, а уже потом предлагать подключить кошелёк.
-
-Игрок выбирает правителя, собирает колоду из тридцати карт и пытается обнулить казну соперника. Здесь важно не только что сыграть, но и когда. Отложенные указы появляются в общей очереди: противник видит угрозу и получает возможность ответить. А отправляя бойца в гарнизон, ты получаешь ресурс, но жертвуешь его атакой.
-
-В рабочей версии уже девяносто девять карт, девять правителей, конструктор колод, открытие паков и новая арена. Пять правителей и базовый набор карт бесплатны. Можно открыть игру в браузере и сразу начать тренировку без кошелька. В демо мы показываем именно этот работающий продукт.
-
-Для Solana реализованы вход через Phantom и чтение реального баланса IMP. Токены в кошельке и внесённый игровой баланс показаны отдельно. Тренировка не требует дополнительной подписи матча или SOL. Экспериментальный NFT-бейдж пока выключен: подтверждённого выпуска ещё нет.
-
-Тестовая версия уже загружена на iDos. Бесплатный случайный PvP проверен с двумя игроками. Токен IMP выпущен в Solana mainnet, его адрес и параметры проверены. Настройка токена платформой исправлена; покупки паков закрыты до пользовательского теста оплаты. Дальше — проверка кошелька и публикация. В демо используются отдельные тестовые IMP.
-
-Я собираю и проверяю игру итерациями: от читаемых карт и удобной колоды до понятных тактических решений на арене. Для этого хакатона моя цель — показать честный, работающий продукт с понятной интеграцией Solana.
-
-Попробуйте IMPERIVM в браузере. Код и актуальный интерфейс доступны на GitHub. Спасибо!
-
-## English script
+## Текст для чтения
 
 Hi, I'm Rollan Rogozhin, the founder of IMPERIVM.
 
-I'm building a browser card battler where imperial Rome meets crypto culture. Players get an interesting battle before connecting a wallet.
+IMPERIVM is a browser card battler where imperial Rome meets crypto culture. My goal is simple: make a game people can enjoy before connecting a wallet.
 
-You choose a ruler, build a thirty-card deck, and try to empty your opponent's Treasury. Timing matters. Delayed edicts enter a public queue, so your opponent can see the threat and respond. Garrisoning a fighter gives you resources, but costs that fighter its attack.
+You choose a ruler, build a thirty-card deck, and fight to empty your opponent's Treasury. Timing is the key. Delayed edicts enter a public queue, so your opponent can see the threat and respond. Garrisoning a fighter earns resources, but costs its attack.
 
-The playable build has ninety-nine cards, nine rulers, a deck workshop, pack reveals, and our new imperial arena. You can open the game in your browser and start training without a wallet.
+The playable game has ninety-nine cards and nine rulers. Five rulers and the starter cards are free. Players can train against AI, challenge a friend, or find a random opponent. The deck workshop lets them build their own strategy.
 
-For Solana, we have implemented Phantom identity and real IMP balance reading. Wallet holdings and the deposited game balance are shown separately. Training needs no extra match signature or SOL. Experimental NFT badges are disabled; a live mint is unverified.
+The game is published on iDos Games. Solana powers wallet identity and IMP, our mainnet token. Players can exchange SOL for IMP through Jupiter and deposit IMP into their iDos game balance. I have confirmed a real deposit and its persistence after reloading.
 
-A test build is uploaded to iDos, and free random PvP has been tested with two players. IMP is launched on Solana mainnet, with its mint and parameters verified. The platform token definition is corrected; pack purchases remain disabled pending an owner payment test. Wallet testing and publication are next. Demo IMP is separate test currency.
+Packs and player-to-player card trading use the game balance. These features are enabled; live purchase and withdrawal testing is still in progress.
 
-I'm testing each iteration, from deck tools to tactical decisions. My goal for this hackathon is a working game with an honest, understandable Solana integration.
+I'm starting with card-game players and crypto communities. During the hackathon, I used player feedback to improve loading, deck building, wallet flows, and the arena.
 
-You can play IMPERIVM in your browser and inspect the current code on GitHub. Thank you!
+You can play IMPERIVM now and review the code on GitHub. Thank you!
 
-## Перед финальной записью
+## Перед записью
 
-1. После фактического завершения интеграции попроси Codex обновить два абзаца про Solana/iDos. Не читай «остаётся сделать», если уже сделано; не читай «работает», если ещё не проверено.
-2. Имя и роль произноси так, как они указаны в твоём профиле. Не добавляй неподтверждённые цифры пользователей, выручки или побед в конкурсах.
-3. Можно добавить одну конкретную правдивую фразу о своём опыте вместо предложения про итерации. Длительность сохраняем до двух минут.
-4. Запиши лицо и голос одним дублем. Презентация не обязательна внутри питч-видео; отдельная ссылка на слайды уже есть в заявке.
+Камера горизонтально, на уровне глаз, тихая комната и ровный свет. Имя произнеси как в профиле. Пробный дубль с таймером: если больше двух минут, убери предложение про гарнизон и предложение про аудиторию. Не добавляй неподтверждённую выручку или число игроков.
 
-## Если решишь озвучить демо
+Название: **IMPERIVM — Founder Pitch | Crypto World's Fair 2026**.
 
-Для 2:58 ролика Muse запиши отдельные короткие фразы с паузами, а не непрерывный текст на три минуты. Ориентируйся на фактически снятые действия:
+Если до записи самостоятельно проверишь покупку пака, продажу или вывод, обнови только соответствующую фразу фактическим результатом. NFT и денежный PvP здесь не обещаны.
 
-| Момент | Пояснение на русском |
-| --- | --- |
-| Меню | «Это IMPERIVM: карточные дуэли в имперском Риме и криптокультуре». |
-| Библиотека | «Здесь можно посмотреть способности карт и подобрать фракцию для своей стратегии». |
-| Колода | «Выбираю Строителя. Меняю одну карту в готовой колоде и сохраняю тридцать карт для боя». |
-| Старт | «Начинаю обычную тренировку без кошелька. Одну дорогую карту в стартовой руке заменяю». |
-| Бой | «Приказы ограничивают розыгрыш. Сначала выставляю бойца, затем на следующем ходу использую готовую атаку». |
-| Механика | Произнеси **только показанное**: «Отправляю бойца в гарнизон: получаю приказ, но теряю его атаку»; или «Указ попадает в видимую очередь, поэтому соперник может подготовить ответ»; или «Строитель восстанавливает здоровье казне и раненому бойцу». |
-| Пак | «Это локальное демо: здесь только тестовые IMP. Открываю пак и раскрываю пять карт по одной». |
-| Конец | «Текущая игра доступна в браузере, а код — на GitHub». |
-
-Озвучка демо прямо не объявлена обязательной в [проверенных правилах Colosseum](https://colosseum.com/hackathon). Это рекомендация для понятности. Без голоса оставляем достаточно времени, чтобы зритель видел действия и результат.
+Источники: [FAQ](https://colosseum.com/hackathon), [правила](https://colosseum.com/legal/Crypto%20World%27s%20Fair%20Hackathon%20Rules.pdf), [выпуск v26](../idos/public-release-20261010.md).
