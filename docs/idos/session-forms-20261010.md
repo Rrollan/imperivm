@@ -19,6 +19,7 @@ The runtime explicitly disabled remembered sessions and always started a DeviceI
 - Session regressions cover cold refresh, a single rotation for concurrent startup, React remount, explicit logout, wallet switch, mismatched server UserID, mismatched server wallet cache and temporary-error retry.
 - Browser reproduction used an iframe with `sandbox="allow-scripts allow-same-origin"`. The original submit button ran zero callbacks. The real `ActionForm` ran exactly one callback per click/Enter. An invalid amount showed a visible error without incrementing the count; disabled Enter did not run an action.
 - These checks performed no wallet signatures or financial transactions. Live two-wallet market settlement and withdrawal remain unverified.
+- The new GitHub CI exposed an incomplete root lockfile: missing Babylon glTF peer and a nested optional UTF-8 validator. Their exact entries were restored without changing existing dependency versions. npm 10 clean-install resolution was checked for both application and server.
 
 ## Published release
 
