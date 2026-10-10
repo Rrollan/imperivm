@@ -17,6 +17,15 @@ function string(value: unknown, max = 80): string {
   return value;
 }
 function registration(value: Record<string, unknown>): PlayerRegistration {
+  // This protocol is a free match. Never discard a client's paid-entry request
+  // and accidentally place them at an unpaid table with no recoverable payout.
+  const financialKeys = new Set(['stake', 'stakeamount', 'entry', 'entryamount', 'currency', 'currencyid', 'amount', 'paid', 'paidpvp', 'payment', 'escrow', 'mint']);
+  if (Object.keys(value).some(key => financialKeys.has(key.toLowerCase().replace(/[_-]/g, ''))) ||
+    value.mode !== undefined && value.mode !== 'free' && value.mode !== 'friend' && value.mode !== 'random') {
+    throw new ProtocolError('paid-pvp-unavailable', 'Матчи на IMP пока недоступны: платформа должна подтвердить удержание взносов, выплату победителю и возврат. Средства не списаны.');
+  }
+  const allowed = new Set(['type', 'playerName', 'heroId', 'deckList', 'collectionAuth', ...(value.type === 'join' ? ['roomCode', 'resumeToken'] : [])]);
+  if (Object.keys(value).some(key => !allowed.has(key))) fail('Неизвестный параметр бесплатного матча.');
   const playerName = string(value.playerName, 32).trim();
   if (!playerName) fail('Введите имя игрока.');
   const heroId = value.heroId === undefined ? 'builder' : string(value.heroId, 40);

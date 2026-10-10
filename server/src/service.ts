@@ -7,6 +7,7 @@ import type {PlayerRegistration} from '../../lib/net/protocol';
 import {createImpBalanceReader, type ImpBalance} from './impBalance';
 import {validSolanaAddress} from '../../lib/solana/tokenBalance';
 import {createWalletRpcRelay, parseWalletRpc, type WalletRpcRequest} from './walletRpc';
+import {impPvpReadiness} from './impPvpReadiness';
 
 export interface ServiceOptions {
   port?: number; host?: string; origins?: string[]; clock?: () => number;
@@ -25,7 +26,15 @@ export function startServer(options: ServiceOptions = {}) {
   const server = createServer(async (request, response) => {
     response.setHeader('Content-Type', 'application/json');
     response.setHeader('Cache-Control', 'no-store');
-    if (request.method === 'GET' && request.url === '/health') {response.end(JSON.stringify({status: 'ok', rooms: rooms.size, queued: rooms.queued, capabilities: ['random-pvp', 'imp-balance', 'wallet-rpc'], paidPvp: {enabled: false, reason: 'External TCG escrow settlement API is not available'}, version: process.env.RENDER_GIT_COMMIT?.slice(0, 12) ?? 'local'})); return;}
+    if (request.method === 'GET' && request.url === '/health') {response.end(JSON.stringify({status: 'ok', rooms: rooms.size, queued: rooms.queued, capabilities: ['random-pvp', 'imp-balance', 'wallet-rpc', 'imp-pvp-readiness'], paidPvp: impPvpReadiness(), version: process.env.RENDER_GIT_COMMIT?.slice(0, 12) ?? 'local'})); return;}
+    if (request.url?.startsWith('/pvp/imp/readiness')) {
+      const origin = request.headers.origin;
+      if (origin && !origins.has(origin)) {response.statusCode = 403; response.end(JSON.stringify({error: 'Origin not allowed'})); return;}
+      if (origin) {response.setHeader('Access-Control-Allow-Origin', origin); response.setHeader('Vary', 'Origin');}
+      if (request.url !== '/pvp/imp/readiness') {response.statusCode = 400; response.end(JSON.stringify({error: 'Readiness takes no parameters'})); return;}
+      if (request.method !== 'GET') {response.statusCode = 405; response.end(JSON.stringify({error: 'GET required'})); return;}
+      response.end(JSON.stringify(impPvpReadiness())); return;
+    }
     if (request.url === '/wallet/rpc') {
       const origin = request.headers.origin;
       if (!origin || !origins.has(origin)) {response.statusCode = 403; response.end(JSON.stringify({error: 'Origin not allowed'})); return;}

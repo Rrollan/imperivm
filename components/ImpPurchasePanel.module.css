@@ -18,3 +18,14 @@
 .success {border:1px solid #8bcaa54d; background:#76a48912; color:#b9d2bd;}
 .notice {border:1px solid #b86b474f; background:#71361922; color:#e8bea2;}
 @media(max-width:520px) {.network{display:none}.heading strong{font-size:14px}.purchase .button{width:100%}.widget{height:620px}}
+.purchase {border-bottom:0;margin-bottom:0;padding-bottom:0;}
+.widget {height:510px;max-width:460px;margin:14px auto 0;border:1px solid #b08d4940;}
+.walletHint {padding:12px 14px;margin-top:14px;border:1px solid #b08d4933;border-radius:9px;background:#120d0944;display:grid;grid-template-columns:1fr auto;gap:5px 12px;font-size:12px;}
+.walletHint>span{color:#b8a386}.walletHint b{color:#b9d2bd;font-family:monospace;font-weight:500;}.walletHint p{grid-column:1/-1;color:#b8a386;margin:0;font-size:11px;line-height:1.5;}
+.success {display:flex;gap:14px;padding:18px;border-color:#90c7a35e;}.success strong{display:block;font-size:28px;font-weight:650;color:#cae2c1;margin:4px 0;}.success .button{margin-top:14px;}.check{display:grid;place-items:center;width:36px;height:36px;flex:none;border:1px solid #90c7a355;border-radius:50%;color:#cae2c1;font-size:20px;}
+.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#a3bf99;}
+.progress{display:flex;gap:12px;align-items:flex-start;background:#b08d490c;border:1px solid #b08d4940;padding:14px;margin:12px 0;border-radius:10px;font-size:12px;line-height:1.5;}.progress strong{color:#edd5a0;font-size:14px;}.progress p{color:#bcaa90;margin:5px 0 0;}
+.spinner{flex:none;width:18px;height:18px;margin-top:3px;border:2px solid #b08d4940;border-top-color:#e5c078;border-radius:50%;animation:imp-spin 1s linear infinite;}@keyframes imp-spin{to{transform:rotate(360deg)}}
+.mint{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+@media(max-width:520px){.widget{height:530px}.walletHint{grid-template-columns:1fr}.walletHint p{grid-column:auto}.success{padding:14px;gap:10px}.success strong{font-size:23px}}
+@media(prefers-reduced-motion:reduce){.spinner{animation:none}}

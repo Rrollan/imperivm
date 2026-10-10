@@ -192,7 +192,7 @@ NEXT_PUBLIC_WS_URL=wss://<сервис>.onrender.com
 
 Для выделенного RPC задать **server-only** `SOLANA_MAINNET_RPC_URL=https://...`. По умолчанию используется публичный mainnet RPC; он ограничен по запросам и не обеспечивает SLA. Browser-Origin на прямом публичном RPC проверкой возвращал 403, поэтому клиент вызывает серверный read-only endpoint. Клиент берёт HTTP host из `NEXT_PUBLIC_WS_URL`, либо отдельного `NEXT_PUBLIC_IMP_BALANCE_URL`.
 
-В production существующий ALLOWED_ORIGINS остаётся обязательным. Код добавляет к нему только два точных origin собственного Title: `https://si4ips8b.idos.games`, `https://si4ips8b-dev.idos.games`. Их используют WS handshake, CORS баланса и RPC-релей. `/health` показывает `capabilities: ["random-pvp", "imp-balance", "wallet-rpc"]`, `paidPvp.enabled:false` с причиной отсутствия API расчёта внешнего TCG и короткую версию `RENDER_GIT_COMMIT`, чтобы отличить старый деплой.
+В production существующий ALLOWED_ORIGINS остаётся обязательным. Код добавляет к нему только два точных origin собственного Title: `https://si4ips8b.idos.games`, `https://si4ips8b-dev.idos.games`. Их используют WS handshake, CORS баланса и RPC-релей. `/health` показывает `capabilities: ["random-pvp", "imp-balance", "wallet-rpc", "imp-pvp-readiness"]`, `paidPvp.enabled:false` с причиной отсутствия API расчёта внешнего TCG и короткую версию `RENDER_GIT_COMMIT`, чтобы отличить старый деплой.
 
 ## RPC для внесения и вывода IMP
 
@@ -204,4 +204,6 @@ NEXT_PUBLIC_WS_URL=wss://<сервис>.onrender.com
 
 Клиент использует свежий официальный адрес пула iDos и сохраняет чек до broadcast. При неопределённом ответе операция остаётся заблокированной до восстановления по той же подписи или `titleTransactionID`; повторное списание не запускается автоматически. Инфраструктура внесения/вывода проверена с mock кошельком/RPC и декодированием wire-транзакции, а не реальной транзакцией владельца. Подробности: [аудит commerce API](../docs/idos/commerce-api-audit-20261010.md).
 
-Тренировка против ИИ бесплатна. Внесение/вывод и денежный PvP — разные функции: релей не удерживает две ставки и не рассчитывает победителя. Денежные матчи остаются выключенными до проверенного reserve/query/settle/refund API с атомарностью и idempotency для внешнего TCG: [готовность и необходимые шаги](../docs/multiplayer-readiness.md).
+Тренировка против ИИ бесплатна. Внесение/вывод и денежный PvP — разные функции: релей не удерживает две ставки и не рассчитывает победителя. Денежные матчи остаются выключенными до проверенного reserve/query/settle/refund API с атомарностью и idempotency для внешнего TCG: [проверенный контракт и сообщение iDos](../docs/idos/paid-pvp-integration-contract-20261010.md).
+
+`GET /pvp/imp/readiness` возвращает тот же финансовый контракт, что `/health.paidPvp`: `enabled:false`, реквизиты канонического IMP, reasonCode и невыполненные требования. Endpoint не принимает параметры или POST; для браузера действует точный Origin allowlist. Это описание возможностей, не проверка средств конкретного игрока. Финансовые поля в бесплатных `create` / `queue` / `join` отклоняются с `paid-pvp-unavailable` до чтения коллекции; неизвестные параметры также запрещены. Поэтому денежная заявка не может незаметно превратиться в бесплатный матч. `intent.stake` — разрешённое игровое действие бойца, связанное с ресурсами доски, оно не отправляет IMP.

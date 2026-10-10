@@ -29,3 +29,16 @@
 .footnote {margin-top: 12px; font-size: 11px;}
 .notice {margin: 12px 0 0; font-size: 12px; line-height: 1.55; border: 1px solid #b86b474f; border-radius: 9px; padding: 10px 12px; color: #e8bea2; background: #71361922; overflow-wrap: anywhere;}
 @media (max-width: 520px) {.panel {padding: 13px;}.actions .button {flex: 1 1 auto;}.symbol {display: none;}.review > strong {font-size: 23px;}}
+.routeTabs {display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;background:#140e0b;margin:-4px -4px 20px;border:1px solid #ad89452b;border-radius:12px;}
+.panel .routeTab {display:flex;align-items:center;gap:10px;min-height:48px;padding:10px 12px;border:1px solid transparent;border-radius:8px;background:none!important;box-shadow:none;color:#b9a487;font:600 13px var(--font-sans);text-align:left;text-shadow:none;}
+.routeTab span {font-size:10px;letter-spacing:.06em;color:#927652;}
+.panel .routeSelected {background:#63482544!important;border-color:#b58d454d;color:#f0d69e;}
+.purchaseSlot[hidden],.transferSlot[hidden] {display:none!important;}
+.available {display:flex;justify-content:space-between;gap:16px;align-items:center;margin:16px 0;padding:12px 14px;background:#160f0a77;border-radius:9px;}
+.available span {font-size:12px;color:#b8a386;}.available strong{font-size:20px;color:#e5c078;font-variant-numeric:tabular-nums;}.available small{font-size:11px;}
+.progress,.success {display:flex;align-items:flex-start;gap:12px;padding:14px;margin-top:12px;border:1px solid #b08d494f;border-radius:10px;background:#b08d490c;font-size:12px;line-height:1.5;}
+.progress strong,.success strong {font-size:14px;color:#edd5a0;}.progress p,.success p {margin:4px 0;color:#c1ab8b;}.progress a,.success a{color:#b9d2bd;font-size:12px;}
+.success{border-color:#81b39255;background:#81b3920b;}.success>span{color:#add7b5;font-size:24px;}
+.spinner{flex:none;width:18px;height:18px;margin-top:3px;border:2px solid #b08d4940;border-top-color:#e5c078;border-radius:50%;animation:imp-spin 1s linear infinite;}@keyframes imp-spin{to{transform:rotate(360deg)}}
+@media(max-width:520px){.panel .routeTab{font-size:12px;gap:7px;padding:9px 8px}.available{align-items:flex-start;flex-direction:column;gap:4px}}
+@media(prefers-reduced-motion:reduce){.spinner{animation:none}}

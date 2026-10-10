@@ -7,6 +7,7 @@ import {validateImpToken} from './token';
 import {idosResult} from './auth';
 
 export type TransferDirection = 'deposit' | 'withdraw';
+export type TransferProgress = {phase: 'preparing' | 'wallet' | 'confirming' | 'crediting' | 'complete'; hash?: string};
 export type TransferReceipt = {version: 1; userId: string; owner: string; direction: TransferDirection; amount: string; startedAt: number; hash?: string; transactionId?: string; requestUncertain?: boolean; lastValidBlockHeight?: number};
 export interface TransferStorage {getItem(key: string): string | null; setItem(key: string, value: string): void; removeItem(key: string): void;}
 export const TRANSFER_KEY = 'imperivm.imp-transfer.v1';
@@ -88,7 +89,7 @@ export function signatureBase58(bytes: Uint8Array): string {
   let zeros = 0; while (zeros < bytes.length && bytes[zeros] === 0) zeros++;
   return '1'.repeat(zeros) + output;
 }
-export type TransferAdapterFactory = (network: BlockchainNetworkDefinition, receipt: TransferReceipt, journal: TransferJournal) => Promise<{adapter: SolanaProgramAdapter; connection: Connection}>;
+export type TransferAdapterFactory = (network: BlockchainNetworkDefinition, receipt: TransferReceipt, journal: TransferJournal, progress?: (value: TransferProgress) => void) => Promise<{adapter: SolanaProgramAdapter; connection: Connection}>;
 type ReceiptRpc = Pick<Connection, 'getSignatureStatuses' | 'getBlockHeight'>;
 async function receiptRpc(): Promise<ReceiptRpc> {const {Connection} = await import('@solana/web3.js'); return new Connection(impTransactionRpcUrl(), 'confirmed');}
 const computeBudgetProgram = 'ComputeBudget111111111111111111111111111111';
@@ -96,10 +97,11 @@ const computeBudgetProgram = 'ComputeBudget111111111111111111111111111111';
  * additions are allowed; the transfer, account privileges and blockhash stay exact.
  * Existing budgets (including iDos withdrawal vouchers) cannot be rewritten. */
 export function assertSignedImpTransfer(expected: Transaction, signed: Transaction): void {
-  const refused = () => {throw new Error('Phantom изменил сумму, получателя или не подписал перевод.');};
-  if (!signed.signature || !signed.verifySignatures()) refused();
+  const refused = (reason = 'instructions') => {throw new Error(`Подписанный перевод не прошёл проверку (${reason}). Транзакция не отправлена. Обновите игру и повторите.`);};
+  if (!signed.signature || !signed.verifySignatures()) refused('signature');
   if (Buffer.from(signed.serializeMessage()).equals(Buffer.from(expected.serializeMessage()))) return;
-  if (!signed.feePayer?.equals(expected.feePayer!) || signed.recentBlockhash !== expected.recentBlockhash ||
+  if (signed.recentBlockhash !== expected.recentBlockhash) refused('blockhash');
+  if (!signed.feePayer?.equals(expected.feePayer!) ||
     signed.signatures.length !== expected.signatures.length || signed.signatures.some((item, index) => !item.publicKey.equals(expected.signatures[index].publicKey)) ||
     expected.instructions.some(ix => ix.programId.toBase58() === computeBudgetProgram) || expected.signatures.some(item => item.signature)) refused();
   const added = signed.instructions.filter(ix => ix.programId.toBase58() === computeBudgetProgram);
@@ -123,8 +125,8 @@ export function assertSignedImpTransfer(expected: Transaction, signed: Transacti
   // Ceiling in lamports; reject unexpectedly expensive wallet-added priority fees.
   if ((limit * price + BigInt(999_999)) / BigInt(1_000_000) > BigInt(1_000_000)) throw new Error('Комиссия приоритета выше 0.001 SOL. Уменьшите её в Phantom и повторите перевод.');
 }
-export async function createImpTransferAdapter(network: BlockchainNetworkDefinition, receipt: TransferReceipt, journal: TransferJournal) {
-  const [{Connection, Transaction}, {createPlatformPoolAdapter}, {getWallets}] = await Promise.all([import('@solana/web3.js'), import('./platformPool'), import('@wallet-standard/app')]);
+export async function createImpTransferAdapter(network: BlockchainNetworkDefinition, receipt: TransferReceipt, journal: TransferJournal, progress: (value: TransferProgress) => void = () => {}) {
+  const [{Connection, Transaction, ComputeBudgetProgram}, {createPlatformPoolAdapter}, {getWallets}] = await Promise.all([import('@solana/web3.js'), import('./platformPool'), import('@wallet-standard/app')]);
   const candidate = getWallets().get().find(wallet => wallet.name.toLowerCase() === 'phantom' && wallet.accounts.some(account => account.address === receipt.owner && account.chains.includes('solana:mainnet')) && 'solana:signTransaction' in wallet.features);
   if (!candidate) throw new Error('Подключите тот же кошелёк Phantom для перевода IMP.');
   const account = candidate.accounts.find(account => account.address === receipt.owner)!;
@@ -138,13 +140,22 @@ export async function createImpTransferAdapter(network: BlockchainNetworkDefinit
     const signed = Transaction.from(args[0]);
     if (!signed.signature) throw new Error('Phantom не подписал транзакцию.');
     receipt.hash = signatureBase58(signed.signature); journal.save(receipt);
+    progress({phase: 'confirming', hash: receipt.hash});
     const hash = await sendRaw(...args); if (hash !== receipt.hash) throw new Error('RPC вернул другую подпись перевода.'); return hash;
   };
   const adapter = createPlatformPoolAdapter({connection, owner: receipt.owner, programId: network.RewardPoolAddress!, signTransaction: async (transaction: Transaction) => {
     if (!candidate.accounts.some(current => current.address === receipt.owner)) throw new Error('Кошелёк изменился. Перевод отменён.');
+    // An explicit budget prevents Phantom's automatic transaction enhancement.
+    // 300k CU matches the pool SDK's withdrawal limit; 10k micro-lamports/CU
+    // caps our added priority fee at 3,000 lamports (0.000003 SOL).
+    // Withdrawal vouchers retain their original instruction indices and budget.
+    if (receipt.direction === 'deposit' && !transaction.instructions.some(ix => ix.programId.toBase58() === computeBudgetProgram)) transaction.instructions.unshift(
+      ComputeBudgetProgram.setComputeUnitLimit({units: 300_000}), ComputeBudgetProgram.setComputeUnitPrice({microLamports: 10_000}),
+    );
     const bytes = transaction.serialize({requireAllSignatures: false, verifySignatures: false});
     // Deserialization resolves account privileges exactly as they appear on the wire.
     const expected = Transaction.from(bytes);
+    progress({phase: 'wallet'});
     const [result] = await feature.signTransaction({account, transaction: bytes, chain: 'solana:mainnet'});
     if (!result || !candidate.accounts.some(current => current.address === receipt.owner)) throw new Error('Подпись отменена или кошелёк изменился.');
     const signed = Transaction.from(result.signedTransaction);
@@ -159,13 +170,14 @@ export class ImpTransferService {
   constructor(private client: IDosGamesClient, readonly journal: TransferJournal, private factory: TransferAdapterFactory = createImpTransferAdapter, private readRpc: () => Promise<ReceiptRpc> = receiptRpc) {}
   async config() {return loadImpTransferConfig(this.client, this.journal);}
   private assertAccount() {if (!this.client.auth.context || this.client.auth.context.userID !== this.journal.userId) throw new Error('Аккаунт iDos изменился. Войдите заново.');}
-  async transfer(direction: TransferDirection, input: string, expectedWithdrawalFeePercent?: string | null): Promise<string> {
+  async transfer(direction: TransferDirection, input: string, expectedWithdrawalFeePercent?: string | null, progress: (value: TransferProgress) => void = () => {}): Promise<string> {
     if (this.busy || this.journal.read()) throw new Error('Предыдущий перевод ещё проверяется. Повторное списание заблокировано.');
     const {amount, raw} = parseImpTransferAmount(input);
     this.busy = true;
     let receipt: TransferReceipt | undefined;
     try {
       this.assertAccount();
+      progress({phase: 'preparing'});
       const config = await this.config();
       if (config.pending) throw new Error('На игровом счёте есть незавершённый перевод. Сначала восстановите его.');
       if (direction === 'withdraw' && expectedWithdrawalFeePercent !== undefined && config.withdrawalFeePercent !== expectedWithdrawalFeePercent) throw new Error('Комиссия вывода iDos изменилась. Проверьте новую комиссию перед подтверждением.');
@@ -176,11 +188,13 @@ export class ImpTransferService {
       if (direction === 'withdraw' && (config.balance === '0' ? BigInt('0') : parseImpTransferAmount(config.balance).raw) < raw) throw new Error('Недостаточно IMP на игровом счёте.');
       receipt = {version: 1, userId: this.journal.userId, owner: this.journal.owner, direction, amount, startedAt: Date.now()};
       this.journal.save(receipt);
-      const {adapter} = await this.factory(config.network, receipt, this.journal);
+      const {adapter} = await this.factory(config.network, receipt, this.journal, progress);
       this.assertAccount();
       if (direction === 'deposit') {
         const {depositTokenSolana} = await import('@idosgames/wallet');
-        const result = await depositTokenSolana({client: this.client, adapter, network: config.network, mint: IMPERIVM_TITLE.mint, amountRaw: raw, titleID: this.client.titleID});
+        const originalDeposit = adapter.depositSpl.bind(adapter);
+        const tracked = {...adapter, depositSpl: async (args: Parameters<typeof originalDeposit>[0]) => {const hash = await originalDeposit(args); progress({phase: 'crediting', hash}); return hash;}};
+        const result = await depositTokenSolana({client: this.client, adapter: tracked, network: config.network, mint: IMPERIVM_TITLE.mint, amountRaw: raw, titleID: this.client.titleID});
         if (!result.ok) throw new Error(result.error);
       } else {
         // Persist the debit ID immediately; a failed signature never creates a second withdrawal.
@@ -195,6 +209,7 @@ export class ImpTransferService {
         const confirmed = idosResult(await this.client.blockchain.confirmWithdrawal(receipt.transactionId, receipt.hash));
         if (confirmed.Status !== 'Completed') throw new Error('iDos ещё проверяет этот вывод.');
       }
+      progress({phase: 'complete', hash: receipt.hash});
       this.journal.clear();
       return amount;
     } catch (error) {
