@@ -1,4 +1,5 @@
-import type {ItemDefinitions, LootboxDefinitions, LootboxRewardRoll, MarketplaceDefinitions, UserInventoryState, ResourceOperation} from '@idosgames/core';
+import type {ItemDefinitions, LootboxDefinitions, LootboxRewardRoll, MarketplaceDefinitions, ResourceOperation} from '@idosgames/core';
+export {cardItemCounts} from './cardInventory';
 import {CARDS} from '../cards';
 import {PACK_CARD_IDS} from '../collection/access';
 import {REAL_PACK_COST} from '../collection/gateway';
@@ -74,16 +75,6 @@ export function validateCardLootboxDefinitions(defs:LootboxDefinitions):void {
   if(!pack||pack.MaxOpenCount!==1||pack.RewardMultiplier||pack.Presets||pack.PityRules?.length||pack.SupplyLimits?.length||
     stable(lootboxEconomics(defs))!==stable(lootboxEconomics(buildCardLootboxDefinitions())))
     throw new Error('Пак iDos должен содержать пять карт и точный шанс легендарной 0,0001% на весь пак.');
-}
-/** Only actual server InventoryV2 quantities are sellable. Starter/legacy unlocks never become goods. */
-export function cardItemCounts(inventory:UserInventoryState):Record<string,number> {
-  const owned:Record<string,number>={};
-  for(const id of Object.keys(CARDS)) {
-    const amount=inventory.Items?.[id];if(!amount)continue;
-    if(!Number.isSafeInteger(amount.StackableAmount)||amount.StackableAmount<0||amount.UnstackableAmount!==0||amount.TotalAmount!==amount.StackableAmount)throw new Error('iDos вернул неверное количество продаваемых карт.');
-    if(amount.StackableAmount>0)owned[id]=amount.StackableAmount;
-  }
-  return owned;
 }
 export function itemPackDrops(operation:ResourceOperation|undefined|null):string[] {
   if(operation?.Grant?.PremiumBonuses?.length||operation?.Grant?.PremiumTiers?.length||operation?.Grant?.Standard?.EventTokens?.length)throw new Error('Получен неожиданный результат пака iDos.');

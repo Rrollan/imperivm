@@ -2,8 +2,7 @@ import { deckError } from '../engine/deckValidation';
 import { needsCollection, parseCollectionAuth, cleanOwned, configuredTitle, deckCardCounts } from './access';
 import {isFreeHero,HEROES} from '../heroes';
 import {heroesFromCollectibles} from './heroAccess';
-import {cardItemCounts} from '../idos/cardEconomy';
-import type {UserInventoryState} from '@idosgames/core';
+import {cardItemCounts,type CardInventoryState} from '../idos/cardInventory';
 
 /** Server-only read of iDos entitlements. URL and Title are controlled by deployment, never by a player. */
 export async function authorizeCollectionDeck(deck: readonly string[], credential?: unknown, fetcher: typeof fetch = fetch,hero='builder'): Promise<void> {
@@ -38,7 +37,7 @@ export async function authorizeCollectionDeck(deck: readonly string[], credentia
     const inventoryText=await inventoryResponse.text();if(inventoryText.length>512_000)throw new Error('Некорректный ответ предметов iDos.');
     const inventoryEnvelope=JSON.parse(inventoryText);
     if(inventoryEnvelope?.Success!==true||!inventoryEnvelope.Data||typeof inventoryEnvelope.Data!=='object'||Array.isArray(inventoryEnvelope.Data))throw new Error('Сессия iDos не подтверждена. Войдите заново.');
-    const items=cardItemCounts(inventoryEnvelope.Data as UserInventoryState);
+    const items=cardItemCounts(inventoryEnvelope.Data as CardInventoryState);
     for(const [id,count] of Object.entries(items))owned[id]=Math.max(owned[id]??0,count);
   }
   const problem = deckError(deck, deckCardCounts(owned));
