@@ -23,13 +23,17 @@ const cssPublicBase = publicBase.startsWith('/v/') ? `https://static.idos.games/
 function publicPrefix(css = false) { const value = css ? cssPublicBase : publicBase; return value === './' && css ? '../' : value; }
 const sharedManifest = reuseAssets ? JSON.parse(readFileSync(process.env.IDOS_SHARED_ASSET_MANIFEST || path.join(root,'platform/idos/shared-assets.v4.json'),'utf8')) : null;
 if (sharedManifest && !publicBase.endsWith(`/v/${sharedManifest.buildId}/`)) throw new Error('Shared artwork manifest must match IDOS_PUBLIC_ASSET_BASE.');
+// Additional exact-hash public assets (e.g. compact card previews) may live in
+// another retained version. Never reuse a partial dynamic group.
+const publicManifests = [sharedManifest, ...((process.env.IDOS_ADDITIONAL_ASSET_MANIFESTS || '').split(',').filter(Boolean).map(file => JSON.parse(readFileSync(path.resolve(root,file),'utf8'))))].filter(Boolean);
+for (const manifest of publicManifests) if (!/^bld[a-z0-9]+$/.test(manifest.buildId)) throw new Error('Invalid shared public version.');
 const hash = file => createHash('sha256').update(readFileSync(path.join(root,file))).digest('hex');
 const ownPrefix = css => css ? base === './' ? '../' : base : ownPublicBase;
 const outDir = path.join(root, 'dist', 'idos');
 const publicValues = {
   NEXT_PUBLIC_IDOS_TITLE_ID: 'SI4IPS8B', NEXT_PUBLIC_IDOS_SOLANA_NETWORK_ID: 'solana',
   NEXT_PUBLIC_IDOS_CURRENCY_ID: 'Main', NEXT_PUBLIC_IDOS_CURRENCY_TYPE: 'CryptoCurrency',
-  NEXT_PUBLIC_IDOS_RULER_CASE_ENABLED: 'true', NEXT_PUBLIC_IDOS_COMMERCE_ENABLED: 'false',
+  NEXT_PUBLIC_IDOS_RULER_CASE_ENABLED: 'true', NEXT_PUBLIC_IDOS_COMMERCE_ENABLED: 'true',
   NEXT_PUBLIC_IDOS_STATIC_BUILD: 'true', NEXT_PUBLIC_WS_URL: 'wss://imperivm-ws.onrender.com',
   NEXT_PUBLIC_PLAY_PROOF_ENABLED: 'false',
 };
@@ -81,7 +85,11 @@ for (const file of readdirSync(path.join(outDir, 'assets')).filter(file => /\.(j
     files.forEach(file => selectedAssets.add(file));
     // Share a dynamic path only when EVERY possible file is present and unchanged.
     // New/changed groups are packaged with this version and use its own origin.
-    const shared = sharedManifest && files.every(file => sharedManifest.assets[file.slice('public/'.length)] === hash(file));
+    const shared = publicManifests.find(manifest => files.every(file => manifest.assets[file.slice('public/'.length)] === hash(file)));
+    if (shared && shared !== sharedManifest) {
+      const sharedPrefix = file.endsWith('.css') ? `https://static.idos.games/drive/app/SI4IPS8B/v/${shared.buildId}/` : `/v/${shared.buildId}/`;
+      replacements.set(prefix+reference,sharedPrefix+reference);
+    }
     if (!shared) {
       files.forEach(file => copiedAssets.add(file));
       if (reuseAssets) replacements.set(prefix+reference,ownPrefix(file.endsWith('.css'))+reference);
@@ -128,5 +136,5 @@ if(codeManifestPath){
   console.log(`Reused ${sharedCode.length} exact-hash code/CSS assets from ${manifest.buildId}.`);
 }
 writeFileSync(path.join(outDir, 'models-availability.json'), JSON.stringify({}));
-writeFileSync(path.join(root,'dist/idos-assets-report.json'),JSON.stringify({base,sharedBase:reuseAssets?publicBase:null,assets:[...selectedAssets].sort().map(file=>({path:file.slice('public/'.length),packaged:copiedAssets.has(file),sha256:hash(file)}))},null,2));
-console.log(`Static iDos game ready: ${outDir} (${selectedAssets.size} referenced public assets; ${copiedAssets.size} packaged${reuseAssets ? `, ${selectedAssets.size-copiedAssets.size} verified unchanged in ${publicBase}` : ''}; Title SI4IPS8B, paid actions validate the token binding).`);
+writeFileSync(path.join(root,'dist/idos-assets-report.json'),JSON.stringify({base,sharedBase:reuseAssets?publicBase:null,sharedPublicBuilds:publicManifests.map(manifest=>manifest.buildId),assets:[...selectedAssets].sort().map(file=>({path:file.slice('public/'.length),packaged:copiedAssets.has(file),sha256:hash(file)}))},null,2));
+console.log(`Static iDos game ready: ${outDir} (${selectedAssets.size} referenced public assets; ${copiedAssets.size} packaged${reuseAssets ? `, ${selectedAssets.size-copiedAssets.size} verified unchanged across ${publicManifests.map(manifest=>manifest.buildId).join(', ')}` : ''}; Title SI4IPS8B, paid actions validate the token binding).`);

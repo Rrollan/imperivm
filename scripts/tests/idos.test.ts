@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { ed25519 } from '@noble/curves/ed25519';
 import { PublicKey } from '@solana/web3.js';
 import type { CollectionDefinitions, OperationResult, WalletChallengeResponse } from '@idosgames/core';
-import { authenticateSolanaWallet, SessionQueue } from '../../lib/idos/auth';
+import { authenticateSolanaWallet, authenticatePlatformSolanaWallet, SessionQueue } from '../../lib/idos/auth';
 import { IDOS_RARITIES, idosPackDrops, validateIDosDefinitions } from '../../lib/collection/idos';
 import { IDOS_CONFIG, REAL_PACK_COST } from '../../lib/collection/gateway';
 import { bytesToBase64, proofMessage, validPlayProof, verifyPlaySignature, type PlayProof } from '../../lib/solana/proof';
@@ -45,6 +45,28 @@ async function main() {
   const signedBefore = signed;
   await assert.rejects(authenticateSolanaWallet(auth, owner, IDOS_CONFIG.network, sign, () => now), /expired/);
   assert.equal(signed, signedBefore); assert(requests >= 6);
+
+  // Embedded login must not require the optional LastWalletLogin cache field.
+  now = 5000;
+  const messages = {addressRequest: 'address:request', addressResponse: 'address:response', signRequest: 'sign:request', signResponse: 'sign:response'};
+  let bridgeAddress = owner, signatureOwner = owner, denied = false;
+  const bridge = async (type: string, responseType: string, payload: Record<string, unknown>) => {
+    assert.equal(payload.titleID, 'SI4IPS8B'); assert.equal(payload.family, 'solana');
+    if (type === messages.addressRequest) {assert.equal(responseType, messages.addressResponse); return {ok: true, data: {address: bridgeAddress}};}
+    assert.equal(type, messages.signRequest); assert.equal(responseType, messages.signResponse);
+    assert.equal(payload.address, owner); assert.equal(payload.message, message);
+    if (denied) return {ok: false, error: 'USER_REJECTED', data: {}};
+    return {ok: true, data: {address: signatureOwner, signature: `0x${Buffer.from(ed25519.sign(new TextEncoder().encode(message), secret)).toString('hex')}`}};
+  };
+  const platformLogin = () => authenticatePlatformSolanaWallet({auth, titleID: 'SI4IPS8B', network: IDOS_CONFIG.network, messages, ask: bridge}, () => now);
+  assert.equal(await platformLogin(), owner, 'Verified bridge address survives an absent Blockchain snapshot');
+  const beforeRefusal = exchanged;
+  denied = true; await assert.rejects(platformLogin(), /USER_REJECTED/); denied = false;
+  signatureOwner = new PublicKey(new Uint8Array(32).fill(19)).toBase58(); await assert.rejects(platformLogin(), /Wallet changed/); signatureOwner = owner;
+  bridgeAddress = 'invalid'; await assert.rejects(platformLogin(), /invalid Solana wallet/); bridgeAddress = owner;
+  assert.equal(exchanged, beforeRefusal, 'Bad bridge replies never exchange a session');
+  refuse = true; await assert.rejects(platformLogin(), /PLAY_ACCESS_REQUIRED/); refuse = false;
+  now = 20_000; await assert.rejects(platformLogin(), /expired/); now = 5000;
 
   const queue = new SessionQueue(), steps: string[] = [];
   let release!: () => void;

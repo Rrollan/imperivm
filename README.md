@@ -6,7 +6,7 @@
 
 A Hearthstone-style card battler set in imperial Rome — on Solana. Read the mempool. Build your legion. Empty the rival's Treasury.
 
-[![Live Demo](https://img.shields.io/badge/🎮_Live_Demo-Play_Now-D4A24C?style=for-the-badge)](https://imperivm.onrender.com)
+[![Live Demo](https://img.shields.io/badge/🎮_Live_Demo-Play_Now-D4A24C?style=for-the-badge)](https://idosgames.com/app/SI4IPS8B/)
 [![Colosseum](https://img.shields.io/badge/Colosseum-2026-14F195)](https://colosseum.org)
 ![Next.js](https://img.shields.io/badge/Next.js-14-0B0A14?logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-3B1F6B?logo=react&logoColor=white)
@@ -27,11 +27,11 @@ A Hearthstone-style card battler set in imperial Rome — on Solana. Read the me
 
 *The current Babylon.js arena in a real training match, captured on 9 October 2026. The main branch contains this interface.*
 
-[Play](https://imperivm.onrender.com/arena) · [Build a deck](https://imperivm.onrender.com/collection) · [Open demo packs](https://imperivm.onrender.com/packs)
+[Play](https://idosgames.com/app/SI4IPS8B/) · [Build a deck](https://si4ips8b.idos.games/#/collection) · [Packs](https://si4ips8b.idos.games/#/packs)
 
-[Current iDos test build (v23)](https://si4ips8b.idos.games/v/bldda32001e101e43c282436b8d451bc2b8/index.html#/collection) — wallet profiles, native card listings and verified sale prices stored in Supabase, plus AI training, private duels, random matchmaking, wallet transfers and SOL → IMP purchase through Jupiter. The owner confirmed a real deposit and persistence after reload. Staged; pack purchases and trading remain disabled pending live settlement and withdrawal checks. [Release checks](docs/idos/card-marketplace-readiness-20261010.md).
+[Public iDos release (v26)](https://idosgames.com/app/SI4IPS8B/) — Live for all players. Native IMP pack purchases, ruler cases and the card marketplace are enabled at the owner's request. Agora packs cost **100,000 IMP** for five cards; the paid legendary chance is **0.0001% per whole pack**. Wallet profiles, free AI training, private duels, random matchmaking, transfers and SOL → IMP purchase through Jupiter are included. The owner confirmed a real deposit and persistence after reload. Live pack settlement, two-wallet sales and withdrawals remain unverified financial operations; SDK integration tests pass. [Release evidence and limits](docs/idos/public-release-20261010.md).
 
-v23 adds compact WebP artwork for all 99 cards and four frames: 4.8 MB instead of 26.6 MB of originals. Visible previews get download priority, catalogue canvases use four times fewer pixels, and detailed inspection upgrades to the original painting. Agora packs now cost 100,000 IMP in both client and iDos configuration. TypeScript, 19 integration groups, production builds and the full game smoke checks pass; desktop/mobile iDos pages show the art and new price. [Artwork validation](docs/design/card-loading-20261010/README.md). Five specifically approved, backed-up obsolete arena scripts were removed to fit this version; shared v4/v8 resources and v22 remain available.
+Compact WebP artwork for all 99 cards and four frames uses 4.8 MB instead of 26.6 MB of originals. Visible previews get download priority, catalogue canvases use four times fewer pixels, and detailed inspection upgrades to the original painting. v26 reuses exact-hash resources from v4/v23/v24; its ZIP is about 1 MB. TypeScript, 19 integration groups and both production builds pass; the public catalog iframe launches the actual game. [Artwork validation](docs/design/card-loading-20261010/README.md).
 
 ---
 

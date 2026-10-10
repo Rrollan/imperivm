@@ -9,6 +9,7 @@ import {SiteFooter,SiteHeader} from './SiteChrome';
 import {CardDialog} from './CardDialog';
 import {PaintedIcon} from '../PaintedIcon';
 import {RomanIcon} from '../presentation/RomanIcon';
+import {expandBattle} from '../presentation/battleFullscreen';
 import styles from './Home.module.css';
 import menu from './HomeMenu.module.css';
 
@@ -21,7 +22,7 @@ export default function HomeScreen(){
   function selectHero(id:string){setHero(id);try{localStorage.setItem(HERO_KEY,id);}catch{}}
   return <div className={styles.shell}><SiteHeader/><main className={menu.main}>
     <section className={menu.hero} aria-labelledby="home-title">
-      <div className={menu.copy}><p className={menu.kicker}>Roman · Crypto · Tactics</p><h1 id="home-title">{t('Твой легион.','Your legion.')}<span>{t('Твой ход.','Your move.')}</span></h1><p>{t('Собери связку. Перехитри соперника.','Build a combo. Outplay your opponent.')}</p><Link href={`/arena?hero=${hero}`} className={menu.play}><PaintedIcon name="play" size={42}/>{t('Играть','Play')}<RomanIcon name="next" size={22}/></Link><small>{t('Бесплатная колода уже готова.','Your free starter deck is ready.')}</small></div>
+      <div className={menu.copy}><p className={menu.kicker}>Roman · Crypto · Tactics</p><h1 id="home-title">{t('Твой легион.','Your legion.')}<span>{t('Твой ход.','Your move.')}</span></h1><p>{t('Собери связку. Перехитри соперника.','Build a combo. Outplay your opponent.')}</p><Link href={`/arena?hero=${hero}`} onClick={expandBattle} className={menu.play}><PaintedIcon name="play" size={42}/>{t('Играть','Play')}<RomanIcon name="next" size={22}/></Link><small>{t('Бесплатная колода уже готова.','Your free starter deck is ready.')}</small></div>
       <div className={menu.fan}>{PREVIEW_CARDS.map((id,index)=><button type="button" key={id} className={menu.fanCard} style={{'--card-index':index} as CSSProperties} onClick={event=>{event.currentTarget.focus({preventScroll:true});setInspected(id);}} aria-label={t(`Рассмотреть карту «${cardName(id)}»`,`Inspect ${cardName(id)}`)}><ArenaCardPreview id={id} locale={locale} label={cardName(id)}/></button>)}<span className={menu.fanHint}>{t('Нажми на карту — узнай её силу.','Tap a card to discover its power.')}</span></div>
     </section>
     <section className={menu.rulers} aria-labelledby="choose-ruler"><h2 id="choose-ruler">{t('Выбери правителя','Choose your ruler')}</h2><HeroRoster compact selected={hero} onSelect={selectHero}/></section>

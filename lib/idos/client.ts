@@ -1,7 +1,7 @@
-import { createIDosGamesClient, type IDosGamesClient, type GetLeaderboardResponse } from '@idosgames/core';
+import { createIDosGamesClient, askPlatformPage, type IDosGamesClient, type GetLeaderboardResponse } from '@idosgames/core';
 import { BrowserPlatformAdapter } from '@idosgames/core/platform';
 import { IDOS_CONFIG } from '../collection/gateway';
-import { authenticateSolanaWallet, idosResult, SessionQueue } from './auth';
+import { authenticateSolanaWallet, authenticatePlatformSolanaWallet, idosResult, SessionQueue } from './auth';
 import {IMPERIVM_TITLE} from './title';
 import {validateImpToken} from './token';
 import type {CollectionAuth} from '../collection/access';
@@ -62,13 +62,12 @@ export class IDosRuntime {
   }
   async loginEmbedded() {
     await this.authenticate(null, async () => {
-      const { loginWithWalletViaPlatform } = await import('@idosgames/wallet');
-      const result = await loginWithWalletViaPlatform({ client: this.client, networkID: IDOS_CONFIG.network, family: 'solana' });
-      if (!result.ok) throw new Error(`iDos ${result.stage}: ${result.error}`);
-      const linked = this.client.data.user.state?.Blockchain?.LastWalletLogin;
-      if (linked?.NetworkID !== IDOS_CONFIG.network || !linked.Address) throw new Error('iDos did not return the connected Solana wallet.');
-      // authenticate() reads this only after the backend verified the platform signature.
-      this.embeddedOwner = linked.Address;
+      const { PLATFORM_WALLET_MESSAGES } = await import('@idosgames/wallet');
+      // askPlatformPage validates the platform origin and correlated replies. The backend
+      // exchanges a fresh wallet challenge before this address can become the session owner.
+      this.embeddedOwner = await authenticatePlatformSolanaWallet({auth: this.client.auth,
+        titleID: this.client.titleID, network: IDOS_CONFIG.network,
+        messages: PLATFORM_WALLET_MESSAGES, ask: askPlatformPage});
     });
   }
   private embeddedOwner: string | null = null;

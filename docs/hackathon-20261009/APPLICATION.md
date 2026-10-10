@@ -18,9 +18,9 @@ The current playable build contains 99 cards and nine rulers, with 49 free base 
 
 Solana integration includes Phantom/iDos wallet identity and server-side reading of the real mainnet IMP token balance. Phantom holdings and the deposited iDos game balance are shown separately. Training needs no additional match signature or SOL. Experimental Ed25519 match-participation and Metaplex Core devnet badge code are disabled by default; a live badge mint has not been verified.
 
-iDos Title SI4IPS8B is configured and v13 is uploaded as a staged platform test build. The founder launched IMP on Solana mainnet; its mint, six decimals and wallet balance have been verified read-only. iDos has corrected Main currency decimals to six. Packs and ruler cases are configured for IMP, but purchases remain disabled pending an owner payment test. Catalog release, owner wallet testing and live payments remain pending; wager-based PvP is not implemented. Demo IMP is separate local test currency.
+iDos Title SI4IPS8B is publicly released as v26. IMP uses Solana mainnet and six decimals. The founder confirmed a real deposit and persistence after reload. Native purchases of five-card packs for 100,000 IMP, ruler cases and player-to-player card trading are enabled. Paid legendary cards have a 0.0001% chance per whole pack. Confirmed sales inform market price history stored in Supabase. Live pack settlement, two-wallet sales and withdrawals are not yet verified; integration tests cover those SDK flows. Wager-based PvP is deferred. Demo IMP is separate local test currency.
 
-Play: https://imperivm.onrender.com
+Play: https://idosgames.com/app/SI4IPS8B/
 
 Code: https://github.com/Rrollan/imperivm
 
@@ -34,11 +34,11 @@ IMPERIVM — браузерная карточная игра в сеттинг�
 
 Рабочая версия содержит 99 карт и 9 правителей. Бесплатная база — 49 карт и 5 правителей; ещё 50 персонажей и 4 правителя связаны с паками и кейсами. Без кошелька доступны тренировки. Работают конструктор колод, анимированное раскрытие демо-паков и новая Babylon.js арена. Бесплатные дуэли с другом и случайный подбор используют авторитетный WS-сервер; матч двух независимых клиентов проверен на домене iDos.
 
-Реализованы Phantom/iDos вход и серверное чтение реального mainnet IMP. Токены кошелька и внесённый игровой баланс разделены. Для тренировки дополнительная подпись матча и SOL не нужны. Экспериментальный proof/NFT путь выключен по умолчанию; успешный devnet mint не подтверждён. Title SI4IPS8B настроен, v13 загружена в Staged. SPL $IMP и 6 decimals проверены; iDos исправил Main.Decimals на 6. Паки и кейсы привязаны к токену, покупки выключены до теста владельца. Публикация, пользовательский вход и оплата ещё требуют проверки; денежный PvP не реализован.
+Реализованы Phantom/iDos вход и серверное чтение реального mainnet IMP. Токены кошелька и внесённый игровой баланс разделены. Для тренировки дополнительная подпись матча и SOL не нужны. Экспериментальный proof/NFT путь выключен по умолчанию; успешный devnet mint не подтверждён. Title SI4IPS8B публично выпущен как v26. Mainnet IMP и 6 decimals проверены; владелец подтвердил пополнение и сохранение игрового баланса. По его разрешению включены покупки паков по 100 000 IMP и торговля картами через iDos. Шанс платной легендарной — 0,0001% на весь пак; история подтверждённых продаж хранится в Supabase. Живые покупка пака, расчёт двух кошельков и вывод пока не подтверждены. Денежный PvP отложен.
 
 ## Technology / integration field
 
-Next.js, React, TypeScript, Babylon.js, authoritative Node.js WebSocket server for private duels and random matchmaking; Solana wallet identity and exact mainnet IMP balance reading; iDos Games SDK with Title SI4IPS8B and staged static v13. Experimental off-chain participation signatures and Metaplex Core devnet badge code are disabled by default. iDos Main decimals are six; live purchases remain disabled pending an owner test. Local demo IMP is separate.
+Next.js, React, TypeScript, Babylon.js, authoritative Node.js WebSocket server for private duels and random matchmaking; Solana wallet identity and exact mainnet IMP balance reading; iDos Games SDK with Title SI4IPS8B and live static v26. Experimental off-chain participation signatures and Metaplex Core devnet badge code are disabled by default. iDos Main decimals are six; native IMP purchases and card trading are enabled, with real settlement and withdrawals still awaiting live verification. Local demo IMP is separate.
 
 ## Development history field
 
@@ -49,10 +49,10 @@ The inspected repository history starts on 3 October 2026, within the Crypto Wor
 | Field | Value / action |
 | --- | --- |
 | GitHub | https://github.com/Rrollan/imperivm — repository, not profile |
-| Browser demo | https://imperivm.onrender.com |
-| iDos staged test | https://si4ips8b.idos.games/v/bldbbb1a6017a044791951e56be0a8b0d5a/index.html |
-| iDos catalog URL | Copy only after actual publication and launch check |
-| Mainnet token | [Verified mint](https://explorer.solana.com/address/7nfdxHzxab9UBhsZd8RCbWqDN45xJMuX33Pkpibeidos); balance reading tested, payment usage pending owner test |
+| Browser demo | https://idosgames.com/app/SI4IPS8B/ |
+| iDos public game | https://si4ips8b.idos.games/ |
+| iDos catalog URL | https://idosgames.com/app/SI4IPS8B/ — public v26 verified |
+| Mainnet token | [Verified mint](https://explorer.solana.com/address/7nfdxHzxab9UBhsZd8RCbWqDN45xJMuX33Pkpibeidos); wallet balance and deposit persistence confirmed; native pack settlement/withdrawals await live verification |
 | Demo video | Public/unlisted working-product recording, ≤3 minutes |
 | Pitch video | ≤2 minutes in the inspected live form; founder on camera or voice with clear identity |
 | Deck | Export/share the reviewed PPTX after final integration-status update |
@@ -87,7 +87,7 @@ We are building a card game that is enjoyable before players connect a wallet. C
 
 ### Technologies
 
-Next.js, React, TypeScript, Tailwind CSS, Babylon.js, Node.js WebSocket server; Solana web3.js, Phantom and wallet-standard APIs; exact mainnet token balance reading; @idosgames/core and @idosgames/wallet adapters. Experimental Ed25519 participation and Metaplex Core devnet badge code are disabled by default. AI-assisted code and artwork with Codex and Google Flow. Public demo on Render; staged v13 on iDos.
+Next.js, React, TypeScript, Tailwind CSS, Babylon.js, Node.js WebSocket server; Solana web3.js, Phantom and wallet-standard APIs; exact mainnet token balance reading; @idosgames/core and @idosgames/wallet adapters. Experimental Ed25519 participation and Metaplex Core devnet badge code are disabled by default. AI-assisted code and artwork with Codex and Google Flow. Public v26 on iDos; Render hosts the multiplayer and integration services.
 
 ### Solana usage
 

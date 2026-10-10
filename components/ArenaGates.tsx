@@ -9,6 +9,7 @@ import {heroPortraitPath} from './presentation/heroPortrait';
 import {powerRules} from './presentation/rulesText';
 import {PaintedIcon} from './PaintedIcon';
 import {ImperivmLogo} from './ImperivmLogo';
+import {expandBattle} from './presentation/battleFullscreen';
 import styles from './ArenaGates.module.css';
 
 export default function ArenaGates(){
@@ -34,7 +35,7 @@ export default function ArenaGates(){
       </div>)}</div>
       <div className={styles.heroBrief} aria-live="polite"><img src={heroPortraitPath(hero)} alt=""/><div><strong>{locale.powerName(hero)} <span>· {HEROES[hero].powerCost} {locale.t('приказа','orders')}</span></strong><p>{powerRules(hero,locale.locale)} {locale.t('Один раз за ход.','Once per turn.')}</p></div></div>
     </section>
-    <section className={styles.modes} aria-label={locale.t('Режимы игры','Game modes')}>{modes.map(mode=><article key={mode.id} className={styles.mode}><div className={styles.modeArt} style={{backgroundImage:`url('/ui/portals/${mode.image}.webp')`}} aria-hidden="true"/><div className={styles.modeCopy}><span className={styles.modeNumber}>{mode.id==='ai'?'I':mode.id==='friend'?'II':'III'}</span><h2>{mode.title}</h2><p>{mode.text}</p><small>{mode.detail}</small><Link href={mode.href}>{mode.action}<PaintedIcon name="play" size={32}/></Link></div></article>)}</section>
+    <section className={styles.modes} aria-label={locale.t('Режимы игры','Game modes')}>{modes.map(mode=><article key={mode.id} className={styles.mode}><div className={styles.modeArt} style={{backgroundImage:`url('/ui/portals/${mode.image}.webp')`}} aria-hidden="true"/><div className={styles.modeCopy}><span className={styles.modeNumber}>{mode.id==='ai'?'I':mode.id==='friend'?'II':'III'}</span><h2>{mode.title}</h2><p>{mode.text}</p><small>{mode.detail}</small><Link href={mode.href} onClick={expandBattle}>{mode.action}<PaintedIcon name="play" size={32}/></Link></div></article>)}</section>
     <footer className={styles.footer}><p>{locale.t('Стартовые колоды доступны бесплатно. Кошелёк и паки не нужны, чтобы сыграть.','Starter decks are free. You do not need a wallet or packs to play.')}</p><Link href="/library#rules"><PaintedIcon name="library" size={30}/>{locale.t('Как играть','How to play')}</Link></footer>
   </main>;
 }
