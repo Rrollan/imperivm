@@ -30,7 +30,8 @@ export function startServer(options: ServiceOptions = {}) {
       const origin = request.headers.origin;
       if (!origin || !origins.has(origin)) {response.statusCode = 403; response.end(JSON.stringify({error: 'Origin not allowed'})); return;}
       response.setHeader('Access-Control-Allow-Origin', origin); response.setHeader('Vary', 'Origin');
-      response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS'); response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      // web3.js always adds solana-client; browsers preflight both headers before any RPC read.
+      response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS'); response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Solana-Client');
       if (request.method === 'OPTIONS') {response.statusCode = 204; response.end(); return;}
       if (request.method !== 'POST') {response.statusCode = 405; response.end(JSON.stringify({error: 'POST required'})); return;}
       const ip = request.socket.remoteAddress ?? 'unknown', now = Date.now();

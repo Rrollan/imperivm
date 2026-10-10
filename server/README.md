@@ -196,7 +196,7 @@ NEXT_PUBLIC_WS_URL=wss://<сервис>.onrender.com
 
 ## RPC для внесения и вывода IMP
 
-`POST /wallet/rpc` принимает один JSON-RPC 2.0 запрос. Требует точный разрешённый `Origin`; отсутствие Origin тоже отклоняется. `OPTIONS` отвечает CORS preflight, другие HTTP-методы запрещены. Клиент не может передать URL upstream, batch или произвольный RPC-метод.
+`POST /wallet/rpc` принимает один JSON-RPC 2.0 запрос. Требует точный разрешённый `Origin`; отсутствие Origin тоже отклоняется. `OPTIONS` отвечает CORS preflight и разрешает только заголовки `Content-Type, Solana-Client` (второй автоматически добавляет web3.js). Другие HTTP-методы запрещены. Клиент не может передать URL upstream, batch или произвольный RPC-метод.
 
 Разрешены `getAccountInfo` (base64), `getLatestBlockhash`, `getBlockHeight`, `getSignatureStatuses` (до четырёх подписей), `getTransaction` и `sendTransaction`. Параметры каждого метода проверяются по allowlist. `sendTransaction` принимает ограниченный base64-пакет с ненулевой подписью, не разрешает `skipPreflight:true` и ограничивает `maxRetries` диапазоном 0–5. Подпись создаёт Phantom в клиенте; Solana проверяет её и транзакцию при preflight. Релей не является серверным signer и не гарантирует успешность переданного пакета.
 
