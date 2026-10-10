@@ -36,7 +36,7 @@ export class TransferJournal {
   save(receipt: TransferReceipt) {this.storage.setItem(this.key, JSON.stringify(receipt)); if (this.storage.getItem(this.key) !== JSON.stringify(receipt)) throw new Error('Не удалось сохранить чек перевода. Разрешите хранилище браузера.');}
   clear() {this.storage.removeItem(this.key);}
 }
-export type TransferConfig = {network: BlockchainNetworkDefinition; currency: CryptoCurrencyDefinition; balance: string; pending: TransferReceipt | null; withdrawalFeePercent: string | null};
+export type TransferConfig = {network: BlockchainNetworkDefinition; currency: CryptoCurrencyDefinition; balance: string; pending: TransferReceipt | null; withdrawalFeePercent: string | null; minimumAccountAgeDays: number | null};
 function feePercent(currency: CryptoCurrencyDefinition): string | null {
   const values = [currency.DeveloperWithdrawalFeePercent, currency.CommunityMarketingWithdrawalFeePercent, currency.WithdrawalBurnPercent];
   if (values.every(value => value == null)) return null;
@@ -63,7 +63,14 @@ export async function loadImpTransferConfig(client: IDosGamesClient, journal: Tr
     if (!Number.isSafeInteger(pending.startedAt) || pending.hash && !signaturePattern.test(pending.hash)) throw new Error('iDos вернул неполный чек предыдущего вывода.');
     journal.save(pending);
   }
-  return {network: {...network, NetworkID: IMPERIVM_TITLE.network}, currency, balance: client.data.user.getCryptoCurrencyAmount(IMPERIVM_TITLE.currency), pending, withdrawalFeePercent: feePercent(currency)};
+  const system = definitions.Blockchain?.SystemState;
+  const webEnabled = system?.PlatformOverrides?.Web !== false && network.PlatformOverrides?.Web !== false;
+  const configuredAge = definitions.Blockchain?.AccountSafety?.MinAccountAgeDays;
+  const minimumAccountAgeDays = typeof configuredAge === 'number' && Number.isSafeInteger(configuredAge) && configuredAge >= 0 ? configuredAge : null;
+  return {network: {...network, NetworkID: IMPERIVM_TITLE.network,
+    DepositsEnabled: network.DepositsEnabled === true && system?.DepositsEnabled !== false && webEnabled,
+    WithdrawalsEnabled: network.WithdrawalsEnabled === true && system?.WithdrawalsEnabled !== false && webEnabled,
+  }, currency, balance: client.data.user.getCryptoCurrencyAmount(IMPERIVM_TITLE.currency), pending, withdrawalFeePercent: feePercent(currency), minimumAccountAgeDays};
 }
 /** Allow only a HTTPS transaction endpoint; the server fixes the mainnet upstream. */
 export function impTransactionRpcUrl(): string {
