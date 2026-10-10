@@ -5,14 +5,14 @@ import { ArenaCardPreview } from '../presentation/ArenaCardPreview';
 import { useLocale } from '../LocaleContext';
 import styles from './Home.module.css';
 
-/** Keep the catalogue's full-resolution art off the network until it approaches view. */
+/** Only compact artwork near the viewport joins the queue. Inspection keeps the original. */
 export function LibraryCardFace({ id }: { id: string }) {
   const { locale, cardName } = useLocale();
   const root = useRef<HTMLSpanElement>(null), [ready, setReady] = useState(false);
   useEffect(() => {
     if (ready) return;
     if (!('IntersectionObserver' in window)) { setReady(true); return; }
-    const observer = new IntersectionObserver(entries => { if (entries.some(entry => entry.isIntersecting)) { setReady(true); observer.disconnect(); } }, { rootMargin: '320px 0px' });
+    const observer = new IntersectionObserver(entries => { if (entries.some(entry => entry.isIntersecting)) { setReady(true); observer.disconnect(); } }, { rootMargin: '120px 0px' });
     if (root.current) observer.observe(root.current);
     return () => observer.disconnect();
   }, [ready]);

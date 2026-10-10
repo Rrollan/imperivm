@@ -1,18 +1,38 @@
 /** Artwork is shared by the table and card inspection. Four downloads at once
  * leave bandwidth for the board/UI; one retry recovers transient failures. */
 export type ArenaImage = {image: HTMLImageElement; loaded: Promise<HTMLImageElement>};
+export type ArenaImageOptions = {priority?: 'high' | 'normal'};
+type QueuedRequest = {src: string; priority: 'high' | 'normal'; start: () => void};
 const images = new Map<string, ArenaImage>();
 const decodedImages = new WeakSet<HTMLImageElement>();
-const queue: (() => void)[] = [];
+const highQueue: QueuedRequest[] = [];
+const normalQueue: QueuedRequest[] = [];
+const queuedRequests = new Map<string, QueuedRequest>();
 let active = 0;
-function pump() {while (active < 4 && queue.length) {active++;queue.shift()!();}}
+function pump() {
+  while (active < 4 && (highQueue.length || normalQueue.length)) {
+    const request = (highQueue.shift() ?? normalQueue.shift())!;
+    queuedRequests.delete(request.src);active++;request.start();
+  }
+}
 
-export function requestArenaImage(src: string): ArenaImage {
+export function requestArenaImage(src: string, options: ArenaImageOptions = {}): ArenaImage {
   const known = images.get(src);
-  if (known) {images.delete(src);images.set(src,known);return known;}
+  if (known) {
+    images.delete(src);images.set(src,known);
+    const queued = queuedRequests.get(src);
+    // A visible consumer can promote a shared prefetch without another download.
+    // Later normal consumers never demote an already visible request.
+    if (options.priority === 'high' && queued?.priority === 'normal') {
+      normalQueue.splice(normalQueue.indexOf(queued),1);
+      queued.priority = 'high';highQueue.push(queued);
+    }
+    return known;
+  }
   const image = new Image();image.crossOrigin = 'anonymous';image.decoding = 'async';
   const loaded = new Promise<HTMLImageElement>((resolve,reject) => {
-    queue.push(() => {
+    const priority = options.priority === 'high' ? 'high' : 'normal';
+    const request: QueuedRequest = {src,priority,start: () => {
       let attempt = 0, settled = false, timer: ReturnType<typeof setTimeout>;
       const finish = (ok: boolean) => {
         if (settled) return;
@@ -42,7 +62,9 @@ export function requestArenaImage(src: string): ArenaImage {
         image.src = generation === 1 ? src : `${src}${src.includes('?')?'&':'?'}arena_retry=1`;
       };
       begin();
-    });
+    }};
+    queuedRequests.set(src,request);
+    (priority === 'high' ? highQueue : normalQueue).push(request);
   });
   const entry = {image,loaded};images.set(src,entry);pump();return entry;
 }

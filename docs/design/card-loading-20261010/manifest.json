@@ -1,0 +1,2169 @@
+{
+  "files": [
+    {
+      "id": "senate-censure",
+      "source": "public/cards/senate-censure.webp",
+      "output": "public/ui/cards/preview-v1/art/senate-censure.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        512,
+        768
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 106404,
+      "bytes": 47536,
+      "sourceSha256": "952ac8ca5ed71a14221f9fc7fd6897ecd0238cc8160f980cb0f7c71fcb03c167",
+      "sha256": "4824fa1bde6ed4e26414403c0e14c3c4b4b30e92538b2b11f5fe83fb8da74233"
+    },
+    {
+      "id": "restoration-rite",
+      "source": "public/cards/restoration-rite.webp",
+      "output": "public/ui/cards/preview-v1/art/restoration-rite.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        512,
+        768
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 128940,
+      "bytes": 58516,
+      "sourceSha256": "296ecacbcb461a1c7430e910403ac98a8c258883a52568703f848b2a00c06f69",
+      "sha256": "68711eb4be48273a5ffd7eb6a1f51d68a4a014f76549dee211ce6b3d4ba5769a"
+    },
+    {
+      "id": "agora-expansion",
+      "source": "public/cards/agora-expansion.webp",
+      "output": "public/ui/cards/preview-v1/art/agora-expansion.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 243378,
+      "bytes": 63848,
+      "sourceSha256": "bbef02c680e61d54f0711b680f90314a93d8e8b5eb66cee013b451273632e3a0",
+      "sha256": "9fc6ff3a18069af833cc5deaec419fac2b3873a690855653bfde90d5055b7e65"
+    },
+    {
+      "id": "diamond-aegis",
+      "source": "public/cards/diamond-aegis.webp",
+      "output": "public/ui/cards/preview-v1/art/diamond-aegis.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 307836,
+      "bytes": 80344,
+      "sourceSha256": "a014491336450fe61cc51764ec670b514dee51eb5afb493e6871314ea5a2fc7a",
+      "sha256": "975f0405589537d5f62ae1776016af1f9c34ebe855209e09c431a3e9e16e9b97"
+    },
+    {
+      "id": "hermes-relayer",
+      "source": "public/cards/hermes-relayer.webp",
+      "output": "public/ui/cards/preview-v1/art/hermes-relayer.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 238964,
+      "bytes": 66622,
+      "sourceSha256": "efc12a6ea0a9ff19869b23f788454bd58ae12e9693f80c73602571dfe64908a3",
+      "sha256": "91aada050d68ab7a6fba7034071cfd59998e8a3e1a49405247bb55f3d1d9c2fb"
+    },
+    {
+      "id": "athena-diamond-guard",
+      "source": "public/cards/athena-diamond-guard.webp",
+      "output": "public/ui/cards/preview-v1/art/athena-diamond-guard.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 275028,
+      "bytes": 72710,
+      "sourceSha256": "31cc77c44fa60246e76aa10c495cc4ef54abda192d2d02439ffe8e8bab73b795",
+      "sha256": "fd9fb213da8a8989864b2b530c7106c54cc42d8d1a9d12d54ab6117722dc6535"
+    },
+    {
+      "id": "zeus-liquidator",
+      "source": "public/cards/zeus-liquidator.webp",
+      "output": "public/ui/cards/preview-v1/art/zeus-liquidator.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 275880,
+      "bytes": 71782,
+      "sourceSha256": "a8d68aa5fe52432dabb144cfd64e3cf3353c0c9bf95801f2af31860fc477eaf7",
+      "sha256": "740e42f2ef01a10d183a3f8364c697a99d1a387e165eaf8b6aa15d5b75c8d6ef"
+    },
+    {
+      "id": "hades-rugkeeper",
+      "source": "public/cards/hades-rugkeeper.webp",
+      "output": "public/ui/cards/preview-v1/art/hades-rugkeeper.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 257870,
+      "bytes": 66294,
+      "sourceSha256": "5fbfc555a479c348847a10d7d9b82a82b8f09df4e3b85692cb81c704c2aad9de",
+      "sha256": "c330728e0074e2c0eed42d7ec784c786d9340a19d1bead837170c654e10d702b"
+    },
+    {
+      "id": "lending-legionnaire",
+      "source": "public/cards/lending-legionnaire.webp",
+      "output": "public/ui/cards/preview-v1/art/lending-legionnaire.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1070,
+        1470
+      ],
+      "size": [
+        384,
+        528
+      ],
+      "sourceBytes": 318800,
+      "bytes": 52196,
+      "sourceSha256": "3d9e3ce593eeab553c51ad0d7ecf1222bf16103edd8ef357dc63224bc9322e2f",
+      "sha256": "2494f08c8808a1bac6a1d34d063233cd1f4ccb34b344a9e53b883b532401121f"
+    },
+    {
+      "id": "amm-centurion",
+      "source": "public/cards/amm-centurion.webp",
+      "output": "public/ui/cards/preview-v1/art/amm-centurion.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1063,
+        1480
+      ],
+      "size": [
+        384,
+        535
+      ],
+      "sourceBytes": 386172,
+      "bytes": 57542,
+      "sourceSha256": "4db492181f5442a927848e17e737b2dc46ef382be3583564619180a3f234e467",
+      "sha256": "2ab38e44d29fb0d9319e5546f13839123987855f26ae92ac2b93098da116471a"
+    },
+    {
+      "id": "liquidation-officer",
+      "source": "public/cards/liquidation-officer.webp",
+      "output": "public/ui/cards/preview-v1/art/liquidation-officer.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1070,
+        1470
+      ],
+      "size": [
+        384,
+        528
+      ],
+      "sourceBytes": 288506,
+      "bytes": 46274,
+      "sourceSha256": "785dc6972ef450e2163e97262a54675e58644461c055b6abac1029fe3475843c",
+      "sha256": "690e8ae813a6a13de66d046ca192915ff25abbb2b0cacf2f1d7145aa2cf60b56"
+    },
+    {
+      "id": "frontrun-bot",
+      "source": "public/cards/frontrun-bot.webp",
+      "output": "public/ui/cards/preview-v1/art/frontrun-bot.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 312786,
+      "bytes": 50534,
+      "sourceSha256": "7accaea51261d894f0be712f82a1bee4188d84b6c6fc837fc47b62fc2f17225d",
+      "sha256": "42ae29056e1eda39ce6386db8d13f26fb4d066f1052c9d3fd1406e33cb311160"
+    },
+    {
+      "id": "priority-fee",
+      "source": "public/cards/priority-fee.webp",
+      "output": "public/ui/cards/preview-v1/art/priority-fee.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1106,
+        1422
+      ],
+      "size": [
+        384,
+        494
+      ],
+      "sourceBytes": 267536,
+      "bytes": 39420,
+      "sourceSha256": "92aa3e84e24439d285770f2c869412628aed4edc48ab0e45d85c1de443e63504",
+      "sha256": "734e5dfe2971c1bc0fdddebda4746d1fbb4b7c457a8fd0ba3c22ea9cd9ce2b69"
+    },
+    {
+      "id": "yield-farmer",
+      "source": "public/cards/yield-farmer.webp",
+      "output": "public/ui/cards/preview-v1/art/yield-farmer.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 332116,
+      "bytes": 54318,
+      "sourceSha256": "a2f6f68893ee2fe57c3d7704f069aead6de56abfd2fe0ed2dfb9915a875ec620",
+      "sha256": "78c78c4fdda192440e7a0d4a19c0d64c19c539833b4739322bfbf66909aa1462"
+    },
+    {
+      "id": "staking-pool",
+      "source": "public/cards/staking-pool.webp",
+      "output": "public/ui/cards/preview-v1/art/staking-pool.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 315088,
+      "bytes": 52124,
+      "sourceSha256": "ffaa5e2d6ec90bf29d2a821ea601e602970a3af664b00399837e91fb9f58c0d9",
+      "sha256": "05d59e5085508d7e9ac17cba11193a819f1dd08035ec3b382a443949943627e0"
+    },
+    {
+      "id": "flash-loan",
+      "source": "public/cards/flash-loan.webp",
+      "output": "public/ui/cards/preview-v1/art/flash-loan.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1082,
+        1454
+      ],
+      "size": [
+        384,
+        516
+      ],
+      "sourceBytes": 270284,
+      "bytes": 41484,
+      "sourceSha256": "4237a136f58d040c4ae8fab07694aae30272d85ac278c4087dfc247e5dc96089",
+      "sha256": "3aa73625fe4f0b95b2c3b177563edf632fc4991d86ac8785b0d6dad7108720de"
+    },
+    {
+      "id": "impermanent-guard",
+      "source": "public/cards/impermanent-guard.webp",
+      "output": "public/ui/cards/preview-v1/art/impermanent-guard.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 311160,
+      "bytes": 46340,
+      "sourceSha256": "6ef3bd19408cace2ddf35dc6b5fc384f02a0783e11925a3f7cd38af5b31c2257",
+      "sha256": "73c011e4efa21befa3841ae39f008469c057526989efcd5b496766dc8564ca3a"
+    },
+    {
+      "id": "imperator-liquidus",
+      "source": "public/cards/imperator-liquidus.webp",
+      "output": "public/ui/cards/preview-v1/art/imperator-liquidus.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 263210,
+      "bytes": 35486,
+      "sourceSha256": "a467ecc3b594a43150b3145f0a9abed0cb8ae6f3ab3d088ae15142604fea83be",
+      "sha256": "d1f55c97039d2b9c4be3ed861647f49d5998df3ffdcb434d8a0413f6f77ae82c"
+    },
+    {
+      "id": "pixel-squire",
+      "source": "public/cards/pixel-squire.webp",
+      "output": "public/ui/cards/preview-v1/art/pixel-squire.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 351128,
+      "bytes": 54454,
+      "sourceSha256": "b0655cd61fd92d574b59cb04ef29aa004130860057df121062f4fd51c2e0e6df",
+      "sha256": "dca42ecff3176057469ad91f15d39e681c34b0ea52b5bf19e39b863d5c246ff0"
+    },
+    {
+      "id": "whitelist-scout",
+      "source": "public/cards/whitelist-scout.webp",
+      "output": "public/ui/cards/preview-v1/art/whitelist-scout.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 320178,
+      "bytes": 48144,
+      "sourceSha256": "dbb979a8ea8c22f5c874b0baf6fcb93425ace2f2122f445ec82f5baba198924a",
+      "sha256": "c78a9573f74b83b3d79d8eaf88226b647d15e811eaa49687451ee9e0914c3de3"
+    },
+    {
+      "id": "profile-pic-phalanx",
+      "source": "public/cards/profile-pic-phalanx.webp",
+      "output": "public/ui/cards/preview-v1/art/profile-pic-phalanx.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1070,
+        1470
+      ],
+      "size": [
+        384,
+        528
+      ],
+      "sourceBytes": 339814,
+      "bytes": 52490,
+      "sourceSha256": "265bebb073be3313b4dd12be87e6247fb1d0268395aff101b9191153d9127a2e",
+      "sha256": "e432a65612878c9f4177de20f4a52b3b953adaa8f538e37aecabeccb33f8543c"
+    },
+    {
+      "id": "trait-reroll",
+      "source": "public/cards/trait-reroll.webp",
+      "output": "public/ui/cards/preview-v1/art/trait-reroll.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1082,
+        1454
+      ],
+      "size": [
+        384,
+        516
+      ],
+      "sourceBytes": 328758,
+      "bytes": 48574,
+      "sourceSha256": "2253992f8754199ff470207d7ae3ff71ee3cf175c6adec40ef93aa2b690c9842",
+      "sha256": "e678c4ebb167eec7b04c7e1d19c95779aa8d516cc362274018b21e586c3d7c75"
+    },
+    {
+      "id": "floor-sweeper",
+      "source": "public/cards/floor-sweeper.webp",
+      "output": "public/ui/cards/preview-v1/art/floor-sweeper.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 318352,
+      "bytes": 56046,
+      "sourceSha256": "de103b145c1de70e3d4b6f5aacb6106b10a23cc260a2ec4e3a67779740355a5f",
+      "sha256": "ad47827f62d4ba7470cf5b6e3ecc002e3a74c73d0a22d2a1c1b82edfa7bd34dd"
+    },
+    {
+      "id": "ape-praetorian",
+      "source": "public/cards/ape-praetorian.webp",
+      "output": "public/ui/cards/preview-v1/art/ape-praetorian.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 339420,
+      "bytes": 54184,
+      "sourceSha256": "68bb46c9aa3d205bb9ce968b938886729cb7d72587c1d9c50ead1a660048ff96",
+      "sha256": "094a4ad38deed69c4081d62711969acd2ccb03b46b57173769ca6c7575283f1d"
+    },
+    {
+      "id": "minting-press",
+      "source": "public/cards/minting-press.webp",
+      "output": "public/ui/cards/preview-v1/art/minting-press.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 344906,
+      "bytes": 53846,
+      "sourceSha256": "6494c3dd97732bca0ffe3e62070df03726914219c7b315c48efd8f36207e3d9d",
+      "sha256": "ec683282261353cb3e17df687a477889cd2b99c661223bd4dc17ebdef35e8fc5"
+    },
+    {
+      "id": "reveal-ceremony",
+      "source": "public/cards/reveal-ceremony.webp",
+      "output": "public/ui/cards/preview-v1/art/reveal-ceremony.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1122,
+        1402
+      ],
+      "size": [
+        384,
+        480
+      ],
+      "sourceBytes": 354212,
+      "bytes": 51418,
+      "sourceSha256": "5e1575446df8951be7f6c793df8914fc85e9807f5b41929febfda221048d867b",
+      "sha256": "b17e2a1099a6b816b0d4911a0473b1d0595e975496fa92a9395b533de12522cf"
+    },
+    {
+      "id": "blue-chip-basilisk",
+      "source": "public/cards/blue-chip-basilisk.webp",
+      "output": "public/ui/cards/preview-v1/art/blue-chip-basilisk.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 328506,
+      "bytes": 51340,
+      "sourceSha256": "9c1d60962b44cd19719d055db2e70a4bea201429213f4f8ded17af20d5f81e8e",
+      "sha256": "880c2781a500ea7d4dfd3da2c6053bfaaa2eb58a4b64ddfb7102a4bb71a3e882"
+    },
+    {
+      "id": "genesis-pfp",
+      "source": "public/cards/genesis-pfp.webp",
+      "output": "public/ui/cards/preview-v1/art/genesis-pfp.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1145,
+        1374
+      ],
+      "size": [
+        384,
+        461
+      ],
+      "sourceBytes": 344076,
+      "bytes": 41676,
+      "sourceSha256": "69209edd07521e7f602845250187faf955106e3cbeca7698fd05e514f4b7bc5e",
+      "sha256": "2154f05096381368c7a098c1c7cc1898ee904af7fd35e51726a40faa24756534"
+    },
+    {
+      "id": "antenna-auxilia",
+      "source": "public/cards/antenna-auxilia.webp",
+      "output": "public/ui/cards/preview-v1/art/antenna-auxilia.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 300972,
+      "bytes": 46668,
+      "sourceSha256": "89e9247daaa5ed715543571b9c712f8ded596cace46c2cb772e0c2dc1d3d294d",
+      "sha256": "c441be3a119c6d1b0f15991a44be149461cf630eea2d77acfe82ee9a824af8f4"
+    },
+    {
+      "id": "mesh-messenger",
+      "source": "public/cards/mesh-messenger.webp",
+      "output": "public/ui/cards/preview-v1/art/mesh-messenger.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 282116,
+      "bytes": 47258,
+      "sourceSha256": "bf959a1ff25803fd15252d603b907dba4d11452177f5ed2b59a5b60fea66d3d4",
+      "sha256": "c5f2d8718d5bc01138912c4a91de4552c89ac5d792e2b0e976e4a011e285d5f2"
+    },
+    {
+      "id": "relay-runner",
+      "source": "public/cards/relay-runner.webp",
+      "output": "public/ui/cards/preview-v1/art/relay-runner.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 337148,
+      "bytes": 52504,
+      "sourceSha256": "19462bb3e03260a914c1e5fe3a09a695f8fdb8c03a8911d1a7e5ea17d53453f4",
+      "sha256": "db58a17c58085df6c883da0ecac99c3613051db1a31004f079a0b2e586cc3f3a"
+    },
+    {
+      "id": "node-sentinel",
+      "source": "public/cards/node-sentinel.webp",
+      "output": "public/ui/cards/preview-v1/art/node-sentinel.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 323732,
+      "bytes": 48302,
+      "sourceSha256": "8fbe5ef5b6855eafa03899b7fe1523cf2f48c4ec0b5229a51f2b8c203be55bd9",
+      "sha256": "bec3dd1f1c9070861a9c3d5a91d26182d907ad75b484973218dac1391ed5612e"
+    },
+    {
+      "id": "bandwidth-barbarian",
+      "source": "public/cards/bandwidth-barbarian.webp",
+      "output": "public/ui/cards/preview-v1/art/bandwidth-barbarian.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 371092,
+      "bytes": 55530,
+      "sourceSha256": "3069392507dae09743cb3bae9260872621a89d234887570fd3847b69dbd338a8",
+      "sha256": "e000eab0df9ab2426fd36fffbd8fb3b17fbe2b5767284c4b918d2e05f605c302"
+    },
+    {
+      "id": "hotspot-hoplite",
+      "source": "public/cards/hotspot-hoplite.webp",
+      "output": "public/ui/cards/preview-v1/art/hotspot-hoplite.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 346130,
+      "bytes": 53734,
+      "sourceSha256": "e16c39822aac4e9c5bc758ccfce367aee67ea1fac3329661b2ea9e2596c62f11",
+      "sha256": "e724f204730c8a630f2aacf57aae47ca2bb1f655936ff2dd871d07efc358e059"
+    },
+    {
+      "id": "gps-gladiator",
+      "source": "public/cards/gps-gladiator.webp",
+      "output": "public/ui/cards/preview-v1/art/gps-gladiator.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 325586,
+      "bytes": 49876,
+      "sourceSha256": "56996b219ec0f5310cdf40fc7b09c18e286a18f05b631b4781a61462541e4d05",
+      "sha256": "cf614fa1f7d6487b6e4dd0bbaaf53ac700fecdd9c66c5ef3493f6cb8929525bd"
+    },
+    {
+      "id": "solar-sapper",
+      "source": "public/cards/solar-sapper.webp",
+      "output": "public/ui/cards/preview-v1/art/solar-sapper.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1079,
+        1458
+      ],
+      "size": [
+        384,
+        519
+      ],
+      "sourceBytes": 329674,
+      "bytes": 52664,
+      "sourceSha256": "62e46b6c55e4b2e3c17997456204a4d1a4ceebac5552044a6a0088fa26c17de7",
+      "sha256": "f754c38686e3437a1ff86073e5348d998d4b8c53a7f9e002fa48b8f85fc8c9c2"
+    },
+    {
+      "id": "firmware-phalanx",
+      "source": "public/cards/firmware-phalanx.webp",
+      "output": "public/ui/cards/preview-v1/art/firmware-phalanx.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 337640,
+      "bytes": 49408,
+      "sourceSha256": "4fd0b97e49fe416eba689523cb1e18ec985829d3830738e966a30f75b8d1bca0",
+      "sha256": "675a109521a3d525b9e47c6310f90db47cec0dca6a89c851c4cd24da125baa1c"
+    },
+    {
+      "id": "the-grand-cartographer",
+      "source": "public/cards/the-grand-cartographer.webp",
+      "output": "public/ui/cards/preview-v1/art/the-grand-cartographer.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 339718,
+      "bytes": 53752,
+      "sourceSha256": "1fabfb5d0202979ee6b319223107cff0ee7e0305cd97eccf62a4d0a131f07ce0",
+      "sha256": "19a980d2291f7c036a1bb099b1e2518af07e406137c6774e69e725c428a9b9c9"
+    },
+    {
+      "id": "jeet-legion",
+      "source": "public/cards/jeet-legion.webp",
+      "output": "public/ui/cards/preview-v1/art/jeet-legion.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 284200,
+      "bytes": 46294,
+      "sourceSha256": "b6a368408a32185d99dbc7b3d70af879750a15b5b54351d4cc100d620206c121",
+      "sha256": "4dc2c8ff3cf80893db01ceb4343caae4c3b660c309f535e7ac8f1d84ed90dc62"
+    },
+    {
+      "id": "gm-greeter",
+      "source": "public/cards/gm-greeter.webp",
+      "output": "public/ui/cards/preview-v1/art/gm-greeter.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 292508,
+      "bytes": 47072,
+      "sourceSha256": "69f58586bc2c0020649bb7ee7d2de5c05d27ed34293adaf7d23f0e6f515d4bbf",
+      "sha256": "b9c6d77d335b0093aa170116a4ae8721b8cf3ac15e30eb1e4ed4b3ba3fb23920"
+    },
+    {
+      "id": "dogen",
+      "source": "public/cards/renewed/dogen.webp",
+      "output": "public/ui/cards/preview-v1/art/dogen.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        512,
+        768
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 71764,
+      "bytes": 33950,
+      "sourceSha256": "e57df53efc5c1d1bd8b1f25a95a603374ece1929d7728db4ab98304685c1ab6a",
+      "sha256": "3c5de55ae61ac1b0ad4dca32a95a383c1855a7b1a5cd6f3bef570ff40d6531c7"
+    },
+    {
+      "id": "sandwich-attacker",
+      "source": "public/cards/sandwich-attacker.webp",
+      "output": "public/ui/cards/preview-v1/art/sandwich-attacker.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 290382,
+      "bytes": 49628,
+      "sourceSha256": "939e1b236549cbe6d1e84f6eef813ce3e35d9fe1c556a1981fb4c8ba5fa9f421",
+      "sha256": "6b6491477696e9e094d5d8a120de0fcfe171b3df520256d84e25709c87167c49"
+    },
+    {
+      "id": "pepito",
+      "source": "public/cards/renewed/pepito.webp",
+      "output": "public/ui/cards/preview-v1/art/pepito.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        512,
+        768
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 84852,
+      "bytes": 39768,
+      "sourceSha256": "df637a70efcc1fa78802baf8bed28dc6c82d50b4ac6a8e9daa6f2399196a8f01",
+      "sha256": "291a7c2c6e2bf39106f84eca94f18506b30ca2f7e5ac77ebc72f70bf193b85f5"
+    },
+    {
+      "id": "pump-chaser",
+      "source": "public/cards/pump-chaser.webp",
+      "output": "public/ui/cards/preview-v1/art/pump-chaser.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 275926,
+      "bytes": 45654,
+      "sourceSha256": "9b5831d701c29b27d53af56c0af692fbfceeeb489eaf35fbab651fe9119bd11e",
+      "sha256": "6e6b163a8edad970920ef8b159948652b599e2fa6b3686ddc44b63ce95bdf4d9"
+    },
+    {
+      "id": "diamond-hoarder",
+      "source": "public/cards/diamond-hoarder.webp",
+      "output": "public/ui/cards/preview-v1/art/diamond-hoarder.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1064,
+        1479
+      ],
+      "size": [
+        384,
+        534
+      ],
+      "sourceBytes": 302772,
+      "bytes": 47858,
+      "sourceSha256": "f24646c02b8ad5312ae898c20e971c9ac3fb93fb74ff1da984656020e0c66ca2",
+      "sha256": "e608d6a0d4b01a670ccb375d9673b6143cebb4599dc34d418770f6962ed1e137"
+    },
+    {
+      "id": "fud-hydra",
+      "source": "public/cards/renewed/fud-hydra.webp",
+      "output": "public/ui/cards/preview-v1/art/fud-hydra.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        512,
+        768
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 113650,
+      "bytes": 53816,
+      "sourceSha256": "8aae8c161fdefe843e42bd20938fca74e55ec6776d618fed9e192c0fb1dec3ea",
+      "sha256": "d51296dd7a863fe0a7af58400d2495d689ee67ee55cd020ee0cb7fc27e379048"
+    },
+    {
+      "id": "to-the-moon-militia",
+      "source": "public/cards/to-the-moon-militia.webp",
+      "output": "public/ui/cards/preview-v1/art/to-the-moon-militia.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 370754,
+      "bytes": 60898,
+      "sourceSha256": "b408c4bec3aaafddc5a5b82eca5db1411b9e097000d1337962cd8d23ba8f302f",
+      "sha256": "dd46a8bad5e01adbc6962c897dcca68101318a2fa88dd40c6d6f6804233e379c"
+    },
+    {
+      "id": "rug-pull",
+      "source": "public/cards/rug-pull.webp",
+      "output": "public/ui/cards/preview-v1/art/rug-pull.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1122,
+        1402
+      ],
+      "size": [
+        384,
+        480
+      ],
+      "sourceBytes": 358634,
+      "bytes": 52872,
+      "sourceSha256": "5741370183a8bbced384aa7364f60273f33d0ff00b404dcd5337cdc73133769c",
+      "sha256": "e6d5e6763d9c24309cda0934216fef727788647699c36e0883b7893242ec8c3a"
+    },
+    {
+      "id": "audit",
+      "source": "public/cards/audit.webp",
+      "output": "public/ui/cards/preview-v1/art/audit.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 254894,
+      "bytes": 42788,
+      "sourceSha256": "0a3bfad86701335f05ff11a785a48ab011ecd14640ea89983e47b3fb90e22afd",
+      "sha256": "335037d9ed5989d84526b702532dbe134634b2e3d9e661ce293ed3f491bff966"
+    },
+    {
+      "id": "collateral-squire",
+      "source": "public/ui/arena-lab/character-art-50/art/01-collateral-squire.webp",
+      "output": "public/ui/cards/preview-v1/art/collateral-squire.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 140432,
+      "bytes": 39340,
+      "sourceSha256": "42aea875bbf56750bd1ead5e78ce00317839985580ddb240741d9bf5a049156c",
+      "sha256": "736dfa5f4d77be918769e270cf5230fd267c59f5369dad88e60fe7541a45280e"
+    },
+    {
+      "id": "reserve-matron",
+      "source": "public/ui/arena-lab/character-art-50/art/02-reserve-matron.webp",
+      "output": "public/ui/cards/preview-v1/art/reserve-matron.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 100160,
+      "bytes": 27804,
+      "sourceSha256": "aa73a76853545b7ddc5975e7d903a2e21edf8c37f2f588d52570d0b773a166d1",
+      "sha256": "8daec27e14654b2eb188b38e58e741b7d69210e995a0b5c57895c9bb3ea7e874"
+    },
+    {
+      "id": "interest-shepherd",
+      "source": "public/ui/arena-lab/character-art-50/art/03-interest-shepherd.webp",
+      "output": "public/ui/cards/preview-v1/art/interest-shepherd.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 197188,
+      "bytes": 49572,
+      "sourceSha256": "dfbf98f8bf7d83e37ceb75a162cb916f8188214d168f38a06ce7cd2861dab1fa",
+      "sha256": "583c1987752181da32a89b9afc5d8461f6d00ececea9afd7c8aca6cb74eb35cf"
+    },
+    {
+      "id": "spread-duelist",
+      "source": "public/ui/arena-lab/character-art-50/art/04-spread-duelist.webp",
+      "output": "public/ui/cards/preview-v1/art/spread-duelist.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 109204,
+      "bytes": 31674,
+      "sourceSha256": "60c42b31ca4d764b2b62496a83b6cd33c30a75ed4f44afc2beb749bc185afa11",
+      "sha256": "33157c0d610fbcaf23fd6a66235fea46a5ba8075ad21b43d08a855f0a32c6891"
+    },
+    {
+      "id": "slippage-netter",
+      "source": "public/ui/arena-lab/character-art-50/art/05-slippage-netter.webp",
+      "output": "public/ui/cards/preview-v1/art/slippage-netter.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 155550,
+      "bytes": 41078,
+      "sourceSha256": "0cdd4dcf96d6ebab6b8aa4534357b972e20ef5e37538fd74a15339f82fc0fd4b",
+      "sha256": "8da5cd719093abcf9fd8251ce27a40122aa3577028d62b24718e1c9a4d117b04"
+    },
+    {
+      "id": "credit-lanternist",
+      "source": "public/ui/arena-lab/character-art-50/art/06-credit-lanternist.webp",
+      "output": "public/ui/cards/preview-v1/art/credit-lanternist.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 126296,
+      "bytes": 33320,
+      "sourceSha256": "621772b2f7d0fff9312e6d5b201682683335359b574baffcc86aa6e48d2a3061",
+      "sha256": "5cf10ed2a514bb0a84bd71aca31b6c4dec3b986047ed25f23ff45711d3a93945"
+    },
+    {
+      "id": "amm-tidekeeper",
+      "source": "public/ui/arena-lab/character-art-50/art/07-amm-tidekeeper.webp",
+      "output": "public/ui/cards/preview-v1/art/amm-tidekeeper.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 117860,
+      "bytes": 33254,
+      "sourceSha256": "d6d4da2f7989c1aedcb0a9c0521377c1354484779b66e61eac2da96dbcad7563",
+      "sha256": "84547730581d26577c5460449046772f3a660463f8d9ebd8cf455208ccd55d16"
+    },
+    {
+      "id": "margin-hoplite",
+      "source": "public/ui/arena-lab/character-art-50/art/08-margin-hoplite.webp",
+      "output": "public/ui/cards/preview-v1/art/margin-hoplite.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 165572,
+      "bytes": 40760,
+      "sourceSha256": "1e525b845e694d3d7d8ffb671a17aaa54b7e45eaa858fd6536a9a2bf05996735",
+      "sha256": "213e0492b10930beef7bfc0c4277f42e35c4c1925760316989e2380905283c92"
+    },
+    {
+      "id": "mempool-usher",
+      "source": "public/ui/arena-lab/character-art-50/art/09-mempool-usher.webp",
+      "output": "public/ui/cards/preview-v1/art/mempool-usher.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 93412,
+      "bytes": 26166,
+      "sourceSha256": "8604df3109b81e054468f23917d48809c10bd507a8902bfcd260b41c6d5611f9",
+      "sha256": "5cf5a4e0cd00d06269cb3273046aab499d26283e6c9367f976911f435b335544"
+    },
+    {
+      "id": "liquidation-bailiff",
+      "source": "public/ui/arena-lab/character-art-50/art/10-liquidation-bailiff.webp",
+      "output": "public/ui/cards/preview-v1/art/liquidation-bailiff.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 131302,
+      "bytes": 37020,
+      "sourceSha256": "9b3c754e3863667af162953c4a69abd2a944a13495cafbe17a848c4c35d036c1",
+      "sha256": "05dd4459c1350a27315f0bc77721467e84681e509106db05c1b9f6e34f4fcbb7"
+    },
+    {
+      "id": "delta-sphinx",
+      "source": "public/ui/arena-lab/character-art-50/art/11-delta-sphinx.webp",
+      "output": "public/ui/cards/preview-v1/art/delta-sphinx.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 123106,
+      "bytes": 35326,
+      "sourceSha256": "01f42374bf1fe39125c560f9df1e55da6314aa25b2234f04828c0b42f4c6564e",
+      "sha256": "0236b620ffe13e7fcdbbeb039e6b585e9352a1f3d69b4367fa03b47e1f47b25c"
+    },
+    {
+      "id": "oracle-of-solvency",
+      "source": "public/ui/arena-lab/character-art-50/art/12-oracle-of-solvency.webp",
+      "output": "public/ui/cards/preview-v1/art/oracle-of-solvency.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 120130,
+      "bytes": 34084,
+      "sourceSha256": "b97869c5e893332e5c0ba9ff54000db022113dcde6cf3dc28b8604f8e2450376",
+      "sha256": "842fca054971e1919a2f486d17f7da79d9d378f331f7bea646fa174aeecb6328"
+    },
+    {
+      "id": "poseidon-deep-liquidity",
+      "source": "public/ui/arena-lab/character-art-50/art/13-poseidon-deep-liquidity.webp",
+      "output": "public/ui/cards/preview-v1/art/poseidon-deep-liquidity.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 186118,
+      "bytes": 49096,
+      "sourceSha256": "a26aa42f07670613e6cb44fe94731743076851dfa386111926569a2b33cbcd5f",
+      "sha256": "975bea335e38db3966eb268d0874e385d2c0229f0066aee327ae534616ab74f3"
+    },
+    {
+      "id": "clay-mint-apprentice",
+      "source": "public/ui/arena-lab/character-art-50/art/14-clay-mint-apprentice.webp",
+      "output": "public/ui/cards/preview-v1/art/clay-mint-apprentice.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 128820,
+      "bytes": 34930,
+      "sourceSha256": "be21fe059f5d07f181407d876ea0d1406f15ccbd2b83976b3fa702d34ce0487e",
+      "sha256": "544c8d12c5b48647d19394463235dab07b74d49a7cd1b5d96470eaeedd64666d"
+    },
+    {
+      "id": "provenance-scribe",
+      "source": "public/ui/arena-lab/character-art-50/art/15-provenance-scribe.webp",
+      "output": "public/ui/cards/preview-v1/art/provenance-scribe.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 90952,
+      "bytes": 25604,
+      "sourceSha256": "3603a24bd346e153d167742fbe880f7c487c7e0eb5811a7d48b7530920920d9f",
+      "sha256": "36856e3787668dbf12165ae3a548e13207db7ee0101ae12705282c879286763d"
+    },
+    {
+      "id": "mosaic-mender",
+      "source": "public/ui/arena-lab/character-art-50/art/16-mosaic-mender.webp",
+      "output": "public/ui/cards/preview-v1/art/mosaic-mender.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 122242,
+      "bytes": 31954,
+      "sourceSha256": "decbd6b3295929b1ab9cedc444f06415ad5d882decf901387c75d1d38be8adfe",
+      "sha256": "b79fa072f8ac94957cbd8acbf0be2fbb63242749f4279da5d63682c2c7d09008"
+    },
+    {
+      "id": "gallery-gatekeeper",
+      "source": "public/ui/arena-lab/character-art-50/art/17-gallery-gatekeeper.webp",
+      "output": "public/ui/cards/preview-v1/art/gallery-gatekeeper.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 105034,
+      "bytes": 27746,
+      "sourceSha256": "31b30798b5a7556e9a2c8f3ad66be56735c0251c0384486d2c503516fc0e06ca",
+      "sha256": "a87f0e1f71b7fd1376c99fbdeac18c87b3733f5c1f83fff9351151ae1f85da61"
+    },
+    {
+      "id": "patina-curator",
+      "source": "public/ui/arena-lab/character-art-50/art/18-patina-curator.webp",
+      "output": "public/ui/cards/preview-v1/art/patina-curator.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 104524,
+      "bytes": 30778,
+      "sourceSha256": "109fddd32bea9173d7045ea265373f023c727d9d7a3e79e2ab144410269edd58",
+      "sha256": "a945b29e7349f706a2f84296ef912c91856976d2823ba0b8a3d2f752f94b5ac5"
+    },
+    {
+      "id": "blank-canvas-sentinel",
+      "source": "public/ui/arena-lab/character-art-50/art/19-blank-canvas-sentinel.webp",
+      "output": "public/ui/cards/preview-v1/art/blank-canvas-sentinel.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 123974,
+      "bytes": 31228,
+      "sourceSha256": "34b5887410a8c85de8cbea04881d9d40533e9b73bceb8c425a34b7ef1781d1e3",
+      "sha256": "2a9db5b0d03fc39ef0f83775b72b1b1353398ba46b882e1426ba5bf5ad415402"
+    },
+    {
+      "id": "reveal-diviner",
+      "source": "public/ui/arena-lab/character-art-50/art/20-reveal-diviner.webp",
+      "output": "public/ui/cards/preview-v1/art/reveal-diviner.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 107086,
+      "bytes": 31140,
+      "sourceSha256": "64acbe8efd2a9ea71d400e8b8b964224b00e2cf76db94bc506e64bcb68d2ec51",
+      "sha256": "c2e4fe7a137fc6a55701e3551e5c6695e9394913a69d71e92b6c79c5dd3b60e5"
+    },
+    {
+      "id": "soulbound-companion",
+      "source": "public/ui/arena-lab/character-art-50/art/21-soulbound-companion.webp",
+      "output": "public/ui/cards/preview-v1/art/soulbound-companion.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 122706,
+      "bytes": 33044,
+      "sourceSha256": "c2854e7c912fbb48f27e6b145d56edc3c61e02bbc3da72b7e15d920bd4caa64c",
+      "sha256": "1c4ecbb65874bfc5cf25557be289649e2ee3b2db782c297c805510dd7fde6d44"
+    },
+    {
+      "id": "royalty-chorister",
+      "source": "public/ui/arena-lab/character-art-50/art/22-royalty-chorister.webp",
+      "output": "public/ui/cards/preview-v1/art/royalty-chorister.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 127666,
+      "bytes": 35358,
+      "sourceSha256": "34b3a291afdc4a5bdb46cc9265b51f987263ea676b5736699bcfc399e1ca133d",
+      "sha256": "d00da25fe6ef9e25190c62e86457b6327326035821049f1d4a484590041fd7a2"
+    },
+    {
+      "id": "unbroken-marble-warden",
+      "source": "public/ui/arena-lab/character-art-50/art/23-unbroken-marble-warden.webp",
+      "output": "public/ui/cards/preview-v1/art/unbroken-marble-warden.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 128370,
+      "bytes": 34652,
+      "sourceSha256": "dd055e4cf249f840e52f680ca65ff5e8994d238ab806aac30d314941c3ab4e20",
+      "sha256": "17784d135ff5757eff7483f9de2841cc82fc8cb655fa3a6909643e7de9e5a482"
+    },
+    {
+      "id": "medusa-of-missing-mints",
+      "source": "public/ui/arena-lab/character-art-50/art/24-medusa-of-missing-mints.webp",
+      "output": "public/ui/cards/preview-v1/art/medusa-of-missing-mints.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 95300,
+      "bytes": 28792,
+      "sourceSha256": "fc0a66d3d46233e75bae193d42278c301e35c16bcc10a0226c5c8b4158e5db24",
+      "sha256": "6eb61671f1ea92c87460078b3dfc281e5fbd955befadc89a32ede29968e815a5"
+    },
+    {
+      "id": "palimpsest-guardian",
+      "source": "public/ui/arena-lab/character-art-50/art/25-palimpsest-guardian.webp",
+      "output": "public/ui/cards/preview-v1/art/palimpsest-guardian.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 135556,
+      "bytes": 35506,
+      "sourceSha256": "086088222c9419e805940f7ea1b62730d185daa0a624113c36acfefa69ff55c2",
+      "sha256": "bb9f3f84510b67e261c7e85d45c80f4a184e873f57c32ab8aa4df1c497bab7b2"
+    },
+    {
+      "id": "persephone-second-mint",
+      "source": "public/ui/arena-lab/character-art-50/art/26-persephone-second-mint.webp",
+      "output": "public/ui/cards/preview-v1/art/persephone-second-mint.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 113030,
+      "bytes": 32166,
+      "sourceSha256": "b97d9c2ec450d1d62e6cd98f72b886795deb1bace26018ae3b9148ee7704cc15",
+      "sha256": "4b435ea9f207f3e5dd6d2aaa9a4050f045a2197b493fb5008398c36f91e1c386"
+    },
+    {
+      "id": "relay-page",
+      "source": "public/ui/arena-lab/character-art-50/art/27-relay-page.webp",
+      "output": "public/ui/cards/preview-v1/art/relay-page.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 132422,
+      "bytes": 38652,
+      "sourceSha256": "2edccc98951655c1afeee79f1096b91470f2471b2b7d4db4dc204b4a30620ab7",
+      "sha256": "13bfc0f24d1a79226f46b230c0a7c944f8e7096eaee2647bc2f17f9a1a1906ed"
+    },
+    {
+      "id": "copper-lineworker",
+      "source": "public/ui/arena-lab/character-art-50/art/28-copper-lineworker.webp",
+      "output": "public/ui/cards/preview-v1/art/copper-lineworker.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 148572,
+      "bytes": 40358,
+      "sourceSha256": "e41674bb52f6f7f214bbed44ac0563b84b17f7acf51e46bfc52408bb67b0cdea",
+      "sha256": "0f5ae56ee69a510cbcadda5670e5022a6a48b5980fa4683eaec13ec8907707b0"
+    },
+    {
+      "id": "beacon-scout",
+      "source": "public/ui/arena-lab/character-art-50/art/29-beacon-scout.webp",
+      "output": "public/ui/cards/preview-v1/art/beacon-scout.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 122846,
+      "bytes": 35686,
+      "sourceSha256": "ce611b03d44c457341b8c4ea5f351bddbdac36a380fa8deb4fe424aa5968a51e",
+      "sha256": "92f1c64f058af2185163310c55f29bcc9688bc6eb24d55d86e1c29e1ffe32f98"
+    },
+    {
+      "id": "ceramic-cachekeeper",
+      "source": "public/ui/arena-lab/character-art-50/art/30-ceramic-cachekeeper.webp",
+      "output": "public/ui/cards/preview-v1/art/ceramic-cachekeeper.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 121680,
+      "bytes": 32838,
+      "sourceSha256": "f7c6ce59ef23494abccd8dbe2249b9315c956d55802e3138158a12ebdfa5dd9c",
+      "sha256": "f17b3bd54cdbf3c41894fd13be8e5c11e62194ee6d9060e3b42e9afb01fa7abf"
+    },
+    {
+      "id": "bridge-riveter",
+      "source": "public/ui/arena-lab/character-art-50/art/31-bridge-riveter.webp",
+      "output": "public/ui/cards/preview-v1/art/bridge-riveter.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 126472,
+      "bytes": 35310,
+      "sourceSha256": "57cd1e88d1d788ce82a3cc07d1e389c54e64477782b16935e770a1f3655248b8",
+      "sha256": "d32bdd7629300ac80777b2fe0c8bcfa80e8d22fee6baa4a30d274b2c927484c1"
+    },
+    {
+      "id": "signal-oracle",
+      "source": "public/ui/arena-lab/character-art-50/art/32-signal-oracle.webp",
+      "output": "public/ui/cards/preview-v1/art/signal-oracle.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 140814,
+      "bytes": 39124,
+      "sourceSha256": "352375cc8be2fc3d2272a3e56ba708834184203bd3598e2b5dc843ab7c2f662c",
+      "sha256": "9255aa87e920ef3fd8ca2f848e69af86b5499addcee6c4495e763c36c5f288fa"
+    },
+    {
+      "id": "mesh-shieldbearer",
+      "source": "public/ui/arena-lab/character-art-50/art/33-mesh-shieldbearer.webp",
+      "output": "public/ui/cards/preview-v1/art/mesh-shieldbearer.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 126354,
+      "bytes": 34278,
+      "sourceSha256": "3f50365aa6abce50a95311faf921f766e3229a80b0b73a253f53b37245a71cc1",
+      "sha256": "a0cc8d9f610eb2fe29533c616fb330e0fab903c33286bd7680403869e16b8845"
+    },
+    {
+      "id": "agora-sitewarden",
+      "source": "public/ui/arena-lab/character-art-50/art/34-agora-sitewarden.webp",
+      "output": "public/ui/cards/preview-v1/art/agora-sitewarden.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 138842,
+      "bytes": 39564,
+      "sourceSha256": "77275fb1e61c0be439245a38f006b562b095fa9e7d02660eeba7cbddd0107cbe",
+      "sha256": "64e5bd3ef53230b02e1bbc00a2fece8ecc9022608de47c156b81f6e2867702ff"
+    },
+    {
+      "id": "packet-ferryman",
+      "source": "public/ui/arena-lab/character-art-50/art/35-packet-ferryman.webp",
+      "output": "public/ui/cards/preview-v1/art/packet-ferryman.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 146790,
+      "bytes": 41514,
+      "sourceSha256": "6471f0aadc24d8ca058fe2778bfa2813c476873cbfdb1d661c8d97d6b98d58e1",
+      "sha256": "696ab30b67da8139b1124d54f3c49ec876167f990be76f3b08c524c31288754f"
+    },
+    {
+      "id": "atlas-nodebearer",
+      "source": "public/ui/arena-lab/character-art-50/art/36-atlas-nodebearer.webp",
+      "output": "public/ui/cards/preview-v1/art/atlas-nodebearer.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 120122,
+      "bytes": 35654,
+      "sourceSha256": "d4b4326dee9d8af4569a43f448250c93854276f667cb0d13d6144da3e451e0d1",
+      "sha256": "c48281398d9069206c441d6866ab1cdbaf61516b21fa2438ea3f19832593d06d"
+    },
+    {
+      "id": "daedalus-protocolwright",
+      "source": "public/ui/arena-lab/character-art-50/art/37-daedalus-protocolwright.webp",
+      "output": "public/ui/cards/preview-v1/art/daedalus-protocolwright.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 139080,
+      "bytes": 37500,
+      "sourceSha256": "ac5576a5550119efd0c41ad9e90a80d9b855f64e0b2c0cf3bc7e3c1421ae7565",
+      "sha256": "88fe3afa6aa503881c004952b9fe8527b2922feb8602d91a0c08b6b4b6d420ae"
+    },
+    {
+      "id": "hephaestus-public-nodes",
+      "source": "public/ui/arena-lab/character-art-50/art/38-hephaestus-public-nodes.webp",
+      "output": "public/ui/cards/preview-v1/art/hephaestus-public-nodes.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 134954,
+      "bytes": 36850,
+      "sourceSha256": "afffb67c3593d4e137946b4bf1f899e01e0726a01d3b36e6e2a00c157a67c5c5",
+      "sha256": "df34a9528a3d6af4c59b5c04b84494382ddd24dd9960730f5262a32c944ef364"
+    },
+    {
+      "id": "copium-jester",
+      "source": "public/ui/arena-lab/character-art-50/art/39-copium-jester.webp",
+      "output": "public/ui/cards/preview-v1/art/copium-jester.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 120082,
+      "bytes": 34030,
+      "sourceSha256": "e99f3055bb64d39ce8740945a660149cc5405d2591fb1172b3cdcd149273a463",
+      "sha256": "46fa9c58cd71defb209820c1e72af0c9ee9762dc92000416273126e36a3d337a"
+    },
+    {
+      "id": "liquidity-goose",
+      "source": "public/ui/arena-lab/character-art-50/art/40-liquidity-goose.webp",
+      "output": "public/ui/cards/preview-v1/art/liquidity-goose.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 100530,
+      "bytes": 29876,
+      "sourceSha256": "dc5b7f671fa2125fbde5d1172c787c1ebf78aa927c697c056c4bacdbd511e3ed",
+      "sha256": "7494632df45b62971e0b4820d26f305a01e832737658fb9fefead45917ca3062"
+    },
+    {
+      "id": "bagholder-donkey",
+      "source": "public/ui/arena-lab/character-art-50/art/41-bagholder-donkey.webp",
+      "output": "public/ui/cards/preview-v1/art/bagholder-donkey.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 121428,
+      "bytes": 30952,
+      "sourceSha256": "cae525cff95c0eb2179b6011fa1895a889b6fcafb13329a032669298029daec3",
+      "sha256": "6fe2f4a6f78a0005ed5445fd98b6305b3322fa85eb0fc566262e8168685893f3"
+    },
+    {
+      "id": "gm-rooster",
+      "source": "public/ui/arena-lab/character-art-50/art/42-gm-rooster.webp",
+      "output": "public/ui/cards/preview-v1/art/gm-rooster.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 101434,
+      "bytes": 30090,
+      "sourceSha256": "b13839088353fcb6a3d55e9972305cbc8381e55b87dfcb182c30f23be53dc3e6",
+      "sha256": "7058a75d83ab953cd86b0423cca9c389b78175ff8f4354a073b42f3fc8893c5e"
+    },
+    {
+      "id": "paperhand-merchant",
+      "source": "public/ui/arena-lab/character-art-50/art/43-paperhand-merchant.webp",
+      "output": "public/ui/cards/preview-v1/art/paperhand-merchant.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 113754,
+      "bytes": 33362,
+      "sourceSha256": "bcbdda5ad68caecc5407184a47bfac3b7f4ef7d655480c927d32e0d2822ac7ee",
+      "sha256": "28440101130ef756d8a51d2448f2a32189c4b23349cd27a2ca737a603378f841"
+    },
+    {
+      "id": "fomo-trumpeter",
+      "source": "public/ui/arena-lab/character-art-50/art/44-fomo-trumpeter.webp",
+      "output": "public/ui/cards/preview-v1/art/fomo-trumpeter.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 115058,
+      "bytes": 32230,
+      "sourceSha256": "d9443d7e0e37cf622a63fa34e90ed458027acf8d256cf2f4ed46b4863fbe2f42",
+      "sha256": "67315faf3d1c89d2145076a0505bceaa391d206e52f61c130ef3a878a94b4fee"
+    },
+    {
+      "id": "diamond-paw-mastiff",
+      "source": "public/ui/arena-lab/character-art-50/art/45-diamond-paw-mastiff.webp",
+      "output": "public/ui/cards/preview-v1/art/diamond-paw-mastiff.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 134084,
+      "bytes": 37704,
+      "sourceSha256": "9fe7b6d54e5323d55242a675df355c620bc63287e45d244b8f85dee06ca2bbf8",
+      "sha256": "1b0fc1902b7f5b575835b509d71eef99059b4c25b92127eeedbb0a487c03c84b"
+    },
+    {
+      "id": "hopium-augur",
+      "source": "public/ui/arena-lab/character-art-50/art/46-hopium-augur.webp",
+      "output": "public/ui/cards/preview-v1/art/hopium-augur.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 108968,
+      "bytes": 30422,
+      "sourceSha256": "f91596cba86b06017bd7ea0e6934e2c42ef07f4d8cb91652ca33c3526bacb51c",
+      "sha256": "f90340cc50fc6794e38ac5f1f99610f5cfebc4e29b40180cbfa9f6069c01a76a"
+    },
+    {
+      "id": "salt-miner-satyr",
+      "source": "public/ui/arena-lab/character-art-50/art/47-salt-miner-satyr.webp",
+      "output": "public/ui/cards/preview-v1/art/salt-miner-satyr.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 102266,
+      "bytes": 26524,
+      "sourceSha256": "52b3772a7e4caa05cb9f47649964d461ea912d29121172ce190aa8064884707b",
+      "sha256": "84fad55bc02e79d5052bccf138f38691339d4f5745c1b28ca104fccc2aa36f43"
+    },
+    {
+      "id": "sir-rug-of-velvet",
+      "source": "public/ui/arena-lab/character-art-50/art/48-sir-rug-of-velvet.webp",
+      "output": "public/ui/cards/preview-v1/art/sir-rug-of-velvet.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 97164,
+      "bytes": 28064,
+      "sourceSha256": "d60803324ade0ee1dac7d2d545bd768c88df9fd7397ef3f9f5074869579bd52a",
+      "sha256": "12476bd529b38e64f581df68f53f4c0e7b676e0d31e85bb633e706f60392d8af"
+    },
+    {
+      "id": "sisyphus-of-the-pump",
+      "source": "public/ui/arena-lab/character-art-50/art/49-sisyphus-of-the-pump.webp",
+      "output": "public/ui/cards/preview-v1/art/sisyphus-of-the-pump.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 124700,
+      "bytes": 34714,
+      "sourceSha256": "b5473e969788b52f7516ba4fd2f05a7d763777a9bdb4f0ace187b813835c3a09",
+      "sha256": "43aca6e20600baddf9e78622fe00ab6e50be47db09a69a9570e822902db03eb9"
+    },
+    {
+      "id": "dionysus-last-pump",
+      "source": "public/ui/arena-lab/character-art-50/art/50-dionysus-last-pump.webp",
+      "output": "public/ui/cards/preview-v1/art/dionysus-last-pump.webp",
+      "max": [
+        384,
+        576
+      ],
+      "sourceSize": [
+        768,
+        1152
+      ],
+      "size": [
+        384,
+        576
+      ],
+      "sourceBytes": 132776,
+      "bytes": 37332,
+      "sourceSha256": "669cfb0aa9e1ae3a59707433bf068c8adc3680fc40ca86633372014a4b7cc5f4",
+      "sha256": "c4569a40912a5cccf03193f266a96be1ad929fe9415f976715cda5b9f14885d1"
+    },
+    {
+      "id": "frame-common",
+      "source": "public/ui/cards/rarity-v1/common.png",
+      "output": "public/ui/cards/preview-v1/frames/common.webp",
+      "max": [
+        768,
+        1344
+      ],
+      "sourceSize": [
+        948,
+        1659
+      ],
+      "size": [
+        768,
+        1344
+      ],
+      "sourceBytes": 1619381,
+      "bytes": 143560,
+      "sourceSha256": "e3a2eeb47db64d613ae630fe1844339fdc04b14c1a16a520a6ec0929d8ad02d8",
+      "sha256": "9196df65c7045a70b59ce52ab99bd7c82d994e4732a9d3f46092581b5ba7391b"
+    },
+    {
+      "id": "frame-rare",
+      "source": "public/ui/cards/rarity-v1/rare.png",
+      "output": "public/ui/cards/preview-v1/frames/rare.webp",
+      "max": [
+        768,
+        1344
+      ],
+      "sourceSize": [
+        948,
+        1659
+      ],
+      "size": [
+        768,
+        1344
+      ],
+      "sourceBytes": 1489503,
+      "bytes": 133914,
+      "sourceSha256": "b3fe7cba1745161f0af40991a525e4418857ab9cdf9bae784f3d2f6f624edba5",
+      "sha256": "f7243f2531e6654696109856568f0c50ff8641075bd066208984bf43cb786070"
+    },
+    {
+      "id": "frame-epic",
+      "source": "public/ui/cards/rarity-v1/epic.png",
+      "output": "public/ui/cards/preview-v1/frames/epic.webp",
+      "max": [
+        768,
+        1344
+      ],
+      "sourceSize": [
+        948,
+        1659
+      ],
+      "size": [
+        768,
+        1344
+      ],
+      "sourceBytes": 1556365,
+      "bytes": 133194,
+      "sourceSha256": "2922eed71c31d9b4c2d7f67fad56078bcf3785d8d217f5bec40c4a93bbb4b3cc",
+      "sha256": "eeea39e8e7e12ba2dd3ae07f2d3e2dd64bbd6daa5fa0ccab0003998ca515ba57"
+    },
+    {
+      "id": "frame-legendary",
+      "source": "public/ui/cards/rarity-v1/legendary.png",
+      "output": "public/ui/cards/preview-v1/frames/legendary.webp",
+      "max": [
+        768,
+        1344
+      ],
+      "sourceSize": [
+        948,
+        1659
+      ],
+      "size": [
+        768,
+        1344
+      ],
+      "sourceBytes": 1474398,
+      "bytes": 126162,
+      "sourceSha256": "8087f9b2373233652e07c8a92bd0edd9651fad2e7a8b5e3dea8c860f52989032",
+      "sha256": "126b5fb2938fb71ac7f40a475fc08ade2f71adcaa5b1f0a31332bc68070f1886"
+    }
+  ],
+  "sourceBytes": 26645881,
+  "bytes": 4806686
+}

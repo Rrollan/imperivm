@@ -110,8 +110,10 @@ async function main(){
  }}});
  const originalGate=COMMERCE_CONFIG.enabled;COMMERCE_CONFIG.enabled=true;
  const gateway=new IDosCardItemGateway(runtime);const before=await gateway.load();assert.equal(before.owned[PACK_CARD_IDS[1]],2);assert.equal(before.packKind,'tradable-items');assert(before.owned[freeId]>0);
- const opened=await gateway.openPack();assert.equal(opened.cards.length,5);assert.equal(opened.snapshot.owned[id],5);assert.equal(opened.snapshot.packKind,'tradable-items');assert.equal(values.size,0);
- lostPack=true;await assert.rejects(gateway.openPack(),/Lost native/);assert.equal(packCalls,2);assert.equal(values.size,1);
+ const liveCost=boxes.Definitions![CARD_PACK_LOOTBOX_ID].PriceOptions!.IMP.Cost!.Standard!.Entries![0];liveCost.Amount=225_000;await assert.rejects(gateway.openPack(),/100000 IMP/);assert.equal(packCalls,0,'Old native pack pricing cannot debit');liveCost.Amount=REAL_PACK_COST;
+ balance='99999.999999';await assert.rejects(gateway.openPack(),/100000 IMP/);assert.equal(packCalls,0,'One millionth below the price cannot debit');balance='100000';
+ const opened=await gateway.openPack();assert.equal(opened.cards.length,5);assert.equal(opened.snapshot.exactBalance,'0','Exactly 100000 IMP buys one native five-card pack');assert.equal(opened.snapshot.owned[id],5);assert.equal(opened.snapshot.packKind,'tradable-items');assert.equal(values.size,0);
+ balance='999999';lostPack=true;await assert.rejects(gateway.openPack(),/Lost native/);assert.equal(packCalls,2);assert.equal(values.size,1);
  const reload=new IDosCardItemGateway(runtime);const pending=await reload.load();assert.equal(pending.owned[id],10,'Actually granted server copies stay playable after lost reply');assert(pending.purchaseBlocked,'Inventory growth alone cannot prove/clear a native payment receipt');await assert.rejects(reload.openPack(),/заблокировано/);assert.equal(packCalls,2);
  values.clear();const signedOut={...runtime,getSnapshot:()=>({status:'anonymous'})} as unknown as IDosRuntime;await assert.rejects(new IDosCardItemGateway(signedOut).openPack(),/кошельком/);assert.equal(packCalls,2);COMMERCE_CONFIG.enabled=originalGate;
  console.log('Card market checks passed: exact per-pack rarity, canonical Item ownership, native atomic contracts, completed-only weighted prices, config/commission gates, wallet isolation, cross-tab duplicate-payment protection, cancel refunds and native pack uncertainty. Mocked SDK only; no financial transactions.');

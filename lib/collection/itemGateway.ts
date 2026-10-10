@@ -41,7 +41,7 @@ export class IDosCardItemGateway extends IDosCollectionGateway {
         if(!boxes)throw new Error('Новый пак продаваемых карт ещё не настроен на iDos.');validateCardLootboxDefinitions(boxes);
         if(!COMMERCE_CONFIG.enabled)throw new Error('Покупки за реальные IMP временно выключены.');
         const inventory=idosResult(await client.user.getUserInventory()),before=cardItemCounts(inventory);
-        if(!cryptoAffordable(client.data.user.getCryptoCurrencyAmount('Main'),String(REAL_PACK_COST)))throw new Error('Для пака нужно 225000 IMP на игровом счёте.');
+        if(!cryptoAffordable(client.data.user.getCryptoCurrencyAmount('Main'),String(REAL_PACK_COST)))throw new Error(`Для пака нужно ${REAL_PACK_COST} IMP на игровом счёте.`);
         const receipt=new PackPaymentReceipt(IDOS_CONFIG.title!,user);if(receipt.status()==='accepted')receipt.clear();assertWallet();receipt.begin(CARD_PACK_LOOTBOX_ID,REAL_PACK_COST);
         const result=idosResult(await client.lootbox.open(CARD_PACK_LOOTBOX_ID,1,'IMP'));
         if(result.LootboxID!==CARD_PACK_LOOTBOX_ID||result.OpenedCount!==1)throw new Error('Пак обработан, но статус ещё не подтверждён. Сверьте коллекцию перед новой покупкой.');

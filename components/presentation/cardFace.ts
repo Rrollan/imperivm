@@ -10,7 +10,7 @@ export const CARD_FACE={width:384,height:672,ratio:384/672};
 // Only the artwork aperture becomes shorter; engraved panels keep their proportions.
 export const BATTLE_FACE={width:384,height:550,ratio:384/550};
 export const FACE_TEXTURE_SCALE=2;
-export function cardFramePath(rarity:Rarity){return `/ui/cards/rarity-v1/${rarity}.png`;}
+export function cardFramePath(rarity:Rarity){return `/ui/cards/preview-v1/frames/${rarity}.webp`;}
 /** Network snapshots redact private cards/decks with empty IDs. */
 export function cardArtworkPaths(ids:readonly string[]){
   return Array.from(new Set(ids.filter(id=>Boolean(CARDS[id])).flatMap(id=>[cardArtPath(id),cardFramePath(CARDS[id].rarity)])));

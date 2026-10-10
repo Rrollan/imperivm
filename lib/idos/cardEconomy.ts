@@ -74,7 +74,7 @@ export function validateCardLootboxDefinitions(defs:LootboxDefinitions):void {
   const pack=defs.Definitions?.[CARD_PACK_LOOTBOX_ID];
   if(!pack||pack.MaxOpenCount!==1||pack.RewardMultiplier||pack.Presets||pack.PityRules?.length||pack.SupplyLimits?.length||
     stable(lootboxEconomics(defs))!==stable(lootboxEconomics(buildCardLootboxDefinitions())))
-    throw new Error('Пак iDos должен содержать пять карт и точный шанс легендарной 0,0001% на весь пак.');
+    throw new Error(`Пак iDos должен содержать пять карт за ${REAL_PACK_COST} IMP и точный шанс легендарной 0,0001% на весь пак.`);
 }
 export function itemPackDrops(operation:ResourceOperation|undefined|null):string[] {
   if(operation?.Grant?.PremiumBonuses?.length||operation?.Grant?.PremiumTiers?.length||operation?.Grant?.Standard?.EventTokens?.length)throw new Error('Получен неожиданный результат пака iDos.');

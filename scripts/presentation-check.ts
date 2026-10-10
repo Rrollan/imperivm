@@ -26,7 +26,9 @@ async function main() {
     const enemy=fighterRow(count,1,true);
     assert.ok(enemy.y+enemy.height/2+12<=row.y-row.height/2,'Opposing full cards must leave a clear attack lane');
     const wideOwn=fighterRow(count,0,false),wideEnemy=fighterRow(count,1,false);
-    assert.ok(wideEnemy.y+wideEnemy.height/2+12<=wideOwn.y-wideOwn.height/2,'Wide rows must leave a clear attack lane');
+    assert.ok(wideEnemy.y+wideEnemy.height/2<wideOwn.y-wideOwn.height/2,'Wide card faces must not overlap');
+    // Aiming uses the inset face boundary (.94), matching targeting below.
+    assert.ok(wideEnemy.y+wideEnemy.height*.94/2+12<=wideOwn.y-wideOwn.height*.94/2,'Wide rows must leave a clear lane between the actual aiming boundaries');
     const enemySocket=rulerSocket(1,false),ownSocket=rulerSocket(0,false);
     assert.ok(wideEnemy.y-wideEnemy.height/2>enemySocket.y+enemySocket.height/2+4,'Wide cards must clear the entire enemy portrait');
     assert.ok(wideOwn.y+wideOwn.height/2<ownSocket.y-ownSocket.height/2-4,'Wide cards must clear the entire own portrait');

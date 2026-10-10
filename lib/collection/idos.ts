@@ -19,7 +19,7 @@ export function validateIDosDefinitions(defs: CollectionDefinitions) {
   if (!defs.Collections?.[IDOS_CONFIG.collection] || !pack) throw new Error('Configure the IMPERIVM collection and pack type in this iDos title.');
   const cost = pack.PriceOptions?.[IDOS_CONFIG.payment]?.Cost;
   const entries = cost?.Standard?.Entries;
-  if (pack.CollectibleCount !== 5 || !entries || entries.length !== 1 || entries[0].Type !== IDOS_CONFIG.currencyType || entries[0].CurrencyID !== IDOS_CONFIG.currency || entries[0].Amount !== REAL_PACK_COST || entries[0].AmountUsd != null || cost?.Standard?.EventTokens?.length || cost?.PremiumTiers?.length || cost?.PremiumDiscounts?.length) throw new Error('The pack must grant 5 cards and cost exactly 225000 IMP in the configured currency.');
+  if (pack.CollectibleCount !== 5 || !entries || entries.length !== 1 || entries[0].Type !== IDOS_CONFIG.currencyType || entries[0].CurrencyID !== IDOS_CONFIG.currency || entries[0].Amount !== REAL_PACK_COST || entries[0].AmountUsd != null || cost?.Standard?.EventTokens?.length || cost?.PremiumTiers?.length || cost?.PremiumDiscounts?.length) throw new Error(`The pack must grant 5 cards and cost exactly ${REAL_PACK_COST} IMP in the configured currency.`);
   const ids = defs.Collections[IDOS_CONFIG.collection].Sets?.flatMap(set => set.Collectibles?.map(card => card.CollectibleID) ?? []) ?? [];
   const rulers=CASE_HERO_IDS.map(rulerCollectible),cardIds=ids.filter(id=>!rulers.includes(id??''));
   if (cardIds.length !== PACK_CARD_IDS.length || new Set(ids).size !== ids.length || cardIds.some(id => typeof id !== 'string' || !PACK_CARD_IDS.includes(id))) throw new Error('The Agora pack collection must contain exactly the 50 pack-exclusive cards. Free cards must not drop from paid packs.');
@@ -81,7 +81,7 @@ export class IDosCollectionGateway implements CollectionGateway {
         validateIDosDefinitions(unwrap(await client.collection.getDefinitions({forceRefresh: true})));
         if (!COMMERCE_CONFIG.enabled) throw new Error('Покупки за реальные IMP временно выключены.');
         const before = await this.read(client);
-        if (!cryptoAffordable(before.exactBalance!, String(REAL_PACK_COST))) throw new Error('Для пака нужно 225000 IMP на игровом счёте. Сначала переведите выбранную сумму из кошелька.');
+        if (!cryptoAffordable(before.exactBalance!, String(REAL_PACK_COST))) throw new Error(`Для пака нужно ${REAL_PACK_COST} IMP на игровом счёте. Сначала переведите выбранную сумму из кошелька.`);
         const payment = this.receipt(client);
         payment.begin(IDOS_CONFIG.pack, REAL_PACK_COST);
         // No retry: a lost reply can still mean a completed server-side debit.

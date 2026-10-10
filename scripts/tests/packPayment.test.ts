@@ -13,5 +13,6 @@ receipt.accept(); assert.equal(receipt.status(), 'accepted'); receipt.clear(); a
 assert.throws(() => new PackPaymentReceipt('T', 'U', {getItem: () => '{bad', setItem: () => {}, removeItem: () => {}}).begin('AGORA_PACK', REAL_PACK_COST), /повреждён/);
 assert.throws(() => new PackPaymentReceipt('T', 'U', {getItem: () => null, setItem: () => {throw new Error('Quota full');}, removeItem: () => {}}).begin('AGORA_PACK', REAL_PACK_COST), /Quota/);
 assert.equal(collectionPrice('local', 'pack'), PACK_COST); assert.equal(collectionPrice('idos', 'pack'), REAL_PACK_COST); assert.equal(collectionPrice('idos', 'ruler'), REAL_RULER_CASE_COST);
-assert.equal(cryptoAffordable('224999.999999', String(REAL_PACK_COST)), false); assert.equal(cryptoAffordable('225000.000001', String(REAL_PACK_COST)), true);
+assert.equal(collectionPrice('idos', 'pack'), 100_000); assert.equal(collectionPrice('idos', 'ruler'), 900_000);
+assert.equal(cryptoAffordable('99999.999999', String(REAL_PACK_COST)), false); assert.equal(cryptoAffordable('100000', String(REAL_PACK_COST)), true); assert.equal(cryptoAffordable('100000.000001', String(REAL_PACK_COST)), true);
 console.log('Pack payment checks passed: real/demo separation, exact affordability, durable unknown-payment guard, reload/account isolation and storage failure. No financial transactions.');

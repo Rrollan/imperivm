@@ -9,7 +9,7 @@ export const COLLECTION_KEY = 'imperivm.collection.v1';
 export const PACK_COST = 50;
 export const RULER_CASE_COST=200;
 // Demo credits are deliberately separate from real SPL-token prices.
-export const REAL_PACK_COST = 225_000;
+export const REAL_PACK_COST = 100_000;
 export const REAL_RULER_CASE_COST = 900_000;
 export function collectionPrice(mode: 'local' | 'idos' | undefined, kind: 'pack' | 'ruler'): number {
   return mode === 'idos' ? (kind === 'pack' ? REAL_PACK_COST : REAL_RULER_CASE_COST) : (kind === 'pack' ? PACK_COST : RULER_CASE_COST);

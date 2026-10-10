@@ -8,3 +8,8 @@ export function cardArtPath(id: string): string {
   // portraits as well as the original cards, including dynamically selected IDs.
   return CHARACTER_CARD_ART[id] ?? (renewed.has(id) ? `/cards/renewed/${id}.webp` : `/cards/${id}.webp`);
 }
+
+/** Small catalogue and deck thumbnails; originals remain available for inspection. */
+export function cardPreviewArtPath(id: string): string {
+  return `/ui/cards/preview-v1/art/${id}.webp`;
+}

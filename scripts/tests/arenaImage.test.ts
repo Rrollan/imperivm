@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {requestArenaImage} from '../../components/presentation/arenaImage';
+import {requestArenaImage, type ArenaImage} from '../../components/presentation/arenaImage';
 import {cardArtworkPaths} from '../../components/presentation/cardFace';
 import {playProofEnabled} from '../../lib/solana/features';
 
@@ -20,8 +20,12 @@ class FakeImage {
 }
 Object.assign(globalThis,{Image:FakeImage});
 const tick = () => new Promise<void>(resolve => setImmediate(resolve));
+async function finish(card: ArenaImage) {
+  const image = card.image as unknown as FakeImage;
+  image.downloaded();image.decoded();await card.loaded;
+}
 async function run() {
-  assert.deepEqual(cardArtworkPaths(['', '', 'dogen', 'dogen']), ['/cards/renewed/dogen.webp', '/ui/cards/rarity-v1/common.png'], 'Preloading must ignore private online card placeholders and deduplicate public artwork');
+  assert.deepEqual(cardArtworkPaths(['', '', 'dogen', 'dogen']), ['/cards/renewed/dogen.webp', '/ui/cards/preview-v1/frames/common.webp'], 'Preloading must ignore private online card placeholders and deduplicate public artwork');
   assert.deepEqual(cardArtworkPaths(['','']),[], 'A private deck never invents portraits');
   const cards = Array.from({length:6},(_,i)=>requestArenaImage(`/test/card-${i}.webp`));
   assert.equal(started.length,4,'At most four active image downloads/decodes');
@@ -34,6 +38,33 @@ async function run() {
   first.decoded();await tick();assert(resolved);assert.equal(started.length,5);
   for (let i=1;i<6;i++) {const image=cards[i].image as unknown as FakeImage;image.downloaded();image.decoded();await tick();}
   await Promise.all(cards.map(card=>card.loaded));
+
+  // Visible artwork takes the next free slot ahead of old background work.
+  const occupied = Array.from({length:4},(_,i)=>requestArenaImage(`/test/occupied-${i}.webp`));
+  const prefetch = Array.from({length:3},(_,i)=>requestArenaImage(`/test/prefetch-${i}.webp`));
+  const visibleFirst = requestArenaImage('/test/visible-first.webp',{priority:'high'});
+  const promoted = requestArenaImage('/test/prefetch-2.webp',{priority:'high'});
+  const visibleLast = requestArenaImage('/test/visible-last.webp',{priority:'high'});
+  assert.equal(promoted,prefetch[2],'Promotion preserves the shared image and readiness promise');
+  assert.equal(requestArenaImage('/test/prefetch-2.webp'),promoted,'A later prefetch cannot demote visible artwork');
+  assert.equal(requestArenaImage('/test/visible-first.webp',{priority:'high'}),visibleFirst);
+  const priorityStart = started.length;
+  const blocked = occupied[0].image as unknown as FakeImage;
+  blocked.downloaded();await tick();
+  assert.equal(started.length,priorityStart,'High priority does not exceed four active downloads/decodes');
+  blocked.decoded();await occupied[0].loaded;
+  assert.equal(started.at(-1),visibleFirst.image,'A later visible request overtakes queued prefetches');
+  await finish(occupied[1]);
+  assert.equal(started.at(-1),promoted.image,'A cached prefetch can move into the visible queue');
+  await finish(occupied[2]);
+  assert.equal(started.at(-1),visibleLast.image,'Visible requests preserve their arrival order');
+  await finish(occupied[3]);
+  assert.equal(started.at(-1),prefetch[0].image,'Background requests resume after the visible queue drains');
+  await finish(visibleFirst);
+  assert.equal(started.at(-1),prefetch[1].image,'Background requests preserve their arrival order');
+  assert.equal(started.length,priorityStart+5,'Promotion never creates a duplicate download');
+  for (const card of [promoted,visibleLast,prefetch[0],prefetch[1]]) await finish(card);
+  await Promise.all([...occupied,...prefetch,visibleFirst,visibleLast].map(card=>card.loaded));
 
   const retry = requestArenaImage('/test/retry.webp');const image = retry.image as unknown as FakeImage;
   const before = started.length;image.failed();assert.equal(started.length,before+1);
@@ -55,6 +86,6 @@ async function run() {
   delete process.env.NEXT_PUBLIC_PLAY_PROOF_ENABLED;assert.equal(playProofEnabled(),false,'Unshipped achievements never ask for a match signature');
   process.env.NEXT_PUBLIC_PLAY_PROOF_ENABLED='true';assert.equal(playProofEnabled(),true);
   if(previous===undefined)delete process.env.NEXT_PUBLIC_PLAY_PROOF_ENABLED;else process.env.NEXT_PUBLIC_PLAY_PROOF_ENABLED=previous;
-  console.log('ARENA LOADING OK: shared requests, four-download limit, decode readiness, bounded retry, failure recovery, decoded cache eviction and opt-in match signatures.');
+  console.log('ARENA LOADING OK: shared requests, visible queue priority/promotion, four-download limit, decode readiness, bounded retry, failure recovery, decoded cache eviction and opt-in match signatures.');
 }
 void run().catch(error=>{console.error(error);process.exitCode=1;});
