@@ -81,17 +81,20 @@ async function main() {
  assert.equal(parseLocalCollection(JSON.stringify({...migration,version:2})).owned[common],2);
  assert.equal(COLLECTION_KEY,'imperivm.collection.v1');
  const oldTitle=process.env.IDOS_TITLE_ID;process.env.IDOS_TITLE_ID='fixture-title';
- let calls=0, data:unknown={CollectionID:'IMPERIVM_AGORA',OwnedCollectibles:{[common]:1}}, accepted=true;
+ let calls=0, data:unknown={CollectionID:'IMPERIVM_AGORA',OwnedCollectibles:{[common]:1}}, accepted=true,items:unknown={};
  const fetcher:typeof fetch = async (url,options) => {
-  calls++;assert.equal(String(url),'https://api.idosgames.com/api/v2/fixture-title/Client/Collection/GetUserState/wallet-test');
+  calls++;const isInventory=String(url).endsWith('/Client/User/GetInventory/wallet-test');
+  assert.equal(String(url),`https://api.idosgames.com/api/v2/fixture-title/Client/${isInventory?'User/GetInventory':'Collection/GetUserState'}/wallet-test`);
   assert.equal(options?.redirect,'error');assert.equal(new Headers(options?.headers).get('Authorization'),`Bearer ${auth.sessionTicket}`);
   assert.deepEqual(JSON.parse(String(options?.body)),{TitleID:'fixture-title',UserID:auth.userId,ClientSessionTicket:auth.sessionTicket});
-  return new Response(JSON.stringify({Success:accepted,Data:data}));
+  return new Response(JSON.stringify({Success:accepted,Data:isInventory?{Items:items}:data}));
  };
  await authorizeCollectionDeck(FREE_DECKS.whale,undefined,fetcher);assert.equal(calls,0);
  await assert.rejects(authorizeCollectionDeck(premiumDeck,undefined,fetcher));assert.equal(calls,0);
  await authorizeCollectionDeck(premiumDeck,auth,fetcher);
  data={CollectionID:'IMPERIVM_AGORA',OwnedCollectibles:{audit:100}};await assert.rejects(authorizeCollectionDeck(premiumDeck,auth,fetcher),/коллекции/);
+ items={[common]:{StackableAmount:1,UnstackableAmount:0,TotalAmount:1}};await authorizeCollectionDeck(premiumDeck,auth,fetcher);
+ items={[common]:{StackableAmount:0,UnstackableAmount:0,TotalAmount:0}};await assert.rejects(authorizeCollectionDeck(premiumDeck,auth,fetcher),/коллекции/);
  data={CollectionID:'OTHER',OwnedCollectibles:{[common]:1}};await assert.rejects(authorizeCollectionDeck(premiumDeck,auth,fetcher),/выпуску/);
  accepted=false;await assert.rejects(authorizeCollectionDeck(premiumDeck,auth,fetcher),/Сессия/);
  await assert.rejects(authorizeCollectionDeck(premiumDeck,auth,async()=>new Response('',{status:401})),/проверить/);

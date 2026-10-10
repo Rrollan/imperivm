@@ -1,4 +1,5 @@
 import { CARDS } from '../cards';
+import {browserLocks} from '../browserLocks';
 import type { CardDef, Rarity } from '../engine/types';
 import { PACK_CARD_IDS, freeCardCounts, withFreeCards, cleanOwned, configuredTitle } from './access';
 import {FREE_HERO_IDS,CASE_HERO_IDS} from '../heroes';
@@ -20,7 +21,7 @@ export const RARITY_WEIGHTS: { rarity: Rarity; weight: number }[] = [
   { rarity: 'common', weight: 60 }, { rarity: 'rare', weight: 25 },
   { rarity: 'epic', weight: 11 }, { rarity: 'legendary', weight: 4 },
 ];
-export interface CollectionSnapshot { mode: 'local' | 'idos'; rug: number; exactBalance?: string; purchaseBlocked?: string; owned: Record<string, number>; packsOpened: number; collectionCurrency?: number; heroes?:string[]; }
+export interface CollectionSnapshot { mode: 'local' | 'idos'; rug: number; exactBalance?: string; purchaseBlocked?: string; owned: Record<string, number>; packsOpened: number; collectionCurrency?: number; heroes?:string[]; ownership?:'items-and-legacy'; packKind?:'tradable-items'; }
 export interface PackResult { cards: CardDef[]; snapshot: CollectionSnapshot; duplicates?: boolean[]; }
 export interface RulerCaseResult {heroId:string;duplicate:boolean;snapshot:CollectionSnapshot}
 export interface CollectionGateway { load(): Promise<CollectionSnapshot>; openPack(): Promise<PackResult>; openRulerCase():Promise<RulerCaseResult>; }
@@ -69,7 +70,7 @@ export class LocalCollectionGateway implements CollectionGateway {
         return { cards, snapshot: structuredClone(this.memory) };
       };
       // Serialize purchases from multiple tabs when Web Locks are available.
-      return typeof navigator !== 'undefined' && navigator.locks ? await navigator.locks.request(COLLECTION_KEY, buy) : await buy();
+      const locks=browserLocks();return locks ? await locks.request(COLLECTION_KEY, buy) : await buy();
     } finally { this.inFlight = false; }
   }
   async openRulerCase():Promise<RulerCaseResult>{
@@ -83,7 +84,7 @@ export class LocalCollectionGateway implements CollectionGateway {
         try{if(this.persistence)this.storage?.setItem(COLLECTION_KEY,JSON.stringify({version:2,...this.memory}));}catch{this.persistence=false;}
         return {heroId,duplicate,snapshot:structuredClone(this.memory)};
       };
-      return typeof navigator!=='undefined'&&navigator.locks?await navigator.locks.request(COLLECTION_KEY,buy):await buy();
+      const locks=browserLocks();return locks?await locks.request(COLLECTION_KEY,buy):await buy();
     }finally{this.inFlight=false;}
   }
 }

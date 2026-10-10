@@ -6,6 +6,7 @@ import LandingPage from '../../app/page';
 import CollectionPage from '../../app/collection/page';
 import LibraryPage from '../../app/library/page';
 import PacksPage from '../../app/packs/page';
+import MarketPage from '../../app/market/page';
 import LeaderboardPage from '../../app/leaderboard/page';
 import ArenaGates from '../../components/ArenaGates';
 import ArenaEntry from '../../components/presentation/ArenaEntry';
@@ -24,6 +25,7 @@ function Pages() {
   if (path === '/collection') return <CollectionPage/>;
   if (path === '/library') return <LibraryPage/>;
   if (path === '/packs') return <PacksPage/>;
+  if (path === '/market') return <MarketPage/>;
   if (path === '/leaderboard') return <LeaderboardPage/>;
   if (path === '/arena') return <ArenaGates/>;
   if (path === '/play') return <PlayLobby/>;

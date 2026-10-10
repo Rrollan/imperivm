@@ -97,17 +97,18 @@ export default function PacksPage() {
         {!opened&&process.env.NEXT_PUBLIC_IDOS_STATIC_BUILD!=='true'&&<Link className={styles.secondaryLink} href="/arena-lab/pack-preview">{t('Предпросмотр анимации','Preview the animation')}<RomanIcon name="next" size={18}/></Link>}
 
         {opened&&!animating&&<Link href="/collection" className={styles.secondaryLink}><PaintedIcon name="cards" size={30}/>{t('Добавить новые карты в колоду','Build with your new cards')}<RomanIcon name="next" size={20}/></Link>}
-        <details className={styles.menuDetails}><summary>{t('Что в паке?', 'What’s inside?')}</summary><p>{t('Пять случайных карт из 50 персонажей Agora. Шансы редкости указаны для одной карты.','Five random cards from 50 Agora characters. Rarity odds apply to each card.')}</p><div className={styles.rarityChances}>
-          {RARITY_WEIGHTS.map(r => (
+        <details className={styles.menuDetails}><summary>{t('Что в паке?', 'What’s inside?')}</summary><p>{paid ? t('Пять случайных карт из 50 персонажей Agora. Шанс получить одну из четырёх платных легендарных карт — 0,0001% на весь пак: в среднем одна легендарная на миллион паков. Гарантии выпадения нет.','Five random cards from 50 Agora characters. The chance of any of the four paid legendary cards is 0.0001% per entire pack: one legendary per million packs on average. A drop is not guaranteed.') : t('Бесплатная тренировка: пять случайных демо-карт. Шансы ниже указаны для одной демо-карты; их нельзя продать или вывести.','Free practice: five random demo cards. The odds below apply to one demo card; demo cards cannot be sold or withdrawn.')}</p><div className={styles.rarityChances}>
+          {(!paid ? RARITY_WEIGHTS : [{rarity:'legendary' as const,weight:0.0001}]).map(r => (
             <span key={rarityName(r.rarity)} >
               <i aria-hidden="true" style={{background:RARITY_COLORS[r.rarity]}}/>
-              {rarityName(r.rarity)} · {r.weight}%
+              {rarityName(r.rarity)} · {r.weight}%{paid ? t(' на пак',' per pack'):''}
             </span>
           ))}
         </div>
 
         <p >{collection.snapshot?.mode === 'idos' ? t('Коллекция и баланс сохраняются в вашем аккаунте iDos.', 'Collection and balance belong to your iDos account.') : t('Локальное демо · 500 тестовых $IMP. Демо-карты работают в тренировке; для паковых карт в PvP нужен аккаунт iDos.', 'Local demo · 500 test $IMP. Demo cards work in training; pack cards in PvP require an iDos account.')}</p>
-        <p >{t('Полученная карта открывает до двух копий в колоде, легендарная — одну. Паки могут содержать повторы; в iDos они превращаются в валюту коллекции, а не в IMP.', 'An obtained card unlocks up to two deck copies, or one for a legendary. Packs may contain duplicates; iDos converts them into collection currency, not IMP.')}</p>
+        <p >{paid ? t('Каждая карта из нового пака — отдельный продаваемый экземпляр. Повторы сохраняются для продажи. Пока у вас есть карта, её можно использовать в колоде: до двух копий, легендарную — одну. Бесплатный набор и прежние открытия сохраняют доступ к игре, но не создают товары на рынке.','Every card from a new pack is a tradable copy. Duplicates stay in your inventory. Owning a card unlocks up to two deck copies, or one for a legendary. Free starters and earlier openings retain gameplay access without creating marketplace goods.') : t('Демо-карты доступны только в тренировке. Полученная карта открывает до двух копий в колоде, легендарная — одну.','Demo cards are for practice. An obtained card unlocks up to two deck copies, or one for a legendary.')}</p>
+        {paid && <Link href="/market">{t('Купить или продать карты за IMP →','Buy or sell cards for IMP →')}</Link>}
         {collection.snapshot?.mode === 'idos' && <p >{t('Валюта коллекции за повторы', 'Collection currency from duplicates')}: <strong>{collection.snapshot.collectionCurrency ?? 0}</strong> · {t('Обмен на карты готовится; сейчас эта валюта не тратится.', 'Card exchange is in preparation; this currency cannot be spent yet.')}</p>}
         </details>
         <details className={styles.menuDetails}><summary><PaintedIcon name="rug" size={30}/>{t('Перевести IMP в игру', 'Transfer IMP to the game')}</summary><RugShop/></details>

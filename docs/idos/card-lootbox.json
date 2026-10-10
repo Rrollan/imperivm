@@ -1,0 +1,3573 @@
+{
+  "Definitions": {
+    "AGORA_TRADABLE_PACK_V1": {
+      "LootboxID": "AGORA_TRADABLE_PACK_V1",
+      "MaxOpenCount": 1,
+      "PriceOptions": {
+        "IMP": {
+          "OptionID": "IMP",
+          "Cost": {
+            "Standard": {
+              "Entries": [
+                {
+                  "Type": "CryptoCurrency",
+                  "CurrencyID": "Main",
+                  "Amount": 225000
+                }
+              ]
+            }
+          }
+        }
+      },
+      "RewardSlots": [
+        {
+          "SlotID": "ordinary-1",
+          "MinRolls": 1,
+          "MaxRolls": 1,
+          "Pool": [
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "collateral-squire",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "reserve-matron",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "interest-shepherd",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "spread-duelist",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "slippage-netter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "credit-lanternist",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "amm-tidekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "margin-hoplite",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mempool-usher",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "liquidation-bailiff",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "delta-sphinx",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "oracle-of-solvency",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "clay-mint-apprentice",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "provenance-scribe",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mosaic-mender",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "gallery-gatekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "patina-curator",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "blank-canvas-sentinel",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "reveal-diviner",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "soulbound-companion",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "royalty-chorister",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "unbroken-marble-warden",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "medusa-of-missing-mints",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "palimpsest-guardian",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "relay-page",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "copper-lineworker",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "beacon-scout",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "ceramic-cachekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "bridge-riveter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "signal-oracle",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mesh-shieldbearer",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "agora-sitewarden",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "packet-ferryman",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "atlas-nodebearer",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "daedalus-protocolwright",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "copium-jester",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "liquidity-goose",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "bagholder-donkey",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "gm-rooster",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "paperhand-merchant",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "fomo-trumpeter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "diamond-paw-mastiff",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "hopium-augur",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "salt-miner-satyr",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "sir-rug-of-velvet",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "sisyphus-of-the-pump",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "SlotID": "ordinary-2",
+          "MinRolls": 1,
+          "MaxRolls": 1,
+          "Pool": [
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "collateral-squire",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "reserve-matron",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "interest-shepherd",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "spread-duelist",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "slippage-netter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "credit-lanternist",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "amm-tidekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "margin-hoplite",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mempool-usher",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "liquidation-bailiff",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "delta-sphinx",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "oracle-of-solvency",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "clay-mint-apprentice",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "provenance-scribe",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mosaic-mender",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "gallery-gatekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "patina-curator",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "blank-canvas-sentinel",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "reveal-diviner",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "soulbound-companion",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "royalty-chorister",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "unbroken-marble-warden",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "medusa-of-missing-mints",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "palimpsest-guardian",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "relay-page",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "copper-lineworker",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "beacon-scout",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "ceramic-cachekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "bridge-riveter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "signal-oracle",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mesh-shieldbearer",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "agora-sitewarden",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "packet-ferryman",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "atlas-nodebearer",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "daedalus-protocolwright",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "copium-jester",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "liquidity-goose",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "bagholder-donkey",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "gm-rooster",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "paperhand-merchant",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "fomo-trumpeter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "diamond-paw-mastiff",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "hopium-augur",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "salt-miner-satyr",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "sir-rug-of-velvet",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "sisyphus-of-the-pump",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "SlotID": "ordinary-3",
+          "MinRolls": 1,
+          "MaxRolls": 1,
+          "Pool": [
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "collateral-squire",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "reserve-matron",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "interest-shepherd",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "spread-duelist",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "slippage-netter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "credit-lanternist",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "amm-tidekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "margin-hoplite",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mempool-usher",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "liquidation-bailiff",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "delta-sphinx",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "oracle-of-solvency",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "clay-mint-apprentice",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "provenance-scribe",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mosaic-mender",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "gallery-gatekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "patina-curator",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "blank-canvas-sentinel",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "reveal-diviner",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "soulbound-companion",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "royalty-chorister",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "unbroken-marble-warden",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "medusa-of-missing-mints",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "palimpsest-guardian",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "relay-page",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "copper-lineworker",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "beacon-scout",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "ceramic-cachekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "bridge-riveter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "signal-oracle",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mesh-shieldbearer",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "agora-sitewarden",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "packet-ferryman",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "atlas-nodebearer",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "daedalus-protocolwright",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "copium-jester",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "liquidity-goose",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "bagholder-donkey",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "gm-rooster",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "paperhand-merchant",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "fomo-trumpeter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "diamond-paw-mastiff",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "hopium-augur",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "salt-miner-satyr",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "sir-rug-of-velvet",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "sisyphus-of-the-pump",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "SlotID": "ordinary-4",
+          "MinRolls": 1,
+          "MaxRolls": 1,
+          "Pool": [
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "collateral-squire",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "reserve-matron",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "interest-shepherd",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "spread-duelist",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "slippage-netter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "credit-lanternist",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "amm-tidekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "margin-hoplite",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mempool-usher",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "liquidation-bailiff",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "delta-sphinx",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "oracle-of-solvency",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "clay-mint-apprentice",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "provenance-scribe",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mosaic-mender",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "gallery-gatekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "patina-curator",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "blank-canvas-sentinel",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "reveal-diviner",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "soulbound-companion",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "royalty-chorister",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "unbroken-marble-warden",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "medusa-of-missing-mints",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "palimpsest-guardian",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "relay-page",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "copper-lineworker",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "beacon-scout",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "ceramic-cachekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "bridge-riveter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "signal-oracle",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mesh-shieldbearer",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "agora-sitewarden",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "packet-ferryman",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "atlas-nodebearer",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "daedalus-protocolwright",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "copium-jester",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "liquidity-goose",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "bagholder-donkey",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "gm-rooster",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 480,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "paperhand-merchant",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "fomo-trumpeter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "diamond-paw-mastiff",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "hopium-augur",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 275,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "salt-miner-satyr",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "sir-rug-of-velvet",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 242,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "sisyphus-of-the-pump",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "SlotID": "legendary-opportunity",
+          "MinRolls": 1,
+          "MaxRolls": 1,
+          "Pool": [
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "collateral-squire",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "reserve-matron",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "interest-shepherd",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "spread-duelist",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "slippage-netter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "credit-lanternist",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "amm-tidekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "margin-hoplite",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mempool-usher",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "liquidation-bailiff",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 57292,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "delta-sphinx",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 57292,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "oracle-of-solvency",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "clay-mint-apprentice",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "provenance-scribe",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mosaic-mender",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "gallery-gatekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "patina-curator",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113637,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "blank-canvas-sentinel",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "reveal-diviner",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "soulbound-companion",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "royalty-chorister",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "unbroken-marble-warden",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 57292,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "medusa-of-missing-mints",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 57292,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "palimpsest-guardian",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "relay-page",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "copper-lineworker",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113637,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "beacon-scout",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "ceramic-cachekeeper",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113637,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "bridge-riveter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "signal-oracle",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "mesh-shieldbearer",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "agora-sitewarden",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "packet-ferryman",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 57292,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "atlas-nodebearer",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 57292,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "daedalus-protocolwright",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "copium-jester",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "liquidity-goose",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113637,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "bagholder-donkey",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "gm-rooster",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 113636,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "paperhand-merchant",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "fomo-trumpeter",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "diamond-paw-mastiff",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "hopium-augur",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 65104,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "salt-miner-satyr",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 57292,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "sir-rug-of-velvet",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 57292,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "sisyphus-of-the-pump",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 1,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "poseidon-deep-liquidity",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 1,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "persephone-second-mint",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 1,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "hephaestus-public-nodes",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Weight": 1,
+              "Reward": {
+                "Standard": {
+                  "Entries": [
+                    {
+                      "Type": "Item",
+                      "CatalogID": "IMPERIVM_CARDS_V1",
+                      "ItemID": "dionysus-last-pump",
+                      "Amount": 1
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "PityRules": [],
+      "SupplyLimits": []
+    }
+  }
+}

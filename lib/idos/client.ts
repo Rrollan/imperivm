@@ -5,6 +5,7 @@ import { authenticateSolanaWallet, idosResult, SessionQueue } from './auth';
 import {IMPERIVM_TITLE} from './title';
 import {validateImpToken} from './token';
 import type {CollectionAuth} from '../collection/access';
+import {WalletProfileService, type ProfileIdentity, type ProfileAvatar} from './profile';
 
 export type IDosSession = { status: 'demo' | 'connecting' | 'guest' | 'wallet' | 'restricted' | 'error'; owner: string | null; userId: string | null; error: string | null; revision: number };
 export type IDosStandings = { board: GetLeaderboardResponse; ownScore: number };
@@ -87,6 +88,17 @@ export class IDosRuntime {
       return {userId: auth.userID, sessionTicket: auth.clientSessionTicket};
     });
   }
+  private profileService(client: IDosGamesClient, expected: ProfileIdentity) {
+    return new WalletProfileService({
+      identity: () => this.session.status === 'wallet' && this.session.owner && this.session.userId
+        ? {owner: this.session.owner, userId: this.session.userId} : null,
+      user: client.user, userCustomData: client.userCustomData,
+      cachedNickname: () => client.data.user.state?.PublicData?.Username,
+    }, expected);
+  }
+  profile(expected: ProfileIdentity) {return this.withAccount(client => this.profileService(client, expected).load());}
+  changeNickname(expected: ProfileIdentity, nickname: string) {return this.withAccount(client => this.profileService(client, expected).changeNickname(nickname));}
+  changeAvatar(expected: ProfileIdentity, avatar: ProfileAvatar) {return this.withAccount(client => this.profileService(client, expected).changeAvatar(avatar));}
   async standings(): Promise<IDosStandings> {
     if (!IDOS_CONFIG.leaderboard) throw new Error('iDos leaderboard is not configured.');
     return this.withAccount(async client => ({ board: idosResult(await client.leaderboard.getLeaderboard(IDOS_CONFIG.leaderboard)), ownScore: idosResult(await client.leaderboard.getMyProgress(IDOS_CONFIG.leaderboard)).CurrentScore ?? 0 }));

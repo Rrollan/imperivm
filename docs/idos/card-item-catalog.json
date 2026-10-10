@@ -1,0 +1,1691 @@
+{
+  "Catalogs": {
+    "IMPERIVM_CARDS_V1": {
+      "Items": {
+        "senate-censure": {
+          "ItemID": "senate-censure",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Senate Censure",
+          "Description": "Reduce a random enemy fighter’s attack by 1, to a minimum of 0.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "senate-censure"
+          }
+        },
+        "restoration-rite": {
+          "ItemID": "restoration-rite",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Restoration Rite",
+          "Description": "Restore 2 health to every friendly fighter, up to their maximum health.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "restoration-rite"
+          }
+        },
+        "agora-expansion": {
+          "ItemID": "agora-expansion",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Agora Expansion",
+          "Description": "Instant. Permanently add one fighter slot, up to seven. Scaling the agora, not the hype.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "agora-expansion"
+          }
+        },
+        "diamond-aegis": {
+          "ItemID": "diamond-aegis",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Diamond Aegis",
+          "Description": "Instant. Give all your fighters +0/+2. Diamond hands hold the line.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "diamond-aegis"
+          }
+        },
+        "hermes-relayer": {
+          "ItemID": "hermes-relayer",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Hermes Relayer",
+          "Description": "Battlecry: Draw one. Ultimate — if you already played a DePIN card this turn, draw two instead. Alpha at the speed of gossip.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "hermes-relayer"
+          }
+        },
+        "athena-diamond-guard": {
+          "ItemID": "athena-diamond-guard",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Athena of Diamond Hands",
+          "Description": "Taunt. Ultimate — if two other NFT fighters survived since your previous turn, give your whole army +1/+1. Never sells the bottom.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "legendary",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "athena-diamond-guard"
+          }
+        },
+        "zeus-liquidator": {
+          "ItemID": "zeus-liquidator",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Zeus the Liquidator",
+          "Description": "Battlecry: Deal one to all enemy fighters. Ultimate — if two of your established fighters are staked, deal three instead. Olympus liquidates your leverage.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "legendary",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "zeus-liquidator"
+          }
+        },
+        "hades-rugkeeper": {
+          "ItemID": "hades-rugkeeper",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Hades the Rugkeeper",
+          "Description": "Battlecry: Deal one to the enemy treasury. Ultimate — if you already played two Meme cards this turn, deal four instead. Exit liquidity is eternal.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "legendary",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "hades-rugkeeper"
+          }
+        },
+        "lending-legionnaire": {
+          "ItemID": "lending-legionnaire",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Lending Legionnaire",
+          "Description": "Lends his shield. Never his denarii.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "lending-legionnaire"
+          }
+        },
+        "amm-centurion": {
+          "ItemID": "amm-centurion",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "AMM Centurion",
+          "Description": "A constant product of blood and iron. x * y = k, and k is Rome.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "amm-centurion"
+          }
+        },
+        "liquidation-officer": {
+          "ItemID": "liquidation-officer",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Liquidation Officer",
+          "Description": "Lifesteal. Battlecry: Deal 1 damage to a random enemy minion. Your collateral was delicious.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "liquidation-officer"
+          }
+        },
+        "frontrun-bot": {
+          "ItemID": "frontrun-bot",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Frontrun Bot",
+          "Description": "Priority. Battlecry: Remove the highest-cost enemy mempool spell. Your mempool order is his business.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "frontrun-bot"
+          }
+        },
+        "priority-fee": {
+          "ItemID": "priority-fee",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Priority Fee",
+          "Description": "Priority. Gain 1 gas. Pay the skipper. Skip the line.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "priority-fee"
+          }
+        },
+        "yield-farmer": {
+          "ItemID": "yield-farmer",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Yield Farmer",
+          "Description": "Every 4 blocks: +1/+1. Emissions halve. Hunger does not.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "yield-farmer"
+          }
+        },
+        "staking-pool": {
+          "ItemID": "staking-pool",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Staking Pool",
+          "Description": "Battlecry: Gain 2 gas. Stake here. Compound forever. Staked minions pay +1 gas each at turn start.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "staking-pool"
+          }
+        },
+        "flash-loan": {
+          "ItemID": "flash-loan",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Flash Loan",
+          "Description": "Draw 2 cards. Borrow the treasury. Return it tomorrow.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "flash-loan"
+          }
+        },
+        "impermanent-guard": {
+          "ItemID": "impermanent-guard",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Impermanent Guard",
+          "Description": "Taunt. Battlecry: Restore 4 to your treasury. Losses impermanent. Loyalty eternal.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "impermanent-guard"
+          }
+        },
+        "imperator-liquidus": {
+          "ItemID": "imperator-liquidus",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Imperator Liquidus",
+          "Description": "Battlecry: Deal 2 damage to all enemy minions. All debts to Rome are settled in blood.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "legendary",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "imperator-liquidus"
+          }
+        },
+        "pixel-squire": {
+          "ItemID": "pixel-squire",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Pixel Squire",
+          "Description": "Born of right-click.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "pixel-squire"
+          }
+        },
+        "whitelist-scout": {
+          "ItemID": "whitelist-scout",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Whitelist Scout",
+          "Description": "Battlecry: Draw a card. Guaranteed spot. Guaranteed glory.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "whitelist-scout"
+          }
+        },
+        "profile-pic-phalanx": {
+          "ItemID": "profile-pic-phalanx",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Profile-Pic Phalanx",
+          "Description": "Taunt. Right-click. Save. Enlist.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "profile-pic-phalanx"
+          }
+        },
+        "trait-reroll": {
+          "ItemID": "trait-reroll",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Trait Reroll",
+          "Description": "Give all your minions +1 attack. New trait just dropped.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "trait-reroll"
+          }
+        },
+        "floor-sweeper": {
+          "ItemID": "floor-sweeper",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Floor Sweeper",
+          "Description": "Battlecry: Draw a card. Sweeps the floor. Keeps the alpha.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "floor-sweeper"
+          }
+        },
+        "ape-praetorian": {
+          "ItemID": "ape-praetorian",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Ape Praetorian",
+          "Description": "Every 3 blocks: +1/+1. Diamond hands. Paper enemies.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "ape-praetorian"
+          }
+        },
+        "minting-press": {
+          "ItemID": "minting-press",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Minting Press",
+          "Description": "Battlecry: Summon a Pixel Squire. The press never sleeps.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "minting-press"
+          }
+        },
+        "reveal-ceremony": {
+          "ItemID": "reveal-ceremony",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Reveal Ceremony",
+          "Description": "Deal 2 damage to all enemy minions. The art was inside us all along.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "reveal-ceremony"
+          }
+        },
+        "blue-chip-basilisk": {
+          "ItemID": "blue-chip-basilisk",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Blue-Chip Basilisk",
+          "Description": "Rush. Gaze upon the floor price.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "blue-chip-basilisk"
+          }
+        },
+        "genesis-pfp": {
+          "ItemID": "genesis-pfp",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Genesis PFP",
+          "Description": "Battlecry: Give all your minions +1/+1. The first face of the Empire.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "legendary",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "genesis-pfp"
+          }
+        },
+        "antenna-auxilia": {
+          "ItemID": "antenna-auxilia",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Antenna Auxilia",
+          "Description": "Carries the signal through the storm.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "antenna-auxilia"
+          }
+        },
+        "mesh-messenger": {
+          "ItemID": "mesh-messenger",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Mesh Messenger",
+          "Description": "Every packet finds its legion.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "mesh-messenger"
+          }
+        },
+        "relay-runner": {
+          "ItemID": "relay-runner",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Relay Runner",
+          "Description": "Battlecry: Draw a card. Faster than gossip.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "relay-runner"
+          }
+        },
+        "node-sentinel": {
+          "ItemID": "node-sentinel",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Node Sentinel",
+          "Description": "Every 3 blocks: +1/+1. Proof of uptime.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "node-sentinel"
+          }
+        },
+        "bandwidth-barbarian": {
+          "ItemID": "bandwidth-barbarian",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Bandwidth Barbarian",
+          "Description": "He eats latency for breakfast.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "bandwidth-barbarian"
+          }
+        },
+        "hotspot-hoplite": {
+          "ItemID": "hotspot-hoplite",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Hotspot Hoplite",
+          "Description": "Taunt. Stake him. He holds the line — and the yield. Staked minions pay +1 gas each at turn start.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "hotspot-hoplite"
+          }
+        },
+        "gps-gladiator": {
+          "ItemID": "gps-gladiator",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "GPS Gladiator",
+          "Description": "Battlecry: Deal 2 damage to a random enemy minion. He always knows where you live.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "gps-gladiator"
+          }
+        },
+        "solar-sapper": {
+          "ItemID": "solar-sapper",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Solar Sapper",
+          "Description": "Deal 2 damage to all enemy minions. Harvested sunlight, weaponized.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "solar-sapper"
+          }
+        },
+        "firmware-phalanx": {
+          "ItemID": "firmware-phalanx",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Firmware Phalanx",
+          "Description": "Battlecry: Give all your minions +1/+1. Update installed. Morale upgraded.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "firmware-phalanx"
+          }
+        },
+        "the-grand-cartographer": {
+          "ItemID": "the-grand-cartographer",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "The Grand Cartographer",
+          "Description": "Battlecry: Gain 2 gas. His maps power the Empire.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "legendary",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "the-grand-cartographer"
+          }
+        },
+        "jeet-legion": {
+          "ItemID": "jeet-legion",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Jeet Legion",
+          "Description": "Battlecry: Deal 1 damage to the enemy treasury. Paper hands. Iron panic.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "jeet-legion"
+          }
+        },
+        "gm-greeter": {
+          "ItemID": "gm-greeter",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "GM Greeter",
+          "Description": "Battlecry: Restore 3 to your treasury. Good morning, legion.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "gm-greeter"
+          }
+        },
+        "dogen": {
+          "ItemID": "dogen",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Dogen",
+          "Description": "Much legion. Wow.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "dogen"
+          }
+        },
+        "sandwich-attacker": {
+          "ItemID": "sandwich-attacker",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Sandwich Attacker",
+          "Description": "Priority. Battlecry: Deal 1 damage to the enemy treasury. He eats the spread — and your lunch.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "sandwich-attacker"
+          }
+        },
+        "pepito": {
+          "ItemID": "pepito",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Pepito",
+          "Description": "Rare. Green. Unstoppable.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "pepito"
+          }
+        },
+        "pump-chaser": {
+          "ItemID": "pump-chaser",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Pump Chaser",
+          "Description": "Battlecry: Gain 1 gas. Buys the top. Every time.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "pump-chaser"
+          }
+        },
+        "diamond-hoarder": {
+          "ItemID": "diamond-hoarder",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Diamond Hoarder",
+          "Description": "Staked hands never sell. Stake her: she cannot attack anyway, but she pays gas.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "diamond-hoarder"
+          }
+        },
+        "fud-hydra": {
+          "ItemID": "fud-hydra",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "FUD Hydra",
+          "Description": "Battlecry: Deal 2 damage to all enemy minions. Cut one FUD, two take its place.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "fud-hydra"
+          }
+        },
+        "to-the-moon-militia": {
+          "ItemID": "to-the-moon-militia",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "To-The-Moon Militia",
+          "Description": "Battlecry: Deal 3 damage to the enemy treasury. One small step for memes.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "to-the-moon-militia"
+          }
+        },
+        "rug-pull": {
+          "ItemID": "rug-pull",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "RUG PULL",
+          "Description": "Destroy ALL minions on both boards. Veni. Vidi. Rugi.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "legendary",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "rug-pull"
+          }
+        },
+        "audit": {
+          "ItemID": "audit",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Audit",
+          "Description": "Priority. Pull the highest-cost enemy mempool spell. On resolve: give your minions +1/+1. The ledger closes before the rug falls.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "audit"
+          }
+        },
+        "collateral-squire": {
+          "ItemID": "collateral-squire",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Collateral Squire",
+          "Description": "Taunt. The shield is collateral. The courage is not.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "collateral-squire"
+          }
+        },
+        "reserve-matron": {
+          "ItemID": "reserve-matron",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Reserve Matron",
+          "Description": "Battlecry: restore 1 health to your treasury. Combo — if at least 1 established friendly fighter is staked, restore 4 health to your treasury instead of the ordinary Battlecry. Emergency reserves are for rainy blocks.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "reserve-matron"
+          }
+        },
+        "interest-shepherd": {
+          "ItemID": "interest-shepherd",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Interest Shepherd",
+          "Description": "Every 4 blocks: +1/+1. The flock compounds while the market sleeps.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "interest-shepherd"
+          }
+        },
+        "spread-duelist": {
+          "ItemID": "spread-duelist",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Spread Duelist",
+          "Description": "Rush. Lifesteal. She takes the spread, not the fair fight.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "spread-duelist"
+          }
+        },
+        "slippage-netter": {
+          "ItemID": "slippage-netter",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Slippage Netter",
+          "Description": "Battlecry: reduce a random enemy fighter’s attack by 1, to a minimum of 0. A tighter net means a smaller slip.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "slippage-netter"
+          }
+        },
+        "credit-lanternist": {
+          "ItemID": "credit-lanternist",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Credit Lanternist",
+          "Description": "Battlecry: draw 1 card. Combo — if at least 1 established friendly fighter is staked, draw 2 cards instead of the ordinary Battlecry. Reads the fine print by borrowed light.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "credit-lanternist"
+          }
+        },
+        "amm-tidekeeper": {
+          "ItemID": "amm-tidekeeper",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "AMM Tidekeeper",
+          "Description": "Battlecry: restore up to 1 health to every friendly fighter. Combo — if at least 1 established friendly fighter is staked, give every friendly fighter +0/+1 instead of the ordinary Battlecry. Keeps the pool from becoming a puddle.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "amm-tidekeeper"
+          }
+        },
+        "margin-hoplite": {
+          "ItemID": "margin-hoplite",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Margin Hoplite",
+          "Description": "Taunt. Combo — if at least 1 other DeFi fighter survived the opponent’s turn, reduce a random enemy fighter’s attack by 2, to a minimum of 0. His margin of safety has a bronze edge.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "margin-hoplite"
+          }
+        },
+        "mempool-usher": {
+          "ItemID": "mempool-usher",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Mempool Usher",
+          "Description": "Battlecry: cancel the highest-cost edict in the enemy queue. Your expensive decree is not on the list.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "mempool-usher"
+          }
+        },
+        "liquidation-bailiff": {
+          "ItemID": "liquidation-bailiff",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Liquidation Bailiff",
+          "Description": "Battlecry: deal 1 damage to a random enemy fighter, or their treasury if there are none. Combo — if at least 2 other DeFi fighters survived the opponent’s turn, deal 4 damage to a random enemy fighter, or their treasury if there are none instead of the ordinary Battlecry. He collects after the legion has secured the court.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "liquidation-bailiff"
+          }
+        },
+        "delta-sphinx": {
+          "ItemID": "delta-sphinx",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Delta Sphinx",
+          "Description": "Taunt. Combo — if at least 1 established friendly fighter is staked, draw 2 cards. The riddle is easy. Keeping the collateral is not.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "delta-sphinx"
+          }
+        },
+        "oracle-of-solvency": {
+          "ItemID": "oracle-of-solvency",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Oracle of Solvency",
+          "Description": "Battlecry: gain 1 order this turn. Combo — if at least 2 established friendly fighters are staked, gain 3 orders this turn instead of the ordinary Battlecry. Foresees one thing: you will need more orders.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "oracle-of-solvency"
+          }
+        },
+        "poseidon-deep-liquidity": {
+          "ItemID": "poseidon-deep-liquidity",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Poseidon of Deep Liquidity",
+          "Description": "Taunt. Battlecry: restore 4 health to your treasury. Combo — if at least 2 established friendly fighters are staked, give every friendly fighter +1/+2 instead of the ordinary Battlecry. The tide rewards those who held their anchors.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "legendary",
+            "DeFi"
+          ],
+          "CustomData": {
+            "CardID": "poseidon-deep-liquidity"
+          }
+        },
+        "clay-mint-apprentice": {
+          "ItemID": "clay-mint-apprentice",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Clay Mint Apprentice",
+          "Description": "Battlecry: restore up to 1 health to every friendly fighter. Fresh clay, fresh conviction.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "clay-mint-apprentice"
+          }
+        },
+        "provenance-scribe": {
+          "ItemID": "provenance-scribe",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Provenance Scribe",
+          "Description": "Combo — if at least 1 other NFT fighter survived the opponent’s turn, draw 2 cards. A surviving original makes the next edition credible.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "provenance-scribe"
+          }
+        },
+        "mosaic-mender": {
+          "ItemID": "mosaic-mender",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Mosaic Mender",
+          "Description": "Battlecry: restore up to 2 health to every friendly fighter. A crack is not a floor price.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "mosaic-mender"
+          }
+        },
+        "gallery-gatekeeper": {
+          "ItemID": "gallery-gatekeeper",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Gallery Gatekeeper",
+          "Description": "Taunt. No right-clickers beyond this point.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "gallery-gatekeeper"
+          }
+        },
+        "patina-curator": {
+          "ItemID": "patina-curator",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Patina Curator",
+          "Description": "Combo — if at least 1 other NFT fighter survived the opponent’s turn, give every friendly fighter +0/+1. Surviving the market is its own collectible trait.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "patina-curator"
+          }
+        },
+        "blank-canvas-sentinel": {
+          "ItemID": "blank-canvas-sentinel",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Blank Canvas Sentinel",
+          "Description": "Every 5 blocks: +1/+1. An unfinished masterpiece still grows.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "blank-canvas-sentinel"
+          }
+        },
+        "reveal-diviner": {
+          "ItemID": "reveal-diviner",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Reveal Diviner",
+          "Description": "Battlecry: deal 1 damage to every enemy fighter. Combo — if you already played at least 1 NFT card this turn, deal 2 damage to every enemy fighter instead of the ordinary Battlecry. The second mint reveals the fire underneath.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "reveal-diviner"
+          }
+        },
+        "soulbound-companion": {
+          "ItemID": "soulbound-companion",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Soulbound Companion",
+          "Description": "Taunt. Combo — if at least 1 other NFT fighter survived the opponent’s turn, restore up to 3 health to every friendly fighter. Stays for the friends, not the floor.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "soulbound-companion"
+          }
+        },
+        "royalty-chorister": {
+          "ItemID": "royalty-chorister",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Royalty Chorister",
+          "Description": "Battlecry: gain 1 order this turn. Combo — if you already played at least 1 NFT card this turn, gain 2 orders this turn instead of the ordinary Battlecry. The chorus pays once. No perpetual royalties.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "royalty-chorister"
+          }
+        },
+        "unbroken-marble-warden": {
+          "ItemID": "unbroken-marble-warden",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Unbroken Marble Warden",
+          "Description": "Taunt. Battlecry: restore 2 health to your treasury. Combo — if at least 2 other NFT fighters survived the opponent’s turn, give every friendly fighter +0/+2 instead of the ordinary Battlecry. Keeps an intact collection through a bear market.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "unbroken-marble-warden"
+          }
+        },
+        "medusa-of-missing-mints": {
+          "ItemID": "medusa-of-missing-mints",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Medusa of Missing Mints",
+          "Description": "Battlecry: reduce a random enemy fighter’s attack by 2, to a minimum of 0. Combo — if you already played at least 1 NFT card this turn, reduce a random enemy fighter’s attack by 4, to a minimum of 0 instead of the ordinary Battlecry. Missed the mint? Try moving with those paper hands.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "medusa-of-missing-mints"
+          }
+        },
+        "palimpsest-guardian": {
+          "ItemID": "palimpsest-guardian",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Palimpsest Guardian",
+          "Description": "Lifesteal. Combo — if at least 2 other NFT fighters survived the opponent’s turn, give every friendly fighter +1/+1. Writes a stronger army over the surviving draft.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "palimpsest-guardian"
+          }
+        },
+        "persephone-second-mint": {
+          "ItemID": "persephone-second-mint",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Persephone of the Second Mint",
+          "Description": "Battlecry: summon a 1/1 Pixel Squire if a slot is free. Combo — if at least 2 other NFT fighters survived the opponent’s turn, summon a 4/3 Blue-Chip Basilisk with Rush if a slot is free instead of the ordinary Battlecry. Spring returns with a second edition.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "legendary",
+            "NFT"
+          ],
+          "CustomData": {
+            "CardID": "persephone-second-mint"
+          }
+        },
+        "relay-page": {
+          "ItemID": "relay-page",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Relay Page",
+          "Description": "Battlecry: restore 1 health to your treasury. First packet of the day: gm.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "relay-page"
+          }
+        },
+        "copper-lineworker": {
+          "ItemID": "copper-lineworker",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Copper Lineworker",
+          "Description": "Battlecry: restore up to 1 health to every friendly fighter. Combo — if you already played at least 1 DePIN card this turn, give every friendly fighter +0/+1 instead of the ordinary Battlecry. One earlier node turns a loose wire into a network.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "copper-lineworker"
+          }
+        },
+        "beacon-scout": {
+          "ItemID": "beacon-scout",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Beacon Scout",
+          "Description": "Rush. Zero latency. Brief life expectancy.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "beacon-scout"
+          }
+        },
+        "ceramic-cachekeeper": {
+          "ItemID": "ceramic-cachekeeper",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Ceramic Cachekeeper",
+          "Description": "Combo — if at least 1 other DePIN fighter survived the opponent’s turn, draw 1 card. Cached yesterday. Useful today.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "ceramic-cachekeeper"
+          }
+        },
+        "bridge-riveter": {
+          "ItemID": "bridge-riveter",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Bridge Riveter",
+          "Description": "Taunt. Battlecry: restore up to 1 health to every friendly fighter. Maintenance is cheaper than rebuilding the bridge.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "bridge-riveter"
+          }
+        },
+        "signal-oracle": {
+          "ItemID": "signal-oracle",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Signal Oracle",
+          "Description": "Battlecry: draw 1 card. Combo — if you already played at least 2 DePIN cards this turn, draw 3 cards instead of the ordinary Battlecry. Three packets, one very clear signal.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "signal-oracle"
+          }
+        },
+        "mesh-shieldbearer": {
+          "ItemID": "mesh-shieldbearer",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Mesh Shieldbearer",
+          "Description": "Taunt. Combo — if you already played at least 1 DePIN card this turn, give every friendly fighter +0/+1. A second node makes the mesh harder to break.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "mesh-shieldbearer"
+          }
+        },
+        "agora-sitewarden": {
+          "ItemID": "agora-sitewarden",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Agora Sitewarden",
+          "Description": "Battlecry: permanently add one fighter slot, up to seven. One more public slot. No infinite scalability promises.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "agora-sitewarden"
+          }
+        },
+        "packet-ferryman": {
+          "ItemID": "packet-ferryman",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Packet Ferryman",
+          "Description": "Battlecry: summon a 1/1 Antenna Auxilia if a slot is free. Combo — if you already played at least 1 DePIN card this turn, summon a 1/2 Mesh Messenger if a slot is free instead of the ordinary Battlecry. The fare includes one passenger.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "packet-ferryman"
+          }
+        },
+        "atlas-nodebearer": {
+          "ItemID": "atlas-nodebearer",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Atlas the Nodebearer",
+          "Description": "Taunt. Combo — if at least 2 other DePIN fighters survived the opponent’s turn, restore up to 4 health to every friendly fighter. The network stays up if somebody carries it.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "atlas-nodebearer"
+          }
+        },
+        "daedalus-protocolwright": {
+          "ItemID": "daedalus-protocolwright",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Daedalus the Protocolwright",
+          "Description": "Battlecry: summon a 1/1 Antenna Auxilia if a slot is free. Combo — if at least 2 other DePIN fighters survived the opponent’s turn, summon a 1/4 Hotspot Hoplite with Taunt if a slot is free instead of the ordinary Battlecry. One helper, properly maintained. Not an infinite factory.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "daedalus-protocolwright"
+          }
+        },
+        "hephaestus-public-nodes": {
+          "ItemID": "hephaestus-public-nodes",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Hephaestus of Public Nodes",
+          "Description": "Battlecry: give every friendly fighter +0/+1. Combo — if at least 2 other DePIN fighters survived the opponent’s turn, give every friendly fighter +2/+2 instead of the ordinary Battlecry. Public infrastructure earns a legendary upgrade.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "legendary",
+            "DePIN"
+          ],
+          "CustomData": {
+            "CardID": "hephaestus-public-nodes"
+          }
+        },
+        "copium-jester": {
+          "ItemID": "copium-jester",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Copium Jester",
+          "Description": "Combo — if you already played at least 1 Meme card this turn, deal 1 damage to the enemy treasury. It is only a loss if the punchline fails.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "copium-jester"
+          }
+        },
+        "liquidity-goose": {
+          "ItemID": "liquidity-goose",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Exit Liquidity Goose",
+          "Description": "Battlecry: deal 1 damage to the enemy treasury. Honk if you bought the top.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "liquidity-goose"
+          }
+        },
+        "bagholder-donkey": {
+          "ItemID": "bagholder-donkey",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Bagholder Donkey",
+          "Description": "Taunt. Still holding. Mostly because he cannot move.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "bagholder-donkey"
+          }
+        },
+        "gm-rooster": {
+          "ItemID": "gm-rooster",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "GM Rooster",
+          "Description": "Battlecry: restore 2 health to your treasury. Wake up. The treasury needs you.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "gm-rooster"
+          }
+        },
+        "paperhand-merchant": {
+          "ItemID": "paperhand-merchant",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Paperhand Merchant",
+          "Description": "Battlecry: gain 1 order this turn. Sold the bag. Bought one more order.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "common",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "paperhand-merchant"
+          }
+        },
+        "fomo-trumpeter": {
+          "ItemID": "fomo-trumpeter",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "FOMO Trumpeter",
+          "Description": "Battlecry: give every friendly fighter +1/+0. Combo — if you already played at least 2 Meme cards this turn, give every friendly fighter +1/+1 instead of the ordinary Battlecry. The third call is when everybody joins.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "fomo-trumpeter"
+          }
+        },
+        "diamond-paw-mastiff": {
+          "ItemID": "diamond-paw-mastiff",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Diamond Paw Mastiff",
+          "Description": "Taunt. Lifesteal. Good boy. Bad exit liquidity.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "diamond-paw-mastiff"
+          }
+        },
+        "hopium-augur": {
+          "ItemID": "hopium-augur",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Hopium Augur",
+          "Description": "Taunt. Battlecry: draw 1 card. Combo — if you already played at least 2 Meme cards this turn, draw 2 cards instead of the ordinary Battlecry. Reads three omens. Keeps the receipts.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "hopium-augur"
+          }
+        },
+        "salt-miner-satyr": {
+          "ItemID": "salt-miner-satyr",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Salt Miner Satyr",
+          "Description": "Rush. Battlecry: reduce a random enemy fighter’s attack by 1, to a minimum of 0. Harvests salt before the counterattack.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "rare",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "salt-miner-satyr"
+          }
+        },
+        "sir-rug-of-velvet": {
+          "ItemID": "sir-rug-of-velvet",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Sir Rug of Velvet",
+          "Description": "Lifesteal. Battlecry: deal 1 damage to a random enemy fighter, or their treasury if there are none. Combo — if you already played at least 1 Meme card this turn, deal 3 damage to a random enemy fighter, or their treasury if there are none instead of the ordinary Battlecry. A velvet rug is still a rug.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "sir-rug-of-velvet"
+          }
+        },
+        "sisyphus-of-the-pump": {
+          "ItemID": "sisyphus-of-the-pump",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Sisyphus of the Pump",
+          "Description": "Every 3 blocks: +1/+1. Battlecry: restore 2 health to your treasury. Another block. Another hill. Still pumping.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "epic",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "sisyphus-of-the-pump"
+          }
+        },
+        "dionysus-last-pump": {
+          "ItemID": "dionysus-last-pump",
+          "CatalogID": "IMPERIVM_CARDS_V1",
+          "ItemClass": "IMPERIVMCard",
+          "DisplayName": "Dionysus of the Last Pump",
+          "Description": "Rush. Battlecry: restore 2 health to your treasury. Combo — if you already played at least 2 Meme cards this turn, give every friendly fighter +2/+1 instead of the ordinary Battlecry. The last pump needs a party that survived the night.",
+          "IsStackable": true,
+          "IsTradable": true,
+          "Tags": [
+            "imperivm-card",
+            "legendary",
+            "Meme"
+          ],
+          "CustomData": {
+            "CardID": "dionysus-last-pump"
+          }
+        }
+      }
+    }
+  }
+}

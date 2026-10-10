@@ -1,0 +1,50 @@
+{
+  "Enabled": true,
+  "PricePolicy": {
+    "AllowCryptoCurrency": true,
+    "AllowVirtualCurrency": false,
+    "AllowItems": false,
+    "AllowEventTokens": false,
+    "Allowed": [
+      {
+        "Kind": "CryptoCurrency",
+        "CurrencyID": "Main",
+        "MinAmount": 1,
+        "MaxAmount": 1000000000000
+      }
+    ],
+    "MaxPositions": 1
+  },
+  "Tradability": {
+    "AllowedCatalogIDs": [
+      "IMPERIVM_CARDS_V1"
+    ],
+    "AllowUnstackableWithState": false
+  },
+  "Listings": {
+    "Enabled": true,
+    "AllowedDurationsHours": [
+      24,
+      72,
+      168
+    ],
+    "MaxActiveListings": 20
+  },
+  "Auctions": {
+    "Enabled": false
+  },
+  "BuyOrders": {
+    "Enabled": false
+  },
+  "DirectTrades": {
+    "Enabled": false
+  },
+  "Matching": {
+    "Enabled": false
+  },
+  "Commission": {
+    "Percent": 0,
+    "MinPerPosition": 0,
+    "Sink": "Ledger"
+  }
+}

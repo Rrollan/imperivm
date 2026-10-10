@@ -32,7 +32,7 @@ export default function CollectionContext({ children }: { children: React.ReactN
     if (local) { next.gateway = localGateway(); void refresh(); }
     else if (idos.runtime && ['guest', 'wallet'].includes(idos.session.status)) {
       setBusy(true);
-      void import('../lib/collection/idos').then(({ IDosCollectionGateway }) => { if (!cancelled) { next.gateway = new IDosCollectionGateway(idos.runtime!); void refresh(); } })
+      void import('../lib/collection/itemGateway').then(({ IDosCardItemGateway }) => { if (!cancelled) { next.gateway = new IDosCardItemGateway(idos.runtime!); void refresh(); } })
         .catch(() => { if (!cancelled) { setBusy(false); setError('iDos collection unavailable.'); } });
     } else { setBusy(idos.session.status === 'connecting'); setError(idos.session.error); }
     return () => { cancelled = true; };

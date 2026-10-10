@@ -93,34 +93,63 @@ export type TransferAdapterFactory = (network: BlockchainNetworkDefinition, rece
 type ReceiptRpc = Pick<Connection, 'getSignatureStatuses' | 'getBlockHeight'>;
 async function receiptRpc(): Promise<ReceiptRpc> {const {Connection} = await import('@solana/web3.js'); return new Connection(impTransactionRpcUrl(), 'confirmed');}
 const computeBudgetProgram = 'ComputeBudget111111111111111111111111111111';
-/** Phantom can add priority-fee instructions. Only these two bounded, account-free
- * additions are allowed; the transfer, account privileges and blockhash stay exact.
- * Existing budgets (including iDos withdrawal vouchers) cannot be rewritten. */
-export function assertSignedImpTransfer(expected: Transaction, signed: Transaction): void {
-  const refused = (reason = 'instructions') => {throw new Error(`Подписанный перевод не прошёл проверку (${reason}). Транзакция не отправлена. Обновите игру и повторите.`);};
+const lighthouseProgram = 'L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95';
+/** Phantom's priority fees and Lighthouse guards are not extra payments. Keep
+ * every original financial instruction and its effective privileges exact.
+ * Lighthouse MemoryWrite/Close and unfamiliar programs remain prohibited.
+ * Source: Jac0xb/lighthouse@4c579479c98635e419b1b167f08be02a71604a71. */
+export function assertSignedImpTransfer(expected: Transaction, signed: Transaction, policy: 'deposit' | 'immutable' | 'legacy' = 'legacy'): void {
+  const refused = (reason = 'instructions') => {throw new Error(`Подписанный перевод не прошёл проверку (${reason}). Транзакция не отправлена.`);};
   if (!signed.signature || !signed.verifySignatures()) refused('signature');
   if (Buffer.from(signed.serializeMessage()).equals(Buffer.from(expected.serializeMessage()))) return;
   if (signed.recentBlockhash !== expected.recentBlockhash) refused('blockhash');
   if (!signed.feePayer?.equals(expected.feePayer!) ||
     signed.signatures.length !== expected.signatures.length || signed.signatures.some((item, index) => !item.publicKey.equals(expected.signatures[index].publicKey)) ||
-    expected.instructions.some(ix => ix.programId.toBase58() === computeBudgetProgram) || expected.signatures.some(item => item.signature)) refused();
+    expected.signatures.some(item => item.signature)) refused('signers');
+  const originalBudget = expected.instructions.filter(ix => ix.programId.toBase58() === computeBudgetProgram);
   const added = signed.instructions.filter(ix => ix.programId.toBase58() === computeBudgetProgram);
-  const financial = signed.instructions.filter(ix => ix.programId.toBase58() !== computeBudgetProgram);
-  if (!added.length || added.length > 2 || financial.length !== expected.instructions.length) refused();
+  const guards = signed.instructions.filter(ix => ix.programId.toBase58() === lighthouseProgram);
+  const originalFinancial = expected.instructions.filter(ix => ix.programId.toBase58() !== computeBudgetProgram);
+  const financial = signed.instructions.filter(ix => ![computeBudgetProgram, lighthouseProgram].includes(ix.programId.toBase58()));
+  if (expected.instructions.some(ix => ix.programId.toBase58() === lighthouseProgram) || financial.length !== originalFinancial.length) refused('extra-instructions');
   financial.forEach((ix, index) => {
-    const original = expected.instructions[index];
+    const original = originalFinancial[index];
     if (!ix.programId.equals(original.programId) || !ix.data.equals(original.data) || ix.keys.length !== original.keys.length ||
-      ix.keys.some((key, position) => !key.pubkey.equals(original.keys[position].pubkey) || key.isSigner !== original.keys[position].isSigner || key.isWritable !== original.keys[position].isWritable)) refused();
+      ix.keys.some((key, position) => !key.pubkey.equals(original.keys[position].pubkey) || key.isSigner !== original.keys[position].isSigner || key.isWritable !== original.keys[position].isWritable)) refused(`payment-${index}`);
   });
+  // Guards may only inspect accounts already involved in the original operation.
+  // Single-target assertions 2/3/5..14/17 and zero-account clock assertion 15
+  // are read-only; delta, memory, compression/CPI instructions are excluded.
+  const accounts = new Set(expected.compileMessage().accountKeys.map(key => key.toBase58()));
+  if (guards.length > 16) refused('guard-count');
+  let guardSeen = false;
+  for (const ix of signed.instructions) {
+    if (ix.programId.toBase58() === lighthouseProgram) {
+      guardSeen = true;
+      const kind = ix.data[0], count = kind === 15 ? 0 : 1;
+      // Borsh stores the LogLevel variant ordinal (0..6), not its Rust repr.
+      if (![2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17].includes(kind) || ix.data.length < 3 || ix.data.length > 1024 || ix.data[1] > 6 || ix.keys.length !== count || ix.keys.some(key => !accounts.has(key.pubkey.toBase58()))) refused(`guard-${kind ?? 'empty'}`);
+    } else if (guardSeen) refused('guard-order');
+  }
+  // Withdrawal vouchers include index-sensitive signature instructions. Neither
+  // their budget nor the ordered original instruction prefix may be changed.
+  if (policy === 'immutable' || policy === 'legacy' && originalBudget.length) {
+    if (signed.instructions.length !== expected.instructions.length + guards.length || expected.instructions.some((ix, index) => {
+      const actual = signed.instructions[index];
+      return !actual || !actual.programId.equals(ix.programId) || !actual.data.equals(ix.data) || actual.keys.length !== ix.keys.length || actual.keys.some((key, position) => !key.pubkey.equals(ix.keys[position].pubkey) || key.isSigner !== ix.keys[position].isSigner || key.isWritable !== ix.keys[position].isWritable);
+    })) refused('voucher-instructions');
+    return;
+  }
+  if (added.length > 2 || originalBudget.length && !added.length) refused('fee-instructions');
   let limit = BigInt(1_400_000), price = BigInt(0); const seen = new Set<number>();
   for (const ix of added) {
     const kind = ix.data[0];
-    if (ix.keys.length || seen.has(kind)) refused();
+    if (ix.keys.length || seen.has(kind)) refused('fee-instructions');
     seen.add(kind);
     if (kind === 2 && ix.data.length === 5) {
-      limit = BigInt(ix.data.readUInt32LE(1)); if (limit < BigInt(1) || limit > BigInt(1_400_000)) refused();
+      limit = BigInt(ix.data.readUInt32LE(1)); if (limit < BigInt(1) || limit > BigInt(1_400_000)) refused('fee-limit');
     } else if (kind === 3 && ix.data.length === 9) price = ix.data.readBigUInt64LE(1);
-    else refused();
+    else refused('fee-kind');
   }
   // Ceiling in lamports; reject unexpectedly expensive wallet-added priority fees.
   if ((limit * price + BigInt(999_999)) / BigInt(1_000_000) > BigInt(1_000_000)) throw new Error('Комиссия приоритета выше 0.001 SOL. Уменьшите её в Phantom и повторите перевод.');
@@ -145,7 +174,8 @@ export async function createImpTransferAdapter(network: BlockchainNetworkDefinit
   };
   const adapter = createPlatformPoolAdapter({connection, owner: receipt.owner, programId: network.RewardPoolAddress!, signTransaction: async (transaction: Transaction) => {
     if (!candidate.accounts.some(current => current.address === receipt.owner)) throw new Error('Кошелёк изменился. Перевод отменён.');
-    // An explicit budget prevents Phantom's automatic transaction enhancement.
+    // Request an explicit budget. Phantom can append safety assertions or adjust
+    // this deposit budget; the post-sign guard verifies those changes separately.
     // 300k CU matches the pool SDK's withdrawal limit; 10k micro-lamports/CU
     // caps our added priority fee at 3,000 lamports (0.000003 SOL).
     // Withdrawal vouchers retain their original instruction indices and budget.
@@ -159,7 +189,7 @@ export async function createImpTransferAdapter(network: BlockchainNetworkDefinit
     const [result] = await feature.signTransaction({account, transaction: bytes, chain: 'solana:mainnet'});
     if (!result || !candidate.accounts.some(current => current.address === receipt.owner)) throw new Error('Подпись отменена или кошелёк изменился.');
     const signed = Transaction.from(result.signedTransaction);
-    assertSignedImpTransfer(expected, signed);
+    assertSignedImpTransfer(expected, signed, receipt.direction === 'deposit' ? 'deposit' : 'immutable');
     return signed;
   }});
   return {adapter, connection};

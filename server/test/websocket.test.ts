@@ -447,11 +447,20 @@ test('premium decks require backend ownership; free decks and frozen paid-seat r
   const paidCard = PACK_CARD_IDS.find(id => CARDS[id].rarity === 'common')!;
   const paid = registration('Collector');paid.deckList.splice(0, 2, paidCard, paidCard);
   const credential = {userId: 'collector', sessionTicket: 'fixture-secret-ticket-never-expose'};
-  let lookups = 0;
+  let lookups = 0, ownsCard = false;
   const fetcher: typeof fetch = async (url, options) => {
-    lookups++; assert.match(String(url), /fixture-title\/Client\/Collection\/GetUserState\/collector$/);
-    assert.equal(new Headers(options?.headers).get('Authorization'), `Bearer ${credential.sessionTicket}`);
-    return new Response(JSON.stringify({Success: true, Data: {CollectionID: 'IMPERIVM_AGORA', OwnedCollectibles: {[paidCard]: 1}}}));
+    lookups++;
+    assert.equal(options?.method, 'POST');assert.equal(options?.redirect, 'error');assert.ok(options?.signal);
+    const headers = new Headers(options?.headers);
+    assert.equal(headers.get('Authorization'), `Bearer ${credential.sessionTicket}`);assert.equal(headers.get('X-IG-Platform'), 'Web');
+    const body = JSON.parse(String(options?.body));
+    assert.equal(body.TitleID, 'fixture-title');assert.equal(body.UserID, credential.userId);assert.equal(body.ClientSessionTicket, credential.sessionTicket);
+    if (String(url) === 'https://api.idosgames.com/api/v2/fixture-title/Client/Collection/GetUserState/collector') {
+      // Legacy collectibles do not establish ownership in this native-Items fixture.
+      return new Response(JSON.stringify({Success: true, Data: {CollectionID: 'IMPERIVM_AGORA', OwnedCollectibles: {}}}));
+    }
+    assert.equal(String(url), 'https://api.idosgames.com/api/v2/fixture-title/Client/User/GetInventory/collector');
+    return new Response(JSON.stringify({Success: true, Data: {Items: ownsCard ? {[paidCard]: {StackableAmount: 2, UnstackableAmount: 0, TotalAmount: 2}} : {}}}));
   };
   const service = await launch({port: 0, host: '127.0.0.1', origins: [ORIGIN], authorizeDeck: data => authorizeCollectionDeck(data.deckList, data.collectionAuth, fetcher)});
   t.after(() => service.close());
@@ -461,8 +470,12 @@ test('premium decks require backend ownership; free decks and frozen paid-seat r
   rejected.send({type: 'create', ...registration('Free player')});
   await rejected.next('joined');assert.equal(lookups, 0);await rejected.close();
 
+  const roomsBeforeUnowned = service.rooms.size;
+  const unowned = new Peer(url);await unowned.open();unowned.send({type: 'create', ...paid, collectionAuth: credential});
+  assert.equal((await unowned.next('error')).code, 'collection-access');assert.equal(service.rooms.size, roomsBeforeUnowned);assert.equal(lookups, 2);await unowned.close();
+  ownsCard = true;
   const collector = new Peer(url);await collector.open();collector.send({type: 'create', ...paid, collectionAuth: credential});
-  const joined = await collector.next('joined');await collector.state(value => value.status === 'waiting');assert.equal(lookups, 1);
+  const joined = await collector.next('joined');await collector.state(value => value.status === 'waiting');assert.equal(lookups, 4);
   const opponent = new Peer(url);await opponent.open();opponent.send({type: 'join', roomCode: joined.roomCode, ...registration('Free opponent')});
   await opponent.next('joined');const before = await collector.state(value => value.status === 'playing');
   const wire = JSON.stringify([before, opponent.snapshot, ...opponent.messages]);
@@ -472,7 +485,7 @@ test('premium decks require backend ownership; free decks and frozen paid-seat r
   // Changed registration deck is ignored: resume uses the existing authorized seat and frozen deck.
   resumed.send({type: 'join', roomCode: joined.roomCode, resumeToken: joined.resumeToken, ...registration('Collector')});
   await resumed.next('joined');const after = await resumed.state(value => value.status === 'playing');
-  assert.equal(after.revision, before.revision);assert.equal(lookups, 1);assert.deepEqual(after.game, before.game);
+  assert.equal(after.revision, before.revision);assert.equal(lookups, 4);assert.deepEqual(after.game, before.game);
 });
 
 test('random queue pairs real sockets, preserves private hands and supports same-name reconnect', async t => {

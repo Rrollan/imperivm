@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import {useSearchParams} from 'next/navigation';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {isFreeHero,HEROES} from '../../lib/heroes';
 import {FREE_DECKS as DECKS} from '../../lib/collection/starterDecks';
 import {loadCustomDeck, deckError} from '../../lib/deckbuilder';
 import {useCollection} from '../CollectionContext';
+import {useIDos} from '../IDosContext';
 import {freeCardCounts, needsCollection, deckCardCounts} from '../../lib/collection/access';
 import type {Action} from '../../lib/engine/types';
 import type {OnlineCommand} from '../../lib/multiplayer/types';
@@ -36,14 +37,35 @@ export function CustomLobby({random = false}: {random?: boolean}) {
   const params = useSearchParams(), invitedCode = normalizeRoomCode(params.get('code') || '');
   const {t, locale, heroName, heroTitle, powerName, errorText} = useLocale();
   const collection = useCollection();
+  const idos = useIDos();
   const [deckErrorText, setDeckErrorText] = useState(''), [checkingDeck, setCheckingDeck] = useState(false);
   const net = useNetGame({roomCode: invitedCode || undefined});
   const [hero, setHero] = useState(() => Object.hasOwn(HEROES, params.get('hero') || '') ? params.get('hero')! : 'builder');
   const [name, setName] = useState(''), [code, setCode] = useState(invitedCode), [tab, setTab] = useState<'create' | 'join'>(invitedCode ? 'join' : 'create');
+  const profilePrefill = useRef(''), profileAccount = useRef('');
   const [customDeck, setCustomDeck] = useState<string[] | null>(null), [deckSource, setDeckSource] = useState<'starter' | 'saved'>('starter');
   const [copied, setCopied] = useState<'code' | 'link' | null>(null), [copyFailed, setCopyFailed] = useState(false);
   useEffect(() => {const deck = loadCustomDeck(hero); setCustomDeck(deck); setDeckSource('starter');}, [hero]);
   useEffect(() => {if (net.identity) {setName(net.identity.playerName); if (net.identity.heroId && Object.hasOwn(HEROES, net.identity.heroId)) setHero(net.identity.heroId);}}, [net.identity]);
+  useEffect(() => {
+    const nextAccount = `${idos.session.owner ?? ''}:${idos.session.userId ?? ''}`;
+    if (!net.identity && profileAccount.current !== nextAccount) {
+      const automaticName = profilePrefill.current;
+      setName(previous => previous === automaticName ? '' : previous);
+      profilePrefill.current = ''; profileAccount.current = nextAccount;
+    }
+    if (!idos.runtime || idos.session.status !== 'wallet' || !idos.session.owner || !idos.session.userId || net.identity) return;
+    let cancelled = false;
+    const runtime = idos.runtime, expected = {owner: idos.session.owner, userId: idos.session.userId};
+    const loadName = () => void runtime.profile(expected).then(profile => {
+      if (!cancelled) {
+        const previousProfileName = profilePrefill.current; profilePrefill.current = profile.nickname;
+        setName(previous => !previous || previous === previousProfileName ? profile.nickname : previous);
+      }
+    }).catch(() => { /* Profile loading must not block a free match. */ });
+    loadName(); window.addEventListener('imperivm:profile-changed', loadName);
+    return () => {cancelled = true; window.removeEventListener('imperivm:profile-changed', loadName);};
+  }, [idos.runtime, idos.session.owner, idos.session.userId, idos.session.status, net.identity]);
   const busy = net.status === 'connecting' || net.status === 'reconnecting';
   const waiting = net.snapshot?.status === 'waiting', locked = busy || !!net.queue || !!net.identity || !!net.snapshot;
   const [now, setNow] = useState(Date.now);

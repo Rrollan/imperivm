@@ -11,7 +11,7 @@ import {ImperivmLogo} from '../ImperivmLogo';
 import {RomanIcon} from '../presentation/RomanIcon';
 import styles from './Home.module.css';
 
-export function SiteHeader({ active = 'home' }: { active?: 'home' | 'library' | 'packs' | 'collection' | 'play' }) {
+export function SiteHeader({ active = 'home' }: { active?: 'home' | 'library' | 'packs' | 'collection' | 'play' | 'market' }) {
   const { t, locale, setLocale } = useLocale();
   const wallet = useImperivmWallet(), idos = useIDos();
   const [accountOpen, setAccountOpen] = useState(false);
@@ -23,6 +23,7 @@ export function SiteHeader({ active = 'home' }: { active?: 'home' | 'library' | 
       <Link href="/library" aria-current={active === 'library' ? 'page' : undefined}><PaintedIcon name="library" size={36}/><span>{t('Библиотека', 'Library')}</span></Link>
       <Link href="/collection" aria-current={active === 'collection' ? 'page' : undefined}><PaintedIcon name="cards" size={36}/><span>{t('Колоды', 'Decks')}</span></Link>
       <Link href="/packs" aria-current={active === 'packs' ? 'page' : undefined}><PaintedIcon name="pack" size={36}/><span>{t('Паки', 'Packs')}</span></Link>
+      <Link href="/market" aria-current={active === 'market' ? 'page' : undefined}><PaintedIcon name="rug" size={36}/><span>{t('Рынок', 'Market')}</span></Link>
       <Link href="/arena" className={styles.navPlay} aria-current={active === 'play' ? 'page' : undefined}><PaintedIcon name="play" size={36}/><span>{t('Играть', 'Play')}</span></Link>
       <button type="button" className={styles.accountButton} onClick={() => setAccountOpen(true)} aria-label={t('Открыть аккаунт и кошелёк', 'Open account and wallet')}><PaintedIcon name="wallet" size={30}/>{owner ? `${owner.slice(0, 4)}…${owner.slice(-4)}` : t('Аккаунт', 'Account')}</button>
       <button type="button" onClick={() => setLocale(locale === 'ru' ? 'en' : 'ru')} aria-label={t('Переключить язык на английский', 'Switch language to Russian')} className={styles.language}>{locale.toUpperCase()} <span aria-hidden="true">/ {locale === 'ru' ? 'EN' : 'RU'}</span></button>

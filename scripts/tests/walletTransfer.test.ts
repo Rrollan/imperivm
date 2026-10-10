@@ -84,9 +84,21 @@ async function main() {
     modify = tx => {assert.equal(tx.instructions.length,3,'The wallet receives one explicit budget and the original deposit.');assert.equal(tx.instructions[0].programId.toBase58(),ComputeBudgetProgram.programId.toBase58());assert.equal(tx.instructions[0].data.readUInt32LE(1),300000);assert.equal(tx.instructions[1].data.readBigUInt64LE(1),BigInt(10000));assert.equal(tx.instructions[2].programId.toBase58(),programId);assert.equal(tx.instructions[2].data.readBigUInt64LE(8),BigInt('225000000000'));};
     const {adapter:wrapped}=await createImpTransferAdapter({RewardPoolAddress:programId},proof,log,value=>{walletPhases.push(value.phase);if(value.phase==='confirming')assert.equal(log.read()?.hash,value.hash,'A visible chain confirmation is tied to the durable receipt.');});
     await wrapped.depositSpl({mint:IMPERIVM_TITLE.mint,amountRaw:BigInt('225000000000'),userID:userId,titleID:IMPERIVM_TITLE.id,category:'game_topup'});assert(log.read()?.hash);assert.deepEqual(walletPhases,['wallet','confirming']);log.clear();
-    const deposit = async () => {const next=receipt('deposit');log.save(next);const {adapter}=await createImpTransferAdapter({RewardPoolAddress:programId},next,log);return adapter.depositSpl({mint:IMPERIVM_TITLE.mint,amountRaw:BigInt('1000000'),userID:userId,titleID:IMPERIVM_TITLE.id,category:'game_topup'});};
+    const deposit = async (amount='1') => {const next={...receipt('deposit'),amount};log.save(next);const {adapter}=await createImpTransferAdapter({RewardPoolAddress:programId},next,log);return adapter.depositSpl({mint:IMPERIVM_TITLE.mint,amountRaw:parseImpTransferAmount(amount).raw,userID:userId,titleID:IMPERIVM_TITLE.id,category:'game_topup'});};
     const budget = () => [ComputeBudgetProgram.setComputeUnitLimit({units:300000}),ComputeBudgetProgram.setComputeUnitPrice({microLamports:250000})];
     modify = () => {};await deposit();assert(log.read()?.hash);assert.equal(broadcasts,2);log.clear();
+    const lighthouse=new PublicKey('L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95');
+    // Pinned Lighthouse codec: AssertAccountInfo(5), Silent(0), IsWritable(6), true, Equal(0).
+    // The guard inspects the already-writable deposit signer and cannot spend or create accounts.
+    const guard=(target=signer.publicKey,data=Buffer.from([5,0,6,1,0]))=>new TransactionInstruction({programId:lighthouse,keys:[{pubkey:target,isSigner:false,isWritable:false}],data});
+    // Phantom may normalize bounded priority limits/prices. Neither a new payment nor a new recipient is allowed.
+    for (const change of [
+      (tx:Transaction)=>{tx.instructions[0]=ComputeBudgetProgram.setComputeUnitLimit({units:300001});},
+      (tx:Transaction)=>{tx.instructions[1]=ComputeBudgetProgram.setComputeUnitPrice({microLamports:10001});},
+      (tx:Transaction)=>{tx.instructions[1]=ComputeBudgetProgram.setComputeUnitPrice({microLamports:2440000});tx.instructions.push(guard());assert.equal(tx.instructions[2].data.readBigUInt64LE(8),BigInt('100000000'));},
+      (tx:Transaction)=>{tx.instructions.push(guard());},
+    ]) {const before:number=broadcasts;modify=change;await deposit('100');assert.equal(broadcasts,before+1);assert(log.read()?.hash);log.clear();}
+    const beforeRejected=broadcasts;
     const forbidden: ((tx:Transaction)=>void)[] = [
       tx=>{tx.instructions[2].data=Buffer.from(tx.instructions[2].data);tx.instructions[2].data.writeBigUInt64LE(BigInt('2000000'),8);},
       tx=>{tx.instructions[2].keys[2].pubkey=Keypair.generate().publicKey;},
@@ -101,29 +113,46 @@ async function main() {
       tx=>{tx.instructions.unshift(new TransactionInstruction({programId:ComputeBudgetProgram.programId,keys:[],data:Buffer.from([2])}));},
       tx=>{tx.instructions.unshift(new TransactionInstruction({programId:ComputeBudgetProgram.programId,keys:[{pubkey:signer.publicKey,isSigner:false,isWritable:true}],data:budget()[0].data}));},
     ];
-    for (const change of forbidden) {modify=change;await assert.rejects(deposit(),/Подписанный перевод не прошёл проверку|Комиссия приоритета/);assert.equal(broadcasts,2,'A changed payment must never reach sendRawTransaction');assert.equal(log.read()?.hash,undefined);log.clear();}
-    // Existing explicit deposit budgets must never be duplicated or rewritten by the wallet.
-    for (const change of [
-      (tx:Transaction)=>{tx.instructions.unshift(...budget());},
-      (tx:Transaction)=>{tx.instructions.push(...budget());},
-      (tx:Transaction)=>{tx.instructions[0]=ComputeBudgetProgram.setComputeUnitLimit({units:300001});},
-      (tx:Transaction)=>{tx.instructions[1]=ComputeBudgetProgram.setComputeUnitPrice({microLamports:10001});},
-      (tx:Transaction)=>{tx.instructions.splice(0,2);},
-    ]) {modify=change;await assert.rejects(deposit(),/Подписанный перевод не прошёл проверку/);assert.equal(broadcasts,2);assert.equal(log.read()?.hash,undefined);log.clear();}
+    for (const change of forbidden) {modify=change;await assert.rejects(deposit(),/Подписанный перевод не прошёл проверку|Комиссия приоритета/);assert.equal(broadcasts,beforeRejected,'A changed payment must never reach sendRawTransaction');assert.equal(log.read()?.hash,undefined);log.clear();}
+    // Duplicated/deleted budgets and non-assertion Lighthouse mutations cannot be broadcast.
+    const forbiddenEnhancements: ((tx:Transaction)=>void)[] = [
+      tx=>{tx.instructions.unshift(...budget());},
+      tx=>{tx.instructions.push(...budget());},
+      tx=>{tx.instructions.splice(0,2);},
+      tx=>{tx.instructions.push(guard(signer.publicKey,Buffer.from([0,0,0])));}, // MemoryWrite
+      tx=>{tx.instructions.push(guard(signer.publicKey,Buffer.from([1,0,0])));}, // MemoryClose
+      tx=>{tx.instructions.push(guard(signer.publicKey,Buffer.from([4,0,0])));}, // delta/memory
+      tx=>{tx.instructions.push(guard(signer.publicKey,Buffer.from([16,0,0])));}, // compression/CPI
+      tx=>{tx.instructions.push(guard(signer.publicKey,Buffer.from([255,0,0])));},
+      tx=>{tx.instructions.push(guard(signer.publicKey,Buffer.from([5,0])));}, // truncated opcode/header
+      tx=>{tx.instructions.push(guard(signer.publicKey,Buffer.from([5,255,6,1,0])));}, // invalid Borsh LogLevel
+      tx=>{tx.instructions.push(guard(Keypair.generate().publicKey));}, // unrelated target account
+      tx=>{const extra=guard();extra.programId=Keypair.generate().publicKey;tx.instructions.push(extra);},
+      tx=>{const extra=guard();extra.keys.push({pubkey:signer.publicKey,isSigner:false,isWritable:false});tx.instructions.push(extra);},
+      tx=>{const extra=guard(tx.instructions[2].keys[2].pubkey);extra.keys[0].isWritable=true;tx.instructions.push(extra);}, // elevates mint privilege
+      tx=>{tx.instructions.unshift(guard());}, // assertions may only follow the original operation
+      tx=>{tx.instructions.push(...Array.from({length:17},()=>guard()));},
+      tx=>{tx.instructions[1]=ComputeBudgetProgram.setComputeUnitPrice({microLamports:3333334});}, // ceil > 0.001 SOL
+    ];
+    for (const change of forbiddenEnhancements) {modify=change;await assert.rejects(deposit(),/Подписанный перевод не прошёл проверку|Комиссия приоритета/);assert.equal(broadcasts,beforeRejected);assert.equal(log.read()?.hash,undefined);log.clear();}
     // An existing withdrawal budget must remain byte-identical even with a valid wallet signature.
     const {assertSignedImpTransfer}=await import('../../lib/idos/walletTransfer');
     const protectedTx=new Transaction({feePayer:signer.publicKey,recentBlockhash:Keypair.generate().publicKey.toBase58()}).add(...budget(),SystemProgram.transfer({fromPubkey:signer.publicKey,toPubkey:signer.publicKey,lamports:1}));
     const originalTx=Transaction.from(protectedTx.serialize({requireAllSignatures:false,verifySignatures:false}));
-    protectedTx.instructions[1]=ComputeBudgetProgram.setComputeUnitPrice({microLamports:1});protectedTx.sign(signer);assert.throws(()=>assertSignedImpTransfer(originalTx,protectedTx),/Подписанный перевод не прошёл проверку/);
+    protectedTx.instructions[1]=ComputeBudgetProgram.setComputeUnitPrice({microLamports:1});protectedTx.sign(signer);assert.throws(()=>assertSignedImpTransfer(originalTx,protectedTx,'immutable'),/Подписанный перевод не прошёл проверку/);
     const invalid=Transaction.from(originalTx.serialize({requireAllSignatures:false,verifySignatures:false}));assert.throws(()=>assertSignedImpTransfer(originalTx,invalid),/signature/);
+    const invalidSignature=Transaction.from(originalTx.serialize({requireAllSignatures:false,verifySignatures:false}));invalidSignature.sign(signer);invalidSignature.signatures[0].signature=Buffer.alloc(64,1);assert.throws(()=>assertSignedImpTransfer(originalTx,invalidSignature,'deposit'),/signature/);
+    const changedPayer=Keypair.generate(), payerTx=Transaction.from(originalTx.serialize({requireAllSignatures:false,verifySignatures:false}));payerTx.feePayer=changedPayer.publicKey;payerTx.sign(changedPayer,signer);assert.throws(()=>assertSignedImpTransfer(originalTx,Transaction.from(payerTx.serialize()),'deposit'),/signers/);
+    const immutableGuard=Transaction.from(originalTx.serialize({requireAllSignatures:false,verifySignatures:false}));immutableGuard.instructions.push(guard());immutableGuard.sign(signer);assert.doesNotThrow(()=>assertSignedImpTransfer(originalTx,Transaction.from(immutableGuard.serialize()),'immutable'));
+    const immutableReordered=Transaction.from(originalTx.serialize({requireAllSignatures:false,verifySignatures:false}));immutableReordered.instructions=[immutableReordered.instructions[2],immutableReordered.instructions[0],immutableReordered.instructions[1]];immutableReordered.sign(signer);assert.throws(()=>assertSignedImpTransfer(originalTx,Transaction.from(immutableReordered.serialize()),'immutable'),/voucher-instructions/);
     // Legacy transactions without an explicit budget still support bounded Phantom enhancements.
     const legacy = () => Transaction.from(new Transaction({feePayer:signer.publicKey,recentBlockhash:Keypair.generate().publicKey.toBase58()}).add(SystemProgram.transfer({fromPubkey:signer.publicKey,toPubkey:Keypair.generate().publicKey,lamports:1})).serialize({requireAllSignatures:false,verifySignatures:false}));
     for (const position of ['prepend','append'] as const) {const expected=legacy();const enhanced=Transaction.from(expected.serialize({requireAllSignatures:false,verifySignatures:false}));if(position==='prepend')enhanced.instructions.unshift(...budget());else enhanced.instructions.push(...budget());enhanced.sign(signer);assert.doesNotThrow(()=>assertSignedImpTransfer(expected,Transaction.from(enhanced.serialize())));}
     const expected=legacy(), expensive=Transaction.from(expected.serialize({requireAllSignatures:false,verifySignatures:false}));expensive.instructions.unshift(ComputeBudgetProgram.setComputeUnitLimit({units:300000}),ComputeBudgetProgram.setComputeUnitPrice({microLamports:3333334}));expensive.sign(signer);assert.throws(()=>assertSignedImpTransfer(expected,Transaction.from(expensive.serialize())),/Комиссия приоритета/);
     // Losing a send response must retain the exact signed receipt; never send a fresh transaction automatically.
     modify=()=>{};Connection.prototype.sendRawTransaction=async bytes=>{broadcasts++;const signed=Transaction.from(bytes);assert(signed.signature);assert.equal(log.read()?.hash,signatureBase58(signed.signature));throw Error('RPC response lost');};
-    await assert.rejects(deposit(),/RPC response lost/);assert.equal(broadcasts,3);assert(log.read()?.hash);assert.equal(log.read()?.lastValidBlockHeight,99);log.clear();
+    await assert.rejects(deposit(),/RPC response lost/);assert.equal(broadcasts,beforeRejected+1);assert(log.read()?.hash);assert.equal(log.read()?.lastValidBlockHeight,99);log.clear();
   } finally {disconnect();Object.assign(Connection.prototype,original);}
-  console.log('IMP transfer checks passed: exact six decimals, durable receipts and phases, single credit/debit, explicit deposit budget, bounded legacy Phantom fees, 12 rejected financial/fee mutations, 5 rejected deposit budget rewrites and protected withdrawal vouchers. No external transactions.');
+  console.log('IMP transfer checks passed: exact six decimals, durable receipts and phases, single credit/debit, explicit deposit budget, bounded legacy Phantom fees, 12 rejected financial/fee mutations, 16 rejected enhancement mutations, bounded deposit budget rewrites plus suffix assertions, and protected withdrawal vouchers. No external transactions.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

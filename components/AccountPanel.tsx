@@ -10,6 +10,7 @@ import {useCollection} from './CollectionContext';
 import {useLocale} from './LocaleContext';
 import {formatImpAmount, readImpWalletBalance} from '../lib/solana/imp';
 import {ImpWalletPanel} from './ImpWalletPanel';
+import {WalletProfilePanel} from './WalletProfilePanel';
 import styles from './AccountPanel.module.css';
 
 export function AccountPanel({onClose}: {onClose: () => void}) {
@@ -28,13 +29,13 @@ export function AccountPanel({onClose}: {onClose: () => void}) {
   const gameBalance = collection.snapshot?.rug;
   const button = styles.button, primary = `${button} ${styles.primary}`;
   return <Dialog title={t('Ваш аккаунт', 'Your account')} onClose={onClose} className={styles.dialog}>
-    <div className={styles.identity}>
+    {idos.session.status === 'wallet' ? <WalletProfilePanel/> : <div className={styles.identity}>
       <RomanIcon name="laurel" size={30} className={styles.seal}/>
-      <div><strong>{idos.session.status === 'wallet' ? t('Кошелёк подключён', 'Wallet connected') : idos.session.status === 'guest' ? t('Гость iDos Games', 'iDos Games guest') : t('Готовы к сражению', 'Ready for battle')}</strong>
-        <p>{idos.session.status === 'wallet' ? t('Коллекция сохранена в вашем аккаунте iDos.', 'Your collection is saved in your iDos account.') : t('Войдите кошельком, чтобы открыть свою коллекцию на любом устройстве.', 'Sign in with your wallet to access your collection on any device.')}</p>
+      <div><strong>{idos.session.status === 'guest' ? t('Гость iDos Games', 'iDos Games guest') : t('Готовы к сражению', 'Ready for battle')}</strong>
+        <p>{t('Войдите кошельком, чтобы открыть свою коллекцию на любом устройстве.', 'Sign in with your wallet to access your collection on any device.')}</p>
         {owner && <a className={styles.address} href={`https://explorer.solana.com/address/${encodeURIComponent(owner)}`} target="_blank" rel="noreferrer" title={owner}>{owner.slice(0, 7)}…{owner.slice(-6)} ↗ Solana mainnet</a>}
       </div>
-    </div>
+    </div>}
     <div className={styles.balances}>
       <section className={styles.balance} aria-label={t('Баланс кошелька', 'Wallet balance')}>
         <h3>{t('В кошельке Phantom', 'In Phantom wallet')}</h3>

@@ -1,0 +1,49 @@
+.panel {border: 1px solid #ad8b513d; border-radius: 14px; background: #120d0b50; overflow: hidden;}
+.summary {display: flex; align-items: center; gap: 14px; padding: 16px;}
+.portrait, .preview > img {object-fit: cover; border-radius: 50%; border: 2px solid #a18450; background: #3d2c21; box-shadow: 0 3px 16px #0005; flex-shrink: 0;}
+.identity {flex: 1; min-width: 0;}
+.identity strong {font-family: var(--font-display, Georgia), serif; font-size: 20px; line-height: 1.2; color: #ead19b; overflow-wrap: anywhere;}
+.identity p {font-size: 12px; line-height: 1.5; color: #bdb09b; margin: 5px 0;}
+.identity a {font: 11px ui-monospace, monospace; color: #a9caba; text-decoration: none;}
+.panel .toggle, .panel .primary, .panel .retry {background-image: none !important; font: inherit; text-shadow: none; border-radius: 9px; box-shadow: none;}
+.panel .toggle {font-size: 12px; min-height: 38px; border: 1px solid #b18b4866; background: #392b20; color: #e4d3b3; padding: 8px 11px; flex-shrink: 0;}
+.editor {border-top: 1px solid #ad8b5133; padding: 18px 16px 14px;}
+.nicknameForm {display: flex; gap: 10px; align-items: flex-end;}
+.nicknameForm label {flex: 1; min-width: 0; display: grid; gap: 7px; color: #e5d1ac; font-size: 13px;}
+.nicknameForm input {width: 100%; min-width: 0; padding: 11px 12px; border: 1px solid #9c7b4a88; border-radius: 9px; background: #1c1511; color: #f1e4cf; font: inherit; font-size: 14px; min-height: 43px; outline: none;}
+.nicknameForm input:focus {border-color: #e0bd71; box-shadow: 0 0 0 2px #e0bd7120;}
+.panel .primary {min-height: 43px; padding: 10px 14px; color: #24190f; font-size: 13px; font-weight: 650; border: 1px solid #e5c586; background-color: #d1ac60; white-space: nowrap;}
+.panel .primary:not(:disabled):hover {background-color: #e2c17d;}
+.panel button:disabled, .panel input:disabled {opacity: .5;}
+.panel button:focus-visible, .panel a:focus-visible, .panel input[type=file]:focus-visible {outline: 2px solid #e0bd71; outline-offset: 3px;}
+.hint {font-size: 11px; line-height: 1.55; color: #b8a58d; margin: 9px 0 15px;}
+.hint:last-child {margin-bottom: 0;}
+.avatars {border: 0; padding: 0; margin: 18px 0 14px; min-width: 0;}
+.avatars legend {color: #e5d1ac; font-size: 13px; padding: 0; margin-bottom: 10px;}
+.portraits {display: flex; flex-wrap: wrap; gap: 9px;}
+.panel .portraits button {padding: 3px; width: 54px; height: 54px; min-height: 0; border-radius: 50%; border: 1px solid #98774666; background-image: none !important; background: #38261b; box-shadow: none;}
+.portraits img {display: block; width: 46px; height: 46px; border-radius: 50%; object-fit: cover;}
+.panel .portraits button[aria-pressed=true] {border-color: #eed198; box-shadow: 0 0 0 2px #d3ad63, 0 0 16px #d3ad6320;}
+.avatarActions {display: flex; align-items: center; gap: 12px; justify-content: space-between;}
+.preview {display: flex; gap: 10px; min-width: 0; align-items: center;}
+.preview > div {min-width: 0;}
+.uploadLabel {display: block; color: #e5d1ac; font-size: 12px; margin-bottom: 5px;}
+.preview input {display: block; max-width: 205px; width: 100%; color: #bfb099; font-size: 11px;}
+.preview input::file-selector-button {border: 1px solid #a1814f77; background: #392b20; border-radius: 5px; padding: 6px 8px; color: #e4d3b3; margin-right: 7px; cursor: pointer;}
+.preview small {display: block; font-size: 10px; color: #a9947b; margin-top: 5px;}
+.error, .success {margin: 10px 14px 14px; font-size: 12px; padding: 10px 12px; line-height: 1.5; border-radius: 9px;}
+.error {color: #ebbaa3; border: 1px solid #b9694955; background: #77351a20;}
+.success {color: #b9d6bd; border: 1px solid #6a9b6566; background: #47704720;}
+.panel .retry {border: 0; padding: 2px 4px; background: transparent; color: #eed198; text-decoration: underline;}
+@media (max-width: 520px) {
+  .summary {gap: 10px; padding: 13px; flex-wrap: wrap;}
+  .portrait {width: 52px; height: 52px;}
+  .identity strong {font-size: 18px;}
+  .identity p {font-size: 11px;}
+  .identity a {font-size: 10px;}
+  .editor {padding: 15px 13px;}
+  .nicknameForm {align-items: stretch; flex-direction: column; gap: 8px;}
+  .avatarActions {align-items: stretch; flex-direction: column;}
+  .preview input {max-width: 225px;}
+  .portraits {gap: 8px;}
+}

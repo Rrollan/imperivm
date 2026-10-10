@@ -12,7 +12,6 @@ import {CardFacts} from '../../components/home/CardFacts';
 import {LibraryCardFace} from '../../components/home/LibraryCardFace';
 import { CHARACTER_CARDS } from '../../lib/characterCards';
 const CHARACTER_CARD_COUNT = Object.keys(CHARACTER_CARDS).length;
-import Dialog from '../../components/Dialog';
 import { useCollection } from '../../components/CollectionContext';
 import { CARDS } from '../../lib/cards';
 import {FREE_CARD_IDS, PACK_CARD_IDS, freeCardCounts, isFreeCard} from '../../lib/collection/access';
@@ -25,7 +24,7 @@ export default function CollectionPage() {
   const nfts = useNfts(), wallet = useImperivmWallet();
   const [inspected, setInspected] = useState<string | null>(null);
   const [filter, setFilter] = useState('All'), [query, setQuery] = useState(''), [mode, setMode] = useState<'catalog' | 'owned' | 'nft' | 'characters'>('catalog');
-  const [building, setBuilding] = useState(true), [trade, setTrade] = useState(false);
+  const [building, setBuilding] = useState(true);
   const localOwned = collection.snapshot?.owned ?? freeCardCounts();
   const owned = localOwned;
   const inventory = mode === 'nft' ? nfts.counts : owned;
@@ -33,7 +32,7 @@ export default function CollectionPage() {
   const visible = Object.values(CARDS).filter(c => (filter === 'All' || c.faction === filter) && (catalogMode || inventory[c.id] > 0) && (mode !== 'characters' || !!CHARACTER_CARDS[c.id]) && `${cardName(c.id)} ${cardText(c.id)} ${c.name} ${c.text}`.toLowerCase().includes(query.toLowerCase()));
   if(building)return <div className={styles.shell}><DeckWorkshop onClose={()=>setBuilding(false)} onInspect={setInspected}/>{inspected&&<CardDialog id={inspected} onClose={()=>setInspected(null)}/>}</div>;
   return <div className={styles.shell}><SiteHeader active="collection" /><main className={`${styles.hubMain} collection-page`}>
-    <nav className="collection-nav"><Link href="/"><RomanIcon name="temple" size={18}/>{t('Главная', 'Home')}</Link><Link href="/packs"><RomanIcon name="pack" size={18}/>{t('Паки', 'Packs')}</Link><Link href="/leaderboard"><RomanIcon name="crown" size={18}/>{t('Победы', 'Victories')}</Link><button onClick={() => setTrade(true)}>{t('Обмен ↗', 'Trade ↗')}</button></nav>
+    <nav className="collection-nav"><Link href="/"><RomanIcon name="temple" size={18}/>{t('Главная', 'Home')}</Link><Link href="/packs"><RomanIcon name="pack" size={18}/>{t('Паки', 'Packs')}</Link><Link href="/leaderboard"><RomanIcon name="crown" size={18}/>{t('Победы', 'Victories')}</Link><Link href="/market"><RomanIcon name="cards" size={18}/>{t('Рынок карт', 'Card market')}</Link></nav>
     <p className="eyebrow">{t('Соберите свой легион', 'Assemble your legion')}</p><h1 className="font-display text-4xl sm:text-5xl gold-text">{t('Коллекция', 'The collection')}</h1>
     <p className="integration-note">{t(`${FREE_CARD_IDS.length} бесплатных · ${PACK_CARD_IDS.length} из паков`, `${FREE_CARD_IDS.length} free · ${PACK_CARD_IDS.length} from packs`)}</p>
     <div className="collection-wallet"><strong>{collection.snapshot?.rug ?? '—'} $IMP</strong><span>{Object.keys(owned).length}/{Object.keys(CARDS).length} {t('видов карт собрано', 'card types collected')}</span><button className="secondary-button" onClick={() => { setBuilding(true); }}><RomanIcon name="cards" size={20}/>{t('Собрать колоду', 'Build a deck')}</button></div>
@@ -43,5 +42,5 @@ export default function CollectionPage() {
     {mode === 'characters' && <div className={styles.expansionNotice}><strong>{t('Agora After Hours · 50 игровых персонажей', 'Agora After Hours · 50 playable characters')}</strong><p>{t('Нажми на карту — изучи её связки. Полученные карты доступны в колодах.','Tap a card to explore its combos. Obtained cards are available for your decks.')}</p><span>{t(`Показано ${visible.length} из ${CHARACTER_CARD_COUNT}`, `Showing ${visible.length} of ${CHARACTER_CARD_COUNT}`)}</span></div>}<div><div className={styles.nativeCollectionGrid}>{visible.map(card => <div key={card.id} className={styles.nativeCollectionCard}><button type="button" className={styles.hubCard} aria-label={t(`Рассмотреть карту «${cardName(card.id)}»`, `Inspect ${cardName(card.id)}`)} onClick={event => {event.currentTarget.focus({preventScroll:true}); setInspected(card.id);}}><LibraryCardFace id={card.id}/><CardFacts compact id={card.id}/></button><div className="collection-card-caption"><span>{isFreeCard(card.id) ? t('Бесплатный набор', 'Free set') : owned[card.id] ? t(`Получена из паков`, `Obtained from packs`) : t('Только из паков · ещё не получена', 'Packs only · not obtained')}{nfts.counts[card.id] > 0 && <><br /><a className="nft-owned-tag" href={explorerUrl(nfts.cards.find(nft => nft.cardId === card.id)!.address)} target="_blank" rel="noreferrer">NFT ×{nfts.counts[card.id]} · {t('проверено', 'verified')} ↗</a></>}</span></div></div>)}</div>
 </div>
     {!visible.length && <p className="py-12 text-center text-lavender">{t('Нет карт по этому запросу. Измените поиск или откройте каталог.', 'No cards match this filter. Change the search or explore the catalog.')}</p>}
-  </main><SiteFooter />{inspected && <CardDialog id={inspected} onClose={() => setInspected(null)} />}{trade && <Dialog title={t('Обмен · предпросмотр devnet', 'Trade · devnet preview')} onClose={() => setTrade(false)}><p className="text-sm text-parchment/80">{t('IMPERIVM Genesis пока не представлен на маркетплейсе. Реальный обмен в этом предпросмотре devnet недоступен.', 'IMPERIVM Genesis has no marketplace listing yet. This devnet preview does not support real trading.')}</p><Link className="secondary-button inline-block mt-5" href="/devnet">{t('Посмотреть настройку devnet →', 'View devnet setup →')}</Link></Dialog>}</div>;
+  </main><SiteFooter />{inspected && <CardDialog id={inspected} onClose={() => setInspected(null)} />}</div>;
 }

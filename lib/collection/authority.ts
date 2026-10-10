@@ -2,6 +2,8 @@ import { deckError } from '../engine/deckValidation';
 import { needsCollection, parseCollectionAuth, cleanOwned, configuredTitle, deckCardCounts } from './access';
 import {isFreeHero,HEROES} from '../heroes';
 import {heroesFromCollectibles} from './heroAccess';
+import {cardItemCounts} from '../idos/cardEconomy';
+import type {UserInventoryState} from '@idosgames/core';
 
 /** Server-only read of iDos entitlements. URL and Title are controlled by deployment, never by a player. */
 export async function authorizeCollectionDeck(deck: readonly string[], credential?: unknown, fetcher: typeof fetch = fetch,hero='builder'): Promise<void> {
@@ -24,7 +26,22 @@ export async function authorizeCollectionDeck(deck: readonly string[], credentia
   if (result.Success !== true || !result.Data || typeof result.Data !== 'object' || Array.isArray(result.Data)) throw new Error('Сессия iDos не подтверждена. Войдите заново.');
   const data = result.Data as Record<string, unknown>;
   if (data.CollectionID !== (process.env.IDOS_COLLECTION_ID || 'IMPERIVM_AGORA')) throw new Error('Коллекция iDos не соответствует этому выпуску карт.');
-  const problem = deckError(deck, deckCardCounts(cleanOwned(data.OwnedCollectibles)));
+  const owned=cleanOwned(data.OwnedCollectibles);
+  // New packs and marketplace purchases are native Items. Legacy collectibles
+  // remain valid play entitlements, never converted into client-granted goods.
+  if(needsCollection(deck)) {
+    const inventoryResponse=await fetcher(`https://api.idosgames.com/api/v2/${encodeURIComponent(title)}/Client/User/GetInventory/${encodeURIComponent(auth.userId)}`, {
+      method:'POST',redirect:'error',headers:{'Content-Type':'application/json','X-IG-Platform':'Web',Authorization:`Bearer ${auth.sessionTicket}`},
+      body:JSON.stringify({TitleID:title,UserID:auth.userId,ClientSessionTicket:auth.sessionTicket,...(process.env.IDOS_BUILD_KEY?{BuildKey:process.env.IDOS_BUILD_KEY}:{})}),signal:AbortSignal.timeout(8000),
+    });
+    if(!inventoryResponse.ok)throw new Error('Не удалось проверить предметы iDos. Обновите вход или выберите бесплатную колоду.');
+    const inventoryText=await inventoryResponse.text();if(inventoryText.length>512_000)throw new Error('Некорректный ответ предметов iDos.');
+    const inventoryEnvelope=JSON.parse(inventoryText);
+    if(inventoryEnvelope?.Success!==true||!inventoryEnvelope.Data||typeof inventoryEnvelope.Data!=='object'||Array.isArray(inventoryEnvelope.Data))throw new Error('Сессия iDos не подтверждена. Войдите заново.');
+    const items=cardItemCounts(inventoryEnvelope.Data as UserInventoryState);
+    for(const [id,count] of Object.entries(items))owned[id]=Math.max(owned[id]??0,count);
+  }
+  const problem = deckError(deck, deckCardCounts(owned));
   if (problem) throw new Error('В колоде есть карты или копии, которых нет в вашей коллекции iDos.');
   if(!heroesFromCollectibles(data.OwnedCollectibles).includes(hero))throw new Error('Этот правитель ещё не получен из кейса iDos.');
 }
