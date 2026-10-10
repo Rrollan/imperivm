@@ -29,7 +29,7 @@ A Hearthstone-style card battler set in imperial Rome — on Solana. Read the me
 
 [Play](https://imperivm.onrender.com/arena) · [Build a deck](https://imperivm.onrender.com/collection) · [Open demo packs](https://imperivm.onrender.com/packs)
 
-[Current iDos test build (v13)](https://si4ips8b.idos.games/v/bldbbb1a6017a044791951e56be0a8b0d5a/index.html#/arena) — AI training, private duels and random matchmaking. Staged; catalog release is pending.
+[Current iDos test build (v15)](https://si4ips8b.idos.games/v/bld6ce8867df2014a148412f03adffc00d3/index.html#/arena) — AI training, private duels, random matchmaking and explicit wallet transfers. Staged; live transfers need owner verification and catalog release is pending.
 
 ---
 
@@ -164,7 +164,7 @@ readme/             Screenshots & GIFs for this README
 | **Local game** | ✅ Full AI matches, 9 rulers, 99 cards, demo packs, owned deck builder |
 | **Solana** | ✅ Mainnet SPL IMP mint and exact wallet balance read verified; owner login test pending |
 | **NFTs** | 🧪 Metaplex Core devnet badge code; mint unverified and match-proof flow disabled by default |
-| **iDos** | 🧪 Title SI4IPS8B configured; v13 staged test build, catalog release pending |
+| **iDos** | 🧪 Title SI4IPS8B configured; v15 staged and UI tested on the iDos domain, catalog release pending |
 | **PvP** | ✅ Authoritative free private duels and random matchmaking tested on iDos; wager mode not implemented |
 | **Mainnet checkout** | 🧪 iDos Main decimals corrected to 6; purchases remain disabled until an owner payment test |
 
