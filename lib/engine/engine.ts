@@ -13,7 +13,9 @@ import { CARDS } from '../cards';
 import { HEROES } from '../heroes';
 import { retaliationDamage } from './combat';
 import {isInstantSpell} from './spellTiming';
-import {boardCapacity, battlecryFor, ultimateReady, MAX_BOARD_CAPACITY} from './tactics';
+import {boardCapacity, effectiveBoardCapacity, battlecryFor, ultimateReady, MAX_BOARD_CAPACITY} from './tactics';
+import {createEmperorState, emperorAfterCardPlay, emperorAnnounceIfDue, emperorAtTurnStart, emperorCanAttackTreasury, emperorCardCost, emperorPowerCost, emperorPrepareFighter, emperorResetTurn, emperorTurnIncome} from './emperor';
+export {effectiveBoardCapacity} from './tactics';
 import {rulesetOf,pendingValidatorOrders,type RulesetOptions,type RulesetId} from './ruleset';
 import type {
   Action,
@@ -219,7 +221,7 @@ function tryLifesteal(
 }
 
 function makeMinion(s: EngineGame, def: CardDef): Minion {
-  return {
+  const minion: Minion = {
     uid: nextUid(s),
     cardId: def.id,
     name: def.name,
@@ -234,6 +236,12 @@ function makeMinion(s: EngineGame, def: CardDef): Minion {
     fresh: true, // package 4A: gate for "first turn" rules
     arrivedBlock: s.block,
   };
+  emperorPrepareFighter(s,def,minion);
+  return minion;
+}
+
+function emperorServices(s: EngineGame) {
+  return {draw:(pid:PlayerId,count:number)=>drawCards(s,pid,count),log:(message:string)=>pushLog(s,message)};
 }
 
 /** priority / counter-mempool: remove the highest-cost enemy mempool spell (ties -> earliest). */
@@ -368,7 +376,7 @@ function applyEffect(s: EngineGame, caster: PlayerId, eff: EffectDef): string[] 
         pushLog(s, 'Summon fizzles (not a minion)');
         break;
       }
-      if (me.board.length >= boardCapacity(me)) {
+      if (me.board.length >= effectiveBoardCapacity(s,caster)) {
         pushLog(s, 'Board full — summon fizzles');
         break;
       }
@@ -462,6 +470,12 @@ function resolveSpellEffect(s: EngineGame, owner: PlayerId, def: CardDef, source
 function completeTurnStart(s: EngineGame): void {
   const me = s.players[s.turn];
   pushLog(s, `Block ${s.block} — P${s.turn} turn`);
+  // Capture rewards committed BEFORE this turn. A newly announced reserve
+  // grant stays reserved until the next own turn instead of paying twice.
+  const committedPowerIncome=me.powerIncome??0;
+  delete me.powerIncome;
+  emperorResetTurn(s,s.turn);
+  emperorAnnounceIfDue(s,emperorServices(s));
 
   // 1. Resolve the new active player's mempool entries in cast order.
   let queuedOrders = 0;
@@ -496,7 +510,7 @@ function completeTurnStart(s: EngineGame): void {
 
   // 3. Gas refill: maxGas grows, staked minions add +1 gas each.
   me.maxGas = Math.min(10, me.maxGas + 1);
-  me.gas = me.maxGas + me.board.filter(m => m.staked).length + queuedOrders;
+  me.gas = me.maxGas + queuedOrders;
   // One opening order compensates the second seat's lost tempo. It expires
   // at refill and neither increases capacity nor creates a collectible card.
   if(s.block===2&&s.turn===1&&me.maxGas===1){me.gas+=1;pushLog(s,'P1 receives 1 opening order');}
@@ -506,7 +520,8 @@ function completeTurnStart(s: EngineGame): void {
     delete me.validatorIncome;
     pushLog(s,`P${s.turn} validator investment pays ${investment} gas`);
   }
-  if(me.powerIncome){me.gas+=me.powerIncome;pushLog(s,`P${s.turn} reserved power pays ${me.powerIncome} gas`);delete me.powerIncome;}
+  if(committedPowerIncome){me.gas+=committedPowerIncome;pushLog(s,`P${s.turn} reserved power pays ${committedPowerIncome} gas`);}
+  me.gas=emperorTurnIncome(s,s.turn,me.gas);
   me.heroPowerUsed = false;
   me.reinforcementUsed = false;
 
@@ -516,6 +531,7 @@ function completeTurnStart(s: EngineGame): void {
   // 4. Draw (fatigue / burn handled inside).
   drawCards(s, s.turn, 1);
   if (s.winner !== null) return;
+  emperorAtTurnStart(s,s.turn);
 
   // 5. Ready unstaked minions and clear "fresh" (first-turn) flag.
   for (const m of me.board) {
@@ -547,7 +563,12 @@ export function effectivePowerCost(state: GameState, pid: PlayerId): number {
   const base = HEROES[p.heroId]?.powerCost ?? 2;
   const discount =
     p.treasury <= COMEBACK_HP_THRESHOLD && f.treasury - p.treasury >= COMEBACK_GAP ? 1 : 0;
-  return Math.max(1, base - discount);
+  return emperorPowerCost(state,Math.max(1, base - discount));
+}
+
+/** Live price: use for display, eligibility and payment rather than printed cost. */
+export function effectiveCardCost(state: GameState, _pid: PlayerId, card: CardDef): number {
+  return emperorCardCost(state,card);
 }
 
 /** Return the package 4A keywords carried by a card. */
@@ -578,8 +599,8 @@ export function canPlay(state: GameState, pid: PlayerId, uid: string): boolean {
   const hc = me.hand.find(h => h.uid === uid);
   if (!hc || state.winner !== null || state.turn !== pid || mulliganAvailable(state)) return false;
   const def = cardDef(hc.cardId);
-  if (def.cost > me.gas) return false;
-  if (def.type === 'minion') return me.board.length < boardCapacity(me);
+  if (effectiveCardCost(state,pid,def) > me.gas) return false;
+  if (def.type === 'minion') return me.board.length < effectiveBoardCapacity(state,pid);
   return true; // spell
 }
 
@@ -690,6 +711,7 @@ export function createGame(
     mulliganPhase: enableMulligan ? [true, true] : [false, false],
   };
   if(opts?.ruleset==='validator-investment-v1')s.rulesetVersion=opts.ruleset;
+  if(opts?.emperor===true)s.emperor=createEmperorState(s.rng);
 
   shuffleDeck(s, s.players[0].deck);
   shuffleDeck(s, s.players[1].deck);
@@ -700,6 +722,8 @@ export function createGame(
   drawCards(s, 1, 4);
 
   pushLog(s, `Game start: ${heroDef(heroA).name} (P0) vs ${heroDef(heroB).name} (P1)`);
+  // The public opening law is known before either player makes a mulligan.
+  if(s.emperor){emperorAnnounceIfDue(s,emperorServices(s));s.players[0].gas=emperorTurnIncome(s,0,s.players[0].gas);}
   if (enableMulligan) pushLog(s, 'Mulligan phase open for both players');
   return s;
 }
@@ -728,9 +752,9 @@ export function legalActions(state: GameState): Action[] {
 
   for (const hc of me.hand) {
     const def = cardDef(hc.cardId);
-    if (def.cost > me.gas) continue;
+    if (effectiveCardCost(s,s.turn,def) > me.gas) continue;
     if (def.type === 'minion') {
-      if (me.board.length < boardCapacity(me)) acts.push({ type: 'play-minion', uid: hc.uid });
+      if (me.board.length < effectiveBoardCapacity(s,s.turn)) acts.push({ type: 'play-minion', uid: hc.uid });
     } else {
       acts.push({ type: 'cast-spell', uid: hc.uid });
     }
@@ -742,7 +766,7 @@ export function legalActions(state: GameState): Action[] {
     // Rush fresh can attack enemy minions but never the hero.
     const canTargetMinions = !m.fresh || m.rush;
     const canTargetHero = !m.fresh;
-    if (canTargetHero && !tauntActive) {
+    if (canTargetHero && !tauntActive && emperorCanAttackTreasury(s,foe.id)) {
       acts.push({ type: 'attack', attackerUid: m.uid, target: 'hero' });
     }
     for (const t of foe.board) {
@@ -755,7 +779,7 @@ export function legalActions(state: GameState): Action[] {
   // package 4A: hero power uses comeback-discounted cost.
   const pc = effectivePowerCost(s, s.turn);
   const power=heroDef(me.heroId).power;
-  const hasRoom=me.board.length<boardCapacity(me);
+  const hasRoom=me.board.length<effectiveBoardCapacity(s,s.turn);
   const useful=power==='rally-squire'||power==='hephaestus-forge'?hasRoom:power==='athena-aegis'?me.board.length>0:power==='poseidon-tide'?foe.board.length>0:power==='heal-treasury'?me.treasury<30||me.board.some(m=>m.health<m.maxHealth):true;
   if (me.gas >= pc && !me.heroPowerUsed&&useful) acts.push({ type: 'hero-power' });
   if (canBuyCard(state)) acts.push({ type: 'buy-card' });
@@ -877,9 +901,10 @@ export function applyAction(state: GameState, action: Action): GameState {
       const def = cardDef(hc.cardId);
       const cry = battlecryFor(s, s.turn, def), ultimate = ultimateReady(s, s.turn, def);
       me.hand.splice(idx, 1);
-      me.gas -= def.cost;
+      me.gas -= effectiveCardCost(s,s.turn,def);
       const m = makeMinion(s, def);
       me.board.push(m);
+      emperorAfterCardPlay(s,s.turn,def,m,emperorServices(s));
       pushLog(s, `P${s.turn} plays ${def.name}`);
       if (s.mulliganPhase[s.turn]) s.mulliganPhase[s.turn] = false;
       // package 4A: pavilion (faction synergy) tracks plays; battlecry resolves separately.
@@ -897,7 +922,7 @@ export function applyAction(state: GameState, action: Action): GameState {
       const hc = me.hand[idx];
       const def = cardDef(hc.cardId);
       me.hand.splice(idx, 1);
-      me.gas -= def.cost;
+      me.gas -= effectiveCardCost(s,s.turn,def);
       const instant = isInstantSpell(def);
       if (!instant) me.mempool.push({ uid: nextUid(s), cardId: def.id, name: def.name, owner: s.turn });
       pushLog(s, `P${s.turn} casts ${def.name} -> ${instant ? 'instant' : 'mempool'}`);
@@ -905,6 +930,7 @@ export function applyAction(state: GameState, action: Action): GameState {
       noteFactionPlay(s, def.faction);
       if (def.priority) counterMempool(s, s.turn);
       if (instant && def.spell) resolveSpellEffect(s, s.turn, def, hc.uid);
+      emperorAfterCardPlay(s,s.turn,def,undefined,emperorServices(s));
       checkWinner(s);
       return s;
     }

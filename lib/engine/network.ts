@@ -1,7 +1,6 @@
 /** DOM-free facade: this exact engine and content run in Next and in the WS service. */
 import {CARDS} from '../cards';
-import {boardCapacity} from './tactics';
-import {applyAction, createGame, effectivePowerCost, legalActions, mempoolOf, mulliganAvailable} from './engine';
+import {applyAction, createGame, effectivePowerCost, effectiveBoardCapacity, legalActions, mempoolOf, mulliganAvailable} from './engine';
 import type {Action, GameState, PlayerId} from './types';
 import type {OnlineGame, OnlinePlayer} from '../multiplayer/types';
 import type {GameIntent} from '../net/protocol';
@@ -44,14 +43,16 @@ export function gameSnapshot(state: GameState, seat: PlayerId, turnDeadline: num
     reinforcementUsed: !!p.reinforcementUsed,
     ...(p.powerIncome?{powerIncome:p.powerIncome}:{}),
     handCount: p.hand.length, deckCount: p.deck.length,
-    boardCapacity: boardCapacity(p), factionPlaysThisTurn: {...p.factionPlaysThisTurn}, pavilionBonuses: [...(p.pavilionBonuses??[])],
+    boardCapacity: effectiveBoardCapacity(state,index as PlayerId), factionPlaysThisTurn: {...p.factionPlaysThisTurn}, pavilionBonuses: [...(p.pavilionBonuses??[])],
     board: p.board.map(m => ({uid: m.uid, cardId: m.cardId, name: m.name, attack: m.attack, health: m.health,
       maxHealth: m.maxHealth, canAttack: m.canAttack, staked: m.staked, taunt: !!m.taunt, rush: !!m.rush,
       lifesteal: !!m.lifesteal, fresh: !!m.fresh, ...(m.arrivedBlock===undefined?{}:{arrivedBlock:m.arrivedBlock})})),
     edicts: mempoolOf(state, index as PlayerId).map(e => ({...e})),
     ...(index === seat ? {hand: p.hand.map(c => ({...c}))} : {}),
   })) as [OnlinePlayer, OnlinePlayer];
+  const emperor = state.emperor;
   return {block: state.block, turn: state.turn, winner: state.winner, players,
+    ...(emperor?{emperor:{version:emperor.version,active:emperor.active,history:emperor.history.map(entry=>({...entry})),playsThisTurn:[...emperor.playsThisTurn] as [number,number],minionsThisTurn:[...emperor.minionsThisTurn] as [number,number],spellsThisTurn:[...emperor.spellsThisTurn] as [number,number]}}:{}),
     actions: state.turn === seat && state.winner === null ? legalActions(state) : [],
     mulliganOpen: state.turn === seat && mulliganAvailable(state), turnDeadline};
 }

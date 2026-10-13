@@ -107,7 +107,7 @@ export function paintBadge(ctx: CanvasRenderingContext2D,font:string, value: str
 
 
 /** The hand and inspection share one card face; portrait art is never fitted into a square. */
-export function paintCardFace(ctx:CanvasRenderingContext2D,id:string,locale:Locale,font:string,art:HTMLImageElement|null,playable?:boolean,stats?:CardFaceStats,frame?:HTMLImageElement|null,variant:'card'|'battlefield'|'queued'='card',reframeHeight?:number){
+export function paintCardFace(ctx:CanvasRenderingContext2D,id:string,locale:Locale,font:string,art:HTMLImageElement|null,playable?:boolean,stats?:CardFaceStats,frame?:HTMLImageElement|null,variant:'card'|'battlefield'|'queued'='card',reframeHeight?:number,cost?:number){
     const def = CARDS[id];
     const battlefield=variant==='battlefield',height=reframeHeight??(battlefield?BATTLE_FACE.height:CARD_FACE.height);
     const layout=cardFaceLayout(def.rarity,battlefield,height),{x,y,w,h}=layout.art;
@@ -117,7 +117,7 @@ export function paintCardFace(ctx:CanvasRenderingContext2D,id:string,locale:Loca
     if(frame){ctx.save();if(playable){ctx.shadowColor='#fff0bc';ctx.shadowBlur=8;}paintFrame(ctx,frame,def.rarity,height);ctx.restore();}
     else{ctx.fillStyle='#4d3423';rounded(ctx,18,layout.nameY-36,348,72,8);ctx.fill();}
     paintCardName(ctx,cardName(id,locale),font,192,layout.nameY,316);
-    paintBadge(ctx,font,`${def.cost}`,48,56,variant==='card'&&playable===false?'#566967':'#287f9a',39);
+    paintBadge(ctx,font,`${cost??def.cost}`,48,56,variant==='card'&&playable===false?'#566967':'#287f9a',39);
     if(def.type==='minion'){
       const radius=37;
       paintBadge(ctx,font,`${stats?.attack??def.attack}`,64,layout.statsY,stats&&stats.attack>(def.attack??0)?'#6e8040':'#b38637',radius);

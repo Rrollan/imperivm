@@ -1,0 +1,223 @@
+.badge.badge {
+  position: absolute;
+  z-index: 7;
+  top: var(--emperor-badge-top, 14px);
+  right: var(--emperor-badge-right, 18px);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: clamp(200px, 22vw, 282px);
+  min-height: 64px;
+  padding: 10px 17px 10px 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent url('/ui/arena-lab/native/edict-register-native.webp') center/100% 100% no-repeat !important;
+  color: #ffe5af;
+  box-shadow: none;
+  text-align: left;
+  text-shadow: 0 1px 3px #200603;
+  cursor: pointer;
+  transition: filter 160ms ease, transform 160ms ease;
+  filter: drop-shadow(0 3px 5px #170c0873);
+}
+.badge.badge:hover { filter: brightness(1.13) drop-shadow(0 3px 5px #170c0873); }
+.badge.badge:active { transform: translateY(1px); }
+.badge.badge:disabled { opacity: .7; cursor: default; }
+.badge img { flex: 0 0 39px; width: 39px; height: 39px; object-fit: contain; }
+.badge > span { min-width: 0; flex: 1; }
+.badge small { display: block; font: 600 10px/1.2 var(--font-sans); color: #f8d8a1; letter-spacing: .025em; }
+.badge strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 15px/1.3 var(--font-roman), serif; }
+.badge > svg { flex-shrink: 0; }
+.badge.badge:focus-visible, .dialog button:focus-visible { outline: 3px solid #fff1bd; outline-offset: 3px; }
+.badgeOpen { opacity: .65; }
+
+.backdrop {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: #150b087d;
+  animation: shadeIn 180ms ease-out both;
+}
+.dialog {
+  --decree-glow: #f0b34d;
+  position: relative;
+  width: min(900px, 100%);
+  max-height: 100%;
+  min-height: 0;
+  overflow: auto;
+  padding: 46px 4px 4px;
+  color: #ffe9bd;
+  scrollbar-width: thin;
+  scrollbar-color: #bb9050 #271409;
+  overscroll-behavior: contain;
+  animation: decreeIn 720ms cubic-bezier(.16,.75,.25,1) both;
+  outline: none;
+}
+.dialog[data-family="court"] { --decree-glow: #f2cb75; }
+.dialog[data-family="commerce"] { --decree-glow: #dfe39b; --artifact-duration: 820ms; }
+.dialog[data-family="mercy"] { --decree-glow: #9ddac5; --artifact-duration: 860ms; }
+.dialog[data-family="mystery"] { --decree-glow: #a6d9ed; --artifact-duration: 780ms; }
+.dialog[data-family="legion"] { --artifact-duration: 740ms; --artifact-origin: 50% 22%; }
+.dialog .close {
+  position: absolute;
+  top: 0;
+  right: 4px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 44px;
+  padding: 7px 11px;
+  border: 1px solid #d6b376;
+  border-radius: 7px;
+  background: #28160ffa !important;
+  color: #fff0d0;
+  box-shadow: 0 2px 4px #0005;
+  font: 600 15px/1.2 var(--font-sans);
+}
+.dialog .close:hover { background: #54301d !important; }
+.decree {
+  padding: 0 10px 15px;
+  text-align: center;
+  border-radius: 24px;
+  background: radial-gradient(ellipse at 30% 62%, #643a205c, transparent 68%), linear-gradient(110deg, #25130feb, #361a13f2 52%, #20120fed);
+  box-shadow: 0 14px 30px #1205045c;
+}
+.eyebrow { display: flex; align-items: center; justify-content: center; gap: 8px; width: min(440px, 90%); min-height: 48px; padding: 12px 25px; margin: 0 auto; background: transparent url('/ui/arena-lab/native/edict-register-native.webp') center/100% 100% no-repeat; color: #f6d99a; font: 650 14px/1.25 var(--font-sans); }
+.decree h2 { margin: 12px 12px 14px; color: #ffe9b5; font: 700 clamp(30px, 3.2vw, 45px)/1.08 var(--font-roman), serif; text-wrap: balance; text-shadow: 0 2px 3px #350600; }
+.decreeBody { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 14px; align-items: center; }
+.artifact { position: relative; min-width: 0; aspect-ratio: 3/2; isolation: isolate; overflow: hidden; }
+.artifact > img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 5px 8px #170b0666); transform-origin: var(--artifact-origin, 50% 75%); animation: artifactUnfold var(--artifact-duration, 720ms) cubic-bezier(.16,.75,.25,1) both; }
+.dialog[data-family="court"] .artifact > img { animation-name: royalRise; }
+.dialog[data-family="commerce"] .artifact > img { animation-name: chestBounce; }
+.dialog[data-family="mercy"] .artifact > img { animation-name: mercyBloom; }
+.dialog[data-family="mystery"] .artifact > img { animation-name: mirrorAngle; }
+.dialog[data-family="legion"] .artifact > img { animation-name: bannerUnfurl; }
+.artifact::after { content: ''; position: absolute; inset: -15% -80%; transform: translateX(-70%) rotate(-20deg); background: linear-gradient(90deg, transparent 39%, #ffeeb522 46%, #fff7d962 50%, #ffeeb522 54%, transparent 61%); mix-blend-mode: screen; pointer-events: none; animation: gilding 650ms ease-out 240ms both; }
+.artifact i { position: absolute; width: 5px; height: 5px; top: 63%; left: 22%; background: var(--decree-glow); box-shadow: 0 0 7px var(--decree-glow); clip-path: polygon(50% 0, 62% 36%, 100% 50%, 62% 63%, 50% 100%, 38% 63%, 0 50%, 38% 36%); pointer-events: none; opacity: 0; animation: sparkRise 600ms ease-out 160ms both; }
+.artifact i:nth-of-type(2) { top: 72%; left: 67%; animation-delay: 220ms; }
+.artifact i:nth-of-type(3) { top: 48%; left: 78%; animation-delay: 180ms; }
+.artifact i:nth-of-type(4) { top: 41%; left: 19%; animation-delay: 270ms; }
+.artifact i:nth-of-type(5) { top: 34%; left: 54%; animation-delay: 190ms; }
+.artifact i:nth-of-type(6) { top: 81%; left: 43%; animation-delay: 230ms; }
+.ruleCopy { min-width: 0; padding: 15px 22px 15px 16px; text-align: left; animation: copyReveal 300ms ease-out 180ms both; }
+.ruleText { margin: 0; color: #fff2d1; font: 600 clamp(19px, 2vw, 25px)/1.4 var(--font-sans); text-wrap: pretty; }
+.duration { margin: 18px 0 0; color: #efd19a; font: 500 13px/1.35 var(--font-sans); }
+.forecast { display: flex; align-items: center; gap: 6px; margin: 9px 0 0; color: #f8dda8; font: 600 14px/1.3 var(--font-sans); }
+.forecast > svg { flex-shrink: 0; }
+.forecast strong { color: #fff0c3; }
+.activeLaw { display: flex; gap: 9px; align-items: flex-start; margin: 3px auto 12px; padding: 12px 16px; width: min(660px, 100%); background: #281910f5; border-left: 3px solid #c89c55; border-radius: 4px; }
+.activeLaw > svg { flex-shrink: 0; margin-top: 2px; }
+.activeLaw span { display: block; color: #cbb085; font: 500 12px/1.25 var(--font-sans); }
+.activeLaw strong { display: block; margin: 3px 0; font: 700 18px/1.2 var(--font-roman), serif; }
+.activeLaw p { margin: 0; color: #efdcb6; font: 500 15px/1.35 var(--font-sans); }
+.controls { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 18px; margin: -4px 0 4px; padding: 0 12px; }
+.controls .accept {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-width: 260px;
+  min-height: 62px;
+  padding: 12px 36px;
+  border: 0;
+  border-radius: 0;
+  background: transparent url('/ui/arena-lab/turn-command.webp') center/100% 100% no-repeat !important;
+  box-shadow: none;
+  color: #fff0cc;
+  font: 700 19px/1.2 var(--font-roman), serif;
+  text-shadow: 0 2px 2px #200a03;
+}
+.controls .accept:hover { filter: brightness(1.14); }
+.controls .readMore { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 7px 11px; border: 1px solid #c69d60; border-radius: 5px; background: #26160ef2 !important; color: #fce6bc; font: 600 14px/1.25 var(--font-sans); }
+.readMore span { color: #e9c785; min-width: 28px; font-variant-numeric: tabular-nums; }
+.manualHint { margin: 0; max-width: 260px; color: #ead2a4; font: 500 13px/1.3 var(--font-sans); text-align: center; text-shadow: 0 1px 3px #100702; }
+.onlineHint { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; margin: 2px 0 6px; padding: 7px 10px; color: #ffe1a4; background: #28170fe8; border-radius: 5px; font: 600 15px/1.3 var(--font-sans); text-align: center; }
+.onlineHint > svg { flex-shrink: 0; }
+.onlineHint strong { color: #fff1c9; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.history { width: min(660px, 100%); margin: 10px auto 0; background: #24160fef; border: 1px solid #82613a; border-radius: 6px; overflow: hidden; }
+.history .historyToggle { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 44px; padding: 8px 14px; border: 0; border-radius: 0; background: transparent !important; box-shadow: none; color: #f0d6a2; font: 600 14px/1.3 var(--font-sans); text-align: left; }
+.historyToggle > span { flex: 1; }
+.historyList { display: grid; gap: 1px; margin: 0; padding: 0; list-style: none; border-top: 1px solid #775735; }
+.historyList li button { display: grid; grid-template-columns: 72px minmax(0,1fr) auto; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 9px 14px; border: 0; border-radius: 0; background: #332016 !important; box-shadow: none; color: #f5ddb4; text-align: left; }
+.historyList li button:hover, .historyList li button[aria-current="true"] { background: #58402a !important; }
+.historyList span, .historyList small { color: #d6bc91; font: 500 12px/1.3 var(--font-sans); }
+.historyList strong { font: 700 16px/1.3 var(--font-roman), serif; }
+.leaving { animation: shadeOut 160ms ease-in both; pointer-events: none; }
+.leaving .dialog { animation: decreeOut 160ms ease-in both; }
+@keyframes shadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes shadeOut { to { opacity: 0; } }
+@keyframes decreeIn { from { opacity: 0; transform: translateY(12px) scale(.97); } 35% { opacity: 1; } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes decreeOut { to { opacity: 0; transform: translateY(-6px) scale(.98); } }
+@keyframes artifactUnfold { from { opacity: 0; transform: translateY(14px) rotate(-4deg) scale(.9,.96); } 65% { opacity: 1; transform: translateY(-2px) rotate(.5deg) scale(1.015); } to { opacity: 1; transform: translateY(0) rotate(0) scale(1); } }
+@keyframes royalRise { from { opacity: 0; transform: translateY(24px) scale(.96); } 65% { opacity: 1; transform: translateY(-2px) scale(1.008); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes chestBounce { from { opacity: 0; transform: translateY(19px) rotate(-2deg) scale(.9); } 52% { opacity: 1; transform: translateY(-5px) rotate(1deg) scale(1.025); } 76% { transform: translateY(2px) rotate(-.3deg) scale(.995); } to { opacity: 1; transform: translateY(0) rotate(0) scale(1); } }
+@keyframes mercyBloom { from { opacity: 0; transform: scale(.86); } 65% { opacity: 1; transform: scale(1.018); } to { opacity: 1; transform: scale(1); } }
+@keyframes mirrorAngle { from { opacity: 0; transform: perspective(700px) rotateY(-13deg) rotate(2deg) scale(.94); } 66% { opacity: 1; transform: perspective(700px) rotateY(2deg) rotate(-.25deg) scale(1.008); } to { opacity: 1; transform: perspective(700px) rotateY(0) rotate(0) scale(1); } }
+@keyframes bannerUnfurl { from { opacity: 0; transform: scale(.94,.78) translateY(-7px); } 66% { opacity: 1; transform: scale(1.008,1.025) translateY(1px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes gilding { from { opacity: 0; transform: translateX(-70%) rotate(-20deg); } 20% { opacity: .8; } to { opacity: 0; transform: translateX(70%) rotate(-20deg); } }
+@keyframes sparkRise { 0% { opacity: 0; transform: translateY(7px) scale(.5); } 25% { opacity: .8; } 100% { opacity: 0; transform: translateY(-33px) scale(.1); } }
+@keyframes copyReveal { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 620px) {
+  .badge.badge { top: var(--emperor-badge-top, 9px); right: var(--emperor-badge-right, 10px); min-height: 54px; width: 210px; padding: 9px 14px; gap: 6px; }
+  .badge img { width: 30px; height: 30px; flex-basis: 30px; }
+  .badge strong { font-size: 14px; }
+  .badge small { font-size: 9px; }
+  .backdrop { padding: 10px; }
+  .dialog { padding-top: 46px; }
+  .decree { padding: 0 12px 14px; border-radius: 18px; }
+  .decree h2 { font-size: 30px; margin: 10px 0 13px; }
+  .eyebrow { font-size: 12px; gap: 6px; }
+  .decreeBody { grid-template-columns: 1fr; gap: 0; }
+  .artifact { width: min(300px, 100%); margin: 0 auto; }
+  .ruleCopy { padding: 6px 5px 8px; text-align: center; }
+  .ruleText { font-size: 20px; line-height: 1.35; }
+  .duration { margin-top: 15px; font-size: 12px; }
+  .forecast { justify-content: center; }
+  .controls { gap: 6px; padding: 0 3px; }
+  .controls .accept { min-width: 240px; min-height: 57px; font-size: 18px; }
+  .controls .readMore { font-size: 13px; }
+  .historyList li button { grid-template-columns: 54px minmax(0,1fr); gap: 6px; }
+  .historyList small { grid-column: 2; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .badge.badge { top: var(--emperor-badge-top, 7px); right: var(--emperor-badge-right, 10px); width: 220px; min-height: 52px; padding: 7px 14px; }
+  .badge img { width: 29px; height: 29px; flex-basis: 29px; }
+  .badge strong { font-size: 14px; }
+  .badge small { font-size: 9px; }
+  .backdrop { padding: 8px 14px; }
+  .dialog { width: min(760px, 100%); padding-top: 42px; }
+  .dialog .close { min-height: 40px; font-size: 14px; }
+  .decree { padding: 0 9px 9px; }
+  .eyebrow { font-size: 12px; min-height: 37px; padding: 9px 22px; }
+  .eyebrow svg { width: 18px; height: 18px; }
+  .decree h2 { margin: 7px 0 9px; font-size: 29px; }
+  .decreeBody { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 8px; }
+  .artifact { width: 100%; max-width: 270px; }
+  .ruleCopy { padding: 3px 10px 7px 0; text-align: left; }
+  .ruleText { font-size: clamp(17px, 2.7vw, 20px); line-height: 1.3; }
+  .duration { margin-top: 9px; font-size: 12px; }
+  .forecast { justify-content: flex-start; margin-top: 6px; font-size: 13px; }
+  .controls .accept { min-height: 52px; min-width: 230px; padding: 9px 30px; font-size: 17px; }
+  .controls .readMore { min-height: 40px; font-size: 13px; }
+  .history { margin-top: 5px; }
+  .activeLaw { padding: 8px 12px; margin-bottom: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .badge.badge { transition: none; }
+  .backdrop, .dialog, .leaving, .leaving .dialog, .artifact > img, .dialog[data-family] .artifact > img, .ruleCopy { animation: none; }
+  .artifact::after, .artifact i { display: none; animation: none; }
+}
+:global(html[data-imperivm-motion="off"]) .badge { transition: none; }
+:global(html[data-imperivm-motion="off"]) .backdrop,
+:global(html[data-imperivm-motion="off"]) .dialog,
+:global(html[data-imperivm-motion="off"]) .artifact > img,
+:global(html[data-imperivm-motion="off"]) .dialog[data-family] .artifact > img,
+:global(html[data-imperivm-motion="off"]) .ruleCopy { animation: none; }
+:global(html[data-imperivm-motion="off"]) .artifact::after,
+:global(html[data-imperivm-motion="off"]) .artifact i { display: none; animation: none; }

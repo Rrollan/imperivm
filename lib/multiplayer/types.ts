@@ -1,5 +1,6 @@
 import type {CollectionAuth} from '../collection/access';
 import type {Action, HandCard, MempoolEntry, Minion, PlayerId, PlayerState} from '../engine/types';
+import type {EmperorState} from '../engine/types';
 
 /** Deliberate wire allowlist. Never send GameState, hidden decks, RNG, or guest credentials. */
 export interface OnlinePlayer {
@@ -23,6 +24,8 @@ export interface OnlinePlayer {
   pavilionBonuses?: PlayerState['pavilionBonuses'];
 }
 export interface OnlineGame {
+  /** Public rules and played-card counters only. The random sequence stays on the server. */
+  emperor?: Omit<EmperorState,'rng'>;
   block: number;
   turn: PlayerId;
   winner: PlayerId | 'draw' | null;

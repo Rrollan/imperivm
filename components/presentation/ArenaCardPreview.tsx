@@ -9,7 +9,7 @@ import material from './ArenaCardMaterial.module.css';
 import {requestArenaImage} from './arenaImage';
 
 /** The exact hand face, with optional inspection-only material. No extra renderer. */
-export function ArenaCardPreview({id,locale,label,stats,interactive=false,reduced=false,compact=!interactive}:{id:string;locale:Locale;label:string;stats?:{attack:number;health:number};interactive?:boolean;reduced?:boolean;compact?:boolean}){
+export function ArenaCardPreview({id,locale,label,stats,cost,interactive=false,reduced=false,compact=!interactive}:{id:string;locale:Locale;label:string;stats?:{attack:number;health:number};cost?:number;interactive?:boolean;reduced?:boolean;compact?:boolean}){
   const canvas=useRef<HTMLCanvasElement>(null);
   const surface=useRef<HTMLSpanElement>(null),frameId=useRef<number|null>(null);
   const point=useRef({x:50,y:50,active:false});
@@ -56,13 +56,13 @@ export function ArenaCardPreview({id,locale,label,stats,interactive=false,reduce
     const art=compact?null:requestArenaImage(cardArtPath(id));
     const frame=requestArenaImage(cardFramePath(CARDS[id].rarity),{priority:'high'});
     const font=getComputedStyle(document.body).getPropertyValue('--font-sans').trim()||'sans-serif';
-    const draw=()=>{if(!live)return;ctx.setTransform(scale,0,0,scale,0,0);ctx.clearRect(0,0,CARD_FACE.width,CARD_FACE.height);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';paintCardFace(ctx,id,locale,font,fullReady&&art?art.image:previewReady?preview.image:null,undefined,stats,frameReady?frame.image:null);
+    const draw=()=>{if(!live)return;ctx.setTransform(scale,0,0,scale,0,0);ctx.clearRect(0,0,CARD_FACE.width,CARD_FACE.height);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';paintCardFace(ctx,id,locale,font,fullReady&&art?art.image:previewReady?preview.image:null,undefined,stats,frameReady?frame.image:null,'card',undefined,cost);
       if(!previewReady&&!fullReady){ctx.save();ctx.fillStyle='#604b30';ctx.font=`600 23px ${font}`;ctx.textAlign='center';ctx.fillText(locale==='ru'?(failed?'Нет связи с иллюстрацией':'Загрузка иллюстрации…'):(failed?'Artwork unavailable':'Loading artwork…'),192,260,275);ctx.restore();}};
     void preview.loaded.then(()=>{if(live){previewReady=true;setArtReady(true);draw();}},()=>{failed=true;draw();});
     if(art)void art.loaded.then(()=>{if(live){fullReady=true;setArtReady(true);draw();}},()=>{});
     void frame.loaded.then(()=>{frameReady=true;draw();},()=>{});draw();void document.fonts.ready.then(draw);
     return()=>{live=false;};
-  },[id,locale,compact,scale,stats?.attack,stats?.health]);
+  },[id,locale,compact,scale,stats?.attack,stats?.health,cost]);
   const face=<canvas ref={canvas} className={interactive?undefined:styles.inspectedCard} width={CARD_FACE.width*scale} height={CARD_FACE.height*scale} role={interactive?'presentation':'img'} aria-busy={!artReady} aria-hidden={interactive||undefined} aria-label={interactive?undefined:label}/>;
   if(!interactive)return face;
   return <span ref={surface} className={`${styles.inspectedCard} ${material.surface}`} data-rarity={CARDS[id].rarity} data-motion={enabled?'on':'off'} role="img" aria-label={label} tabIndex={enabled?0:undefined}

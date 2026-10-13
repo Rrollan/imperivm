@@ -153,6 +153,25 @@ export interface GameState {
   winner: PlayerId | 'draw' | null;
   log: string[]; // newest last
   rng: number; // internal rng state, do not touch directly
+  /** Optional Emperor rules; absent in legacy/classic fixtures. */
+  emperor?: EmperorState;
+}
+
+export interface EmperorAnnouncement {
+  id: string;
+  round: number;
+  block: number;
+}
+export interface EmperorState {
+  version: 1;
+  active: string | null;
+  history: EmperorAnnouncement[];
+  /** Private independent selection RNG: never include in multiplayer snapshots. */
+  rng: number;
+  /** Public action counts, reset at the start of each player's own turn. */
+  playsThisTurn: [number, number];
+  minionsThisTurn: [number, number];
+  spellsThisTurn: [number, number];
 }
 
 /** target: minion uid, or 'hero' for the enemy treasury */
@@ -177,6 +196,7 @@ export type Action =
  */
 export interface CreateGameOptions {
   enableMulligan?: boolean;
+  emperor?: boolean;
   mulliganCount?: number; // default 3 for P0, 4 for P1 (matches opening draws)
 }
 

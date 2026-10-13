@@ -1,6 +1,6 @@
 import {CARDS} from '../../lib/cards';
-import {legalActions,mulliganAvailable} from '../../lib/engine/engine';
-import {boardCapacity} from '../../lib/engine/tactics';
+import {legalActions,mulliganAvailable,effectiveCardCost,effectiveBoardCapacity} from '../../lib/engine/engine';
+import {activeEmperorRule} from '../../lib/engine/emperor';
 import type {Action,GameState,Minion,PlayerId} from '../../lib/engine/types';
 import type {Locale} from '../../lib/locale';
 
@@ -46,8 +46,12 @@ export function unavailableCardText(state:GameState,cardId:string,locale:Locale,
   if(busy)return ru?'Действие выполняется':'Action resolving';
   if(state.turn!==0)return ru?'Ход соперника':'Opponent’s turn';
   if(mulliganAvailable(state))return ru?'Сначала выберите стартовую руку':'Choose the opening hand first';
-  if(player.gas<card.cost)return ru?`Не хватает приказов: ${card.cost-player.gas}`:`Need ${card.cost-player.gas} more orders`;
-  if(card.type==='minion'&&player.board.length>=boardCapacity(player))return ru?`Строй заполнен: ${boardCapacity(player)} бойцов. Расширьте агору.`:`Court full: ${boardCapacity(player)} fighters. Expand the agora.`;
+  const cost=effectiveCardCost(state,0,card),capacity=effectiveBoardCapacity(state,0);
+  if(player.gas<cost)return ru?`Не хватает приказов: ${cost-player.gas}`:`Need ${cost-player.gas} more orders`;
+  if(card.type==='minion'&&player.board.length>=capacity){
+    if(activeEmperorRule(state)?.id==='three-seats')return ru?'Император разрешил только 3 бойца. Освободите место.':'The Emperor allows only 3 fighters. Free a slot.';
+    return ru?`Строй заполнен: ${capacity} бойцов. Расширьте агору.`:`Court full: ${capacity} fighters. Expand the agora.`;
+  }
   return ru?'Розыгрыш недоступен':'Cannot play this card';
 }
 

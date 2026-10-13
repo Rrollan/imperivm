@@ -11,7 +11,8 @@ import {retaliationDamage} from './engine/combat';
 import { CARDS } from './cards';
 import { HEROES } from './heroes';
 import {isInstantSpell} from './engine/spellTiming';
-import { effectivePowerCost, legalActions, mempoolOf } from './engine/engine';
+import {activeEmperorRule} from './engine/emperor';
+import { effectivePowerCost, effectiveCardCost, effectiveBoardCapacity, legalActions, mempoolOf } from './engine/engine';
 import type { Action, CardDef, GameState, HandCard } from './engine/types';
 
 function handCard(state: GameState, uid: string): HandCard | undefined {
@@ -25,7 +26,8 @@ function cardOf(state: GameState, uid: string): CardDef | undefined {
 
 function playCost(state: GameState, a: Action): number {
   if (a.type === 'play-minion' || a.type === 'cast-spell') {
-    return cardOf(state, a.uid)?.cost ?? 999;
+    const card=cardOf(state,a.uid);
+    return card ? effectiveCardCost(state,state.turn,card) : 999;
   }
   return 999;
 }
@@ -92,7 +94,7 @@ export function chooseAiAction(state: GameState): Action {
       const card=cardOf(state,a.uid);
       if(card&&isInstantSpell(card)){
         switch(card.spell?.kind){
-          case 'expand-board':return boardCapacity(me)<MAX_BOARD_CAPACITY&&me.board.length>=boardCapacity(me)-1;
+          case 'expand-board':return boardCapacity(me)<MAX_BOARD_CAPACITY&&effectiveBoardCapacity(state,state.turn)<MAX_BOARD_CAPACITY&&me.board.length>=effectiveBoardCapacity(state,state.turn)-1;
           case 'heal-own-minions':return me.board.some(m=>m.health<m.maxHealth);
           case 'weaken-random-enemy':return foe.board.some(m=>m.attack>0);
           case 'buff-own':return me.board.length>0;
@@ -198,8 +200,9 @@ export function chooseAiAction(state: GameState): Action {
   // 5. A single low-attack income unit can bridge an early expensive hand.
   // Release it once normal gas pays the curve. Never stake/unstake the same
   // minion in a loop: desired count is constant within the action sequence.
-  const peakCost = Math.max(0, ...me.hand.map(h => CARDS[h.cardId].cost));
-  const desiredStakes = me.maxGas < 8 && peakCost > Math.min(10, me.maxGas + 1) ? 1 : 0;
+  const peakCost = Math.max(0, ...me.hand.map(h => effectiveCardCost(state,state.turn,CARDS[h.cardId])));
+  const garrisonIncomeDisabled=['garrison-holiday','morning-parade'].includes(activeEmperorRule(state)?.id??'');
+  const desiredStakes = !garrisonIncomeDisabled && me.maxGas < 8 && peakCost > Math.min(10, me.maxGas + 1) ? 1 : 0;
   const staked = me.board.filter(m => m.staked).length;
   if (staked > desiredStakes) {
     const release = acts.find(a => a.type === 'unstake');

@@ -1,5 +1,6 @@
 import type {CardDef, EffectDef, GameState, PlayerId, PlayerState} from './types';
 import {CARDS} from '../cards';
+import {emperorBoardCapacity} from './emperor';
 
 export const BASE_BOARD_CAPACITY = 5;
 export const MAX_BOARD_CAPACITY = 7;
@@ -7,6 +8,10 @@ export function boardCapacity(player: PlayerState): number {
   const capacity = player.boardCapacity;
   return typeof capacity === 'number' && Number.isInteger(capacity)
     ? Math.max(BASE_BOARD_CAPACITY, Math.min(MAX_BOARD_CAPACITY, capacity)) : BASE_BOARD_CAPACITY;
+}
+/** Shared by legality, summons, AI and UI; never evicts existing fighters. */
+export function effectiveBoardCapacity(state: GameState, owner: PlayerId): number {
+  return emperorBoardCapacity(state,boardCapacity(state.players[owner]));
 }
 /** Evaluate before paying/placing the card: the new fighter cannot satisfy its own condition. */
 export function ultimateProgress(state: GameState, owner: PlayerId, card: CardDef): number {

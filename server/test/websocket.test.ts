@@ -151,6 +151,9 @@ test('two sockets receive separate authorized snapshots and reject takeover / a 
   assert.equal(first.game?.players[1].hand, undefined);
   assert.equal(second.game?.players[0].hand, undefined);
   assert.equal(Object.hasOwn(first.game ?? {}, 'rng'), false);
+  assert.equal(Object.hasOwn(first.game?.emperor ?? {}, 'rng'), false,'The upcoming imperial sequence must remain private');
+  assert.equal(first.game?.emperor?.history.length,1);
+  assert.deepEqual(first.game?.emperor?.history,second.game?.emperor?.history,'Both players see the same opening decree');
   assert.equal(Object.hasOwn(first.game?.players[0] ?? {}, 'deck'), false);
   assert.equal(second.game?.actions.length, 0, 'Inactive player must not receive actionable options');
 
@@ -197,14 +200,14 @@ test('opening replacement accepts the same legal subset in either UID order', as
   assert.equal(second.snapshot?.game?.players[0].hand, undefined);
 });
 
-test('75-second timer resolves an idle opening and is not extended by a legal move or ping', async t => {
+test('75-second turn plus one fixed opening decree grace is not extended by a legal move or ping', async t => {
   let now = 1_800_000_000_000;
   const service = await launch({port: 0, host: '127.0.0.1', origins: [ORIGIN], clock: () => now, tickIntervalMs: 60_000});
   t.after(() => service.close());
   const {first, second} = await room(portOf(service));
   const opening = await first.state();
-  assert.equal(opening.game?.turnDeadline, now + 75_000);
-  now += 74_999;
+  assert.equal(opening.game?.turnDeadline, now + 85_000);
+  now += 84_999;
   service.rooms.tick();
   first.send({type: 'ping'});
   await first.next('pong');
@@ -226,6 +229,29 @@ test('75-second timer resolves an idle opening and is not extended by a legal mo
   const final = await first.state(snapshot => snapshot.revision > kept.revision);
   assert.equal(final.game?.turn, 0);
   assert.equal(final.game?.turnDeadline, now + 75_000);
+});
+
+test('imperial rounds 1/4/7 stay identical for both seats and add reading time exactly once', async t => {
+  let now = 1_800_000_000_000;
+  const service = await launch({port:0,host:'127.0.0.1',origins:[ORIGIN],clock:()=>now,tickIntervalMs:60_000});
+  t.after(()=>service.close());
+  const {first,second}=await room(portOf(service));
+  await first.state(); await second.state();
+  while(first.snapshot!.game!.block<13){
+    const before=first.snapshot!.game!;
+    const actor=before.turn===0?first:second;
+    now+=1_000;
+    const after=await move(first,second,actor,actor.snapshot!.game!.mulliganOpen?{type:'mulligan',cardIds:[]}:{type:'endTurn'});
+    const changed=(after.game!.emperor?.history.length??0)>(before.emperor?.history.length??0);
+    assert.equal(after.game!.turnDeadline,before.turn===after.game!.turn?before.turnDeadline:now+75_000+(changed?10_000:0));
+    assert.deepEqual(first.snapshot!.game!.emperor,second.snapshot!.game!.emperor);
+    assert.equal(Object.hasOwn(after.game!.emperor??{},'rng'),false);
+    assert.equal(actor.snapshot!.game!.players[1-after.seat].hand,undefined);
+  }
+  assert.deepEqual(first.snapshot!.game!.emperor!.history.map(e=>e.round),[1,4,7]);
+  const deadline=first.snapshot!.game!.turnDeadline;
+  first.send({type:'sync'}); await first.state();
+  assert.equal(first.snapshot!.game!.turnDeadline,deadline,'Reopening/syncing cannot prolong the turn');
 });
 
 test('a ten-second network break resumes the same seat and current state with its private token', {timeout: 25_000}, async t => {

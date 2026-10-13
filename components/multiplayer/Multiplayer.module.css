@@ -22,6 +22,7 @@
 
 /* Online-only status and server history; the scene uses ArenaLab's unchanged CSS. */
 .netHud { position:absolute;z-index:4;top:12px;left:14px;display:flex;align-items:center;gap:12px;max-width:calc(100% - 28px);padding:6px 10px;border:1px solid #9c7b46;border-radius:4px;background:#2b211bdb;color:#edce8a;font:650 12px/1.3 var(--font-sans);pointer-events:none; }
+@media (max-width:620px) { .onlineShell { --emperor-badge-top:52px; } }
 .netHud>span:first-child { letter-spacing:.08em; }.netHud[data-online=false] { border-color:#c78456; }.netClock { display:inline-flex;align-items:center;gap:5px;min-width:35px;font-variant-numeric:tabular-nums; }.netClock svg { width:16px;height:16px; }.netClock[data-urgent=true] { color:#ffae7d; }
 .netOpening { min-width:0;margin:0;padding:0;border:0; }.netOpening:disabled { opacity:.7; }
 .netHistory { margin:18px 0 0;padding-left:26px;color:#402b1c; }.netHistory li { margin:10px 0;padding:8px;border-bottom:1px solid #b29562;overflow-wrap:anywhere; }

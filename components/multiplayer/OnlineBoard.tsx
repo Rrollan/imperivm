@@ -8,6 +8,7 @@ import {useCallback, useEffect, useMemo, useRef, useState, type RefObject} from 
 import {CARDS} from '../../lib/cards';
 import {cardArtPath} from '../../lib/cardArt';
 import {isInstantSpell} from '../../lib/engine/spellTiming';
+import {effectiveCardCost} from '../../lib/engine/engine';
 import {BattleResultEmblem} from '../presentation/BattleResultEmblem';
 import type {Action, GameState, HandCard, MempoolEntry, PlayerState} from '../../lib/engine/types';
 import type {BattleEvents} from '../../lib/events';
@@ -22,6 +23,7 @@ import type {RenderQuality} from '../presentation/renderQuality';
 import {ArenaInspection} from '../presentation/ArenaInspection';
 import {ArenaCardPreview} from '../presentation/ArenaCardPreview';
 import {OpeningHand} from '../presentation/OpeningHand';
+import {EmperorDecree} from '../presentation/EmperorDecree';
 import {RomanIcon} from '../presentation/RomanIcon';
 import {heroPortraitPath} from '../presentation/heroPortrait';
 import {cardKeywords, cardRules,retaliationRules, powerRules} from '../presentation/rulesText';
@@ -55,6 +57,7 @@ function arenaView(game: OnlineGame, seat: 0 | 1): ArenaView {
   return {block: game.block, turn: game.turn === seat ? 0 : 1,
     winner: game.winner === null || game.winner === 'draw' ? game.winner : game.winner === seat ? 0 : 1,
     players: [player(0), player(1)], log: [], rng: 0,
+    ...(game.emperor?{emperor:{...game.emperor,rng:0,history:game.emperor.history.map(e=>({...e})),playsThisTurn:[game.emperor.playsThisTurn[seat],game.emperor.playsThisTurn[1-seat]],minionsThisTurn:[game.emperor.minionsThisTurn[seat],game.emperor.minionsThisTurn[1-seat]],spellsThisTurn:[game.emperor.spellsThisTurn[seat],game.emperor.spellsThisTurn[1-seat]]}}:{}),
     enableMulligan: game.mulliganOpen, mulliganPhase: [game.mulliganOpen, false],
     presentationActions: game.actions,
     mulliganCount: [game.players[seat].handCount, game.players[(1 - seat) as 0 | 1].handCount]};
@@ -151,13 +154,14 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
   const previous = useRef({view, revision: room.revision}), requested = useRef<{revision: number; action: Action} | null>(null);
   const [ready, setReady] = useState(false), [failure, setFailure] = useState(''), [animating, setAnimating] = useState(false);
   const [loadingProgress,setLoadingProgress]=useState<{loaded:number;total:number}>();
+  const [emperorOpen,setEmperorOpen]=useState(false);
   const [selected, setSelected] = useState<string | null>(null), selection = useRef<string | null>(null);
   const [inspect, setInspect] = useState<ArenaTarget | null>(null), [help, setHelp] = useState(false), [history, setHistory] = useState(false), [keyboard, setKeyboard] = useState(false);
   const [picks, setPicks] = useState<string[]>([]), [concede, setConcede] = useState(false), [now, setNow] = useState(Date.now());
   const [muted, updateMuted] = useState(true), [quality, setQuality] = useState<RenderQuality>('auto');
   const helpPanel = useRef<HTMLElement>(null), historyPanel = useRef<HTMLElement>(null), actionPanel = useRef<HTMLElement>(null), openingPanel = useRef<HTMLElement>(null), resultPanel = useRef<HTMLElement>(null);
-  const showOpening = ready && game.mulliganOpen && game.turn === room.seat && game.winner === null;
-  const active = connected && !pending && !animating && game.turn === room.seat && game.winner === null;
+  const showOpening = ready && !emperorOpen && game.mulliganOpen && game.turn === room.seat && game.winner === null;
+  const active = connected && !pending && !animating && !emperorOpen && game.turn === room.seat && game.winner === null;
   const actions = active ? game.actions : [];
   const callbacks = useRef({pick: (_target: ArenaTarget) => {}, play: (_uid: string) => {}, attack: (_uid: string, _target: string) => {}});
   const select = useCallback((uid: string | null) => {selection.current = uid; setSelected(uid); renderer.current?.select(uid);}, []);
@@ -220,7 +224,7 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
   useEffect(() => {renderer.current?.setLocale(locale);}, [locale, ready]);
   useEffect(() => {renderer.current?.setReducedMotion(reduced);}, [reduced, ready]);
   useEffect(() => {renderer.current?.setQuality(quality);}, [quality, ready]);
-  useEffect(() => {renderer.current?.setOverlayOpen(help || history || keyboard || inspect !== null || showOpening || game.winner !== null || !connected || pending);}, [help, history, keyboard, inspect, showOpening, game.winner, connected, pending, ready]);
+  useEffect(() => {renderer.current?.setOverlayOpen(help || history || emperorOpen || keyboard || inspect !== null || showOpening || game.winner !== null || !connected || pending);}, [help, history, emperorOpen, keyboard, inspect, showOpening, game.winner, connected, pending, ready]);
   useEffect(() => {const timer = window.setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer);}, []);
   useEffect(() => {updateMuted(isMuted()); return onMuteChange(updateMuted);}, []);
   useEffect(() => {try {const saved = localStorage.getItem('imperivm-arena-quality'); if (saved === 'auto' || saved === 'sharp' || saved === 'fast') setQuality(saved);} catch {}}, []);
@@ -229,13 +233,14 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
     const escape = (event: KeyboardEvent) => {if (event.key === 'Escape' && !event.defaultPrevented) {select(null); setInspect(null); setHelp(false); setHistory(false); setKeyboard(false); setConcede(false);}};
     window.addEventListener('keydown', escape); return () => window.removeEventListener('keydown', escape);
   }, [select]);
-  usePanelFocus(help, helpPanel); usePanelFocus(history, historyPanel); usePanelFocus(keyboard, actionPanel); usePanelFocus(showOpening, openingPanel); usePanelFocus(game.winner !== null && !animating, resultPanel);
-  const seconds = Math.min(turnDuration, Math.max(0, Math.ceil((game.turnDeadline - now - timeOffset) / 1000)));
+  usePanelFocus(help, helpPanel); usePanelFocus(history, historyPanel); usePanelFocus(keyboard, actionPanel); usePanelFocus(showOpening, openingPanel); usePanelFocus(game.winner !== null && !animating && !emperorOpen, resultPanel);
+  const seconds = Math.min(turnDuration+10, Math.max(0, Math.ceil((game.turnDeadline - now - timeOffset) / 1000)));
   const result = game.winner === 'draw' ? t('Ничья', 'Draw') : game.winner === room.seat ? t('Победа', 'Victory') : t('Поражение', 'Defeat');
   const status = !connected ? t('Переподключение…', 'Reconnecting…') : pending ? t('Отправка…', 'Sending…') : game.winner !== null ? result : game.turn === room.seat ? t('Ваш ход', 'Your turn') : t('Ход соперника', 'Opponent’s turn');
   const close = () => {setInspect(null); select(null);};
   const unavailable = (cardId: string) => !connected ? t('Переподключение…', 'Reconnecting…') : unavailableCardText(view, cardId, locale, pending || animating);
   const card = inspect?.cardId ? CARDS[inspect.cardId] : undefined;
+  const inspectedCost = card&&inspect?.kind==='hand'?effectiveCardCost(view,inspect.owner,card):card?.cost;
   const minion = inspect?.kind === 'minion' ? view.players[inspect.owner].board.find(m => m.uid === inspect.uid) : undefined;
   const playAction = actions.find(a => (a.type === 'play-minion' || a.type === 'cast-spell') && a.uid === inspect?.uid);
   const stakeAction = actions.find(a => (a.type === 'stake' || a.type === 'unstake') && a.uid === inspect?.uid);
@@ -254,9 +259,10 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
   };
   const leave = () => void send({type: 'cancel'}).then(() => router.replace(`/play?mode=${room.mode}&hero=${me.heroId}`));
 
-  return <main className={arenaStyles.shell}>
+  return <main className={`${arenaStyles.shell} ${styles.onlineShell}`}>
     <ArenaOrientationHint status={game.winner===null?`${status} · ${seconds} ${t('сек. до конца хода','sec. until turn end')}`:result}/>
     <canvas ref={canvas} className={arenaStyles.canvas} aria-label={t('Онлайн-арена IMPERIVM. Управление с клавиатуры доступно в меню игры.', 'IMPERIVM online arena. Keyboard controls are available in the game menu.')}/>
+    <EmperorDecree key={room.id} state={view} ready={ready&&connected&&!help&&!history&&!keyboard&&!inspect} busy={animating||pending} onlineSeconds={seconds} onOpenChange={setEmperorOpen}/>
     <div className={styles.netHud} data-online={connected}><span>{roomCode || 'PvP'}</span><strong role="status">{status}</strong>{game.winner === null && <span className={styles.netClock} data-urgent={seconds <= 15} aria-label={`${seconds} ${t('секунд до конца хода', 'seconds until turn end')}`}><RomanIcon name="hourglass"/>{seconds}</span>}</div>
     <header className={arenaStyles.header}><button className={arenaStyles.settingsButton} onClick={() => {select(null); setInspect(null); setHelp(true);}} aria-label={t('Меню игры', 'Game menu')}><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M13 3h6l1 4 3 2 4-1 3 5-3 3v3l3 3-3 5-4-1-3 2-1 4h-6l-1-4-3-2-4 1-3-5 3-3v-3l-3-3 3-5 4 1 3-2z"/><circle cx="16" cy="17" r="5"/></svg></button></header>
     {!ready && !failure && <ArenaLoading progress={loadingProgress}/>}
@@ -266,10 +272,10 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
       {(error || failure) && <button onClick={() => {if (failure) window.location.reload(); else void refresh();}} aria-label={t('Обновить состояние', 'Refresh state')}><RomanIcon name="scroll"/></button>}
     </div>}
     {inspect && card && <ArenaInspection key={`${inspect.kind}:${inspect.uid}`} {...inspectionProps} title={cardName(card.id)} eyebrow={roleName(card.id, locale)} kind="card"
-      visual={<ArenaCardPreview id={card.id} locale={locale} interactive reduced={reduced} label={`${cardName(card.id)}. ${t('Приказы', 'Orders')}: ${card.cost}${card.type === 'minion' ? `. ${t('Атака', 'Attack')}: ${minion?.attack ?? card.attack}. ${t('Здоровье', 'Health')}: ${minion?.health ?? card.health}` : ''}`} stats={minion ? {attack: minion.attack, health: minion.health} : undefined}/>}
+      visual={<ArenaCardPreview cost={inspectedCost} id={card.id} locale={locale} interactive reduced={reduced} label={`${cardName(card.id)}. ${t('Приказы', 'Orders')}: ${inspectedCost}${card.type === 'minion' ? `. ${t('Атака', 'Attack')}: ${minion?.attack ?? card.attack}. ${t('Здоровье', 'Health')}: ${minion?.health ?? card.health}` : ''}`} stats={minion ? {attack: minion.attack, health: minion.health} : undefined}/>}
       onBack={inspect.kind === 'queue' ? () => setInspect({kind: 'scroll', uid: 'arena-scroll', owner: 0}) : undefined}
       actions={inspect.owner === 0 && (inspect.kind === 'hand' || stakeAction || attackAction) ? <>
-        {inspect.kind === 'hand' && <button className={arenaStyles.primary} disabled={!playAction} onClick={() => {if (playAction) act(playAction);}}>{playAction ? <><span className={arenaStyles.costChip}>{card.cost}</span>{isInstantSpell(card) ? t('Применить сейчас', 'Cast now') : t('Разыграть', 'Play')}</> : unavailable(card.id)}</button>}
+        {inspect.kind === 'hand' && <button className={arenaStyles.primary} disabled={!playAction} onClick={() => {if (playAction) act(playAction);}}>{playAction ? <><span className={arenaStyles.costChip}>{inspectedCost}</span>{isInstantSpell(card) ? t('Применить сейчас', 'Cast now') : t('Разыграть', 'Play')}</> : unavailable(card.id)}</button>}
         {attackAction && <button className={arenaStyles.primary} onClick={() => {select(inspect.uid); setInspect(null);}}>{t('Атаковать', 'Attack')}</button>}
         {stakeAction && <button onClick={() => act(stakeAction)}>{stakeAction.type === 'stake' ? t('Гарнизон · +1 приказ', 'Garrison · +1 order') : t('Вернуть в бой', 'Return to battle')}</button>}
       </> : undefined}>
@@ -304,7 +310,7 @@ export function OnlineBoard({room, pending, connected, error, send, refresh, tur
       </div>{concede && <div className={styles.netConcede}><p>{t('Подтвердить поражение?', 'Confirm concession?')}</p><button disabled={!connected || pending} onClick={() => void send({type: 'concede', roomId: room.id, revision: room.revision})}>{t('Подтвердить', 'Confirm')}</button><button onClick={() => setConcede(false)}>{t('Продолжить бой', 'Continue playing')}</button></div>}
     </div></section></div>}
     {history && <div className={arenaStyles.modalBackdrop}><section ref={historyPanel} className={arenaStyles.history} role="dialog" aria-modal="true" aria-label={t('История боя', 'Battle history')}><button className={arenaStyles.close} onClick={() => setHistory(false)} aria-label={t('Закрыть историю', 'Close history')}><RomanIcon name="close"/></button><h2>{t('История боя', 'Battle history')}</h2><ol className={styles.netHistory}>{room.history.map(e => <li key={e.revision}>{locale === 'en' ? e.textEn ?? e.text : e.text}</li>)}</ol></section></div>}
-    {game.winner !== null && !animating && <div className={arenaStyles.modalBackdrop}><section ref={resultPanel} className={`${arenaStyles.result} ${arenaStyles.resultWithFx}`} role="dialog" aria-modal="true" aria-label={t('Результат боя','Battle result')}><span className={arenaStyles.eyebrow}>IMPERIVM</span><BattleResultEmblem outcome={game.winner===room.seat?'win':game.winner==='draw'?'draw':'loss'} reduced={reduced} title={result} replayLabel={t('Повторить триумф','Replay triumph')}/><p>{room.resultReason==='concede'?t('Матч завершён сдачей.','Match ended by concession.'):t('Бой завершён.','Battle completed.')}</p><button className={arenaStyles.primary} disabled={pending} onClick={leave}>{t('Вернуться в зал','Back to the hall')}</button></section></div>}
+    {game.winner !== null && !animating && !emperorOpen && <div className={arenaStyles.modalBackdrop}><section ref={resultPanel} className={`${arenaStyles.result} ${arenaStyles.resultWithFx}`} role="dialog" aria-modal="true" aria-label={t('Результат боя','Battle result')}><span className={arenaStyles.eyebrow}>IMPERIVM</span><BattleResultEmblem outcome={game.winner===room.seat?'win':game.winner==='draw'?'draw':'loss'} reduced={reduced} title={result} replayLabel={t('Повторить триумф','Replay triumph')}/><p>{room.resultReason==='concede'?t('Матч завершён сдачей.','Match ended by concession.'):t('Бой завершён.','Battle completed.')}</p><button className={arenaStyles.primary} disabled={pending} onClick={leave}>{t('Вернуться в зал','Back to the hall')}</button></section></div>}
     {selected && <span className={styles.netAccessible} role="status">{t('Выберите цель для атаки.', 'Choose an attack target.')}</span>}
   </main>;
 }

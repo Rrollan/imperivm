@@ -26,10 +26,10 @@ export interface SessionSnapshot {
 }
 
 /** A real, seeded mid-match encounter, reached entirely through legal engine actions. */
-export function createLabGame(heroId = 'builder', opening = false, seed = 2718, opponent?:string,ruleset:RulesetId='classic-v1', playerDeck?: readonly string[]): GameState {
+export function createLabGame(heroId = 'builder', opening = false, seed = 2718, opponent?:string,ruleset:RulesetId='classic-v1', playerDeck?: readonly string[], emperor = false): GameState {
   const hero = Object.hasOwn(HEROES,heroId) ? heroId : 'builder';
   const foe = opponent&&Object.hasOwn(HEROES,opponent)?opponent:hero === 'degen' ? 'whale' : 'degen';
-  let state = createGame(hero, playerDeck ? [...playerDeck] : DECKS[hero], foe, playerDeck ? FREE_DECKS[foe] : DECKS[foe], {enableMulligan:opening,ruleset}, seed);
+  let state = createGame(hero, playerDeck ? [...playerDeck] : DECKS[hero], foe, playerDeck ? FREE_DECKS[foe] : DECKS[foe], {enableMulligan:opening,ruleset,emperor}, seed);
   if (!opening) {
     for (let step = 0; step < 180 && state.block < 9 && state.winner === null; step++) {
       state = applyAction(state, chooseAiAction(state));

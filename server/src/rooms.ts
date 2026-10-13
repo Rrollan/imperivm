@@ -85,8 +85,8 @@ export class RoomAuthority {
       // Assign first-player position fairly without changing opening-hand / engine rules.
       if (randomInt(2)) room.players.reverse();
       const [a, b] = room.players;
-      room.game = createGame(a.heroId, a.deck, b!.heroId, b!.deck, {enableMulligan: true}, randomInt(0x7fffffff));
-      room.revision++; room.turnDeadline = this.clock() + TURN_MS;
+      room.game = createGame(a.heroId, a.deck, b!.heroId, b!.deck, {enableMulligan: true,emperor:true}, randomInt(0x7fffffff));
+      room.revision++; room.turnDeadline = this.clock() + TURN_MS + 10_000;
       this.remember(room, 'Оба игрока за столом. Выберите стартовые карты.', 'Both players are seated. Choose your opening cards.');
     }
     room.lastActivity = this.clock(); this.publish(room, true);
@@ -104,8 +104,8 @@ export class RoomAuthority {
     const players: [Player, Player] = [opponent.player, this.makePlayer(message, socket)];
     if (randomInt(2)) players.reverse();
     const [a, b] = players;
-    const room: Room = {code, mode: 'random', players, game: createGame(a.heroId, a.deck, b.heroId, b.deck, {enableMulligan: true}, randomInt(0x7fffffff)), revision: 1,
-      lastActivity: this.clock(), turnDeadline: this.clock() + TURN_MS, reason: null, history: []};
+    const room: Room = {code, mode: 'random', players, game: createGame(a.heroId, a.deck, b.heroId, b.deck, {enableMulligan: true,emperor:true}, randomInt(0x7fffffff)), revision: 1,
+      lastActivity: this.clock(), turnDeadline: this.clock() + TURN_MS + 10_000, reason: null, history: []};
     this.rooms.set(code, room); players.forEach(player => this.membership.set(player.socket!, room));
     this.remember(room, 'Соперник найден. Выберите стартовые карты.', 'Opponent found. Choose your opening cards.'); this.publish(room, true);
   }
@@ -139,7 +139,7 @@ export class RoomAuthority {
       if (before.turn !== seat) return this.error('wrong-turn', 'Сейчас ход противника.');
       try {room.game = applyMove(before, seat, actionForIntent(before, message.intent));}
       catch (error: unknown) {return this.error('illegal-action', error instanceof Error ? error.message : 'Нелегальное действие.');}
-      if (before.turn !== room.game.turn) room.turnDeadline = this.clock() + TURN_MS;
+      if (before.turn !== room.game.turn) room.turnDeadline = this.clock() + TURN_MS + ((room.game.emperor?.history.length??0)>(before.emperor?.history.length??0)?10_000:0);
       if (room.game.winner !== null) room.reason = 'battle';
     }
     room.revision++; room.lastActivity = this.clock();
@@ -190,7 +190,8 @@ export class RoomAuthority {
         continue;
       }
       if (room.game && room.game.winner === null && now >= room.turnDeadline) {
-        room.game = endExpiredTurn(room.game); room.revision++; room.turnDeadline = now + TURN_MS;
+        const previousCount = room.game.emperor?.history.length ?? 0;
+        room.game = endExpiredTurn(room.game); room.revision++; room.turnDeadline = now + TURN_MS + ((room.game.emperor?.history.length??0)>previousCount?10_000:0);
         if (room.game.winner !== null) room.reason = 'battle';
         this.remember(room, '75 секунд истекли: ход передан противнику.', '75 seconds elapsed: the turn passed to the opponent.');
         this.publish(room);

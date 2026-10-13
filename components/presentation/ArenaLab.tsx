@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { CARDS } from '../../lib/cards';
 import {isInstantSpell} from '../../lib/engine/spellTiming';
 import { chooseAiAction } from '../../lib/ai';
-import { effectivePowerCost,legalActions,mempoolOf,mulliganAvailable } from '../../lib/engine/engine';
+import { effectivePowerCost,effectiveCardCost,effectiveBoardCapacity,legalActions,mempoolOf,mulliganAvailable } from '../../lib/engine/engine';
 import { unlockAudio, isMuted, setMuted, onMuteChange } from '../../lib/audio/manager';
 import { emitSfxFromEvents } from '../../lib/audio/events';
 import type { Action } from '../../lib/engine/types';
@@ -21,7 +21,7 @@ import {RomanIcon} from './RomanIcon';
 import { cardKeywords, cardRules,retaliationRules, powerRules } from './rulesText';
 import { battleCommand, fighterReadiness, nextHalvingBlock, readinessText, unavailableCardText } from './battleReadability';
 import {BattleResultEmblem} from './BattleResultEmblem';
-import {ultimateProgress,ultimateReady,boardCapacity} from '../../lib/engine/tactics';
+import {ultimateProgress,ultimateReady} from '../../lib/engine/tactics';
 import type {RenderQuality} from './renderQuality';
 import {roleName,rankName} from './cardIdentity';
 import {ordersView} from './ordersView';
@@ -34,6 +34,7 @@ import {heroPortraitPath} from './heroPortrait';
 import {factionLink} from './factionLink';
 import {rulesetOf,pendingValidatorOrders,type RulesetId} from '../../lib/engine/ruleset';
 import {usePracticeMatch} from './usePracticeMatch';
+import {EmperorDecree} from './EmperorDecree';
 import Dialog from '../Dialog';
 import {FREE_DECKS} from '../../lib/collection/starterDecks';
 
@@ -55,10 +56,11 @@ function usePanelFocus(open: boolean, panel: React.RefObject<HTMLElement>, modal
   }, [open, panel, modal]);
 }
 
-export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ruleset='classic-v1', initialDeck }: { heroId: string; opening: boolean; debug: boolean; seed?:number;opponent?:string;ruleset?:RulesetId; initialDeck?: readonly string[] }) {
+export default function ArenaLab({ heroId, opening, debug, seed,opponent,ruleset='classic-v1', initialDeck, emperor=!debug }: { heroId: string; opening: boolean; debug: boolean; seed?:number;opponent?:string;ruleset?:RulesetId; initialDeck?: readonly string[]; emperor?:boolean }) {
   const locale = useLocale(), reduced = useReducedMotion();
   const sessionRef = useRef<GameSession>();
-  if (!sessionRef.current) sessionRef.current = new GameSession(createLabGame(heroId, opening,seed,opponent,ruleset,initialDeck));
+  const initialSeed = useRef(seed ?? 2718), randomizedOpening = useRef(false);
+  if (!sessionRef.current) sessionRef.current = new GameSession(createLabGame(heroId, opening,initialSeed.current,opponent,ruleset,initialDeck,emperor));
   const session = sessionRef.current;
   const [view, setView] = useState<SessionSnapshot>(() => session.snapshot());
   const practice = usePracticeMatch(heroId, debug || !opening, view.shown, view.busy);
@@ -71,7 +73,8 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
   const [quality,setQuality] = useState<RenderQuality>('auto');
   const [help, setHelp] = useState(false);
   const [historyOpen,setHistoryOpen]=useState(false);
-  const pausedPanel=useRef(false);pausedPanel.current=help||historyOpen||inspect!==null||practice.pending;
+  const [emperorOpen,setEmperorOpen]=useState(false), [matchSerial,setMatchSerial]=useState(0);
+  const pausedPanel=useRef(false);pausedPanel.current=help||historyOpen||emperorOpen||inspect!==null||practice.pending;
   const [keyboard, setKeyboard] = useState(false);
   const [metrics, setMetrics] = useState<ArenaMetrics | null>(null);
   const [lastAction,setLastAction] = useState<{type:string;owner:number;revision:number}|null>(null);
@@ -80,16 +83,16 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
   const canvas = useRef<HTMLCanvasElement>(null);
   const renderer = useRef<ArenaRenderer | null>(null);
   const helpPanel = useRef<HTMLElement>(null), actionPanel = useRef<HTMLElement>(null), resultPanel = useRef<HTMLElement>(null), mulliganPanel=useRef<HTMLElement>(null),historyPanel=useRef<HTMLElement>(null);
-  const showMulligan=ready&&!view.busy&&!practice.pending&&view.state.turn===0&&mulliganAvailable(view.state);
+  const showMulligan=ready&&!view.busy&&!practice.pending&&!emperorOpen&&view.state.turn===0&&mulliganAvailable(view.state);
   usePanelFocus(help, helpPanel, true);
   usePanelFocus(keyboard, actionPanel);
-  usePanelFocus(view.shown.winner !== null&&!view.busy, resultPanel, true);
+  usePanelFocus(view.shown.winner !== null&&!view.busy&&!emperorOpen, resultPanel, true);
   usePanelFocus(showMulligan,mulliganPanel,true);
   usePanelFocus(historyOpen,historyPanel,true);
   const selectedRef = useRef<string | null>(null);
   const callbacks = useRef({ pick: (_target: ArenaTarget) => {}, play: (_uid: string) => {}, attack: (_uid: string, _target: string) => {} });
   const shown = view.shown, me = shown.players[0], foe = shown.players[1];
-  const legal = view.busy || practice.pending ? [] : legalActions(view.state);
+  const legal = view.busy || practice.pending || emperorOpen ? [] : legalActions(view.state);
 
 
   const select = useCallback((uid: string | null) => {
@@ -97,7 +100,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
   }, []);
 
   const dispatch = useCallback((action: Action) => {
-    if (practice.pending) return;
+    if (practice.pending || emperorOpen) return;
     void unlockAudio();
     try {
       const batch = session.dispatch(action); if (!batch) return;
@@ -111,7 +114,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
     } catch (error) {
       setFailure(error instanceof Error ? locale.errorText(error.message) : locale.t('Действие недоступно.', 'Action unavailable.'));
     }
-  }, [locale.locale, select, session, debug, practice.pending]);
+  }, [locale.locale, select, session, debug, practice.pending, emperorOpen]);
 
   const play = (uid: string) => {
     const current = session.snapshot(); if (current.state.turn !== 0 || current.busy) return;
@@ -154,6 +157,14 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
   };
 
   useEffect(() => session.subscribe(setView), [session]);
+  useEffect(()=>{
+    // Hydrate a stable opening, then choose a fresh match before the renderer loads.
+    // Explicit diagnostic seeds keep the same cards and decree sequence.
+    if(debug||seed!==undefined||randomizedOpening.current)return;
+    randomizedOpening.current=true;
+    initialSeed.current=Math.floor(Math.random()*0x100000000);
+    session.restart(createLabGame(heroId,opening,initialSeed.current,opponent,ruleset,initialDeck,emperor));
+  },[session,debug,seed,heroId,opening,opponent,ruleset,initialDeck,emperor]);
   useEffect(() => {
     let cancelled = false;
     const element = canvas.current; if (!element) return;
@@ -177,23 +188,23 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
   useEffect(() => { renderer.current?.sync(view.shown); }, [view.shown]);
   useEffect(() => { renderer.current?.setLocale(locale.locale); }, [locale.locale]);
   useEffect(() => { renderer.current?.setReducedMotion(reduced); }, [reduced]);
-  useEffect(()=>{renderer.current?.setPaused(help||historyOpen||inspect!==null);},[help,historyOpen,inspect,ready]);
+  useEffect(()=>{renderer.current?.setPaused(help||historyOpen||emperorOpen||inspect!==null);},[help,historyOpen,emperorOpen,inspect,ready]);
   useEffect(()=>{const visibility=()=>setPageVisible(!document.hidden);visibility();document.addEventListener('visibilitychange',visibility);return()=>document.removeEventListener('visibilitychange',visibility);},[]);
-  useEffect(() => {renderer.current?.setOverlayOpen(help||historyOpen||keyboard||inspect!==null||showMulligan||shown.winner!==null||practice.pending);},[help,historyOpen,keyboard,inspect,ready,showMulligan,shown.winner,practice.pending]);
+  useEffect(() => {renderer.current?.setOverlayOpen(help||historyOpen||emperorOpen||keyboard||inspect!==null||showMulligan||shown.winner!==null||practice.pending);},[help,historyOpen,emperorOpen,keyboard,inspect,ready,showMulligan,shown.winner,practice.pending]);
   useEffect(() => {
     try {const saved=localStorage.getItem('imperivm-arena-quality');if(saved==='auto'||saved==='sharp'||saved==='fast')setQuality(saved);} catch {}
   }, []);
   useEffect(() => {renderer.current?.setQuality(quality);}, [quality,ready]);
   useEffect(() => { updateMuted(isMuted()); return onMuteChange(updateMuted); }, []);
   useEffect(() => {
-    if (!ready || !pageVisible || help || historyOpen || inspect || practice.pending || view.busy || view.state.winner !== null || view.state.turn !== 1) return;
+    if (!ready || !pageVisible || help || historyOpen || emperorOpen || inspect || practice.pending || view.busy || view.state.winner !== null || view.state.turn !== 1) return;
     const timer = window.setTimeout(() => {
       const current=session.snapshot();
       if(document.hidden||pausedPanel.current||current.busy||current.state.winner!==null||current.state.turn!==1)return;
       dispatch(chooseAiAction(current.state));
     }, reduced ? 180 : 450);
     return () => window.clearTimeout(timer);
-  }, [view.revision, view.busy, view.state, ready, pageVisible, help, historyOpen, inspect, practice.pending, reduced, dispatch, session]);
+  }, [view.revision, view.busy, view.state, ready, pageVisible, help, historyOpen, emperorOpen, inspect, practice.pending, reduced, dispatch, session]);
   useEffect(() => {
     const escape = (event: KeyboardEvent) => { if (event.key === 'Escape'&&!event.defaultPrevented) { select(null); setInspect(null); setHelp(false); setHistoryOpen(false); setKeyboard(false); setMulliganUids([]); } };
     window.addEventListener('keydown', escape); return () => window.removeEventListener('keydown', escape);
@@ -203,10 +214,12 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
     renderer.current?.cancel(); select(null); setInspect(null);
     setHelp(false);setHistoryOpen(false);setKeyboard(false);setMulliganUids([]);setLastAction(null);setFailure('');
     practice.reset(nextHero, debug || !fromOpening);
-    session.restart(createLabGame(nextHero, fromOpening,seed,opponent,ruleset,initialDeck ? nextHero === heroId ? initialDeck : FREE_DECKS[nextHero] : undefined));
+    setEmperorOpen(false); setMatchSerial(old=>old+1);
+    session.restart(createLabGame(nextHero, fromOpening,debug ? initialSeed.current : Math.floor(Math.random()*0x100000000),opponent,ruleset,initialDeck ? nextHero === heroId ? initialDeck : FREE_DECKS[nextHero] : undefined,emperor));
   }
 
   const card = inspect?.cardId ? CARDS[inspect.cardId] : null;
+  const inspectedCost = card&&inspect?.kind==='hand'?effectiveCardCost(shown,inspect.owner,card):card?.cost;
   const inspectedMinion = inspect?.kind === 'minion' ? shown.players[inspect.owner].board.find(m => m.uid === inspect.uid) : null;
   const playAction = inspect ? legal.find(a => (a.type === 'play-minion' || a.type === 'cast-spell') && a.uid === inspect.uid) : undefined;
   const stakeAction = inspect ? legal.find(a => (a.type === 'stake' || a.type === 'unstake') && a.uid === inspect.uid) : undefined;
@@ -242,6 +255,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
     <ArenaOrientationHint/>
     {rulesetOf(shown)==='validator-investment-v1'&&<div className={styles.rulesetBadge}>{locale.t('Эксперимент · Инвестиция Валидатора','Experiment · Validator investment')}</div>}
     <canvas ref={canvas} className={styles.canvas} aria-label={locale.t('Объёмный игровой стол IMPERIVM. Клавиатурное управление: меню игры, затем «Доступные действия».', 'IMPERIVM game table. Keyboard controls: open the game menu, then Available actions.')} />
+    <EmperorDecree key={matchSerial} state={shown} ready={ready&&!practice.pending&&!help&&!historyOpen&&!keyboard&&!inspect} busy={view.busy} onOpenChange={setEmperorOpen}/>
     <header className={styles.header}><button className={styles.settingsButton} onClick={() => { select(null); setInspect(null); setHelp(true); }} aria-label={locale.t('Меню игры', 'Game menu')}><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M13 3h6l1 4 3 2 4-1 3 5-3 3v3l3 3-3 5-4-1-3 2-1 4h-6l-1-4-3-2-4 1-3-5 3-3v-3l-3-3 3-5 4 1 3-2z"/><circle cx="16" cy="17" r="5"/></svg></button></header>
 
 
@@ -252,10 +266,10 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
 
     {inspect && card && <ArenaInspection key={`${inspect.kind}:${inspect.uid}`} {...inspectionProps}
       title={locale.cardName(card.id)} eyebrow={roleName(card.id,locale.locale)} kind="card"
-      visual={<ArenaCardPreview id={card.id} locale={locale.locale} interactive reduced={reduced} label={`${locale.cardName(card.id)}. ${locale.t('Приказы','Orders')}: ${card.cost}${card.type==='minion'?`. ${locale.t('Атака','Attack')}: ${inspectedMinion?.attack??card.attack}. ${locale.t('Здоровье','Health')}: ${inspectedMinion?.health??card.health}`:''}`} stats={inspectedMinion?{attack:inspectedMinion.attack,health:inspectedMinion.health}:undefined}/>}
+      visual={<ArenaCardPreview cost={inspectedCost} id={card.id} locale={locale.locale} interactive reduced={reduced} label={`${locale.cardName(card.id)}. ${locale.t('Приказы','Orders')}: ${inspectedCost}${card.type==='minion'?`. ${locale.t('Атака','Attack')}: ${inspectedMinion?.attack??card.attack}. ${locale.t('Здоровье','Health')}: ${inspectedMinion?.health??card.health}`:''}`} stats={inspectedMinion?{attack:inspectedMinion.attack,health:inspectedMinion.health}:undefined}/>}
       onBack={inspect.kind==='queue'&&inspect.uid!=='historical-card'?()=>setInspect({kind:'scroll',uid:'arena-scroll',owner:0}):undefined}
       actions={inspect.owner===0&&(inspect.kind==='hand'||stakeAction||attackAction)?<>
-        {inspect.kind==='hand'&&<button className={styles.primary} aria-label={playAction?(isInstantSpell(card)?locale.t('Применить сейчас','Cast now'):locale.t('Разыграть','Play')):undefined} disabled={!playAction} onClick={()=>{if(playAction)dispatch(playAction);}}>{playAction?<><span className={styles.costChip}>{card.cost}</span>{isInstantSpell(card)?locale.t('Применить сейчас','Cast now'):locale.t('Разыграть','Play')}</>:unavailableCardText(view.state,card.id,locale.locale,view.busy)}</button>}
+        {inspect.kind==='hand'&&<button className={styles.primary} aria-label={playAction?(isInstantSpell(card)?locale.t('Применить сейчас','Cast now'):locale.t('Разыграть','Play')):undefined} disabled={!playAction} onClick={()=>{if(playAction)dispatch(playAction);}}>{playAction?<><span className={styles.costChip}>{inspectedCost}</span>{isInstantSpell(card)?locale.t('Применить сейчас','Cast now'):locale.t('Разыграть','Play')}</>:unavailableCardText(view.state,card.id,locale.locale,view.busy)}</button>}
         {attackAction&&<button className={styles.primary} onClick={()=>{select(inspect.uid);setInspect(null);}}>{locale.t('Атаковать','Attack')}</button>}
         {stakeAction&&<button onClick={()=>dispatch(stakeAction)}>{stakeAction.type==='stake'?locale.t('Гарнизон · +1 приказ','Garrison · +1 order'):locale.t('Вернуть в бой','Return to battle')}</button>}
       </>:undefined}>
@@ -291,7 +305,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
       {inspect.kind==='gas'&&<><dl className={styles.inspectionStats}><div><dt>{locale.t('Доступно','Available')}</dt><dd>{me.gas}</dd></div><div><dt>{locale.t('Запас','Capacity')}</dt><dd>{me.maxGas}</dd></div><div><dt>{locale.t('Бонус','Bonus')}</dt><dd>+{ordersView(me.gas,me.maxGas).bonus}</dd></div></dl><p className={styles.inspectionRules}>{locale.t('Карты и сила правителя расходуют приказы. Каждый светящийся камень — один доступный приказ.','Cards and the ruler’s power spend orders. Each lit stone is one available order.')}</p><details className={styles.inspectionExtra}><summary>{locale.t('Пополнение и бонусы','Refill and bonuses')}</summary><p>{locale.t('Запас пополняется в начале вашего хода. Золотистые камни — бонусные. За пределами десяти ячеек остаток указан числом.','Refill at the start of your turn. Gold stones are bonuses. Extra orders beyond ten sockets are counted numerically.')}</p></details></>}
       {inspect.kind==='gas'&&<div className={styles.factionLink}><strong>{locale.t('Связка фракции · +1 приказ','Faction link · +1 order')}</strong><p>{locale.t('Разыграйте две карты одной фракции за один ход. Вторая вернёт один приказ, один раз за ход для каждой фракции. Сначала нужно оплатить полную цену карты.','Play two cards of the same faction in one turn. The second refunds one order, once per turn per faction. Pay the full card cost first.')}</p></div>}
       {inspect.kind==='block'&&<><dl className={styles.inspectionStats}><div><dt>{locale.t('Блок','Block')}</dt><dd>{shown.block}</dd></div></dl><p className={styles.inspectionRules}>{locale.t('В начале вашего хода срабатывают ваши указы и восстанавливается запас приказов.','Your edicts resolve and orders refill at the start of your turn.')}</p></>}
-      {inspect.kind==='deck'&&<><dl className={styles.inspectionStats}><div><dt>{locale.t('Карт осталось','Cards remaining')}</dt><dd>{me.deck.length}</dd></div></dl><p>{locale.t('Строй: ','Court: ')}{me.board.length}/{boardCapacity(me)} · {locale.t('Расширение агоры добавляет место, максимум до 7.','Agora Expansion adds a slot, up to 7.')}</p><p className={styles.inspectionRules}>{locale.t('В начале хода вы берёте следующую карту.','Draw the next card at the start of your turn.')}</p><p>{locale.t('Пустая колода наносит урон казне. Купите случайную карту из её исходного состава за 2 приказа: один раз за свой ход, если в руке меньше 10 карт. Усталость сохраняется.','An empty deck damages your treasury. Buy a random card from its original list for 2 orders: once per own turn, with room in your hand. Fatigue still applies.')}</p>{me.deck.length===0&&<p className={styles.fighterStatus}>{me.reinforcementUsed?locale.t('Подкрепление уже куплено в этом ходу.','Reinforcement already purchased this turn.'):me.hand.length>=10?locale.t('Рука заполнена.','Your hand is full.'):me.gas<2?locale.t('Нужно 2 приказа.','Requires 2 orders.'):shown.turn!==0?locale.t('Дождитесь своего хода.','Wait for your turn.'):''}</p>}</>}
+      {inspect.kind==='deck'&&<><dl className={styles.inspectionStats}><div><dt>{locale.t('Карт осталось','Cards remaining')}</dt><dd>{me.deck.length}</dd></div></dl><p>{locale.t('Строй: ','Court: ')}{me.board.length}/{effectiveBoardCapacity(shown,0)} · {locale.t('Расширение агоры добавляет место, максимум до 7.','Agora Expansion adds a slot, up to 7.')}</p><p className={styles.inspectionRules}>{locale.t('В начале хода вы берёте следующую карту.','Draw the next card at the start of your turn.')}</p><p>{locale.t('Пустая колода наносит урон казне. Купите случайную карту из её исходного состава за 2 приказа: один раз за свой ход, если в руке меньше 10 карт. Усталость сохраняется.','An empty deck damages your treasury. Buy a random card from its original list for 2 orders: once per own turn, with room in your hand. Fatigue still applies.')}</p>{me.deck.length===0&&<p className={styles.fighterStatus}>{me.reinforcementUsed?locale.t('Подкрепление уже куплено в этом ходу.','Reinforcement already purchased this turn.'):me.hand.length>=10?locale.t('Рука заполнена.','Your hand is full.'):me.gas<2?locale.t('Нужно 2 приказа.','Requires 2 orders.'):shown.turn!==0?locale.t('Дождитесь своего хода.','Wait for your turn.'):''}</p>}</>}
       {inspect.kind==='scroll'&&<><p className={styles.inspectionRules}>{locale.t('В начале следующего хода владельца, по порядку.','At the start of the owner’s next turn, in cast order.')}</p>{([0,1] as const).map(owner=><section className={styles.queueGroup} key={owner}><h3>{owner===0?locale.t('Ваши указы','Your edicts'):locale.t('Указы соперника','Enemy edicts')}</h3>{mempoolOf(shown,owner).length?mempoolOf(shown,owner).map((entry,index)=><button className={styles.queueEntry} key={entry.uid} onClick={()=>setInspect({kind:'queue',uid:`queued-${entry.uid}`,owner,cardId:entry.cardId})}><span>{index+1}</span><img src={cardArtPath(entry.cardId)} alt=""/><strong>{locale.cardName(entry.cardId)}</strong></button>):<p className={styles.queueEmpty}>{locale.t('Очередь пуста.','No pending edicts.')}</p>}</section>)}</>}
     </ArenaInspection>}
 
@@ -320,7 +334,7 @@ export default function ArenaLab({ heroId, opening, debug, seed=2718,opponent,ru
       <div className="dialog-actions"><button className="primary-button" disabled={practice.signing} onClick={practice.demo}>{locale.t('Играть без подписи','Play without signing')}</button><button className="secondary-button" disabled={practice.signing} onClick={() => void practice.sign()}>{practice.signing ? locale.t('Ожидаем Phantom…','Waiting for Phantom…') : locale.t('Подтвердить участие','Record participation')}</button></div>
       {practice.error && <p className="integration-error" role="status">{locale.errorText(practice.error)}</p>}
     </Dialog>}
-    {shown.winner !== null && !view.busy && <div className={styles.modalBackdrop}><section ref={resultPanel} className={`${styles.result} ${styles.resultWithFx}`} role="dialog" aria-modal="true" aria-label={locale.t('Результат боя','Battle result')}><span className={styles.eyebrow}>IMPERIVM</span><BattleResultEmblem outcome={shown.winner===0?'win':shown.winner==='draw'?'draw':'loss'} reduced={reduced} title={shown.winner===0?locale.t('Ваша империя устояла','Your empire stands'):shown.winner==='draw'?locale.t('Империи пали вместе','Both empires fell'):locale.t('Казна опустела','The treasury is empty')} replayLabel={locale.t('Повторить триумф','Replay triumph')}/><p>{shown.winner===0?locale.t('Венец заслужен. Империя помнит победу.','Your laurel is earned. The empire remembers.'):locale.t('Каждая потеря — урок для следующего боя.','Every loss is a lesson for the next battle.')}</p><button className={styles.primary} onClick={()=>restart()}>{locale.t('Ещё один бой','Another battle')}</button></section></div>}
+    {shown.winner !== null && !view.busy && !emperorOpen && <div className={styles.modalBackdrop}><section ref={resultPanel} className={`${styles.result} ${styles.resultWithFx}`} role="dialog" aria-modal="true" aria-label={locale.t('Результат боя','Battle result')}><span className={styles.eyebrow}>IMPERIVM</span><BattleResultEmblem outcome={shown.winner===0?'win':shown.winner==='draw'?'draw':'loss'} reduced={reduced} title={shown.winner===0?locale.t('Ваша империя устояла','Your empire stands'):shown.winner==='draw'?locale.t('Империи пали вместе','Both empires fell'):locale.t('Казна опустела','The treasury is empty')} replayLabel={locale.t('Повторить триумф','Replay triumph')}/><p>{shown.winner===0?locale.t('Венец заслужен. Империя помнит победу.','Your laurel is earned. The empire remembers.'):locale.t('Каждая потеря — урок для следующего боя.','Every loss is a lesson for the next battle.')}</p><button className={styles.primary} onClick={()=>restart()}>{locale.t('Ещё один бой','Another battle')}</button></section></div>}
     {debug && <output hidden data-action={JSON.stringify({last:lastAction,turn:shown.turn,block:shown.block,busy:view.busy,command:view.busy?'busy':battleCommand(shown),history:view.history.length,orders:me.gas,capacity:me.maxGas,pendingOrders:pendingValidatorOrders(shown,0),ruleset:rulesetOf(shown),queued:mempoolOf(shown,0).map(entry=>entry.cardId)})}/>}
     {debug && metrics && <output className={styles.metrics} hidden data-perf={JSON.stringify(metrics)}>{metrics.drawCalls} draws · {Math.round(metrics.triangles).toLocaleString()} triangles · {metrics.meshes} meshes · {metrics.models} models · {metrics.failedModels} failed · {metrics.frameMedianMs}/{metrics.frameP95Ms} ms median/p95 · 1 canvas</output>}
   </main>;

@@ -1,5 +1,5 @@
 'use client';
-import {boardCapacity} from '../../lib/engine/tactics';
+import {EmperorDecree} from '../../components/presentation/EmperorDecree';
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -17,6 +17,8 @@ import {
   legalActions,
   mempoolOf,
   effectivePowerCost,
+  effectiveCardCost,
+  effectiveBoardCapacity,
   mulliganAvailable,
 } from '../../lib/engine/engine';
 import { chooseAiAction } from '../../lib/ai';
@@ -124,6 +126,7 @@ function GameBoard() {
   const autoDemo = searchParams.get('demo') === '1';
 
   const [state, setState] = useState<GameState | null>(null);
+  const [emperorOpen,setEmperorOpen]=useState(false);
   const [attackerUid, setAttackerUid] = useState<string | null>(null);
   const [aiThinking, setAiThinking] = useState(false);
   const [logOpen, setLogOpen] = useState(false);
@@ -239,10 +242,11 @@ function GameBoard() {
         playableDeck(heroId, owned.current, useCustom ? loadCustomDeck(heroId) : null),
         aiHeroId,
         DECKS[aiHeroId] ?? DECKS.degen,
-        { enableMulligan: true },
+        { enableMulligan: true, emperor: true },
         seed,
       );
       prevRef.current = null;
+      setEmperorOpen(false);
       setState(s);
       setStats(emptyMatchStats());
       setMulliganPicks([]);
@@ -320,7 +324,7 @@ function GameBoard() {
 
   // AI loop: one action every ~600ms until the AI ends its turn.
   useEffect(() => {
-    if (!state || combatFlight || combatBusy.current || state.winner !== null || proofPending || !(state.turn === FOE || autoplay)) return;
+    if (!state || emperorOpen || combatFlight || combatBusy.current || state.winner !== null || proofPending || !(state.turn === FOE || autoplay)) return;
     const t = setTimeout(() => {
       try {
         aiSteps.current++;
@@ -336,7 +340,7 @@ function GameBoard() {
       }
     }, autoplay ? 380 : 520);
     return () => clearTimeout(t);
-  }, [state, autoplay, showOnboarding, proofPending, combatFlight, presentAction]);
+  }, [state, emperorOpen, autoplay, showOnboarding, proofPending, combatFlight, presentAction]);
 
   // Derive battle animations from the diff between consecutive states.
   useEffect(() => {
@@ -448,7 +452,7 @@ function GameBoard() {
     if (el) el.scrollTop = el.scrollHeight;
   }, [state?.log, logOpen]);
 
-  const legal = useMemo<Action[]>(() => (state ? legalActions(state) : []), [state]);
+  const legal = useMemo<Action[]>(() => (state&&!emperorOpen ? legalActions(state) : []), [state,emperorOpen]);
   useEffect(() => {
     if (!state || state.winner === null || proofPending || !match.current.id) return;
     saveMatch({ id: match.current.id, owner: proof?.owner ?? 'demo', heroId, won: state.winner === ME, draw: state.winner === 'draw', blocks: state.block, playedAt: match.current.startedAt, stats, exhibition: match.current.exhibition, proofSignature: proof?.signature, proof: proof ?? undefined });
@@ -479,7 +483,7 @@ function GameBoard() {
   const foe = state.players[FOE];
   const myHero = HEROES[me.heroId];
   const foeHero = HEROES[foe.heroId];
-  const myTurn = state.turn === ME && !aiThinking && state.winner === null && !proofPending && !combatFlight;
+  const myTurn = state.turn === ME && !emperorOpen && !aiThinking && state.winner === null && !proofPending && !combatFlight;
 
   const playableUids = new Set<string>();
   for (const a of legal) {
@@ -635,7 +639,8 @@ function GameBoard() {
 
   return (
     <DndProvider onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
-      <div className={`game-shell board-${skin}`} style={{ ['--board-art' as string]: `url('/boards/${skin}.webp')` }}>
+      <div className={`game-shell board-${skin}`} style={{ position:'relative', ['--board-art' as string]: `url('/boards/${skin}.webp')`, ['--emperor-badge-top' as string]:'88px' }}>
+        <EmperorDecree key={match.current.id} state={state} ready={!proofPending&&!showOnboarding&&!settingsOpen&&!helpOpen&&!logOpen&&!zoomUid&&!inspectUid&&!inspectCardId} busy={!!combatFlight} onOpenChange={setEmperorOpen}/>
         <WalletBar onSettings={() => setSettingsOpen(true)} onHelp={() => setHelpOpen(true)} />
         <main className="game-content">
           <nav className="arena-toolbar" aria-label={t('Управление матчем', 'Match controls')}>
@@ -671,7 +676,7 @@ function GameBoard() {
               <span className="combatant-label">{t('ПРОТИВНИК · ИИ', 'RIVAL · AI')}</span>
             </div></DroppableFoeHero>
             <div className="rank-row enemy-rank" aria-label={t('Существа противника', 'Rival minions')}>
-              <div className="rank-label">{t('Ряды противника', 'Rival ranks')} <span>{foe.board.length}/{boardCapacity(foe)}</span></div>
+              <div className="rank-label">{t('Ряды противника', 'Rival ranks')} <span>{foe.board.length}/{effectiveBoardCapacity(state,FOE)}</span></div>
               <BoardRank cards={foe.board.map(m => ({ uid: m.uid, node: <DroppableMinion uid={m.uid} foe attackable={foeAttackable(m)}>
                 <MinionToken inFlight={combatFlight?.minion.uid === m.uid} minion={m} attackable={foeAttackable(m)} shaking={attackAnim?.targetUid === m.uid}
                   justPlayed={playedUids.has(m.uid)} floats={floatsFor(m.uid)}
@@ -695,7 +700,7 @@ function GameBoard() {
               {attackerUid && <button className="cancel-target" onClick={() => setInspectUid(attackerUid)}>{t('Карта / стейкинг', 'Card / staking')}</button>}
             </div>
             <DroppableBoard><div id="my-board-slot" className="rank-row own-rank" aria-label={t('Ваши существа', 'Your minions')}>
-              <div className="rank-label">{t('Ваш легион', 'Your ranks')} <span>{me.board.length}/{boardCapacity(me)}</span>
+              <div className="rank-label">{t('Ваш легион', 'Your ranks')} <span>{me.board.length}/{effectiveBoardCapacity(state,ME)}</span>
                 {!!me.pavilionBonuses?.length && <b className="pavilion-tag" title={mechanicText('Pavilion')}>{t('Синергия +1 мана', 'Pavilion +1 mana')}</b>}
               </div>
               <BoardRank own cards={me.board.map(m => {
@@ -737,7 +742,7 @@ function GameBoard() {
                     onBlur={isDesktop ? clearHover : undefined}>
                     <div data-hand-uid={hc.uid} className={`hand-card-wrap ${dealtUids.has(hc.uid) ? 'deal-in' : ''}`} style={{ animationDelay: `${i * 45}ms` }}>
                       <div className="hand-card-hover">
-                        <CardView card={def} size="sm" playable={playable} disabled={!playable && !selecting} selected={picked}
+                        <CardView card={{...def,cost:effectiveCardCost(state,ME,def)}} size="sm" playable={playable} disabled={!playable && !selecting} selected={picked}
                           onClick={() => selecting ? setMulliganPicks(old => old.includes(hc.uid) ? old.filter(u => u !== hc.uid) : [...old, hc.uid]) : setZoomUid(hc.uid)} />
                         {selecting && <span className={`mulligan-choice ${picked ? 'replace' : ''}`}>{picked ? t('ЗАМЕНИТЬ', 'REPLACE') : t('ОСТАВИТЬ', 'KEEP')}</span>}
                       </div>
@@ -773,7 +778,7 @@ function GameBoard() {
         {logOpen && <Dialog title={t('Журнал боя', 'Battle log')} onClose={() => setLogOpen(false)}><div ref={logBoxRef} className="battle-log thin-scroll">
           {state.log.map((line, i) => <p key={`${state.block}-${i}`}>{logLine(line)}</p>)}
         </div></Dialog>}
-        {zoomUid && (() => { const h = me.hand.find(h => h.uid === zoomUid); return h ? <CardZoomModal card={CARDS[h.cardId]}
+        {zoomUid && (() => { const h = me.hand.find(h => h.uid === zoomUid); return h ? <CardZoomModal card={{...CARDS[h.cardId],cost:effectiveCardCost(state,ME,CARDS[h.cardId])}}
           playable={myTurn && playableUids.has(h.uid) && !autoplay} onPlay={() => onHandClick(h.uid)} onClose={() => setZoomUid(null)} /> : null; })()}
         {inspectCardId && <CardZoomModal card={CARDS[inspectCardId]} playable={false} onPlay={() => {}} onClose={() => setInspectCardId(null)} />}
         {inspectUid && (() => {
@@ -790,8 +795,8 @@ function GameBoard() {
             </div>}
           </div></Dialog>;
         })()}
-        {state.winner !== null && !combatFlight && <EndOverlay winner={state.winner} blocks={state.block} stats={stats} onRematch={() => startGame(Date.now() & 0x7fffffff)} />}
-        <HandHoverPreview card={isDesktop && handPreviewUid ? CARDS[me.hand.find(h => h.uid === handPreviewUid)?.cardId ?? ''] : undefined} position={handPreviewPosition} />
+        {state.winner !== null && !combatFlight && !emperorOpen && <EndOverlay winner={state.winner} blocks={state.block} stats={stats} onRematch={() => startGame(Date.now() & 0x7fffffff)} />}
+        <HandHoverPreview card={isDesktop && handPreviewUid ? (()=>{const card=CARDS[me.hand.find(h=>h.uid===handPreviewUid)?.cardId??''];return card?{...card,cost:effectiveCardCost(state,ME,card)}:undefined;})() : undefined} position={handPreviewPosition} />
         <DragPreview hand={me.hand} board={me.board} />
         <AttackFlight flight={combatFlight}
           currentMinion={combatFlight ? [...me.board, ...foe.board].find(m => m.uid === combatFlight.minion.uid) : undefined}

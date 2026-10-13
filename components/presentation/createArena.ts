@@ -17,7 +17,7 @@ import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';
 import { DirectionalLight } from '@babylonjs/core/Lights/directionalLight';
 import { SceneInstrumentation } from '@babylonjs/core/Instrumentation/sceneInstrumentation';
 import { PointerEventTypes } from '@babylonjs/core/Events/pointerEvents';
-import { mempoolOf, legalActions, effectivePowerCost } from '../../lib/engine/engine';
+import { mempoolOf, legalActions, effectivePowerCost, effectiveCardCost } from '../../lib/engine/engine';
 import type { Action, GameState, Minion } from '../../lib/engine/types';
 import type { Locale } from '../../lib/locale';
 import { ArenaTextures, type Face } from './ArenaTextures';
@@ -285,7 +285,7 @@ export function createArena(canvas: HTMLCanvasElement, options: ArenaOptions) {
     });
     const hand = state.players[0].hand;
     const spacing = Math.min(portrait?116:130,(portrait?670:900)/Math.max(1,hand.length-1));
-    hand.forEach((c,i)=>{const x=800+(i-(hand.length-1)/2)*spacing,h=compact?240:portrait?196:248;keep(c.uid,{kind:'hand',uid:c.uid,owner:0,cardId:c.cardId},{kind:'card',cardId:c.cardId,playable:playableCards.has(c.uid)},h*CARD_FACE.ratio,h,x,handY()+Math.abs(x-800)*.024,-1-i*.015);});
+    hand.forEach((c,i)=>{const x=800+(i-(hand.length-1)/2)*spacing,h=compact?240:portrait?196:248;keep(c.uid,{kind:'hand',uid:c.uid,owner:0,cardId:c.cardId},{kind:'card',cardId:c.cardId,playable:playableCards.has(c.uid),cost:effectiveCardCost(state,0,CARDS[c.cardId])},h*CARD_FACE.ratio,h,x,handY()+Math.abs(x-800)*.024,-1-i*.015);});
     const backs = Math.min(8,state.players[1].hand.length);
     for(let i=0;i<backs;i++){const e=keep(`back-${i}`,{kind:'hand',uid:`back-${i}`,owner:1},{kind:'back'},50,70,800+(i-(backs-1)/2)*40,portrait?-93:35,.5);e.face.isPickable=false;}
     for(const owner of [0,1] as const){
