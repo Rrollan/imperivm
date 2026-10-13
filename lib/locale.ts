@@ -2,6 +2,7 @@ import { CARDS } from './cards';
 import { CHARACTER_CARD_RU } from './characterCards';
 import { HEROES } from './heroes';
 import {isInstantSpell} from './engine/spellTiming';
+import {requiresWalletReauthentication} from './idos/sessionRecovery';
 import type { Rarity, CardDef } from './engine/types';
 
 export type Locale = 'ru' | 'en';
@@ -206,6 +207,9 @@ const MESSAGE_RU: Record<string, string> = {
   "User rejected the transaction.": "Вы отклонили транзакцию в кошельке.",
 };
 export function errorText(message: string, locale: Locale): string {
+  if (requiresWalletReauthentication(message)) return locale === 'ru'
+    ? 'Не удалось восстановить вход кошельком. Повторите вход через «Войти кошельком»; потребуется подпись сообщения.'
+    : 'Your wallet sign-in could not be restored. Use “Sign in with wallet” to sign a fresh login message.';
   if (locale === 'en') return message;
   if (MESSAGE_RU[message]) return MESSAGE_RU[message];
   const patterns: Array<[RegExp, (...parts: string[]) => string]> = [

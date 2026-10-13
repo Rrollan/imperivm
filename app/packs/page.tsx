@@ -25,6 +25,7 @@ import RugShop from '../../components/RugShop';
 import {PurchaseConfirm} from '../../components/home/PurchaseConfirm';
 import {cryptoAffordable, COMMERCE_CONFIG} from '../../lib/idos/commerce';
 import {formatImpAmount} from '../../lib/solana/imp';
+import {requiresWalletReauthentication} from '../../lib/idos/sessionRecovery';
 
 export default function PacksPage() {
   const { t, locale, rarityName, errorText, cardName } = useLocale();
@@ -35,6 +36,7 @@ export default function PacksPage() {
   const [animating,setAnimating]=useState(false),[openingId,setOpeningId]=useState(0);
   const inFlight=useRef(false);
   const idos=useIDos();
+  const walletSignInNeeded = idos.session.status === 'error' && requiresWalletReauthentication(idos.session.error);
   const [opened, setOpened] = useState(false), [confirm, setConfirm] = useState(false);
   const paid = collection.snapshot?.mode === 'idos';
   const cost = collectionPrice(collection.snapshot?.mode, 'pack');
@@ -77,7 +79,7 @@ export default function PacksPage() {
       <main className={`${styles.hubMain} ${styles.packMain}`}>
         <header className={styles.pageTitle}><span className={styles.kicker}>AGORA · AFTER HOURS</span><h1>{t('Паки', 'Packs')}</h1><p>{t('Пять карт. Новые связки.','Five cards. New combos.')}</p></header>
         <div className="collection-wallet"><strong>{collection.snapshot ? formatImpAmount(collection.snapshot.exactBalance ?? String(collection.snapshot.rug), locale) : '—'} IMP</strong><span>{collection.snapshot?.mode === 'idos' ? t('Баланс iDos', 'iDos balance') : t('Демо · без оплаты', 'Demo · no payment')}</span><Link href="/collection">{t('Коллекция →', 'Collection →')}</Link></div>
-        {collection.error && <div className="integration-error" role="status"><p>{errorText(collection.error)}</p><div className="dialog-actions"><button className="secondary-button" onClick={() => void collection.refresh()} disabled={collection.busy}>{t('Повторить', 'Retry')}</button><button className="secondary-button" onClick={() => void collection.useLocalDemo()} disabled={collection.busy}>{t('Локальное демо', 'Use local demo')}</button></div></div>}
+        {collection.error && <div className="integration-error" role="status"><p>{errorText(collection.error)}</p><div className="dialog-actions">{walletSignInNeeded && <button className="primary-button" onClick={() => void idos.login()} disabled={idos.busy || collection.busy}>{idos.busy ? t('Ожидаем подпись…', 'Waiting for signature…') : t('Войти кошельком', 'Sign in with wallet')}</button>}<button className="secondary-button" onClick={() => void (idos.session.status === 'error' ? idos.retry() : collection.refresh())} disabled={idos.busy || collection.busy}>{t('Повторить', 'Retry')}</button><button className="secondary-button" onClick={() => void collection.useLocalDemo()} disabled={idos.busy || collection.busy}>{t('Локальное демо', 'Use local demo')}</button></div></div>}
 
         {opened?<PackOpening key={openingId} cards={pack} duplicates={duplicates} onInspect={setInspected} onComplete={()=>setAnimating(false)} onReplayStart={()=>setAnimating(true)}/>:<div className="pack-idle"><PaintedIcon name="pack" size={170}/></div>}
 

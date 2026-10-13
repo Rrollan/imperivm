@@ -81,11 +81,13 @@ export function ImpPurchasePanel({disabled, visible = true, onPurchased, onActiv
     return () => {cancelled = true; clearTimeout(timeout); closeImpSwap(container);};
     // A balance refresh or past receipt must not reset an active swap.
   }, [visible, signedIn, idos.session.owner, idos.session.userId, idos.embedded, container, widgetRevision]);
-  const standaloneUrl = typeof window === 'undefined' ? undefined : `${window.location.origin}${window.location.pathname}#/packs`;
   const blocked = disabled || checking;
   return <div className={styles.purchase}>
-    <div className={styles.heading}><PaintedIcon name="rug" size={38}/><div><strong>{t('Купить IMP', 'Buy IMP')}</strong><p>{t('SOL → IMP через Jupiter · покупка поступит в Phantom', 'SOL → IMP via Jupiter · tokens arrive in Phantom')}</p></div><span className={styles.network}>Solana</span></div>
-    {idos.embedded ? <div className={styles.actions}><a className={styles.button} href={standaloneUrl} target="_blank" rel="noopener noreferrer">{t('Открыть покупку ↗', 'Open purchase ↗')}</a><p className={styles.hint}>{t('Откройте игру в отдельной вкладке для подключения Phantom.', 'Open the game in a separate tab to connect Phantom.')}</p></div> : !signedIn ? <button className={styles.button} disabled={idos.busy || disabled} onClick={() => void idos.login()}>{t('Подключить Phantom', 'Connect Phantom')}</button> : <>
+    <div className={styles.heading}><PaintedIcon name="rug" size={38}/><div><strong>{idos.embedded ? t('Обмен SOL ↔ IMP на iDos', 'Swap SOL ↔ IMP on iDos') : t('Купить IMP', 'Buy IMP')}</strong><p>{idos.embedded ? t('Блок Buy / Sell рядом с игрой · на телефоне — ниже игры.', 'Use the Buy / Sell panel beside the game; on a phone, it is below the game.') : t('SOL → IMP через Jupiter · покупка поступит в Phantom', 'SOL → IMP via Jupiter · tokens arrive in Phantom')}</p></div><span className={styles.network}>Solana</span></div>
+    {idos.embedded ? <div className={styles.platformGuide}>
+      <ol><li>{t('Выберите Buy для покупки IMP за SOL или Sell для обмена IMP на SOL.', 'Choose Buy for SOL → IMP, or Sell for IMP → SOL.')}</li><li>{t('Укажите сумму и нажмите Place Trade. Проверьте обмен в Phantom.', 'Enter the amount and press Place Trade. Review the swap in Phantom.')}</li><li>{t('Покупка поступает в кошелёк. Для паков переведите нужную сумму на игровой счёт.', 'Purchased tokens arrive in your wallet. Deposit the amount you need into the game to buy packs.')}</li></ol>
+      <button className={styles.secondary} disabled={disabled} onClick={() => current.current.onPurchased('')}>{t('Пополнение / вывод IMP', 'Deposit / withdraw IMP')}</button>
+    </div> : !signedIn ? <button className={styles.button} disabled={idos.busy || disabled} onClick={() => void idos.login()}>{t('Подключить Phantom', 'Connect Phantom')}</button> : <>
       <div className={styles.walletHint}><span>{t('Кошелёк покупки', 'Purchase wallet')}</span><b>{idos.session.owner?.slice(0,7)}…{idos.session.owner?.slice(-6)}</b><p>{t('Выберите этот Phantom в Jupiter. Оставьте SOL для комиссии сети.', 'Select this Phantom in Jupiter. Keep SOL for network fees.')}</p></div>
       {(checking || screen === 'Swapping' || operation?.phase === 'complete' || operation?.phase === 'error') && <div className={`${styles.progress} ${operation?.phase === 'complete' ? styles.success : ''}`} role="status">
         {checking || screen === 'Swapping' ? <span className={styles.spinner}/> : <PaintedIcon name={operation?.phase === 'complete' ? 'wallet' : 'history'} size={30}/>}
@@ -105,6 +107,6 @@ export function ImpPurchasePanel({disabled, visible = true, onPurchased, onActiv
       </details>}
     </>}
     {!signedIn && notice && <p className={styles.notice} role="status">{errorText(notice)}</p>}
-    <p className={styles.mint}><a href={IMP_SWAP_URL} target="_blank" rel="noopener noreferrer">{t('Открыть Jupiter отдельно', 'Open Jupiter separately')} ↗</a><span>IMP · {IMPERIVM_TITLE.mint.slice(0,8)}…{IMPERIVM_TITLE.mint.slice(-8)}</span></p>
+    <p className={styles.mint}>{!idos.embedded && <a href={IMP_SWAP_URL} target="_blank" rel="noopener noreferrer">{t('Открыть Jupiter отдельно', 'Open Jupiter separately')} ↗</a>}<span>IMP · {IMPERIVM_TITLE.mint.slice(0,8)}…{IMPERIVM_TITLE.mint.slice(-8)}</span></p>
   </div>;
 }
