@@ -72,6 +72,26 @@ for(const seat of [0,1] as const){
     }
     covered.add(id);
   }
+  // Mercy preserves normal combat damage and heals the fighter's own treasury.
+  // The decree grants the keyword on arrival; existing units are unchanged.
+  state=fixture('mercy-medals',seat);
+  const foe=seat===0?1:0;
+  state.players[seat].board=[fighter('before-mercy',{lifesteal:false})];
+  next=play(state,'lending-legionnaire','mercy-arrival');
+  assert.equal(next.players[seat].board[0].lifesteal,false,'The law does not retroactively bless existing fighters');
+  const blessed=next.players[seat].board[1];
+  blessed.attack=3;blessed.health=blessed.maxHealth=5;blessed.fresh=false;blessed.canAttack=true;
+  next.players[foe].board=[fighter('mercy-target',{attack:0,health:5,maxHealth:5,lifesteal:false})];
+  const traded=applyAction(next,{type:'attack',attackerUid:blessed.uid,target:'mercy-target'});
+  assert.equal(traded.players[foe].board[0].health,2,'The enemy fighter still takes 3 damage');
+  assert.equal(traded.players[seat].treasury,23,'The same 3 damage heals the attacker\'s treasury');
+  assert.equal(traded.players[foe].treasury,20,'Mercy does not redirect fighter damage to the enemy treasury');
+  const capped=structuredClone(next);capped.players[seat].treasury=29;
+  assert.equal(applyAction(capped,{type:'attack',attackerUid:blessed.uid,target:'mercy-target'}).players[seat].treasury,30,'No healing above 30');
+  const overkill=structuredClone(next);overkill.players[foe].board[0].health=1;
+  assert.equal(applyAction(overkill,{type:'attack',attackerUid:blessed.uid,target:'mercy-target'}).players[seat].treasury,21,'Only actual health removed is healed');
+  const heroHit=applyAction(next,{type:'attack',attackerUid:blessed.uid,target:'hero'});
+  assert.equal(heroHit.players[foe].treasury,17);assert.equal(heroHit.players[seat].treasury,23);
   state=fixture('honorable-duels',seat);state.players[seat].board=[fighter('attacker')];state.players[seat===0?1:0].board=[fighter('enemy')];
   assert(!legalActions(state).some(a=>a.type==='attack'&&a.target==='hero'));
   assert(legalActions(state).some(a=>a.type==='attack'&&a.target==='enemy'));

@@ -20,7 +20,14 @@
   transition: filter 160ms ease, transform 160ms ease;
   filter: drop-shadow(0 3px 5px #170c0873);
 }
-.badge.badge:hover { filter: brightness(1.13) drop-shadow(0 3px 5px #170c0873); }
+.badge.badge:is(:hover, :active, :focus-visible) {
+  background: transparent url('/ui/arena-lab/native/edict-register-native.webp') center/100% 100% no-repeat !important;
+  border: 0;
+  box-shadow: none;
+  outline: none;
+  filter: brightness(1.13) drop-shadow(0 3px 5px #170c0873);
+}
+.badge.badge:focus-visible { filter: brightness(1.2) drop-shadow(0 0 4px #ffe6a0) drop-shadow(0 3px 5px #170c0873); }
 .badge.badge:active { transform: translateY(1px); }
 .badge.badge:disabled { opacity: .7; cursor: default; }
 .badge img { flex: 0 0 39px; width: 39px; height: 39px; object-fit: contain; }
@@ -28,7 +35,7 @@
 .badge small { display: block; font: 600 10px/1.2 var(--font-sans); color: #f8d8a1; letter-spacing: .025em; }
 .badge strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 15px/1.3 var(--font-roman), serif; }
 .badge > svg { flex-shrink: 0; }
-.badge.badge:focus-visible, .dialog button:focus-visible { outline: 3px solid #fff1bd; outline-offset: 3px; }
+.dialog button:focus-visible { outline: 3px solid #fff1bd; outline-offset: 3px; }
 .badgeOpen { opacity: .65; }
 
 .backdrop {
@@ -132,10 +139,9 @@
   font: 700 19px/1.2 var(--font-roman), serif;
   text-shadow: 0 2px 2px #200a03;
 }
-.controls .accept:hover { filter: brightness(1.14); }
-.controls .readMore { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 7px 11px; border: 1px solid #c69d60; border-radius: 5px; background: #26160ef2 !important; color: #fce6bc; font: 600 14px/1.25 var(--font-sans); }
-.readMore span { color: #e9c785; min-width: 28px; font-variant-numeric: tabular-nums; }
-.manualHint { margin: 0; max-width: 260px; color: #ead2a4; font: 500 13px/1.3 var(--font-sans); text-align: center; text-shadow: 0 1px 3px #100702; }
+.controls .accept:is(:hover, :active, :focus-visible) { background: transparent url('/ui/arena-lab/turn-command.webp') center/100% 100% no-repeat !important; border: 0; box-shadow: none; filter: brightness(1.14); }
+.countdown { display: flex; align-items: center; gap: 7px; margin: 0; min-height: 44px; color: #fce6bc; font: 600 14px/1.25 var(--font-sans); }
+.countdown strong { color: #e9c785; font-variant-numeric: tabular-nums; }
 .onlineHint { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; margin: 2px 0 6px; padding: 7px 10px; color: #ffe1a4; background: #28170fe8; border-radius: 5px; font: 600 15px/1.3 var(--font-sans); text-align: center; }
 .onlineHint > svg { flex-shrink: 0; }
 .onlineHint strong { color: #fff1c9; white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -181,7 +187,7 @@
   .forecast { justify-content: center; }
   .controls { gap: 6px; padding: 0 3px; }
   .controls .accept { min-width: 240px; min-height: 57px; font-size: 18px; }
-  .controls .readMore { font-size: 13px; }
+  .countdown { font-size: 13px; }
   .historyList li button { grid-template-columns: 54px minmax(0,1fr); gap: 6px; }
   .historyList small { grid-column: 2; }
 }
@@ -204,7 +210,7 @@
   .duration { margin-top: 9px; font-size: 12px; }
   .forecast { justify-content: flex-start; margin-top: 6px; font-size: 13px; }
   .controls .accept { min-height: 52px; min-width: 230px; padding: 9px 30px; font-size: 17px; }
-  .controls .readMore { min-height: 40px; font-size: 13px; }
+  .countdown { min-height: 40px; font-size: 13px; }
   .history { margin-top: 5px; }
   .activeLaw { padding: 8px 12px; margin-bottom: 8px; }
 }

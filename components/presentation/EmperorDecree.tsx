@@ -8,7 +8,7 @@ import { useLocale } from '../LocaleContext';
 import { RomanIcon } from './RomanIcon';
 import styles from './EmperorDecree.module.css';
 
-type DecreeView = { key: string; index: number; automatic: boolean };
+type DecreeView = { key: string; index: number };
 
 const FAMILIES = {
   court: ['three-seats', 'grand-court', 'royal-favor', 'royal-levy', 'imperial-tax', 'amnesty', 'balanced-books'],
@@ -44,7 +44,6 @@ export function EmperorDecree({ state, ready = true, busy = false, onlineSeconds
   const [closing, setClosing] = useState(false);
   const [seconds, setSeconds] = useState(10);
   const [historyExpanded, setHistoryExpanded] = useState(false);
-  const reading = useRef(false);
   const closingRef = useRef(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout>>();
   const panel = useRef<HTMLElement>(null);
@@ -69,13 +68,12 @@ export function EmperorDecree({ state, ready = true, busy = false, onlineSeconds
     else closeTimer.current = setTimeout(finish, 160);
   }, [reduced]);
 
-  const show = useCallback((index: number, key: string, automatic: boolean) => {
+  const show = useCallback((index: number, key: string) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     closingRef.current = false;
-    reading.current = false;
     setClosing(false);
     setHistoryExpanded(false);
-    setView({ index, key, automatic });
+    setView({ index, key });
   }, []);
 
   useEffect(() => {
@@ -90,7 +88,7 @@ export function EmperorDecree({ state, ready = true, busy = false, onlineSeconds
   useEffect(() => {
     if (!latestRule || !latestKey || !ready || busy || seen.current.has(latestKey)) return;
     seen.current.add(latestKey);
-    show(latestIndex, latestKey, true);
+    show(latestIndex, latestKey);
   }, [latestKey, latestIndex, latestRule, ready, busy, show]);
 
   useEffect(() => { openChange.current?.(open); }, [open]);
@@ -99,22 +97,22 @@ export function EmperorDecree({ state, ready = true, busy = false, onlineSeconds
     openChange.current?.(false);
   }, []);
 
-  // Ten seconds of visible reading time. Hidden tabs and hovering the rule do not consume it.
+  // Ten visible seconds, with no hover, keyboard or button-based pause.
   useEffect(() => {
-    if (!view?.automatic || closing) return;
+    if (!view || closing) return;
     let remaining = 10_000, last = performance.now();
     setSeconds(10);
     const visibilityChanged = () => { last = performance.now(); };
     document.addEventListener('visibilitychange', visibilityChanged);
     const timer = setInterval(() => {
       const now = performance.now();
-      if (!document.hidden && !reading.current) remaining -= Math.min(now - last, 500);
+      if (!document.hidden) remaining -= Math.min(now - last, 500);
       last = now;
       setSeconds(Math.max(0, Math.ceil(remaining / 1000)));
       if (remaining <= 0) { clearInterval(timer); close(); }
     }, 100);
     return () => { clearInterval(timer); document.removeEventListener('visibilitychange', visibilityChanged); };
-  }, [view?.key, view?.automatic, closing, close]);
+  }, [view?.key, closing, close]);
 
   useEffect(() => {
     if (!open || !panel.current) return;
@@ -126,8 +124,6 @@ export function EmperorDecree({ state, ready = true, busy = false, onlineSeconds
     const key = (event: KeyboardEvent) => {
       if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(); return; }
       if (event.key !== 'Tab') return;
-      // Intentional keyboard exploration keeps the text open until the player dismisses it.
-      setView(current => current ? { ...current, automatic: false } : current);
       const items = focusable(), first = items[0], last = items.at(-1);
       if (!first) { event.preventDefault(); root.focus(); return; }
       if (!root.contains(document.activeElement)) { event.preventDefault(); first.focus(); }
@@ -151,13 +147,12 @@ export function EmperorDecree({ state, ready = true, busy = false, onlineSeconds
 
   const title = (item: EmperorRule) => locale === 'ru' ? item.titleRu : item.titleEn;
   const text = (item: EmperorRule) => locale === 'ru' ? item.textRu : item.textEn;
-  const keepOpen = () => setView(current => current ? { ...current, automatic: false } : current);
 
   return <>
     <button ref={badge} type="button" className={`${styles.badge} ${open ? styles.badgeOpen : ''}`}
       disabled={!ready} aria-expanded={open} aria-haspopup="dialog"
       aria-label={t('Открыть приказ Императора: ', 'Open the Emperor’s decree: ') + title(badgeRule)}
-      onClick={() => { seen.current.add(latestKey); show(latestIndex, latestKey, false); }}>
+      onClick={() => { seen.current.add(latestKey); show(latestIndex, latestKey); }}>
       <img src={`/ui/emperor/v1/${badgeRule.id}.webp`} alt="" width="42" height="42" />
       <span><small>{t('Император повелевает', 'The Emperor commands')}</small><strong>{title(badgeRule)}</strong></span>
       <RomanIcon name="scroll" size={18} />
@@ -171,7 +166,7 @@ export function EmperorDecree({ state, ready = true, busy = false, onlineSeconds
           <RomanIcon name="close" size={22} /><span>{t('Закрыть', 'Close')}</span>
         </button>
 
-        <div className={styles.decree} onMouseEnter={() => { reading.current = true; }} onMouseLeave={() => { reading.current = false; }}>
+        <div className={styles.decree}>
           <div className={styles.eyebrow}>
             <RomanIcon name="crown" size={22} />
             <span>{t('Император повелевает', 'The Emperor commands')}</span>
@@ -206,9 +201,7 @@ export function EmperorDecree({ state, ready = true, busy = false, onlineSeconds
 
         <div className={styles.controls}>
           <button type="button" className={styles.accept} onClick={close}>{t('Продолжить бой', 'Continue battle')}<RomanIcon name="next" size={22} /></button>
-          {view.automatic
-            ? <button type="button" className={styles.readMore} onClick={keepOpen}>{t('Читать без таймера', 'Keep reading')}<span>{seconds}{t(' с', ' s')}</span></button>
-            : <p className={styles.manualHint}>{t('Этот приказ всегда доступен на арене', 'Reopen this decree from the arena badge')}</p>}
+          <p className={styles.countdown}><RomanIcon name="hourglass" size={18}/><span>{t('Закроется через ', 'Closes in ')}<strong>{seconds}{t(' с', ' s')}</strong></span></p>
           {onlineSeconds !== undefined && <p className={styles.onlineHint}>
             <RomanIcon name="hourglass" size={19} /><span>{t('Онлайн-таймер продолжает идти', 'The online turn timer keeps running')} · <strong>{Math.max(0, Math.ceil(onlineSeconds))}{t(' с', ' s')}</strong></span>
           </p>}
@@ -216,7 +209,7 @@ export function EmperorDecree({ state, ready = true, busy = false, onlineSeconds
 
         {history.length > 1 && <div className={styles.history}>
           <button type="button" className={styles.historyToggle} aria-expanded={historyExpanded} aria-controls={historyId}
-            onClick={() => { keepOpen(); setHistoryExpanded(value => !value); }}>
+            onClick={() => { setHistoryExpanded(value => !value); }}>
             <RomanIcon name="history" size={19} /><span>{t('Приказы этого боя', 'This battle’s decrees')} · {history.length}</span>
             <RomanIcon name={historyExpanded ? 'minus' : 'plus'} size={18} />
           </button>
@@ -225,7 +218,7 @@ export function EmperorDecree({ state, ready = true, busy = false, onlineSeconds
               const previousRule = EMPEROR_RULES.find(candidate => candidate.id === item.id);
               if (!previousRule) return null;
               return <li key={`${index}:${item.id}:${item.block}`}><button type="button" aria-current={view.index === index ? 'true' : undefined}
-                onClick={() => { setView({ index, key: `${index}:${item.id}:${item.round}:${item.block}`, automatic: false }); }}>
+                onClick={() => { setView({ index, key: `${index}:${item.id}:${item.round}:${item.block}` }); }}>
                 <span>{t('Раунд', 'Round')} {item.round}</span><strong>{title(previousRule)}</strong>
                 <small>{previousRule.kind === 'law' && active?.id === previousRule.id ? t('Действует', 'Active') : t('Исполнен', 'Applied')}</small>
               </button></li>;
