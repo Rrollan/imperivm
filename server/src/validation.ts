@@ -24,7 +24,7 @@ function registration(value: Record<string, unknown>): PlayerRegistration {
     value.mode !== undefined && value.mode !== 'free' && value.mode !== 'friend' && value.mode !== 'random') {
     throw new ProtocolError('paid-pvp-unavailable', 'Матчи на IMP пока недоступны: платформа должна подтвердить удержание взносов, выплату победителю и возврат. Средства не списаны.');
   }
-  const allowed = new Set(['type', 'playerName', 'heroId', 'deckList', 'collectionAuth', ...(value.type === 'join' ? ['roomCode', 'resumeToken'] : [])]);
+  const allowed = new Set(['type', 'playerName', 'heroId', 'deckList', 'collectionAuth', 'emperorVersion', ...(value.type === 'join' ? ['roomCode', 'resumeToken'] : [])]);
   if (Object.keys(value).some(key => !allowed.has(key))) fail('Неизвестный параметр бесплатного матча.');
   const playerName = string(value.playerName, 32).trim();
   if (!playerName) fail('Введите имя игрока.');
@@ -36,7 +36,8 @@ function registration(value: Record<string, unknown>): PlayerRegistration {
   if (problem) fail(problem);
   const collectionAuth = value.collectionAuth === undefined ? undefined : parseCollectionAuth(value.collectionAuth);
   if (collectionAuth === null) fail('Некорректная сессия коллекции iDos.');
-  return {playerName, heroId, deckList, ...(collectionAuth ? {collectionAuth} : {})};
+  if (value.emperorVersion !== undefined && value.emperorVersion !== 1) fail('Неподдерживаемая версия приказов Императора. Обновите игру.');
+  return {playerName, heroId, deckList, ...(collectionAuth ? {collectionAuth} : {}), ...(value.emperorVersion === 1 ? {emperorVersion: 1 as const} : {})};
 }
 function intent(value: unknown): GameIntent {
   const data = object(value);

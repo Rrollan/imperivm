@@ -10,7 +10,7 @@ export const TURN_MS = 75_000;
 export const ROOM_TTL_MS = 30 * 60_000;
 export const QUEUE_TTL_MS = 5 * 60_000;
 interface Player {
-  name: string; heroId: string; deck: string[]; token: string; socket: WebSocket | null;
+  name: string; heroId: string; deck: string[]; token: string; socket: WebSocket | null; emperorVersion?: 1;
 }
 interface Room {
   code: string; mode: 'friend' | 'random'; players: [Player, Player | null]; game: GameState | null; revision: number;
@@ -34,7 +34,7 @@ export class RoomAuthority {
   get queued(): number {return this.queue.size;}
   private error(code: string, reason: string, fatal = false): never {throw new ProtocolError(code, reason, fatal);}
   private makePlayer(data: PlayerRegistration, socket: WebSocket): Player {
-    return {name: data.playerName, heroId: data.heroId ?? 'builder', deck: [...data.deckList], token: randomBytes(32).toString('base64url'), socket};
+    return {name: data.playerName, heroId: data.heroId ?? 'builder', deck: [...data.deckList], token: randomBytes(32).toString('base64url'), socket, emperorVersion: data.emperorVersion};
   }
   private view(room: Room, seat: PlayerId): NetSnapshot {
     const now = this.clock(), player = room.players[seat]!;
@@ -75,6 +75,9 @@ export class RoomAuthority {
       if (!existing || !message.resumeToken || !timingSafeEqual(digest(existing.token), digest(message.resumeToken))) {
         return this.error('resume-denied', 'Место занято. Вернуться можно только из вкладки, где вы начали бой.', true);
       }
+      if (room.game?.emperor && message.emperorVersion !== 1) {
+        return this.error('client-update-required', 'В этом бою действуют приказы Императора. Обновите игру и вернитесь в свою комнату.', true);
+      }
       // The old close event must not clear the socket that just replaced it.
       const old = existing.socket;
       existing.socket = socket; this.membership.set(socket, room);
@@ -85,8 +88,9 @@ export class RoomAuthority {
       // Assign first-player position fairly without changing opening-hand / engine rules.
       if (randomInt(2)) room.players.reverse();
       const [a, b] = room.players;
-      room.game = createGame(a.heroId, a.deck, b!.heroId, b!.deck, {enableMulligan: true,emperor:true}, randomInt(0x7fffffff));
-      room.revision++; room.turnDeadline = this.clock() + TURN_MS + 10_000;
+      const emperor = a.emperorVersion === 1 && b!.emperorVersion === 1;
+      room.game = createGame(a.heroId, a.deck, b!.heroId, b!.deck, {enableMulligan: true,emperor}, randomInt(0x7fffffff));
+      room.revision++; room.turnDeadline = this.clock() + TURN_MS + (emperor ? 10_000 : 0);
       this.remember(room, 'Оба игрока за столом. Выберите стартовые карты.', 'Both players are seated. Choose your opening cards.');
     }
     room.lastActivity = this.clock(); this.publish(room, true);
@@ -104,8 +108,9 @@ export class RoomAuthority {
     const players: [Player, Player] = [opponent.player, this.makePlayer(message, socket)];
     if (randomInt(2)) players.reverse();
     const [a, b] = players;
-    const room: Room = {code, mode: 'random', players, game: createGame(a.heroId, a.deck, b.heroId, b.deck, {enableMulligan: true,emperor:true}, randomInt(0x7fffffff)), revision: 1,
-      lastActivity: this.clock(), turnDeadline: this.clock() + TURN_MS + 10_000, reason: null, history: []};
+    const emperor = a.emperorVersion === 1 && b.emperorVersion === 1;
+    const room: Room = {code, mode: 'random', players, game: createGame(a.heroId, a.deck, b.heroId, b.deck, {enableMulligan: true,emperor}, randomInt(0x7fffffff)), revision: 1,
+      lastActivity: this.clock(), turnDeadline: this.clock() + TURN_MS + (emperor ? 10_000 : 0), reason: null, history: []};
     this.rooms.set(code, room); players.forEach(player => this.membership.set(player.socket!, room));
     this.remember(room, 'Соперник найден. Выберите стартовые карты.', 'Opponent found. Choose your opening cards.'); this.publish(room, true);
   }

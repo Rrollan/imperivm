@@ -88,7 +88,13 @@ export function useNetGame({roomCode: initialRoomCode}: {roomCode?: string} = {}
       if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({type: 'ping'} satisfies ClientMessage));
     }, HEARTBEAT_MS);
     heartbeatTimer.current = heartbeat;
-    ws.onopen = () => {if (marker !== generation.current) return; lastInbound = Date.now(); ws.send(JSON.stringify(message));};
+    ws.onopen = () => {
+      if (marker !== generation.current) return;
+      lastInbound = Date.now();
+      // Announce support on fresh joins and saved-seat reconnects alike.
+      const registration = message.type === 'create' || message.type === 'join' || message.type === 'queue';
+      ws.send(JSON.stringify(registration ? {...message, emperorVersion: 1} : message));
+    };
     ws.onmessage = event => {
       if (marker !== generation.current) return;
       lastInbound = Date.now(); const incoming = readMessage(event.data);

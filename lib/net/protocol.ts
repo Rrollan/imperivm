@@ -2,7 +2,7 @@ import type {OnlineRoom} from '../multiplayer/types';
 import type {CollectionAuth} from '../collection/access';
 
 export type Seat = 'p1' | 'p2';
-export interface PlayerRegistration {playerName: string; deckList: string[]; heroId?: string; collectionAuth?: CollectionAuth}
+export interface PlayerRegistration {playerName: string; deckList: string[]; heroId?: string; collectionAuth?: CollectionAuth; emperorVersion?: 1}
 export interface CreateMessage extends PlayerRegistration {type: 'create'}
 export interface QueueMessage extends PlayerRegistration {type: 'queue'}
 export interface JoinMessage extends PlayerRegistration {type: 'join'; roomCode: string; resumeToken?: string}

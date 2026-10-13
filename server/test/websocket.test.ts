@@ -73,21 +73,21 @@ class Peer {
   }
 }
 
-function registration(playerName: string, heroId = 'whale'): PlayerRegistration {
-  return {playerName, heroId, deckList: [...DECKS[heroId]]};
+function registration(playerName: string, heroId = 'whale', emperor = true): PlayerRegistration {
+  return {playerName, heroId, deckList: [...DECKS[heroId]], ...(emperor ? {emperorVersion: 1 as const} : {})};
 }
 
-async function room(port: number, heroA = 'whale', heroB = 'degen') {
+async function room(port: number, heroA = 'whale', heroB = 'degen', emperor: [boolean, boolean] = [true, true]) {
   const url = `ws://127.0.0.1:${port}`;
   const creator = new Peer(url);
   await creator.open();
-  creator.send({type: 'create', ...registration('Aurelius', heroA)});
+  creator.send({type: 'create', ...registration('Aurelius', heroA, emperor[0])});
   const created = await creator.next('joined');
   assert.match(created.roomCode, /^[A-Z0-9]{6}$/);
   await creator.state(snapshot => snapshot.status === 'waiting');
   const joiner = new Peer(url);
   await joiner.open();
-  joiner.send({type: 'join', roomCode: created.roomCode, ...registration('Cassia', heroB)});
+  joiner.send({type: 'join', roomCode: created.roomCode, ...registration('Cassia', heroB, emperor[1])});
   const joinerJoined = await joiner.next('joined');
   await Promise.all([creator.state(snapshot => snapshot.status === 'playing'), joiner.state(snapshot => snapshot.status === 'playing')]);
   const creatorJoined = await creator.next('joined');
@@ -198,6 +198,34 @@ test('opening replacement accepts the same legal subset in either UID order', as
   assert.equal(after.game?.mulliganOpen, false);
   assert.ok(after.game?.players[0].hand?.every(card => !replaced.includes(card.uid)));
   assert.equal(second.snapshot?.game?.players[0].hand, undefined);
+});
+
+test('legacy and mixed client versions keep classic rules and the 75-second clock', async t => {
+  const now = 1_800_000_000_000;
+  const service = await launch({port: 0, host: '127.0.0.1', origins: [ORIGIN], clock: () => now, tickIntervalMs: 60_000});
+  t.after(() => service.close());
+  for (const versions of [[false, false], [true, false], [false, true]] as [boolean, boolean][]) {
+    const {first, second} = await room(portOf(service), 'whale', 'degen', versions);
+    for (const snapshot of [await first.state(), await second.state()]) {
+      assert.equal(snapshot.game?.emperor, undefined, 'A player must not receive rules their interface cannot explain');
+      assert.equal(snapshot.game?.turnDeadline, now + 75_000);
+    }
+    await first.close(); await second.close();
+  }
+});
+
+test('an outdated reconnect cannot replace an Emperor-capable seat', async t => {
+  const service = await launch({port: 0, host: '127.0.0.1', origins: [ORIGIN]});
+  t.after(() => service.close());
+  const match = await room(portOf(service));
+  const snapshot = await match.first.state();
+  const outdated = new Peer(match.url); await outdated.open();
+  outdated.send({type: 'join', roomCode: snapshot.roomCode, resumeToken: match.firstJoined.resumeToken,
+    ...registration(snapshot.names[0], snapshot.heroId, false)});
+  assert.equal((await outdated.next('error')).code, 'client-update-required');
+  assert.equal(match.first.socket.readyState, WebSocket.OPEN, 'The supported original connection remains seated');
+  assert.equal(match.first.snapshot?.revision, snapshot.revision);
+  await outdated.close();
 });
 
 test('75-second turn plus one fixed opening decree grace is not extended by a legal move or ping', async t => {
